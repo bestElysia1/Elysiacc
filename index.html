@@ -398,151 +398,145 @@ draw();
 }
 </style>
 
-<!-- 🌸 Elysia 玻璃质感播放器 -->
+<!-- 🎧 Elysia 扁平玻璃质感播放器 -->
 <div class="elysia-player">
   <div class="elysia-controls">
-    <button id="prevBtn">⏮</button>
-    <button id="playPauseBtn">⏯</button>
-    <button id="nextBtn">⏭</button>
+    <button id="prevBtn">⏮️</button>
+    <button id="playPauseBtn">⏯️</button>
+    <button id="nextBtn">⏭️</button>
   </div>
-  <span id="songTitle">加载中...</span>
+  <div id="songTitle">My Soul, Your Beats! - Piano Arrange Ver.</div>
+  <audio id="elysiaAudio" preload="auto"></audio>
 </div>
 
-<!-- 🎵 播放器脚本 -->
 <script>
 const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
-  { title: "theme of SSS -Piano Arrange Ver.-", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
-  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间.mp3" }
+  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3",
+  "assets/theme of SSS -Piano Arrange Ver.-.mp3",
+  "assets/给我一首歌的时间.mp3"
 ];
-
 let currentSong = 0;
-const audio = new Audio(songs[currentSong].src);
-const playPauseBtn = document.getElementById("playPauseBtn");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const titleEl = document.getElementById("songTitle");
+const audio = document.getElementById('elysiaAudio');
+const title = document.getElementById('songTitle');
+const playPauseBtn = document.getElementById('playPauseBtn');
 
-function updateSong() {
-  titleEl.textContent = songs[currentSong].title;
-  audio.src = songs[currentSong].src;
-  audio.play().catch(() => {});
-  playPauseBtn.textContent = "⏸";
+function loadSong(index) {
+  audio.src = songs[index];
+  title.textContent = songs[index].split('/').pop().replace('.mp3','');
+  audio.play().catch(()=>{}); // 尝试自动播放
+  playPauseBtn.textContent = '⏸️';
 }
 
-playPauseBtn.addEventListener("click", () => {
+document.getElementById('prevBtn').onclick = () => {
+  currentSong = (currentSong - 1 + songs.length) % songs.length;
+  loadSong(currentSong);
+};
+
+document.getElementById('nextBtn').onclick = () => {
+  currentSong = (currentSong + 1) % songs.length;
+  loadSong(currentSong);
+};
+
+playPauseBtn.onclick = () => {
   if (audio.paused) {
     audio.play();
-    playPauseBtn.textContent = "⏸";
+    playPauseBtn.textContent = '⏸️';
   } else {
     audio.pause();
-    playPauseBtn.textContent = "▶️";
+    playPauseBtn.textContent = '⏯️';
   }
-});
+};
 
-prevBtn.addEventListener("click", () => {
-  currentSong = (currentSong - 1 + songs.length) % songs.length;
-  updateSong();
-});
-
-nextBtn.addEventListener("click", () => {
+audio.onended = () => {
   currentSong = (currentSong + 1) % songs.length;
-  updateSong();
-});
+  loadSong(currentSong);
+};
 
-audio.addEventListener("ended", () => {
-  nextBtn.click();
-});
-
-updateSong(); // 自动播放第一首
+loadSong(currentSong);
 </script>
 
-<!-- 🌈 玻璃质感样式 -->
 <style>
+/* 🌸 Elysia 扁平玻璃质感播放器 */
 .elysia-player {
   position: fixed;
-  bottom: 20px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 10px 24px;
-  background: rgba(255, 255, 255, 0.15);
+  gap: 16px;
+  padding: 6px 24px;
+  background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(160, 120, 255, 0.3);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(160, 120, 255, 0.25);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   z-index: 9999;
-  animation: floaty 5s ease-in-out infinite;
+  animation: floaty 6s ease-in-out infinite;
+  transition: all 0.3s ease;
 }
 
 /* 控制按钮 */
 .elysia-controls {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
 }
 
-/* 按钮玻璃质感 */
 .elysia-controls button {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(156, 107, 255, 0.4);
-  color: #ffffff;
-  font-size: 16px;
+  box-shadow: 0 1px 6px rgba(156, 107, 255, 0.3);
+  color: #fff;
   cursor: pointer;
   transition: all 0.25s ease;
 }
-
-/* 悬停发光 */
 .elysia-controls button:hover {
   background: rgba(190, 150, 255, 0.3);
-  box-shadow: 0 0 15px rgba(156, 107, 255, 0.8);
-  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(156, 107, 255, 0.6);
+  transform: scale(1.05);
 }
 
-/* 歌曲标题 */
+/* 歌曲名 */
 #songTitle {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
   color: #a48ffb;
-  text-shadow: 0 0 10px rgba(164, 143, 251, 0.7);
+  text-shadow: 0 0 6px rgba(164, 143, 251, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   animation: scrollText 12s linear infinite;
 }
 
-/* 滚动效果 */
+/* 滚动动画 */
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-40%); }
 }
 
-/* 浮动动画 */
+/* 漂浮动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -4px); }
+  50% { transform: translate(-50%, -3px); }
 }
 
 /* 🌙 自动深色模式适配 */
 @media (prefers-color-scheme: dark) {
   .elysia-player {
-    background: rgba(30, 30, 40, 0.4);
-    border: 1px solid rgba(180, 150, 255, 0.2);
-    box-shadow: 0 8px 24px rgba(100, 70, 180, 0.4);
+    background: rgba(25, 25, 35, 0.5);
+    border-color: rgba(180, 150, 255, 0.25);
+    box-shadow: 0 6px 20px rgba(100, 70, 180, 0.35);
   }
   .elysia-controls button {
-    background: rgba(100, 70, 180, 0.25);
-    border-color: rgba(200, 170, 255, 0.3);
-    box-shadow: 0 2px 8px rgba(180, 140, 255, 0.4);
+    background: rgba(120, 90, 200, 0.25);
+    border-color: rgba(180, 150, 255, 0.35);
   }
   #songTitle {
     color: #d6c4ff;

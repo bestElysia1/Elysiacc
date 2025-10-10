@@ -206,5 +206,40 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
     }
     updateCount(); setInterval(updateCount, 1000);
   </script>
+  <!--  Elysia 悬浮音乐播放器 -->
+<div class="music-player-floating">
+  <audio controls autoplay loop id="elysia-audio">
+    <source src="assets/theme of SSS -Piano Arrange Ver.-.mp3" type="audio/mpeg">
+    您的浏览器不支持音频播放。
+  </audio>
+</div>
+
+<!--  样式 -->
+<style>
+.music-player-floating {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 8px 14px;
+  box-shadow: 0 0 20px rgba(156,107,255,0.6);
+  transition: all 0.3s ease;
+}
+.music-player-floating:hover {
+  box-shadow: 0 0 30px rgba(156,107,255,0.9);
+}
+.music-player-floating audio {
+  width: 320px;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+}
+</style>
+
 </body>
 </html>

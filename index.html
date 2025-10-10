@@ -440,16 +440,17 @@ loadSong(index);
 </script>
 
 <style>
-<!--  Elysia 极简悬浮播放器 -->
+<!--  Elysia 极简淡紫悬浮播放器 -->
 <div class="elysia-mini-player">
-  <button id="prevBtn"></button>
+  <button id="prevBtn">⟨</button>
   <button id="playPauseBtn"></button>
-  <button id="nextBtn"></button>
+  <button id="nextBtn">⟩</button>
   <span id="songTitle">加载中...</span>
   <audio id="elysiaAudio" preload="auto"></audio>
 </div>
 
 <style>
+/*  播放器容器 */
 .elysia-mini-player {
   position: fixed;
   bottom: 20px;
@@ -457,26 +458,30 @@ loadSong(index);
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 0 15px rgba(156,107,255,0.3);
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(156,107,255,0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  box-shadow: 0 0 18px rgba(156,107,255,0.3);
   animation: floaty 5s ease-in-out infinite;
   z-index: 9999;
+  color: #7d53ff;
   font-size: 0.9rem;
-  color: #6f4aff;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-/* 滚动歌名 */
+/*  滚动歌名 */
 #songTitle {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
   width: 160px;
-  text-overflow: ellipsis;
-  animation: marquee 10s linear infinite;
+  color: #6c4aff;
+  text-shadow: 0 0 6px rgba(156,107,255,0.3);
+  animation: marquee 12s linear infinite;
 }
 
 @keyframes marquee {
@@ -484,32 +489,36 @@ loadSong(index);
   100% { transform: translateX(-100%); }
 }
 
-/* 小按钮样式 */
+/*  按钮 */
 .elysia-mini-player button {
-  background: rgba(156,107,255,0.2);
+  background: rgba(156,107,255,0.18);
   border: none;
-  color: #7d53ff;
-  border-radius: 8px;
-  width: 26px;
-  height: 26px;
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(156,107,255,0.35);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
 }
 .elysia-mini-player button:hover {
   background: rgba(156,107,255,0.35);
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 0 14px rgba(156,107,255,0.6);
 }
 
-/* 漂浮动画 */
+/*  漂浮动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
 }
 
+/*  响应式 */
 @media (max-width: 600px) {
   #songTitle { width: 120px; font-size: 0.8rem; }
-  .elysia-mini-player { padding: 5px 10px; gap: 6px; }
+  .elysia-mini-player { padding: 6px 10px; gap: 6px; }
 }
 </style>
 

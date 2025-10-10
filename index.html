@@ -54,16 +54,27 @@
     <div class="banner"><img src="assets/banner.jpg" alt="Banner"></div>
 
     <header>
-<div class="music">
-  <audio controls autoplay loop style="width:330px; border-radius:10px;">
+<div class="music-player" style="text-align:center; margin:20px 0;">
+  <audio controls autoplay loop style="width:330px; border-radius:12px;">
     <source src="assets/theme of SSS -Piano Arrange Ver.-.mp3" type="audio/mpeg">
     您的浏览器不支持音频播放。
   </audio>
+  <style>
+audio {
+  width: 330px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+  box-shadow: 0 0 12px rgba(156,107,255,0.6);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+audio:hover {
+  box-shadow: 0 0 18px rgba(156,107,255,0.9);
+}
+</style>
 </div>
 
-      <div class="music">
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="https://music.163.com/outchain/player?type=2&id=471799&auto=1&height=66"></iframe>
-      </div>
+      
     </header>
 
     <div class="countdown" id="countdown" aria-live="polite">

@@ -553,6 +553,120 @@ resetTimer();
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
 }
+/* ===== Elysia — 液态玻璃风 ===== */
+.elysia-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px;
+  border-radius: 16px;
+  z-index: 9999;
+
+  /* 基础半透明玻璃面（保留模糊）*/
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  overflow: hidden;               /* 重要：让伪元素不溢出 */
+  box-shadow: 0 8px 24px rgba(120,80,200,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease, box-shadow .4s ease;
+}
+
+/* —— 动态液滴（彩色模糊层）: 使用伪元素产生多层模糊渐变并移动 —— */
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%; /* 扩大范围，保证模糊自然 */
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  transform: scale(1.05);
+  opacity: 0.95;
+  animation: moveBlobs 12s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* —— 斜向高光 sheen —— */
+.elysia-player::after {
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: -30%;
+  width: 180%;
+  height: 120%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0) 60%);
+  transform: rotate(-18deg);
+  opacity: 0.7;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: transform .6s ease, opacity .6s ease;
+}
+
+/* 按钮与文字层保持在顶层（相对定位） */
+.elysia-player > * { position: relative; z-index: 2; }
+
+/* 控制按钮：保持玻璃风，但更轻薄 */
+.elysia-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .25s ease, background .25s ease;
+  backdrop-filter: blur(6px);
+}
+.elysia-controls button:hover {
+  transform: scale(1.08);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 8px 18px rgba(150,110,230,0.18);
+}
+
+/* 歌曲标题：微光与剪裁滚动 */
+#songTitle {
+  position: relative;
+  z-index: 2;
+  color: #f2eaff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 200px;
+  font-size: 0.95rem;
+  text-shadow: 0 0 10px rgba(160,120,255,0.45);
+  animation: scrollText 12s linear infinite;
+}
+
+/* 隐藏态（你之前的隐藏逻辑会用到） */
+.elysia-player.hidden {
+  opacity: 0;
+  transform: translate(-50%, 25px);
+  filter: blur(6px) saturate(80%);
+  pointer-events: none;
+}
+
+/* 小的动效 keyframes */
+@keyframes moveBlobs {
+  0%   { transform: translate3d(0,0,0) scale(1.03) rotate(0deg); }
+  25%  { transform: translate3d(8%, -6%, 0) scale(1.08) rotate(2deg); }
+  50%  { transform: translate3d(-6%, 6%, 0) scale(1.04) rotate(-1deg); }
+  75%  { transform: translate3d(6%, -4%, 0) scale(1.06) rotate(1deg); }
+  100% { transform: translate3d(0,0,0) scale(1.03) rotate(0deg); }
+}
+
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 </style>
 
 

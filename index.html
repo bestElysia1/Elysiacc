@@ -440,135 +440,134 @@ loadSong(index);
 </script>
 
 <style>
-/*  Elysia 浮动播放器（美化+动画） */
-.music-player-floating {
+<!--  Elysia 极简悬浮播放器 -->
+<div class="elysia-mini-player">
+  <button id="prevBtn"></button>
+  <button id="playPauseBtn"></button>
+  <button id="nextBtn"></button>
+  <span id="songTitle">加载中...</span>
+  <audio id="elysiaAudio" preload="auto"></audio>
+</div>
+
+<style>
+.elysia-mini-player {
   position: fixed;
-  bottom: 18px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9999;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 18px rgba(156,107,255,0.4);
-  backdrop-filter: blur(10px);
-  animation: floaty 6s ease-in-out infinite;
-  transition: all 0.3s ease;
-}
-
-.music-player-floating:hover {
-  box-shadow: 0 0 30px rgba(156,107,255,0.7);
-  background: rgba(255, 255, 255, 0.35);
-}
-
-/* 歌曲标题滚动发光 */
-.song-title {
-  font-size: 0.9rem;
-  color: #bca9ff;
-  text-shadow: 0 0 8px rgba(156,107,255,0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  width: 260px;
-  text-align: center;
-  animation: scrollTitle 12s linear infinite;
-}
-
-@keyframes scrollTitle {
-  0% { text-indent: 100%; }
-  100% { text-indent: -100%; }
-}
-
-/* 播放器主体 */
-.music-player-floating audio {
-  width: 260px;
-  height: 34px;
-  border: none;
-  outline: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #b388ff, #9c6bff);
-  accent-color: #9c6bff;
-}
-
-/* 切歌按钮 */
-.music-controls {
-  display: flex;
   gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(156,107,255,0.3);
+  animation: floaty 5s ease-in-out infinite;
+  z-index: 9999;
+  font-size: 0.9rem;
+  color: #6f4aff;
 }
 
-.music-controls button {
-  background: linear-gradient(135deg, #b388ff, #9c6bff);
+/* 滚动歌名 */
+#songTitle {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 160px;
+  text-overflow: ellipsis;
+  animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* 小按钮样式 */
+.elysia-mini-player button {
+  background: rgba(156,107,255,0.2);
   border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  color: #fff;
-  font-size: 18px;
+  color: #7d53ff;
+  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  font-size: 0.8rem;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(156,107,255,0.4);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+.elysia-mini-player button:hover {
+  background: rgba(156,107,255,0.35);
+  transform: scale(1.05);
 }
 
-.music-controls button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(156,107,255,0.8);
-  background: linear-gradient(135deg, #c5a3ff, #a788ff);
-}
-
-/* 浮动动画 */
+/* 漂浮动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -5px); }
+  50% { transform: translate(-50%, -4px); }
 }
 
-/* 光流动效果 */
-@keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-/* 控件样式美化 */
-.music-player-floating audio::-webkit-media-controls-panel {
-  background: linear-gradient(90deg, #b48eff, #a177ff);
-  border-radius: 12px;
-}
-.music-player-floating audio::-webkit-media-controls-play-button {
-  filter: drop-shadow(0 0 6px rgba(154,110,240,0.6));
-}
-.music-player-floating audio::-webkit-media-controls-timeline {
-  background: linear-gradient(90deg, rgba(180,140,255,0.4), rgba(120,90,240,0.4), rgba(180,140,255,0.4));
-  background-size: 200% 100%;
-  animation: shimmer 4s linear infinite;
-  border-radius: 4px;
-}
-.music-player-floating audio::-webkit-media-controls-current-time-display,
-.music-player-floating audio::-webkit-media-controls-time-remaining-display {
-  color: #fff !important;
-  text-shadow: 0 0 4px rgba(150,100,255,0.8);
-}
-
-/* 手机端适配 */
 @media (max-width: 600px) {
-  .music-player-floating {
-    padding: 8px;
-  }
-  .music-player-floating audio {
-    width: 200px;
-  }
-  .song-title {
-    width: 200px;
-    font-size: 0.8rem;
-  }
-  .music-controls button {
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-  }
+  #songTitle { width: 120px; font-size: 0.8rem; }
+  .elysia-mini-player { padding: 5px 10px; gap: 6px; }
 }
 </style>
+
+<script>
+const songs = [
+  "assets/theme of SSS -Piano Arrange Ver.-.mp3",
+  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3",
+  "assets/给我一首歌的时间.mp3"
+];
+
+const titles = [
+  "Theme of SSS - Piano Arrange Ver.",
+  "My Soul, Your Beats! - Piano Arrange Ver.",
+  "给我一首歌的时间"
+];
+
+let current = 0;
+const audio = document.getElementById("elysiaAudio");
+const title = document.getElementById("songTitle");
+const playBtn = document.getElementById("playPauseBtn");
+
+function loadSong(index) {
+  audio.src = songs[index];
+  title.textContent = titles[index];
+}
+
+function playPause() {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "";
+  } else {
+    audio.pause();
+    playBtn.textContent = "";
+  }
+}
+
+function nextSong() {
+  current = (current + 1) % songs.length;
+  loadSong(current);
+  audio.play();
+  playBtn.textContent = "";
+}
+
+function prevSong() {
+  current = (current - 1 + songs.length) % songs.length;
+  loadSong(current);
+  audio.play();
+  playBtn.textContent = "";
+}
+
+document.getElementById("nextBtn").onclick = nextSong;
+document.getElementById("prevBtn").onclick = prevSong;
+playBtn.onclick = playPause;
+audio.onended = nextSong;
+
+loadSong(current);
+</script>
+
 
 </body>
 </html>

@@ -406,27 +406,7 @@ draw();
   <span id="songTitle">加载中...</span>
   <audio id="elysiaAudio" preload="auto" hidden></audio>
 </div>
-/* 🌸 Elysia 播放按钮美化 */
-.elysia-controls button {
-  background: linear-gradient(135deg, #b388ff, #9c6bff);
-  border: none;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(156,107,255,0.5);
-}
 
-.elysia-controls button:hover {
-  background: linear-gradient(135deg, #c9aaff, #b388ff);
-  box-shadow: 0 0 12px rgba(156,107,255,0.7);
-  transform: scale(1.05);
-}
-
-.elysia-controls button:active {
-  transform: scale(0.95);
-}
 <style>
 /* 🌸 播放器容器 */
 .elysia-mini-player {
@@ -482,6 +462,27 @@ draw();
   background: rgba(156,107,255,0.4);
   transform: scale(1.1);
   box-shadow: 0 0 14px rgba(156,107,255,0.6);
+}
+/* 🌸 Elysia 播放按钮美化 */
+.elysia-controls button {
+  background: linear-gradient(135deg, #b388ff, #9c6bff);
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(156,107,255,0.5);
+}
+
+.elysia-controls button:hover {
+  background: linear-gradient(135deg, #c9aaff, #b388ff);
+  box-shadow: 0 0 12px rgba(156,107,255,0.7);
+  transform: scale(1.05);
+}
+
+.elysia-controls button:active {
+  transform: scale(0.95);
 }
 
 /* 💫 播放时按钮发光 */

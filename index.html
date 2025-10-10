@@ -398,161 +398,155 @@ draw();
 }
 </style>
 
-<!-- 🎧 Elysia 轻盈音乐播放器 -->
+<!-- 🌸 Elysia 玻璃质感播放器 -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="prevBtn">⏮</button>
-    <button id="playPauseBtn">▶️</button>
+    <button id="playPauseBtn">⏯</button>
     <button id="nextBtn">⏭</button>
   </div>
-  <div class="elysia-title" id="songTitle">My Soul, Your Beats!</div>
+  <span id="songTitle">加载中...</span>
 </div>
 
-<!-- 🎵 脚本部分 -->
+<!-- 🎵 播放器脚本 -->
 <script>
 const songs = [
   { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
-  { title: "Theme of SSS", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
+  { title: "theme of SSS -Piano Arrange Ver.-", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
   { title: "给我一首歌的时间", src: "assets/给我一首歌的时间.mp3" }
 ];
 
 let currentSong = 0;
-let audio = new Audio(songs[currentSong].src);
-audio.volume = 0.8;
+const audio = new Audio(songs[currentSong].src);
+const playPauseBtn = document.getElementById("playPauseBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
 
-const playPauseBtn = document.getElementById('playPauseBtn');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const songTitle = document.getElementById('songTitle');
-
-function playSong(index) {
-  audio.src = songs[index].src;
-  songTitle.textContent = songs[index].title;
-  audio.play();
-  playPauseBtn.textContent = '⏸';
+function updateSong() {
+  titleEl.textContent = songs[currentSong].title;
+  audio.src = songs[currentSong].src;
+  audio.play().catch(() => {});
+  playPauseBtn.textContent = "⏸";
 }
 
-function togglePlayPause() {
+playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
-    playPauseBtn.textContent = '⏸';
+    playPauseBtn.textContent = "⏸";
   } else {
     audio.pause();
-    playPauseBtn.textContent = '▶️';
+    playPauseBtn.textContent = "▶️";
   }
-}
-
-function playNext() {
-  currentSong = (currentSong + 1) % songs.length;
-  playSong(currentSong);
-}
-
-function playPrev() {
-  currentSong = (currentSong - 1 + songs.length) % songs.length;
-  playSong(currentSong);
-}
-
-audio.addEventListener('ended', playNext);
-playPauseBtn.addEventListener('click', togglePlayPause);
-nextBtn.addEventListener('click', playNext);
-prevBtn.addEventListener('click', playPrev);
-
-// 自动播放第一首
-window.addEventListener('load', () => {
-  playSong(currentSong);
 });
+
+prevBtn.addEventListener("click", () => {
+  currentSong = (currentSong - 1 + songs.length) % songs.length;
+  updateSong();
+});
+
+nextBtn.addEventListener("click", () => {
+  currentSong = (currentSong + 1) % songs.length;
+  updateSong();
+});
+
+audio.addEventListener("ended", () => {
+  nextBtn.click();
+});
+
+updateSong(); // 自动播放第一首
 </script>
 
-<!-- 🎨 样式部分 -->
+<!-- 🌈 玻璃质感样式 -->
 <style>
 .elysia-player {
   position: fixed;
-  bottom: 18px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(156,107,255,0.3);
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 18px;
-  box-shadow: 0 0 10px rgba(156,107,255,0.2);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(160, 120, 255, 0.3);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   z-index: 9999;
-  transition: all 0.3s ease;
-  animation: floaty 6s ease-in-out infinite;
+  animation: floaty 5s ease-in-out infinite;
 }
 
-/* 🌙 跟随系统模式 */
-@media (prefers-color-scheme: dark) {
-  .elysia-player {
-    background: rgba(60, 50, 90, 0.4);
-    border-color: rgba(180,150,255,0.3);
-    box-shadow: 0 0 12px rgba(150,120,255,0.3);
-  }
-  .elysia-title {
-    color: #dcd0ff;
-  }
-}
-
+/* 控制按钮 */
 .elysia-controls {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* 💜 优化播放器按钮样式（柔和淡紫玻璃风） */
+/* 按钮玻璃质感 */
 .elysia-controls button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(156, 107, 255, 0.4);
+  color: #ffffff;
+  font-size: 16px;
   cursor: pointer;
-  background: rgba(200, 160, 255, 0.25);
-  color: #fff;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 8px rgba(170,120,255,0.4);
   transition: all 0.25s ease;
 }
 
+/* 悬停发光 */
 .elysia-controls button:hover {
-  background: rgba(200, 160, 255, 0.4);
-  box-shadow: 0 0 14px rgba(170,120,255,0.6);
+  background: rgba(190, 150, 255, 0.3);
+  box-shadow: 0 0 15px rgba(156, 107, 255, 0.8);
   transform: scale(1.1);
 }
 
-.elysia-controls button:active {
-  transform: scale(0.95);
-  background: rgba(170,120,255,0.5);
-}
-
-.elysia-title {
-  font-size: 0.9rem;
-  color: #8f66f0;
+/* 歌曲标题 */
+#songTitle {
+  font-size: 1rem;
   font-weight: 600;
+  color: #a48ffb;
+  text-shadow: 0 0 10px rgba(164, 143, 251, 0.7);
   white-space: nowrap;
   overflow: hidden;
-  width: 200px;
-  text-align: center;
-  animation: scrollText 10s linear infinite;
+  text-overflow: ellipsis;
+  animation: scrollText 12s linear infinite;
 }
 
-/* 歌名滚动动画 */
+/* 滚动效果 */
 @keyframes scrollText {
-  0% { text-indent: 0; }
-  100% { text-indent: -100%; }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-/* 漂浮动画 */
+/* 浮动动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
 }
 
-@media (max-width: 600px) {
-  .elysia-title { width: 160px; }
-  .elysia-controls button { width: 30px; height: 30px; font-size: 13px; }
+/* 🌙 自动深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .elysia-player {
+    background: rgba(30, 30, 40, 0.4);
+    border: 1px solid rgba(180, 150, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(100, 70, 180, 0.4);
+  }
+  .elysia-controls button {
+    background: rgba(100, 70, 180, 0.25);
+    border-color: rgba(200, 170, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(180, 140, 255, 0.4);
+  }
+  #songTitle {
+    color: #d6c4ff;
+  }
 }
 </style>
 

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>订阅使用指南 ver.3.16</title>
+  <style>
+    :root{
+      --accent-start: #9a6ef0;
+      --accent-end: #7b3fe4;
+      --link: #8f66f0;
+      --bg: #ffffff;
+      --maxw: 980px;
+    }
+    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333;}
+    .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
+    .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
+    .banner img{width:100%;height:auto;display:block}
+    header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+    .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
+    .music{margin-left:auto}
+    iframe{border-radius:6px;border:0}
+    /* countdown */
+    .countdown{margin:22px 0;padding:18px 22px;border-radius:12px;background:linear-gradient(180deg,rgba(123,63,228,0.05),rgba(123,63,228,0.01));display:inline-block;box-shadow:0 2px 8px rgba(123,63,228,0.03)}
+    .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
+    /* content */
+    section{margin-top:28px}
+    h2{font-size:1.02rem;margin:8px 0 14px 0;padding-left:10px;border-left:4px solid rgba(123,63,228,0.12);color:var(--accent-end);background:linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));padding:8px;border-radius:6px}
+    p, ul, li{color:#4a3f6d;line-height:1.8;font-size:0.95rem}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
+    footer{margin:36px 0;color:#999;font-size:0.85rem}
+    /* layout */
+    .leftnav{position:fixed;left:12px;top:120px;width:160px}
+    .leftnav ul{list-style:none;padding:0;margin:0}
+    .leftnav li{margin:8px 0;color:var(--link);font-size:0.9rem}
+    /* responsive */
+    @media (max-width:900px){
+      .container{padding:0 18px}
+      .leftnav{display:none}
+      header{flex-direction:column;align-items:flex-start}
+      .music{margin-left:0;margin-top:8px}
+    }
+  </style>
+</head>
+<body>
+  <nav class="leftnav" aria-hidden="true">
+    <ul>
+      <li>订阅使用指南 ver.3.16</li>
+      <li>订阅链接</li>
+      <li>通知</li>
+      <li>使用细则</li>
+      <li>移动端 Mobile Devices</li>
+      <li>电脑端 Computers</li>
+      <li>路由器类 Routers</li>
+      <li>规则集</li>
+      <li>测速链接 & 邮箱</li>
+      <li>附测速图</li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="banner"><img src="assets/banner.jpg" alt="Banner"></div>
+
+    <header>
+      <div class="title">
+        <h1>订阅使用指南 ver.3.16</h1>
+        <div class="subtitle">Welcome to the New World E=mc²</div>
+      </div>
+
+      <div class="music">
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="https://music.163.com/outchain/player?type=2&id=471799&auto=1&height=66"></iframe>
+      </div>
+    </header>
+
+    <div class="countdown" id="countdown" aria-live="polite">
+      <div style="font-size:0.95rem;color:#666;margin-bottom:6px">倒计时</div>
+      <div class="nums" id="countdownNums">— 天 — : — : —</div>
+    </div>
+
+    <section>
+      <p><strong>唯云</strong> Disney+,YouTube,Netflix 流媒体、ChatGPT .etc全解锁，无限速，顶级专线</p>
+      <p><strong>奶昔</strong> 同上</p>
+      <p><strong>IEPL IPLC</strong> 顶级专线</p>
+      <p><strong>IEPL prem.</strong> 游戏专用</p>
+      <p><strong>纯净</strong> 原生 IP 双 ISP</p>
+      <p><strong>深港</strong> 备用线路</p>
+      <p><strong>限定</strong> 备用线路</p>
+      <p><strong>隧道</strong> 备用线路</p>
+    </section>
+
+    <section>
+      <h2>订阅链接</h2>
+      <p>略</p>
+    </section>
+
+    <section>
+      <h2>通知</h2>
+      <ul>
+        <li>三网优化已完成〜 2025-09-16</li>
+        <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜2025-09-16</li>
+        <li>由于部分省份升级省级防火墙原因，移动线路要做特别优化，如果无法使用，请联系我给你单独调优 ~2025-09-19</li>
+        <li>部分省份移动已G，请切换电信，移动网络暂时无法使用 ~2025-09-30（已修复）</li>
+        <li>德国法兰克福 CN2 GIA 专线 10月 20日上线 2025-10-10</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>使用细则</h2>
+      <p>复制订阅链接到软件中同步即可使用</p>
+    </section>
+
+    <section>
+      <h2>移动端 Mobile Devices</h2>
+      <ul>
+        <li><strong>Android 安卓：</strong>V2rayNG、FIClash、Nekobox、Sing - box for Android、Clash Meta for Android .etc</li>
+        <li><strong>iOS（含 iPadOS/tvOS）：</strong>ShadowRocket（小火箭）、Surge、Loon、Stash、Quantumult .etc</li>
+        <li><strong>Harmony OS NEXT：</strong>同安卓，但不建议使用</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>电脑端 Computers</h2>
+      <ul>
+        <li><strong>Windows：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
+        <li><strong>macOS：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
+        <li><strong>Linux：</strong>V2rayN、Singbox for Linux .etc</li>
+        <li><strong>FreeBSD/Unix：</strong>Mihomo（裸核）、Sing - box .etc</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>路由器类 Routers</h2>
+      <ul>
+        <li><strong>华硕 硬路由：</strong>MerlinClash2（梅林）、FancySS</li>
+        <li><strong>小米 硬路由：</strong>ShellCrash</li>
+        <li><strong>OpenWrt 软路由：</strong>OpenClash、PassWall、Nikki</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>规则集</h2>
+      <p>Shadowsrocket:</p>
+      <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+      <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
+      <ul>
+        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module</a></li>
+        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module</a></li>
+        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</a></li>
+      </ul>
+      <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
+    </section>
+
+    <section>
+      <h2>Shadowrocket 进阶</h2>
+      <p>Shadowrocket 最终毕业玩法：</p>
+      <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject，三个模块，打开其中 proxy 模块，你可以看到 proxy_list，例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
+      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
+DOMAIN-SUFFIX,ydhm.one,PROXY
+DOMAIN-SUFFIX,anime1.me,PROXY</pre>
+    </section>
+
+    <section>
+      <h2>测速链接 & 邮箱</h2>
+      <ul>
+        <li><a href="http://puspfc.speedtestcustom.com/">http://puspfc.speedtestcustom.com/</a></li>
+        <li><a href="https://gfiber.com/speedtest/">https://gfiber.com/speedtest/</a></li>
+        <li>Email: <a href="mailto:bestElysia@hotmail.com">bestElysia@hotmail.com</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      订阅使用指南 ver.3.16 · 页面由 ChatGPT 自动生成，部署于 GitHub Pages。
+    </footer>
+  </main>
+
+  <script>
+    // Countdown to 2025-12-31 23:59:59 (UTC+8)
+    const target = new Date('2025-12-31T23:59:59+08:00').getTime();
+    const el = document.getElementById('countdownNums');
+    function updateCount() {
+      const now = Date.now();
+      let diff = target - now;
+      if (diff < 0) diff = 0;
+      const days = Math.floor(diff / (24*60*60*1000));
+      diff -= days * 24*60*60*1000;
+      const hrs = Math.floor(diff / (60*60*1000));
+      diff -= hrs * 60*60*1000;
+      const mins = Math.floor(diff / (60*1000));
+      diff -= mins * 60*1000;
+      const secs = Math.floor(diff / 1000);
+      el.textContent = `${days} 天 ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
+    }
+    updateCount(); setInterval(updateCount, 1000);
+  </script>
+</body>
+</html>

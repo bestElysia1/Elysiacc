@@ -21,6 +21,13 @@
     .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
     .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
     .banner img{width:100%;height:auto;display:block}
+    .banner img{width:100%;height:auto;display:block}
+
+/* 🌈 裸眼3D Banner 效果 */
+.banner-3d {
+  position: relative;
+  ...
+}
     header{display:flex;align-items:center;justify-content:space-between;gap:20px}
     .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
     .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
@@ -214,7 +221,13 @@ main.container li:hover {
   </nav>
 
   <main class="container">
-    <div class="banner"><img src="assets/banner.jpg" alt="Banner"></div>
+    <!-- 🌌 裸眼3D Banner -->
+<div class="banner-3d" id="banner3d">
+  <div class="banner-layer">
+    <img src="assets/banner.jpg" alt="Banner">
+  </div>
+  <div class="banner-glow"></div>
+</div>
 
     <header>
 
@@ -459,6 +472,30 @@ draw();
 
 }
 </style>
+
+<script>
+// 🌌 裸眼3D Banner交互
+const banner3d = document.getElementById("banner3d");
+const bannerLayer = banner3d?.querySelector(".banner-layer");
+const bannerGlow = banner3d?.querySelector(".banner-glow");
+
+if (banner3d) {
+  banner3d.addEventListener("mousemove", e => {
+    const rect = banner3d.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotY = ((x / rect.width) - 0.5) * 16;  // 左右倾斜角
+    const rotX = ((y / rect.height) - 0.5) * -12; // 上下倾斜角
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+    bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
+  });
+
+  banner3d.addEventListener("mouseleave", () => {
+    bannerLayer.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
+  });
+}
+</script>
 
 <!-- 🌸 Elysia 玻璃质感播放器（10秒无操作自动隐藏） -->
 <div class="elysia-player">

@@ -474,18 +474,19 @@ draw();
 </style>
 
 <script>
-// 🌌 裸眼3D Banner交互
+// 🌌 裸眼3D + 呼吸浮动 Banner
 const banner3d = document.getElementById("banner3d");
 const bannerLayer = banner3d?.querySelector(".banner-layer");
 const bannerGlow = banner3d?.querySelector(".banner-glow");
 
-if (banner3d) {
+// 🌈 桌面端：鼠标 3D 视差
+if (window.matchMedia("(pointer:fine)").matches && banner3d) {
   banner3d.addEventListener("mousemove", e => {
     const rect = banner3d.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const rotY = ((x / rect.width) - 0.5) * 16;  // 左右倾斜角
-    const rotX = ((y / rect.height) - 0.5) * -12; // 上下倾斜角
+    const rotY = ((x / rect.width) - 0.5) * 16;
+    const rotX = ((y / rect.height) - 0.5) * -12;
     bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
     bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
   });
@@ -495,7 +496,70 @@ if (banner3d) {
     bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
   });
 }
+
+// 📱 移动端：滚动视差（假3D）
+if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
+  window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    const rotX = Math.min(scrollY / 30, 10);
+    const rotY = Math.sin(scrollY / 180) * 8;
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+  });
+}
 </script>
+
+<style>
+/* 🌬️ Banner 呼吸浮动动画 */
+@keyframes bannerFloaty {
+  0%, 100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  50% {
+    transform: translateY(-6px);
+    filter: brightness(1.05);
+  }
+}
+
+/* 🌈 裸眼3D Banner 容器 */
+.banner-3d {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 28px auto;
+  perspective: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
+  animation: bannerFloaty 8s ease-in-out infinite; /* 🫧 呼吸浮动 */
+}
+
+.banner-3d .banner-layer {
+  transition: transform 0.25s ease-out;
+  transform-origin: center;
+}
+
+.banner-3d img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* ✨ 光影高光层 */
+.banner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: background-position 0.2s ease-out;
+}
+</style>
 
 <!-- 🌸 Elysia 玻璃质感播放器（10秒无操作自动隐藏） -->
 <div class="elysia-player">

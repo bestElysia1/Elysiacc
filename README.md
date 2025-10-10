@@ -1,4 +1,4 @@
-# Elysia - 订阅使用指南 (GitHub Pages)
+# Elysia - 订阅使用指南 
 <img src="./assets/banner.jpg" width="800">
 
 

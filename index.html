@@ -398,17 +398,17 @@ draw();
 }
 </style>
 
-<!--  Elysia 极简淡紫悬浮播放器 -->
+<!-- 💜 Elysia 极简悬浮播放器（My Soul 优先播放） -->
 <div class="elysia-mini-player">
   <button id="prevBtn">⟨</button>
-  <button id="playPauseBtn"></button>
+  <button id="playPauseBtn" class="glow">▶</button>
   <button id="nextBtn">⟩</button>
   <span id="songTitle">加载中...</span>
-  <audio id="elysiaAudio" preload="auto"></audio>
+  <audio id="elysiaAudio" preload="auto" hidden></audio>
 </div>
 
 <style>
-/*  播放器容器 */
+/* 🌸 播放器容器 */
 .elysia-mini-player {
   position: fixed;
   bottom: 20px;
@@ -420,18 +420,17 @@ draw();
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.25);
   border: 1px solid rgba(156,107,255,0.25);
-  backdrop-filter: blur(12px);
   border-radius: 18px;
+  backdrop-filter: blur(12px);
   box-shadow: 0 0 18px rgba(156,107,255,0.3);
   animation: floaty 5s ease-in-out infinite;
   z-index: 9999;
   color: #7d53ff;
   font-size: 0.9rem;
   font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
-/*  滚动歌名 */
+/* 🎶 滚动歌名 */
 #songTitle {
   display: inline-block;
   overflow: hidden;
@@ -441,39 +440,52 @@ draw();
   text-shadow: 0 0 6px rgba(156,107,255,0.3);
   animation: marquee 12s linear infinite;
 }
-
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
 
-/*  按钮 */
+/* 🔘 按钮样式 */
 .elysia-mini-player button {
-  background: rgba(156,107,255,0.18);
+  background: rgba(156,107,255,0.2);
   border: none;
-  color: #fff;
+  color: white;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   font-size: 0.8rem;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(156,107,255,0.35);
   transition: all 0.25s ease;
-  backdrop-filter: blur(6px);
+  box-shadow: 0 0 8px rgba(156,107,255,0.4);
 }
 .elysia-mini-player button:hover {
-  background: rgba(156,107,255,0.35);
+  background: rgba(156,107,255,0.4);
   transform: scale(1.1);
   box-shadow: 0 0 14px rgba(156,107,255,0.6);
 }
 
-/*  漂浮动画 */
+/* 💫 播放时按钮发光 */
+.glow.playing {
+  animation: glowPulse 2s ease-in-out infinite alternate;
+}
+@keyframes glowPulse {
+  from {
+    box-shadow: 0 0 8px rgba(156,107,255,0.4);
+    background: rgba(156,107,255,0.3);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(156,107,255,0.8);
+    background: rgba(156,107,255,0.5);
+  }
+}
+
+/* 🌫️ 漂浮动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
 }
 
-/*  响应式 */
+/* 📱 响应式 */
 @media (max-width: 600px) {
   #songTitle { width: 120px; font-size: 0.8rem; }
   .elysia-mini-player { padding: 6px 10px; gap: 6px; }
@@ -482,14 +494,13 @@ draw();
 
 <script>
 const songs = [
+  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", // 优先播放
   "assets/theme of SSS -Piano Arrange Ver.-.mp3",
-  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3",
   "assets/给我一首歌的时间.mp3"
 ];
-
 const titles = [
-  "Theme of SSS - Piano Arrange Ver.",
   "My Soul, Your Beats! - Piano Arrange Ver.",
+  "Theme of SSS - Piano Arrange Ver.",
   "给我一首歌的时间"
 ];
 
@@ -506,10 +517,12 @@ function loadSong(index) {
 function playPause() {
   if (audio.paused) {
     audio.play();
-    playBtn.textContent = "";
+    playBtn.textContent = "⏸";
+    playBtn.classList.add("playing");
   } else {
     audio.pause();
-    playBtn.textContent = "";
+    playBtn.textContent = "▶";
+    playBtn.classList.remove("playing");
   }
 }
 
@@ -517,22 +530,54 @@ function nextSong() {
   current = (current + 1) % songs.length;
   loadSong(current);
   audio.play();
-  playBtn.textContent = "";
+  playBtn.textContent = "⏸";
+  playBtn.classList.add("playing");
 }
 
 function prevSong() {
   current = (current - 1 + songs.length) % songs.length;
   loadSong(current);
   audio.play();
-  playBtn.textContent = "";
+  playBtn.textContent = "⏸";
+  playBtn.classList.add("playing");
+}
+
+audio.onended = nextSong;
+
+// ⚙️ 自动播放逻辑（兼容所有浏览器）
+window.addEventListener("DOMContentLoaded", () => {
+  loadSong(current);
+  audio.volume = 0;
+  audio.muted = true;
+  audio.play().then(() => {
+    setTimeout(() => {
+      fadeInAudio();
+    }, 1000);
+  }).catch(() => {
+    document.body.addEventListener("click", unlockAudio, { once: true });
+  });
+});
+
+function unlockAudio() {
+  fadeInAudio();
+  audio.play();
+}
+
+function fadeInAudio() {
+  audio.muted = false;
+  let vol = 0;
+  const fade = setInterval(() => {
+    vol += 0.05;
+    audio.volume = vol;
+    if (vol >= 1) clearInterval(fade);
+  }, 150);
+  playBtn.textContent = "⏸";
+  playBtn.classList.add("playing");
 }
 
 document.getElementById("nextBtn").onclick = nextSong;
 document.getElementById("prevBtn").onclick = prevSong;
 playBtn.onclick = playPause;
-audio.onended = nextSong;
-
-loadSong(current);
 </script>
 
 

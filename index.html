@@ -561,7 +561,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 }
 </style>
 
-<!-- 🌸 Elysia 玻璃质感播放器（10秒无操作自动隐藏） -->
+<!-- 🌸 Elysia 液态玻璃播放器（呼吸光晕 + 按钮闪光 + 自动隐藏） -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn">▶</button>
@@ -570,7 +570,6 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
   <span id="songTitle">加载中...</span>
 </div>
 
-<!-- 🎵 播放器脚本 -->
 <script>
 const songs = [
   { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
@@ -583,6 +582,7 @@ const audio = new Audio(songs[currentSong].src);
 const playPauseBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
 const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
 
 function updateSong() {
   titleEl.textContent = songs[currentSong].title;
@@ -606,43 +606,36 @@ nextBtn.addEventListener("click", () => {
   updateSong();
 });
 
-audio.addEventListener("ended", () => {
-  nextBtn.click();
-});
+audio.addEventListener("ended", () => nextBtn.click());
 
-updateSong(); // 自动播放第一首
+// 🌸 播放时呼吸光晕
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
+updateSong();
 
-// 💤 10秒无操作自动隐藏播放器
+// 💤 10 秒无操作自动隐藏
 let inactivityTimer;
-const player = document.querySelector('.elysia-player');
-
 function hidePlayer() {
   player.style.opacity = '0';
   player.style.transform = 'translate(-50%, 40px)';
   player.style.pointerEvents = 'none';
 }
-
 function showPlayer() {
   player.style.opacity = '1';
   player.style.transform = 'translate(-50%, 0)';
   player.style.pointerEvents = 'auto';
   resetTimer();
 }
-
 function resetTimer() {
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 10000); // 10秒后隐藏
+  inactivityTimer = setTimeout(hidePlayer, 10000);
 }
-
-// 用户操作监听
-['scroll', 'mousemove', 'mousedown', 'touchstart', 'keydown'].forEach(evt =>
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
   window.addEventListener(evt, showPlayer)
 );
-
 resetTimer();
 </script>
 
-<!-- 🌈 玻璃质感样式 -->
 <style>
 .elysia-player {
   position: fixed;
@@ -651,113 +644,36 @@ resetTimer();
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 7px 22px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(154, 110, 240, 0.25);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  z-index: 9999;
-  animation: floaty 5s ease-in-out infinite;
-  transition: all 0.5s ease; /* 柔和淡出效果 */
-}
-
-/* 控制按钮（白色+淡紫光） */
-.elysia-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.elysia-controls button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #fff;
-  font-size: 15px;
-  text-shadow: 0 0 6px rgba(154, 110, 240, 0.8);
-  box-shadow: 0 0 10px rgba(154, 110, 240, 0.4);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.elysia-controls button:hover {
-  background: rgba(154, 110, 240, 0.25);
-  box-shadow: 0 0 16px rgba(154, 110, 240, 0.8);
-  transform: scale(1.1);
-}
-
-/* 歌曲标题 */
-#songTitle {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #a48ffb;
-  text-shadow: 0 0 10px rgba(164, 143, 251, 0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  animation: scrollText 12s linear infinite;
-}
-
-/* 滚动动画 */
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* 漂浮动画 */
-@keyframes floaty {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -4px); }
-}
-/* ===== Elysia — 液态玻璃风 ===== */
-.elysia-player {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  display: flex;
-  align-items: center;
   gap: 14px;
   padding: 8px 20px;
   border-radius: 16px;
   z-index: 9999;
-
-  /* 基础半透明玻璃面（保留模糊）*/
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
   border: 1px solid rgba(255,255,255,0.14);
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  overflow: hidden;               /* 重要：让伪元素不溢出 */
+  overflow: hidden;
   box-shadow: 0 8px 24px rgba(120,80,200,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
   transition: opacity .6s ease, transform .6s ease, filter .6s ease, box-shadow .4s ease;
 }
 
-/* —— 动态液滴（彩色模糊层）: 使用伪元素产生多层模糊渐变并移动 —— */
+/* 液体层动效 */
 .elysia-player::before {
   content: "";
   position: absolute;
-  inset: -30%; /* 扩大范围，保证模糊自然 */
+  inset: -30%;
   background:
     radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
     radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
     radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
   filter: blur(36px);
-  transform: scale(1.05);
   opacity: 0.95;
   animation: moveBlobs 12s linear infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
 
-/* —— 斜向高光 sheen —— */
+/* 高光层 */
 .elysia-player::after {
   content: "";
   position: absolute;
@@ -770,13 +686,13 @@ resetTimer();
   opacity: 0.7;
   pointer-events: none;
   mix-blend-mode: overlay;
-  transition: transform .6s ease, opacity .6s ease;
 }
 
-/* 按钮与文字层保持在顶层（相对定位） */
-.elysia-player > * { position: relative; z-index: 2; }
-
-/* 控制按钮：保持玻璃风，但更轻薄 */
+/* 控制按钮 */
+.elysia-controls {
+  display: flex;
+  gap: 10px;
+}
 .elysia-controls button {
   width: 32px;
   height: 32px;
@@ -785,47 +701,62 @@ resetTimer();
   border: 1px solid rgba(255,255,255,0.12);
   color: #fff;
   cursor: pointer;
-  transition: transform .2s ease, box-shadow .25s ease, background .25s ease;
+  transition: all .25s ease;
   backdrop-filter: blur(6px);
 }
 .elysia-controls button:hover {
-  transform: scale(1.08);
   background: rgba(255,255,255,0.12);
   box-shadow: 0 8px 18px rgba(150,110,230,0.18);
+  transform: scale(1.08);
 }
 
-/* 歌曲标题：微光与剪裁滚动 */
+/* 播放状态按钮闪光 */
+.elysia-player.playing .elysia-controls button {
+  animation: btnPulse 3.5s ease-in-out infinite;
+}
+@keyframes btnPulse {
+  0%, 100% {
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 8px rgba(160,120,255,0.3);
+  }
+  50% {
+    background: rgba(180,140,255,0.18);
+    box-shadow: 0 0 18px rgba(160,120,255,0.65);
+  }
+}
+
+/* 歌曲名 */
 #songTitle {
-  position: relative;
-  z-index: 2;
   color: #f2eaff;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   width: 200px;
   font-size: 0.95rem;
   text-shadow: 0 0 10px rgba(160,120,255,0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   animation: scrollText 12s linear infinite;
 }
 
-/* 隐藏态（你之前的隐藏逻辑会用到） */
-.elysia-player.hidden {
-  opacity: 0;
-  transform: translate(-50%, 25px);
-  filter: blur(6px) saturate(80%);
-  pointer-events: none;
+/* 播放中玻璃层呼吸光晕 */
+.elysia-player.playing {
+  animation: pulseGlow 3.5s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(160,120,255,0.35), inset 0 0 6px rgba(255,255,255,0.08);
+  }
+  50% {
+    box-shadow: 0 0 36px rgba(160,120,255,0.7), inset 0 0 10px rgba(255,255,255,0.12);
+  }
 }
 
-/* 小的动效 keyframes */
+/* 液体流动与滚动动画 */
 @keyframes moveBlobs {
-  0%   { transform: translate3d(0,0,0) scale(1.03) rotate(0deg); }
-  25%  { transform: translate3d(8%, -6%, 0) scale(1.08) rotate(2deg); }
-  50%  { transform: translate3d(-6%, 6%, 0) scale(1.04) rotate(-1deg); }
-  75%  { transform: translate3d(6%, -4%, 0) scale(1.06) rotate(1deg); }
+  0% { transform: translate3d(0,0,0) scale(1.03) rotate(0deg); }
+  50% { transform: translate3d(4%, -3%, 0) scale(1.05) rotate(2deg); }
   100% { transform: translate3d(0,0,0) scale(1.03) rotate(0deg); }
 }
-
 @keyframes scrollText {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }

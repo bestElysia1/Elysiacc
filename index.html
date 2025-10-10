@@ -300,13 +300,112 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
     }
     updateCount(); setInterval(updateCount, 1000);
   </script>
-<!--  Elysia 精致悬浮播放器 -->
+<!--  Elysia 可手动切歌悬浮播放器 -->
 <div class="music-player-floating">
-  <audio controls autoplay loop id="elysia-audio">
-    <source src="assets/theme of SSS -Piano Arrange Ver.-.mp3" type="audio/mpeg">
-    您的浏览器不支持音频播放。
-  </audio>
+  <audio id="elysia-audio" controls></audio>
+  <div class="music-controls">
+    <button onclick="prevSong()"></button>
+    <button onclick="nextSong()"></button>
+  </div>
 </div>
+
+<script>
+//  歌曲列表（把你上传的 mp3 文件名写在这里）
+const songs = [
+  "assets/theme of SSS -Piano Arrange Ver.-.mp3",
+  "assets/My Soul, Your Beats! -Piano Arrange Ver.-",
+  "assets/给我一首歌的时间"
+];
+
+let index = 0;
+const player = document.getElementById("elysia-audio");
+
+function loadSong(i) {
+  player.src = songs[i];
+  player.play().catch(()=>{});
+}
+
+function prevSong() {
+  index = (index - 1 + songs.length) % songs.length;
+  loadSong(index);
+}
+
+function nextSong() {
+  index = (index + 1) % songs.length;
+  loadSong(index);
+}
+
+player.addEventListener("ended", () => {
+  nextSong(); // 播完自动切下一首
+});
+
+// 初始化播放
+loadSong(index);
+</script>
+
+<style>
+.music-player-floating {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 8px 14px;
+  box-shadow: 0 0 15px rgba(156,107,255,0.5);
+  animation: floaty 5s ease-in-out infinite;
+}
+
+.music-player-floating:hover {
+  box-shadow: 0 0 22px rgba(156,107,255,0.8);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.music-player-floating audio {
+  width: 260px;
+  height: 32px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  accent-color: #9c6bff;
+  vertical-align: middle;
+}
+
+.music-controls {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.music-controls button {
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.music-controls button:hover {
+  background: linear-gradient(90deg, #c9a8ff, #a88fff);
+  box-shadow: 0 0 10px rgba(156,107,255,0.6);
+}
+
+/* 浮动动画 */
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+
+@media (max-width: 600px) {
+  .music-player-floating audio { width: 200px; }
+  .music-controls button { font-size: 12px; padding: 3px 6px; }
+}
+</style>
 
 <!--  样式 -->
 <style>

@@ -516,6 +516,178 @@ draw();
 
 }
 </style>
+<!--  Elysia 高级悬浮播放器 -->
+<div class="music-player-floating">
+  <div class="song-title" id="song-title">加载中...</div>
+  <audio id="elysia-audio" controls></audio>
+  <div class="music-controls">
+    <button onclick="prevSong()"></button>
+    <button onclick="nextSong()"></button>
+  </div>
+</div>
+
+<script>
+//  歌曲列表（你的歌曲）
+const songs = [
+  { title: "Theme of SSS - Piano Arrange Ver.", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
+  { title: "My Soul, Your Beats! - Piano Arrange Ver.", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
+  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间.mp3" }
+];
+
+let index = 0;
+const player = document.getElementById("elysia-audio");
+const title = document.getElementById("song-title");
+
+function loadSong(i) {
+  player.src = songs[i].src;
+  title.textContent = songs[i].title;
+  player.play().catch(()=>{});
+}
+
+function prevSong() {
+  index = (index - 1 + songs.length) % songs.length;
+  loadSong(index);
+}
+
+function nextSong() {
+  index = (index + 1) % songs.length;
+  loadSong(index);
+}
+
+player.addEventListener("ended", nextSong);
+loadSong(index);
+</script>
+
+<style>
+/*  Elysia 浮动播放器（美化+动画） */
+.music-player-floating {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 18px rgba(156,107,255,0.4);
+  backdrop-filter: blur(10px);
+  animation: floaty 6s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.music-player-floating:hover {
+  box-shadow: 0 0 30px rgba(156,107,255,0.7);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* 歌曲标题滚动发光 */
+.song-title {
+  font-size: 0.9rem;
+  color: #bca9ff;
+  text-shadow: 0 0 8px rgba(156,107,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 260px;
+  text-align: center;
+  animation: scrollTitle 12s linear infinite;
+}
+
+@keyframes scrollTitle {
+  0% { text-indent: 100%; }
+  100% { text-indent: -100%; }
+}
+
+/* 播放器主体 */
+.music-player-floating audio {
+  width: 260px;
+  height: 34px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+  accent-color: #9c6bff;
+}
+
+/* 切歌按钮 */
+.music-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.music-controls button {
+  background: linear-gradient(135deg, #b388ff, #9c6bff);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(156,107,255,0.4);
+  transition: all 0.3s ease;
+}
+
+.music-controls button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(156,107,255,0.8);
+  background: linear-gradient(135deg, #c5a3ff, #a788ff);
+}
+
+/* 浮动动画 */
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -5px); }
+}
+
+/* 光流动效果 */
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* 控件样式美化 */
+.music-player-floating audio::-webkit-media-controls-panel {
+  background: linear-gradient(90deg, #b48eff, #a177ff);
+  border-radius: 12px;
+}
+.music-player-floating audio::-webkit-media-controls-play-button {
+  filter: drop-shadow(0 0 6px rgba(154,110,240,0.6));
+}
+.music-player-floating audio::-webkit-media-controls-timeline {
+  background: linear-gradient(90deg, rgba(180,140,255,0.4), rgba(120,90,240,0.4), rgba(180,140,255,0.4));
+  background-size: 200% 100%;
+  animation: shimmer 4s linear infinite;
+  border-radius: 4px;
+}
+.music-player-floating audio::-webkit-media-controls-current-time-display,
+.music-player-floating audio::-webkit-media-controls-time-remaining-display {
+  color: #fff !important;
+  text-shadow: 0 0 4px rgba(150,100,255,0.8);
+}
+
+/* 手机端适配 */
+@media (max-width: 600px) {
+  .music-player-floating {
+    padding: 8px;
+  }
+  .music-player-floating audio {
+    width: 200px;
+  }
+  .song-title {
+    width: 200px;
+    font-size: 0.8rem;
+  }
+  .music-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}
+</style>
 
 </body>
 </html>

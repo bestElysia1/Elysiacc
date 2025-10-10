@@ -31,7 +31,22 @@
     a{color:var(--link);text-decoration:none}
     a:hover{text-decoration:underline}
     pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
-    footer{margin:36px 0;color:#999;font-size:0.85rem}
+    footer {
+  margin: 36px 0 0 0;
+  padding-top: 12px;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid rgba(156,107,255,0.2);
+  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
+  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
+  transition: all 0.4s ease;
+}
+footer:hover {
+  text-shadow: 0 0 6px rgba(156,107,255,0.6);
+  color: #bca9ff;
+}
+
     /* layout */
     .leftnav{position:fixed;left:12px;top:120px;width:160px}
     .leftnav ul{list-style:none;padding:0;margin:0}
@@ -85,6 +100,13 @@ h2:hover {
 a:hover, p:hover, li:hover {
   animation: glowPulse 1.8s ease-in-out infinite;
   transition: all 0.4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section {
+  animation: fadeInUp 0.8s ease both;
 }
 
 

@@ -67,6 +67,23 @@ h2:hover, a:hover, p:hover, li:hover {
   animation: glowPulse 1.8s ease-in-out infinite;
   transition: all 0.4s ease;
 }
+/*  Elysia 标题渐变流动效果 */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+h2 {
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  transition: all 0.6s ease;
+}
+
+h2:hover {
+  animation: gradientFlow 3s linear infinite;
+}
 
   </style>
 </head>

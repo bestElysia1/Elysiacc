@@ -1,6 +1,6 @@
 # Elysia - 订阅使用指南 (GitHub Pages)
 <img src="./assets/banner.jpg" width="800">
-此仓库用于展示《订阅使用指南 ver.3.16》
+
 
 ## 部署地址 
 https://bestxuyi.github.io/Elysia/

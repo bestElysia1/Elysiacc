@@ -184,7 +184,7 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
     }
     updateCount(); setInterval(updateCount, 1000);
   </script>
-  <!--  Elysia 悬浮音乐播放器 -->
+<!--  Elysia 精致悬浮播放器 -->
 <div class="music-player-floating">
   <audio controls autoplay loop id="elysia-audio">
     <source src="assets/theme of SSS -Piano Arrange Ver.-.mp3" type="audio/mpeg">
@@ -196,28 +196,35 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
 <style>
 .music-player-floating {
   position: fixed;
-  bottom: 25px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  backdrop-filter: blur(8px);
-  background: rgba(255,255,255,0.3);
-  border-radius: 20px;
-  padding: 8px 14px;
-  box-shadow: 0 0 20px rgba(156,107,255,0.6);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 6px 12px;
+  box-shadow: 0 0 15px rgba(156,107,255,0.5);
   transition: all 0.3s ease;
 }
 .music-player-floating:hover {
-  box-shadow: 0 0 30px rgba(156,107,255,0.9);
+  box-shadow: 0 0 22px rgba(156,107,255,0.8);
+  background: rgba(255, 255, 255, 0.35);
 }
 .music-player-floating audio {
-  width: 320px;
+  width: 260px;
+  height: 32px;
   border: none;
   outline: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(90deg, #b388ff, #9c6bff);
+  accent-color: #9c6bff;
+}
+@media (max-width: 600px) {
+  .music-player-floating audio {
+    width: 200px;
+  }
 }
 </style>
-
 </body>
 </html>

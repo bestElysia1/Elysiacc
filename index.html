@@ -27,7 +27,69 @@
     .music{margin-left:auto}
     iframe{border-radius:6px;border:0}
     /* countdown */
-    .countdown{margin:22px 0;padding:18px 22px;border-radius:12px;background:linear-gradient(180deg,rgba(123,63,228,0.05),rgba(123,63,228,0.01));display:inline-block;box-shadow:0 2px 8px rgba(123,63,228,0.03)}
+   /* 🌌 Elysia — 液态紫粉玻璃倒计时 */
+.countdown {
+  position: relative;
+  margin: 22px 0;
+  padding: 20px 28px;
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 4px 18px rgba(160,120,255,0.3);
+  animation: countdownFloat 8s ease-in-out infinite;
+}
+
+/* 💫 液态流光背景 */
+.countdown::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
+    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
+    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+  filter: blur(40px);
+  animation: blobMove 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 🕒 倒计时数字与标题 */
+.countdown div {
+  color: rgba(240,230,255,0.9);
+  font-size: 0.96rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(180,140,255,0.6);
+}
+.countdown .nums {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #d9caff;
+  text-shadow:
+    0 0 10px rgba(180,140,255,0.8),
+    0 0 20px rgba(160,120,255,0.4);
+}
+
+/* ✨ 轻微呼吸漂浮 */
+@keyframes countdownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 🌊 背景液态移动 */
+@keyframes blobMove {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(6%, -4%) scale(1.05); }
+  50% { transform: translate(-5%, 5%) scale(1.02); }
+  75% { transform: translate(3%, -3%) scale(1.07); }
+  100% { transform: translate(0,0) scale(1); }
+}
     .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
     /* content */
     section{margin-top:28px}

@@ -502,24 +502,29 @@ window.addEventListener('load', () => {
   gap: 8px;
 }
 
+/* 💜 优化播放器按钮样式（柔和淡紫玻璃风） */
 .elysia-controls button {
-  background: rgba(164, 143, 255, 0.25);
-  border: 1px solid rgba(164, 143, 255, 0.3);
-  color: #8f66f0;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
+  border: none;
   cursor: pointer;
+  background: rgba(200, 160, 255, 0.25);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 8px rgba(170,120,255,0.4);
   transition: all 0.25s ease;
-  box-shadow: none;
 }
+
 .elysia-controls button:hover {
-  background: rgba(164, 143, 255, 0.4);
-  transform: scale(1.08);
+  background: rgba(200, 160, 255, 0.4);
+  box-shadow: 0 0 14px rgba(170,120,255,0.6);
+  transform: scale(1.1);
+}
+
+.elysia-controls button:active {
+  transform: scale(0.95);
+  background: rgba(170,120,255,0.5);
 }
 
 .elysia-title {

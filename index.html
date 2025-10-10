@@ -397,49 +397,7 @@ draw();
 
 }
 </style>
-<!--  Elysia 高级悬浮播放器 -->
-<div class="music-player-floating">
-  <div class="song-title" id="song-title">加载中...</div>
-  <audio id="elysia-audio" controls></audio>
-  <div class="music-controls">
-    <button onclick="prevSong()"></button>
-    <button onclick="nextSong()"></button>
-  </div>
-</div>
 
-<script>
-//  歌曲列表（你的歌曲）
-const songs = [
-  { title: "Theme of SSS - Piano Arrange Ver.", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
-  { title: "My Soul, Your Beats! - Piano Arrange Ver.", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
-  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间.mp3" }
-];
-
-let index = 0;
-const player = document.getElementById("elysia-audio");
-const title = document.getElementById("song-title");
-
-function loadSong(i) {
-  player.src = songs[i].src;
-  title.textContent = songs[i].title;
-  player.play().catch(()=>{});
-}
-
-function prevSong() {
-  index = (index - 1 + songs.length) % songs.length;
-  loadSong(index);
-}
-
-function nextSong() {
-  index = (index + 1) % songs.length;
-  loadSong(index);
-}
-
-player.addEventListener("ended", nextSong);
-loadSong(index);
-</script>
-
-<style>
 <!--  Elysia 极简淡紫悬浮播放器 -->
 <div class="elysia-mini-player">
   <button id="prevBtn">⟨</button>

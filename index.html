@@ -628,7 +628,7 @@ function showPlayer() {
 }
 function resetTimer() {
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 10000);
+  inactivityTimer = setTimeout(hidePlayer, 20000);
 }
 ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
   window.addEventListener(evt, showPlayer)

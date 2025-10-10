@@ -391,46 +391,12 @@ draw();
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: -1;
-  background: radial-gradient(ellipse at center, #fdfcff 0%, #e9e5ff 100%);
+  z-index: -2;  /*  更靠后一层 */
+  background: transparent;  /* 去掉浅色背景 */
+  pointer-events: none;  /* 防止拦截鼠标点击 */
 }
 </style>
-<!--  Elysia 星云光晕 -->
-<div class="elysia-nebula"></div>
 
-<style>
-.elysia-nebula {
-  position: fixed;
-  top: -100px;
-  left: 50%;
-  width: 600px;
-  height: 600px;
-  transform: translateX(-50%);
-  background: radial-gradient(
-    circle at center,
-    rgba(180,160,255,0.35) 0%,
-    rgba(156,107,255,0.15) 40%,
-    rgba(255,255,255,0) 80%
-  );
-  filter: blur(80px);
-  border-radius: 50%;
-  z-index: -1;
-  animation: nebulaRotate 60s linear infinite;
-  opacity: 0.6;
-}
-
-@keyframes nebulaRotate {
-  from { transform: translateX(-50%) rotate(0deg); }
-  to { transform: translateX(-50%) rotate(360deg); }
-}
-
-@media (max-width: 600px) {
-  .elysia-nebula {
-    width: 400px;
-    height: 400px;
-    filter: blur(60px);
-    opacity: 0.4;
-  }
 }
 </style>
 

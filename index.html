@@ -398,208 +398,166 @@ draw();
 }
 </style>
 
-<!-- 💜 Elysia 极简悬浮播放器（My Soul 优先播放） -->
-<div class="elysia-mini-player">
-  <button id="prevBtn">⟨</button>
-  <button id="playPauseBtn" class="glow">▶</button>
-  <button id="nextBtn">⟩</button>
-  <span id="songTitle">加载中...</span>
-  <audio id="elysiaAudio" preload="auto" hidden></audio>
+<!-- 🌸 Elysia Elegant Music Player -->
+<div class="elysia-player">
+  <div class="elysia-controls">
+    <button id="prevBtn">⏮</button>
+    <button id="playBtn">▶</button>
+    <button id="nextBtn">⏭</button>
+  </div>
+  <div id="songTitle">My Soul, Your Beats! -Piano Arrange Ver.-</div>
+  <audio id="elysiaAudio" preload="auto"></audio>
 </div>
 
+<script>
+const songs = [
+  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3",
+  "assets/theme of SSS -Piano Arrange Ver.-.mp3",
+  "assets/给我一首歌的时间.mp3"
+];
+let currentSong = 0;
+const audio = document.getElementById("elysiaAudio");
+const title = document.getElementById("songTitle");
+const playBtn = document.getElementById("playBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+
+// 初始化默认歌曲
+audio.src = songs[currentSong];
+title.textContent = songs[currentSong].split("/").pop().replace(".mp3", "");
+
+// 自动播放第一个
+window.addEventListener("load", () => {
+  audio.play().catch(() => {
+    console.log("⚠️ 自动播放被阻止，等待用户交互后播放。");
+  });
+});
+
+// 切换播放暂停
+playBtn.onclick = () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+};
+
+// 下一首
+nextBtn.onclick = () => {
+  currentSong = (currentSong + 1) % songs.length;
+  audio.src = songs[currentSong];
+  title.textContent = songs[currentSong].split("/").pop().replace(".mp3", "");
+  audio.play();
+  playBtn.textContent = "⏸";
+};
+
+// 上一首
+prevBtn.onclick = () => {
+  currentSong = (currentSong - 1 + songs.length) % songs.length;
+  audio.src = songs[currentSong];
+  title.textContent = songs[currentSong].split("/").pop().replace(".mp3", "");
+  audio.play();
+  playBtn.textContent = "⏸";
+};
+
+// 自动播放下一首
+audio.addEventListener("ended", () => nextBtn.onclick());
+</script>
+
 <style>
-/* 🌸 播放器容器 */
-.elysia-mini-player {
+/* 🌸 Elysia Elegant Theme（自适应浅色 / 深色模式） */
+
+/* ====== 播放器样式 ====== */
+.elysia-player {
   position: fixed;
-  bottom: 20px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.25);
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(156,107,255,0.25);
-  border-radius: 18px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(156,107,255,0.25);
   backdrop-filter: blur(12px);
-  box-shadow: 0 0 18px rgba(156,107,255,0.3);
-  animation: floaty 5s ease-in-out infinite;
   z-index: 9999;
-  color: #7d53ff;
-  font-size: 0.9rem;
-  font-weight: 500;
+  animation: floaty 5s ease-in-out infinite;
 }
-
-/* 🎶 滚动歌名 */
-#songTitle {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 160px;
-  color: #6c4aff;
-  text-shadow: 0 0 6px rgba(156,107,255,0.3);
-  animation: marquee 12s linear infinite;
-}
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-/* 🔘 按钮样式 */
-.elysia-mini-player button {
-  background: rgba(156,107,255,0.2);
-  border: none;
-  color: white;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 0 8px rgba(156,107,255,0.4);
-}
-.elysia-mini-player button:hover {
-  background: rgba(156,107,255,0.4);
-  transform: scale(1.1);
-  box-shadow: 0 0 14px rgba(156,107,255,0.6);
-}
-/* 🌸 Elysia 播放按钮美化 */
-.elysia-controls button {
-  background: linear-gradient(135deg, #b388ff, #9c6bff);
-  border: none;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(156,107,255,0.5);
-}
-
-.elysia-controls button:hover {
-  background: linear-gradient(135deg, #c9aaff, #b388ff);
-  box-shadow: 0 0 12px rgba(156,107,255,0.7);
-  transform: scale(1.05);
-}
-
-.elysia-controls button:active {
-  transform: scale(0.95);
-}
-
-/* 💫 播放时按钮发光 */
-.glow.playing {
-  animation: glowPulse 2s ease-in-out infinite alternate;
-}
-@keyframes glowPulse {
-  from {
-    box-shadow: 0 0 8px rgba(156,107,255,0.4);
-    background: rgba(156,107,255,0.3);
-  }
-  to {
-    box-shadow: 0 0 20px rgba(156,107,255,0.8);
-    background: rgba(156,107,255,0.5);
-  }
-}
-
-/* 🌫️ 漂浮动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -4px); }
+  50% { transform: translate(-50%, -3px); }
 }
 
-/* 📱 响应式 */
-@media (max-width: 600px) {
-  #songTitle { width: 120px; font-size: 0.8rem; }
-  .elysia-mini-player { padding: 6px 10px; gap: 6px; }
+/* ====== 控制按钮 ====== */
+.elysia-controls {
+  display: flex;
+  gap: 8px;
 }
-</style>
-
-<script>
-const songs = [
-  "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", // 优先播放
-  "assets/theme of SSS -Piano Arrange Ver.-.mp3",
-  "assets/给我一首歌的时间.mp3"
-];
-const titles = [
-  "My Soul, Your Beats! - Piano Arrange Ver.",
-  "Theme of SSS - Piano Arrange Ver.",
-  "给我一首歌的时间"
-];
-
-let current = 0;
-const audio = document.getElementById("elysiaAudio");
-const title = document.getElementById("songTitle");
-const playBtn = document.getElementById("playPauseBtn");
-
-function loadSong(index) {
-  audio.src = songs[index];
-  title.textContent = titles[index];
+.elysia-controls button {
+  background: linear-gradient(135deg, #a48ffb, #875cff);
+  border: none;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 10px rgba(156,107,255,0.6);
+}
+.elysia-controls button:hover {
+  background: linear-gradient(135deg, #bfa3ff, #9c6bff);
+  transform: scale(1.1);
+}
+.elysia-controls button:active {
+  transform: scale(0.9);
 }
 
-function playPause() {
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "⏸";
-    playBtn.classList.add("playing");
-  } else {
-    audio.pause();
-    playBtn.textContent = "▶";
-    playBtn.classList.remove("playing");
+/* ====== 歌曲名滚动效果 ====== */
+#songTitle {
+  font-size: 14px;
+  color: #a48ffb;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 180px;
+  text-align: center;
+  animation: scrollTitle 14s linear infinite;
+}
+@keyframes scrollTitle {
+  0% { transform: translateX(40%); }
+  100% { transform: translateX(-40%); }
+}
+
+/* ====== 深色模式适配 ====== */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #121212;
+    color: #ddd;
+  }
+  h2, h3, strong, p, li, a {
+    color: #cbb6ff !important;
+  }
+  .elysia-player {
+    background: rgba(50, 40, 70, 0.5);
+    border: 1px solid rgba(156,107,255,0.3);
+    box-shadow: 0 0 18px rgba(156,107,255,0.4);
+  }
+  .elysia-controls button {
+    background: linear-gradient(135deg, #a48ffb, #875cff);
+    box-shadow: 0 0 14px rgba(156,107,255,0.8);
+  }
+  .elysia-controls button:hover {
+    background: linear-gradient(135deg, #bfa3ff, #9c6bff);
+  }
+  #songTitle {
+    color: #cbb6ff;
   }
 }
-
-function nextSong() {
-  current = (current + 1) % songs.length;
-  loadSong(current);
-  audio.play();
-  playBtn.textContent = "⏸";
-  playBtn.classList.add("playing");
-}
-
-function prevSong() {
-  current = (current - 1 + songs.length) % songs.length;
-  loadSong(current);
-  audio.play();
-  playBtn.textContent = "⏸";
-  playBtn.classList.add("playing");
-}
-
-audio.onended = nextSong;
-
-// ⚙️ 自动播放逻辑（兼容所有浏览器）
-window.addEventListener("DOMContentLoaded", () => {
-  loadSong(current);
-  audio.volume = 0;
-  audio.muted = true;
-  audio.play().then(() => {
-    setTimeout(() => {
-      fadeInAudio();
-    }, 1000);
-  }).catch(() => {
-    document.body.addEventListener("click", unlockAudio, { once: true });
-  });
-});
-
-function unlockAudio() {
-  fadeInAudio();
-  audio.play();
-}
-
-function fadeInAudio() {
-  audio.muted = false;
-  let vol = 0;
-  const fade = setInterval(() => {
-    vol += 0.05;
-    audio.volume = vol;
-    if (vol >= 1) clearInterval(fade);
-  }, 150);
-  playBtn.textContent = "⏸";
-  playBtn.classList.add("playing");
-}
-
-document.getElementById("nextBtn").onclick = nextSong;
-document.getElementById("prevBtn").onclick = prevSong;
-playBtn.onclick = playPause;
-</script>
+</style>
 
 
 </body>

@@ -226,6 +226,14 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
     width: 200px;
   }
 }
+  /*  Elysia 浮动动画 */
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+.music-player-floating {
+  animation: floaty 5s ease-in-out infinite;
+}
 </style>
 </body>
 </html>

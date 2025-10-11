@@ -309,11 +309,9 @@ main.container li:hover {
       <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
       <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
       <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
-      <ul>
-        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module</pre>
-        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module</pre>
-        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
-      </ul>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module</pre>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module</pre>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
       <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
 
     </section>
@@ -323,7 +321,9 @@ main.container li:hover {
       <p>Shadowrocket 最终毕业玩法：</p>
       <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject，三个模块，打开其中 proxy 模块，你可以看到 proxy_list，例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
       <pre>DOMAIN-SUFFIX,yhdm.one,PROXY<pre>
+        
       <pre>DOMAIN-SUFFIX,yinhuadm.one,PROXY<pre>
+        
       <pre>DOMAIN-SUFFIX,anime1.me,PROXY</pre>
       <p>然后保存即可，注意批量添加时，请确保每个规则一行一起复制粘贴进去即可</p>
       <p>其他诸如特定网站走直连（打开其中direct模块...）等同理~</p>

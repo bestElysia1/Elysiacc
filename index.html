@@ -604,8 +604,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 const songs = [
   { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
   { title: "My Most Precious Treasure (From My Most Precious Treasure)", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3" },
-  { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3
-" },
+  { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3" },
   { title: "Last regrets,foretting me", src: "assets/Last regrets,foretting me.mp3" },
   { title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3" },
   { title: "My Soul, Your Beats! ~Classic~ Instrumental", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3" },
@@ -619,20 +618,29 @@ const nextBtn = document.getElementById("nextBtn");
 const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
 
+let nextAudio = null; // 预加载用
+
+function preloadNext() {
+  const nextIndex = (currentSong + 1) % songs.length;
+  nextAudio = new Audio(songs[nextIndex].src);
+  nextAudio.preload = "auto";
+}
+
 function updateSong() {
   titleEl.textContent = songs[currentSong].title;
   audio.src = songs[currentSong].src;
   audio.play().catch(() => {});
-  playPauseBtn.textContent = "⏸";
+  playPauseBtn.textContent = "";
+  preloadNext(); // 播放后预加载下一首
 }
 
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
-    playPauseBtn.textContent = "⏸";
+    playPauseBtn.textContent = "";
   } else {
     audio.pause();
-    playPauseBtn.textContent = "▶";
+    playPauseBtn.textContent = "";
   }
 });
 
@@ -643,12 +651,12 @@ nextBtn.addEventListener("click", () => {
 
 audio.addEventListener("ended", () => nextBtn.click());
 
-// 🌸 播放时呼吸光晕
+//  播放时呼吸光晕
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
 updateSong();
 
-// 💤 10 秒无操作自动隐藏
+//  30 秒无操作自动隐藏
 let inactivityTimer;
 function hidePlayer() {
   player.style.opacity = '0';
@@ -663,13 +671,14 @@ function showPlayer() {
 }
 function resetTimer() {
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 20000);
+  inactivityTimer = setTimeout(hidePlayer, 30000); //  30秒自动隐藏
 }
 ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
   window.addEventListener(evt, showPlayer)
 );
 resetTimer();
 </script>
+
 
 <style>
 .elysia-player {

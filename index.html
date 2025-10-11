@@ -262,7 +262,7 @@ main.container li:hover {
       <h2>通知</h2>
       <ul>
         <li>三网优化已完成〜 2025-09-16</li>
-        <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜2025-09-16</li>
+        <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜2025-09-16(已完成自动切换）</li>
         <li>由于部分省份升级省级防火墙原因，移动线路要做特别优化，如果无法使用，请联系我给你单独调优 ~2025-09-19</li>
         <li>部分省份移动已G，请切换电信，移动网络暂时无法使用 ~2025-09-30（已修复）</li>
         <li>德国法兰克福 CN2 GIA 专线将于 10月 20日上线 2025-10-10</li>
@@ -310,9 +310,9 @@ main.container li:hover {
       <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
       <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
       <ul>
-        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module</a></li>
-        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module</a></li>
-        <li><a href="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</a></li>
+        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module</pre>
+        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module</pre>
+        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
       </ul>
       <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
 
@@ -322,9 +322,9 @@ main.container li:hover {
       <h2>Shadowrocket 进阶</h2>
       <p>Shadowrocket 最终毕业玩法：</p>
       <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject，三个模块，打开其中 proxy 模块，你可以看到 proxy_list，例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
-      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
-DOMAIN-SUFFIX,yinhuadm.one,PROXY
-DOMAIN-SUFFIX,anime1.me,PROXY</pre>
+      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY<pre>
+      <pre>DOMAIN-SUFFIX,yinhuadm.one,PROXY<pre>
+      <pre>DOMAIN-SUFFIX,anime1.me,PROXY</pre>
       <p>然后保存即可，注意批量添加时，请确保每个规则一行一起复制粘贴进去即可</p>
       <p>其他诸如特定网站走直连（打开其中direct模块...）等同理~</p>
     
@@ -333,8 +333,8 @@ DOMAIN-SUFFIX,anime1.me,PROXY</pre>
     <section>
       <h2>Shadowrocket 负载均衡</h2>
       <p>打开⼩⽕箭－⾸⻚－全局路由－启⽤回退；分组－简单模式－开启；分组－编辑－选择⾃⼰想要使⽤的节点－完成</p>
-      <p>这里务必保证选择包含奶昔香港节点，唯云新加坡节点，唯云日本节点01</p>
-      <p>旨在保证永远可⽤以及自动切换可用</p>
+      <p>这里务必保证包含 唯云香港&新加坡&日本节点，奶昔香港&新加坡&日本节点</p>
+      <p>旨在保证永远可⽤&自动切换可用</p>
       <p>⸺</p>
       <p>其他 v2rayN、clash verge、sing - box .etc 略</p>
     

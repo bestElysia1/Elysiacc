@@ -898,5 +898,12 @@ resetTimer();
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
 
+<script>
+document.querySelectorAll('a[href]').forEach(a => {
+  if (!a.target) a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener noreferrer');
+});
+</script>
+
 </body>
 </html>

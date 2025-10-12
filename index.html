@@ -720,10 +720,11 @@ titleEl.addEventListener("click", e => {
   playlist.classList.toggle("show");
 });
 
-// 🚪 点击空白处关闭列表
 document.addEventListener("click", e => {
   if (!playlist.contains(e.target) && e.target !== titleEl) {
     playlist.classList.remove("show");
+    playlist.classList.add("hide");
+    setTimeout(() => playlist.classList.remove("hide"), 350);
   }
 });
 
@@ -880,6 +881,27 @@ resetTimer();
 @keyframes softPulse {
   0%, 100% { box-shadow: 0 0 10px rgba(160,120,255,0.4); }
   50% { box-shadow: 0 0 18px rgba(160,120,255,0.8); }
+}
+/* === macOS 弹出 / 缩回 动画 === */
+@keyframes dockOpen {
+  0%   { transform: translateX(-50%) scale(0.7); opacity: 0; }
+  60%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 播放列表显示时应用弹出动画 */
+.elysia-playlist.show {
+  animation: dockOpen 0.45s cubic-bezier(0.25, 1.25, 0.5, 1);
+}
+
+/* 播放列表隐藏时应用收回动画 */
+.elysia-playlist.hide {
+  animation: dockClose 0.35s cubic-bezier(0.5, 0, 0.75, 0.5);
 }
 </style>
 

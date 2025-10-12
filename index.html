@@ -853,19 +853,18 @@ resetTimer();
 .playlist-item:hover { background: rgba(160,120,255,0.12); }
 .playlist-item.active { background: rgba(160,120,255,0.22); box-shadow: 0 0 10px rgba(160,120,255,0.55); animation: softPulse 3s ease-in-out infinite; }
 
-/* ===== macOS 风格弹跳（开/关） + 发光波纹 ===== */
-/* 弹跳开（带溢出回弹） */
+/* 中等项 */
 @keyframes dockBounceOpen {
-  0%   { transform: translateX(-50%) scale(0.6); opacity: 0; }
-  55%  { transform: translateX(-50%) scale(1.12); opacity: 1; }
-  75%  { transform: translateX(-50%) scale(0.96); }
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
   100% { transform: translateX(-50%) scale(1); }
 }
-/* 缩回（先略放大再收回，制造被“吸入”的感觉） */
+
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  35%  { transform: translateX(-50%) scale(1.06); }
-  100% { transform: translateX(-50%) scale(0.55); opacity: 0; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
 }
 
 /* 发光波纹层（使用 ::after） */

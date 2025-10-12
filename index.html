@@ -848,11 +848,27 @@ resetTimer();
   will-change: transform, opacity;
 }
 
-/* 列表项 */
-.playlist-item { padding:6px 10px; color:#eae4ff; font-size:.9rem; border-radius:8px; cursor:pointer; transition: background .2s; }
-.playlist-item:hover { background: rgba(160,120,255,0.12); }
-.playlist-item.active { background: rgba(160,120,255,0.22); box-shadow: 0 0 10px rgba(160,120,255,0.55); animation: softPulse 3s ease-in-out infinite; }
+/* 歌曲名文字颜色调整为淡紫色调 */
+.playlist-item {
+  padding: 6px 10px;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
 
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* 悬停时变亮 */
+}
+
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
+}
 /* 中等项 */
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }

@@ -969,5 +969,27 @@ document.querySelectorAll('a[href]').forEach(a => {
 })();
 </script>
 
+<script>
+// 自定义右键菜单，只替换默认菜单，不完全禁右键
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const menu = document.createElement('div');
+  menu.textContent = "🌸 Elysia Player — 禁止查看源码";
+  Object.assign(menu.style, {
+    position: 'fixed',
+    left: e.pageX + 'px',
+    top: e.pageY + 'px',
+    background: 'rgba(30,30,40,0.9)',
+    color: '#fff',
+    padding: '6px 12px',
+    borderRadius: '8px',
+    zIndex: 999999,
+    userSelect: 'none'
+  });
+  document.body.appendChild(menu);
+  setTimeout(() => menu.remove(), 1200);
+});
+</script>
+
 </body>
 </html>

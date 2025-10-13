@@ -972,79 +972,7 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-// 🌸 Elysia 自定义右键菜单
-document.addEventListener("contextmenu", (e) => {
-  e.preventDefault();
 
-  // 移除旧菜单
-  const oldMenu = document.getElementById("elysia-context-menu");
-  if (oldMenu) oldMenu.remove();
-
-  // 创建菜单容器
-  const menu = document.createElement("div");
-  menu.id = "elysia-context-menu";
-  menu.innerHTML = `
-    <div class="item">🔄 刷新页面</div>
-    <div class="item">⬅ 返回上一页</div>
-    <div class="item">➡ 前进</div>
-    <div class="item">📋 复制文字</div>
-    <div class="item disabled">🚫 查看源代码已禁用</div>
-  `;
-  Object.assign(menu.style, {
-    position: "fixed",
-    top: `${e.clientY}px`,
-    left: `${e.clientX}px`,
-    background: "rgba(40,30,60,0.85)",
-    border: "1px solid rgba(180,150,255,0.25)",
-    backdropFilter: "blur(12px)",
-    borderRadius: "12px",
-    color: "#e7dcff",
-    padding: "6px 0",
-    zIndex: 999999,
-    fontSize: "0.9rem",
-    minWidth: "180px",
-    boxShadow: "0 6px 24px rgba(150,110,255,0.25)",
-    animation: "fadeIn 0.2s ease-out"
-  });
-
-  // 样式
-  const style = document.createElement("style");
-  style.textContent = `
-    #elysia-context-menu .item {
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    #elysia-context-menu .item:hover {
-      background: rgba(156,107,255,0.15);
-    }
-    #elysia-context-menu .item.disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-  `;
-  document.head.appendChild(style);
-
-  // 添加事件
-  menu.querySelector(".item:nth-child(1)").onclick = () => location.reload();
-  menu.querySelector(".item:nth-child(2)").onclick = () => history.back();
-  menu.querySelector(".item:nth-child(3)").onclick = () => history.forward();
-  menu.querySelector(".item:nth-child(4)").onclick = () => {
-    document.execCommand("copy");
-  };
-
-  document.body.appendChild(menu);
-
-  // 点击外部关闭菜单
-  setTimeout(() => {
-    document.addEventListener("click", () => menu.remove(), { once: true });
-  }, 0);
-});
-</script>
 
 
 </body>

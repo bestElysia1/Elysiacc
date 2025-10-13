@@ -924,148 +924,35 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-(function(){
-  // --- 配置 ---
-  const ENABLE_BLOCK_SHORTCUTS = true; // 阻止快捷键
-  const ENABLE_DISABLE_CONTEXT = true; // 禁右键
-  const ENABLE_DISABLE_SELECT = false; // 禁选中（可选）
-  const ENABLE_DETECT = true; // 检测 DevTools
-  const DETECT_ACTION = 'overlay'; // 'overlay'|'redirect'|'console'|'none'
-  const REDIRECT_URL = 'about:blank'; // 若使用 redirect
-
-  // --- 快捷键拦截 ---
-  if (ENABLE_BLOCK_SHORTCUTS) {
-    window.addEventListener('keydown', function(e){
-      // F12
-      if (e.key === 'F12') { e.preventDefault(); return false; }
-      // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) {
-        e.preventDefault(); return false;
-      }
-      // Ctrl+U (查看源码)
-      if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') {
-        e.preventDefault(); return false;
-      }
-      // Ctrl+S / Ctrl+Shift+S (保存)
-      if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'S') {
-        e.preventDefault(); return false;
-      }
-    }, {capture: true});
-  }
-
-  // --- 禁右键 / 禁选择 ---
-  if (ENABLE_DISABLE_CONTEXT) {
-    document.addEventListener('contextmenu', function(e){
+(function() {
+  // 禁用 F12、Ctrl+Shift+I/J/C/U 等调试快捷键
+  document.addEventListener('keydown', function(e) {
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
+      (e.ctrlKey && e.key.toUpperCase() === 'U')
+    ) {
       e.preventDefault();
-    }, {capture: true});
-  }
-  if (ENABLE_DISABLE_SELECT) {
-    document.addEventListener('selectstart', function(e){ e.preventDefault(); }, {capture:true});
-  }
-
-  // --- DevTools 检测 & 响应 ---
-  function createOverlay() {
-    let ov = document.getElementById('__devtools_block_overlay__');
-    if (!ov) {
-      ov = document.createElement('div');
-      ov.id = '__devtools_block_overlay__';
-      Object.assign(ov.style, {
-        position: 'fixed', left:0, top:0, right:0, bottom:0,
-        background: 'rgba(8,8,12,0.95)', color:'#fff', zIndex:2147483647,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize: '18px', textAlign:'center', padding:'20px',
-        backdropFilter: 'blur(4px)'
-      });
-      ov.innerHTML = '<div>检测到开发者工具已打开。为保证页面安全，已限制部分功能。如需继续，请关闭开发者工具。</div>';
-      document.body.appendChild(ov);
-    }
-    return ov;
-  }
-
-  function onDevToolsDetected() {
-    // TODO: 根据需求替换行为
-    if (DETECT_ACTION === 'overlay') {
-      createOverlay();
-    } else if (DETECT_ACTION === 'redirect') {
-      window.location.href = REDIRECT_URL;
-    } else if (DETECT_ACTION === 'console') {
-      console.warn('DevTools detected');
-    }
-    // 你也可以发送一个 fetch 到后端记录此事件：
-    // navigator.sendBeacon('/log/devtools', JSON.stringify({ts:Date.now(), url:location.href}));
-  }
-
-  if (ENABLE_DETECT) {
-    // 多种检测策略综合使用，提高命中率（但仍不是 100%）
-    let detected = false;
-
-    // 方法A：监测窗口内外尺寸差（常见方法，针对 Dock/侧边 DevTools）
-    function checkWindowSize() {
-      try {
-        const threshold = 160; // 阈值，可调整
-        if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-          return true;
-        }
-      } catch (e) {}
+      e.stopPropagation();
       return false;
-    }
-
-    // 方法B：使用 debugger/timing 技巧（对面板打开导致执行速度变慢时触发）
-    function checkDebuggerTiming() {
-      const start = performance.now();
-      // 执行一个空的 debugger 触发（在某些情况下会被停顿）
-      // 注意：在生产环境不建议频繁调用 debugger，可能影响性能
-      // 此处以 try-catch 包裹以避免异常
-      // eslint-disable-next-line no-debugger
-      try { debugger; } catch(e) {}
-      const end = performance.now();
-      return (end - start) > 100; // 超时阈值，可调整
-    }
-
-    // 方法C：检测 devtools-detect 经典技巧（console size）
-    let elementForConsoleCheck = document.createElement('div');
-    elementForConsoleCheck.__defineGetter__ && elementForConsoleCheck.__defineGetter__('id', function() {
-      detected = true;
-      return '';
-    });
-
-    function checkConsoleOpen() {
-      detected = false;
-      console.log('%c', elementForConsoleCheck);
-      return detected;
-    }
-
-    // 综合检测循环
-    function detectLoop() {
-      try {
-        if (!detected) {
-          if (checkWindowSize()) detected = true;
-          else if (checkConsoleOpen()) detected = true;
-          else if (checkDebuggerTiming()) detected = true;
-        }
-        if (detected) {
-          onDevToolsDetected();
-        } else {
-          // 继续检测
-          setTimeout(detectLoop, 1200);
-        }
-      } catch (e) {
-        // 安全降级
-        setTimeout(detectLoop, 2000);
-      }
-    }
-    setTimeout(detectLoop, 800);
-  }
-
-  // --- 退出或恢复逻辑（可选），比如关闭 overlay 时的处理 ---
-  document.addEventListener('keydown', function(e){
-    // 如果 overlay 存在，按 Esc 可移除（如果你希望用户能关闭）
-    if (e.key === 'Escape') {
-      const ov = document.getElementById('__devtools_block_overlay__');
-      if (ov) ov.remove();
     }
   }, true);
 
+  // 简单检测开发者工具（静默处理）
+  let devtoolsOpen = false;
+  const threshold = 160;
+  function detect() {
+    if (
+      window.outerWidth - window.innerWidth > threshold ||
+      window.outerHeight - window.innerHeight > threshold
+    ) {
+      devtoolsOpen = true;
+    } else {
+      devtoolsOpen = false;
+    }
+    setTimeout(detect, 1500);
+  }
+  detect();
 })();
 </script>
 

@@ -211,72 +211,17 @@ main.container li:hover {
   text-shadow: 0 0 6px rgba(156,107,255,0.4);
   transition: all 0.3s ease;
 }
-/* --- 🚀 订阅链接复制按钮样式 --- */
-.copy-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  /* 确保按钮和文本在同一行 */
-}
 
-.copy-btn {
-  /* 按钮基础样式，匹配 Elysia 主题 */
-  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(120, 80, 255, 0.4);
-  transition: all 0.3s ease;
-  white-space: nowrap; /* 防止按钮内文字换行 */
-}
-
-.copy-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(120, 80, 255, 0.6);
-}
-
-.copy-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(120, 80, 255, 0.3);
-}
-
-/* 规则代码块内的复制按钮 */
-.pre-wrapper {
-  position: relative;
-  margin: 10px 0;
-}
-
-.pre-wrapper .copy-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  background: rgba(123, 63, 228, 0.7); /* 略透明，不遮挡代码 */
-  box-shadow: none;
-}
-.pre-wrapper .copy-btn:hover {
-  background: rgba(123, 63, 228, 1);
-  transform: none;
-}
-.pre-wrapper .copy-btn:active {
-  background: rgba(90, 40, 180, 1);
-}
-
-/* --- 🎶 Elysia 漂浮音符特效样式 --- */
-/* 音符容器：固定在右下角，确保音符可以向上飘出屏幕 */
+/* --- 🎶 Elysia 漂浮音符特效样式（优化后） --- */
+/* 音符容器：固定在右侧，宽度限制在 300px，高度只占屏幕 80% */
 #music-notes-container {
   position: fixed;
   bottom: 0;
   right: 0;
-  width: 100%;
-  height: 100vh;
+  width: 300px; /* 限制宽度 */
+  height: 80vh; /* 限制高度 */
   pointer-events: none; /* 确保不影响点击事件 */
-  overflow: hidden; /* 防止音符溢出屏幕造成滚动条 */
+  overflow: hidden; /* 防止音符溢出造成滚动条 */
   z-index: 9998; /* 位于播放器之下，但高于星空 */
 }
 
@@ -291,7 +236,7 @@ main.container li:hover {
   text-shadow: 0 0 8px rgba(180, 140, 255, 0.7); /* 柔和发光 */
 }
 
-/* 向上漂浮的关键动画 */
+/* 向上且斜向右上方漂浮的关键动画（更斜） */
 @keyframes noteFloat {
   0% {
     transform: translate(0, 0) rotate(0deg);
@@ -301,7 +246,7 @@ main.container li:hover {
     opacity: 0.8;
   }
   100% {
-    transform: translate(20px, -120vh) rotate(15deg); /* 向上+轻微右飘 */
+    transform: translate(150px, -120vh) rotate(25deg); /* 150px 显著向右斜上漂浮 */
     opacity: 0;
   }
 }
@@ -349,11 +294,8 @@ main.container li:hover {
     <section>
       <h2>订阅链接</h2>
       <p>请发送 订阅 至邮箱自动获取</p>
-      <div class="copy-container">
-        <p style="margin:0">E-mail: <a href="mailto:bestElysia+support@hotmail.com">bestElysia+support@hotmail.com</a></p>
-        <button class="copy-btn" data-copy="bestElysia+support@hotmail.com">复制邮箱</button>
-      </div>
-      </section>
+      <p>E-mail: <a href="mailto:bestElysia+support@hotmail.com">bestElysia+support@hotmail.com</a></p>
+    </section>
 
     <section>
       <h2>通知</h2>
@@ -404,19 +346,12 @@ main.container li:hover {
       <h2>规则集</h2>
       <p>Shadowsrocket:</p>
       <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
-      <div class="pre-wrapper">
-        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
-        <button class="copy-btn" data-copy="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf">复制链接</button>
-      </div>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
       <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
-      <div class="pre-wrapper">
-        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
-        <button class="copy-btn" data-copy="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
-https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
-https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">复制模块</button>
-      </div>
+
       <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
 
     </section>
@@ -431,9 +366,11 @@ DOMAIN-SUFFIX,anime1.me,PROXY
 DOMAIN-SUFFIX,openai.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,openai.com,唯☁️｜新加坡02-❄️10Gbps
 DOMAIN-SUFFIX,openai.com,唯☁️｜日本01-❄️10Gbps
+DOMAIN-SUFFIX,openai.com,奶昔｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜新加坡02-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜日本01-❄️10Gbps
+DOMAIN-SUFFIX,chatgpt.com,奶昔｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,googleapis.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.googleapis.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,bard.google.com,唯☁️｜新加坡01-❄️10Gbps
@@ -467,7 +404,7 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
         <li><strong>常用工具：</strong>Final shell、Putty、CMD、XUI&3X-UI</li>
         <li><strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 这个链接复制到VPS然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 </li>
         <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
-        <li><strong>CMD：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
+        <li><strong>CMD：：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
         <li><strong>建议：：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
       </ul>
     </section>
@@ -1079,41 +1016,6 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-/* --- ✂️ 一键复制功能 JS --- */
-function setupCopyButtons() {
-  document.querySelectorAll('.copy-btn').forEach(button => {
-    button.addEventListener('click', async () => {
-      const dataToCopy = button.getAttribute('data-copy');
-      const originalText = button.textContent;
-      
-      try {
-        // 使用 Clipboard API 复制内容
-        await navigator.clipboard.writeText(dataToCopy);
-        
-        // 成功反馈
-        button.textContent = '✅ 已复制！';
-        button.style.backgroundColor = '#4CAF50';
-        button.style.background = '#4CAF50';
-
-      } catch (err) {
-        // 失败（如权限问题），可以退回到旧的 execCommand
-        console.error('Copy failed:', err);
-        button.textContent = '❌ 复制失败';
-      }
-
-      // 恢复按钮文本
-      setTimeout(() => {
-        button.textContent = originalText;
-        button.style.backgroundColor = ''; // 清除内联样式，恢复 CSS 样式
-        button.style.background = '';
-      }, 2000);
-    });
-  });
-}
-// 在页面加载后调用设置函数
-window.addEventListener('load', setupCopyButtons);
-</script>
-<script>
 /* --- 🎵 漂浮音符生成逻辑 --- */
 // 获取元素
 const notesContainer = document.createElement('div');
@@ -1135,11 +1037,13 @@ function createNote() {
 
   // 获取播放器的位置作为音符的起点（为了保持风格一致性，从播放器附近飘出）
   const playerRect = musicPlayer.getBoundingClientRect();
-  const startX = playerRect.left + playerRect.width / 2;
+  
+  // 计算音符初始位置：靠近播放器中心但偏向右侧
+  const startX = playerRect.right - 60; // 靠右 60px
   const startY = playerRect.top + playerRect.height / 2;
 
-  // 设置音符初始位置
-  note.style.left = `${startX + (Math.random() * 20 - 10)}px`; // 在播放器中心小范围波动
+  // 设置音符初始位置（相对于整个视口）
+  note.style.left = `${startX + (Math.random() * 20 - 10)}px`; // 在播放器右侧小范围波动
   note.style.top = `${startY}px`;
 
   // 随机应用动画属性

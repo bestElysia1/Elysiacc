@@ -26,7 +26,7 @@
 /* 🌈 裸眼3D Banner 效果 */
 .banner-3d {
   position: relative;
-  ...
+  /* ... 这里可能包含原有被省略的 CSS 规则 ... */
 }
     header{display:flex;align-items:center;justify-content:space-between;gap:20px}
     .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
@@ -132,7 +132,7 @@ footer:hover {
       header{flex-direction:column;align-items:flex-start}
       .music{margin-left:0;margin-top:8px}
     }
-/*  Elysia 呼吸发光渐亮效果 */
+/* Elysia 呼吸发光渐亮效果 */
 @keyframes glowPulse {
   0% {
     color: #9a6ef0;
@@ -152,7 +152,7 @@ footer:hover {
   }
 }
 
-/*  Elysia 标题渐变流动 + 发光组合 */
+/* Elysia 标题渐变流动 + 发光组合 */
 @keyframes gradientFlow {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
@@ -182,20 +182,20 @@ a:hover, p:hover, li:hover {
 section {
   animation: fadeInUp 0.8s ease both;
 }
-/*  全局正文淡紫色优化（Elysia 风格） */
+/* 全局正文淡紫色优化（Elysia 风格） */
 p, ul, li {
   color: #7a66c7 !important; /* 柔和淡紫色 */
   line-height: 1.8;
   font-size: 0.95rem;
 }
 
-/*  段落 hover 时轻微亮一点 */
+/* 段落 hover 时轻微亮一点 */
 p:hover, li:hover {
   color: #9a6ef0 !important;
   text-shadow: 0 0 6px rgba(156,107,255,0.3);
   transition: all 0.3s ease;
 }
-/*  强制让正文显示淡紫色 */
+/* 强制让正文显示淡紫色 */
 main.container p,
 main.container ul,
 main.container li {
@@ -204,15 +204,107 @@ main.container li {
   font-size: 0.95rem;
 }
 
-/*  鼠标悬停轻微发光 */
+/* 鼠标悬停轻微发光 */
 main.container p:hover,
 main.container li:hover {
   color: #9a6ef0 !important;
   text-shadow: 0 0 6px rgba(156,107,255,0.4);
   transition: all 0.3s ease;
 }
+/* --- 🚀 订阅链接复制按钮样式 --- */
+.copy-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 确保按钮和文本在同一行 */
+}
 
+.copy-btn {
+  /* 按钮基础样式，匹配 Elysia 主题 */
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(120, 80, 255, 0.4);
+  transition: all 0.3s ease;
+  white-space: nowrap; /* 防止按钮内文字换行 */
+}
 
+.copy-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(120, 80, 255, 0.6);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(120, 80, 255, 0.3);
+}
+
+/* 规则代码块内的复制按钮 */
+.pre-wrapper {
+  position: relative;
+  margin: 10px 0;
+}
+
+.pre-wrapper .copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  background: rgba(123, 63, 228, 0.7); /* 略透明，不遮挡代码 */
+  box-shadow: none;
+}
+.pre-wrapper .copy-btn:hover {
+  background: rgba(123, 63, 228, 1);
+  transform: none;
+}
+.pre-wrapper .copy-btn:active {
+  background: rgba(90, 40, 180, 1);
+}
+
+/* --- 🎶 Elysia 漂浮音符特效样式 --- */
+/* 音符容器：固定在右下角，确保音符可以向上飘出屏幕 */
+#music-notes-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none; /* 确保不影响点击事件 */
+  overflow: hidden; /* 防止音符溢出屏幕造成滚动条 */
+  z-index: 9998; /* 位于播放器之下，但高于星空 */
+}
+
+/* 单个音符的基础样式 */
+.note {
+  position: absolute;
+  font-size: 20px; /* Unicode 字符音符大小 */
+  color: #bfa0ff; /* 柔和的淡紫色 */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  will-change: transform, opacity;
+  text-shadow: 0 0 8px rgba(180, 140, 255, 0.7); /* 柔和发光 */
+}
+
+/* 向上漂浮的关键动画 */
+@keyframes noteFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(20px, -120vh) rotate(15deg); /* 向上+轻微右飘 */
+    opacity: 0;
+  }
+}
   </style>
 </head>
 <body>
@@ -221,8 +313,7 @@ main.container li:hover {
   </nav>
 
   <main class="container">
-    <!-- 🌌 裸眼3D Banner -->
-<div class="banner-3d" id="banner3d">
+    <div class="banner-3d" id="banner3d">
   <div class="banner-layer">
     <img src="assets/banner.jpg" alt="Banner">
   </div>
@@ -258,8 +349,11 @@ main.container li:hover {
     <section>
       <h2>订阅链接</h2>
       <p>请发送 订阅 至邮箱自动获取</p>
-      <p>E-mail: <a href="mailto:bestElysia+support@hotmail.com">bestElysia+support@hotmail.com</a></p>
-    </section>
+      <div class="copy-container">
+        <p style="margin:0">E-mail: <a href="mailto:bestElysia+support@hotmail.com">bestElysia+support@hotmail.com</a></p>
+        <button class="copy-btn" data-copy="bestElysia+support@hotmail.com">复制邮箱</button>
+      </div>
+      </section>
 
     <section>
       <h2>通知</h2>
@@ -283,26 +377,26 @@ main.container li:hover {
       <ul>
         <li><strong>Android 安卓：</strong>V2rayNG、FIClash、Nekobox、Sing - box for Android、Clash Meta for Android .etc</li>
         <li><strong>iOS（含 iPadOS/tvOS）：</strong>ShadowRocket（小火箭）、Surge、Loon、Stash、Quantumult .etc</li>
-        <li><strong>Harmony OS NEXT：</strong>同安卓，但不建议使用</li>
+        <li><strong>Harmony OS NEXT：：</strong>同安卓，但不建议使用</li>
       </ul>
     </section>
 
     <section>
       <h2>电脑端 Computers</h2>
       <ul>
-        <li><strong>Windows：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
-        <li><strong>macOS：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
-        <li><strong>Linux：</strong>V2rayN、Singbox for Linux .etc</li>
-        <li><strong>FreeBSD/Unix：</strong>Mihomo（裸核）、Sing - box .etc</li>
+        <li><strong>Windows：：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
+        <li><strong>macOS：：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
+        <li><strong>Linux：：</strong>V2rayN、Singbox for Linux .etc</li>
+        <li><strong>FreeBSD/Unix：：</strong>Mihomo（裸核）、Sing - box .etc</li>
       </ul>
     </section>
 
     <section>
       <h2>路由器类 Routers</h2>
       <ul>
-        <li><strong>华硕 硬路由：</strong>MerlinClash2（梅林）、FancySS</li>
-        <li><strong>小米 硬路由：</strong>ShellCrash</li>
-        <li><strong>OpenWrt 软路由：</strong>OpenClash、PassWall、Nikki</li>
+        <li><strong>华硕 硬路由：：</strong>MerlinClash2（梅林）、FancySS</li>
+        <li><strong>小米 硬路由：：</strong>ShellCrash</li>
+        <li><strong>OpenWrt 软路由：：</strong>OpenClash、PassWall、Nikki</li>
       </ul>
     </section>
 
@@ -310,12 +404,19 @@ main.container li:hover {
       <h2>规则集</h2>
       <p>Shadowsrocket:</p>
       <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+      <div class="pre-wrapper">
+        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+        <button class="copy-btn" data-copy="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf">复制链接</button>
+      </div>
       <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+      <div class="pre-wrapper">
+        <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
-
+        <button class="copy-btn" data-copy="https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module">复制模块</button>
+      </div>
       <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
 
     </section>
@@ -330,11 +431,9 @@ DOMAIN-SUFFIX,anime1.me,PROXY
 DOMAIN-SUFFIX,openai.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,openai.com,唯☁️｜新加坡02-❄️10Gbps
 DOMAIN-SUFFIX,openai.com,唯☁️｜日本01-❄️10Gbps
-DOMAIN-SUFFIX,openai.com,奶昔｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜新加坡02-❄️10Gbps
 DOMAIN-SUFFIX,chatgpt.com,唯☁️｜日本01-❄️10Gbps
-DOMAIN-SUFFIX,chatgpt.com,奶昔｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,googleapis.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.googleapis.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,bard.google.com,唯☁️｜新加坡01-❄️10Gbps
@@ -369,7 +468,7 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
         <li><strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 这个链接复制到VPS然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 </li>
         <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
         <li><strong>CMD：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
-        <li><strong>建议：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
+        <li><strong>建议：：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
       </ul>
     </section>
 
@@ -406,8 +505,8 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
         <li><strong>常用工具：</strong>Final shell、Putty、CMD、XUI&3X-UI</li>
         <li><strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 这个链接复制到VPS然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 </li>
         <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
-        <li><strong>CMD：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
-        <li><strong>建议：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
+        <li><strong>CMD：：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
+        <li><strong>建议：：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
       </ul>
     </section>
 
@@ -456,7 +555,6 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
     updateCount(); setInterval(updateCount, 1000);
   </script>
 
-<!--  样式 -->
 <style>
 .music-player-floating {
   position: fixed;
@@ -489,7 +587,7 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
     width: 200px;
   }
 }
-  /*  Elysia 浮动动画 */
+  /* Elysia 浮动动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
@@ -544,7 +642,7 @@ draw();
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: -2;  /*  更靠后一层 */
+  z-index: -2;  /* 更靠后一层 */
   background: transparent;  /* 去掉浅色背景 */
   pointer-events: none;  /* 防止拦截鼠标点击 */
 }
@@ -639,7 +737,6 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 }
 </style>
 
-<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
@@ -981,5 +1078,111 @@ document.querySelectorAll('a[href]').forEach(a => {
 })();
 </script>
 
+<script>
+/* --- ✂️ 一键复制功能 JS --- */
+function setupCopyButtons() {
+  document.querySelectorAll('.copy-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const dataToCopy = button.getAttribute('data-copy');
+      const originalText = button.textContent;
+      
+      try {
+        // 使用 Clipboard API 复制内容
+        await navigator.clipboard.writeText(dataToCopy);
+        
+        // 成功反馈
+        button.textContent = '✅ 已复制！';
+        button.style.backgroundColor = '#4CAF50';
+        button.style.background = '#4CAF50';
+
+      } catch (err) {
+        // 失败（如权限问题），可以退回到旧的 execCommand
+        console.error('Copy failed:', err);
+        button.textContent = '❌ 复制失败';
+      }
+
+      // 恢复按钮文本
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = ''; // 清除内联样式，恢复 CSS 样式
+        button.style.background = '';
+      }, 2000);
+    });
+  });
+}
+// 在页面加载后调用设置函数
+window.addEventListener('load', setupCopyButtons);
+</script>
+<script>
+/* --- 🎵 漂浮音符生成逻辑 --- */
+// 获取元素
+const notesContainer = document.createElement('div');
+notesContainer.id = 'music-notes-container';
+document.body.appendChild(notesContainer);
+const musicPlayer = document.querySelector('.elysia-player'); // 引用你的音乐播放器元素
+
+// Unicode 音符字符
+const noteSymbols = ['♪', '♫', '♩', '♬'];
+
+function createNote() {
+  // 仅在音乐播放时生成音符
+  if (audio.paused) return;
+
+  const note = document.createElement('div');
+  note.classList.add('note');
+  note.textContent = noteSymbols[Math.floor(Math.random() * noteSymbols.length)];
+  notesContainer.appendChild(note);
+
+  // 获取播放器的位置作为音符的起点（为了保持风格一致性，从播放器附近飘出）
+  const playerRect = musicPlayer.getBoundingClientRect();
+  const startX = playerRect.left + playerRect.width / 2;
+  const startY = playerRect.top + playerRect.height / 2;
+
+  // 设置音符初始位置
+  note.style.left = `${startX + (Math.random() * 20 - 10)}px`; // 在播放器中心小范围波动
+  note.style.top = `${startY}px`;
+
+  // 随机应用动画属性
+  const duration = Math.random() * 4 + 5; // 持续时间 5s 到 9s
+  const delay = Math.random() * 0.5; // 延迟 0 到 0.5s
+
+  note.style.animation = `noteFloat ${duration}s linear ${delay}s forwards`;
+
+  // 动画结束后移除音符以清理 DOM
+  note.addEventListener('animationend', () => {
+    note.remove();
+  });
+}
+
+let noteInterval;
+
+audio.addEventListener('play', () => {
+  // 音乐开始播放，启动定时器生成音符
+  if (!noteInterval) {
+    noteInterval = setInterval(createNote, 400); // 每 400ms 生成一个音符
+  }
+});
+
+audio.addEventListener('pause', () => {
+  // 音乐暂停，停止生成音符
+  if (noteInterval) {
+    clearInterval(noteInterval);
+    noteInterval = null;
+  }
+});
+
+audio.addEventListener('ended', () => {
+  // 音乐结束，停止生成音符
+  if (noteInterval) {
+    clearInterval(noteInterval);
+    noteInterval = null;
+  }
+});
+
+// 首次加载时，如果音乐自动播放，也应该开始生成音符
+if (!audio.paused) {
+    noteInterval = setInterval(createNote, 400);
+}
+</script>
 </body>
 </html>

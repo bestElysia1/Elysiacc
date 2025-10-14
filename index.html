@@ -815,46 +815,7 @@ function resetTimer() {
   window.addEventListener(evt, showPlayer)
 );
 resetTimer();
-
-/* === 🎧 更健壮的 Media Session 更新函数（替换原有 updateMediaSession） === */
-function updateMediaSession() {
-  if (!('mediaSession' in navigator)) return;
-
-  // 绝对封面路径（避免相对路径在 file:// 或特殊上下文失效）
-  const coverPath = (location.origin ? location.origin : window.location.href.replace(/\/[^\/]*$/, '')) + '/assets/banner.jpg';
-
-  try {
-    // 先清空，防止 iOS 使用缓存旧图
-    navigator.mediaSession.metadata = null;
-  } catch (e) {
-    // ignore
-  }
-
-  // 小延迟再次设置，确保 Safari 已经激活播放会话
-  setTimeout(() => {
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: songs[currentSong].title,
-        artist: 'Elysia Player',
-        album: 'Piano Collection',
-        artwork: [
-          { src: coverPath, sizes: '96x96',  type: 'image/jpeg' },
-          { src: coverPath, sizes: '128x128', type: 'image/jpeg' },
-          { src: coverPath, sizes: '192x192', type: 'image/jpeg' },
-          { src: coverPath, sizes: '256x256', type: 'image/jpeg' },
-          { src: coverPath, sizes: '512x512', type: 'image/jpeg' }
-        ]
-      });
-      // 同步播放状态
-      navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
-    } catch (err) {
-      console.log('MediaSession set failed', err);
-    }
-  }, 220); // 220ms 延迟：对 iOS 效果稳定
-}
-
 </script>
-
 
 <style>
 /* ====== 基础：液态玻璃播放器 ====== */

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 能量边界版</title>
+<title>Elysia 能量边界版（修正版）</title>
 
 <style>
 html, body {
@@ -69,7 +69,7 @@ body {
   transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
   animation: rippleGlass 2.8s cubic-bezier(0.25, 1, 0.3, 1) forwards;
-  z-index: 6;
+  z-index: 10;
   background: radial-gradient(circle, rgba(255,255,255,0.25) 10%, rgba(255,255,255,0.05) 80%, transparent 100%);
   backdrop-filter: blur(12px) brightness(1.4);
   -webkit-backdrop-filter: blur(12px) brightness(1.4);
@@ -124,7 +124,7 @@ body {
   }
 }
 
-/* === 鼠标点击闪光反馈 === */
+/* === 点击闪光反馈 === */
 .highlight-flash {
   animation: flashEffect 0.6s ease-out;
 }
@@ -142,12 +142,16 @@ body {
   <div id="elysia-highlight"></div>
   <div class="line left"></div>
   <div class="line right"></div>
+  <!-- ✅ 让水波放在容器内部，这样不会被 overflow 隐藏 -->
+  <div id="ripple-layer"></div>
 </div>
 
 <script>
+const container = document.getElementById('elysia-container');
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
+const rippleLayer = document.getElementById('ripple-layer');
 
 /* === 轻微3D倾斜 === */
 function update3DEffect(clientX, clientY) {
@@ -168,13 +172,13 @@ document.addEventListener('mouseleave', () => {
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 
-/* === 点击水波特效 === */
-document.addEventListener('click', e => {
+/* === 点击水波特效（修复版）=== */
+container.addEventListener('click', e => {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
   ripple.style.left = `${e.clientX}px`;
   ripple.style.top = `${e.clientY}px`;
-  document.body.appendChild(ripple);
+  rippleLayer.appendChild(ripple);
   ripple.addEventListener('animationend', () => ripple.remove());
 
   highlight.classList.add('highlight-flash');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 3D 展示（轻3D + 水波特效）</title>
+<title>Elysia 3D 展示</title>
 
 <style>
 html, body {
@@ -11,30 +11,34 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: black;
   overflow: hidden;
+  background: #000;
 }
 
-/* === 主容器 === */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === 全屏容器 === */
 #elysia-container {
   position: relative;
   width: 100vw;
   height: 100vh;
-  perspective: 800px;
   overflow: hidden;
-  cursor: pointer;
+  perspective: 800px;
 }
 
 /* === 主图 & 深度图 === */
-#elysia-img, #elysia-depth {
+#elysia-img, #elysia-depth, #elysia-highlight {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
   will-change: transform;
 }
 
@@ -46,86 +50,67 @@ html, body {
 
 /* === 高光层 === */
 #elysia-highlight {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
-  animation: highlightBreathing 3s ease-in-out infinite;
   transition: background 0.3s ease-out;
+  animation: highlightBreathing 3s ease-in-out infinite;
 }
 
 /* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
-  0% {
-    opacity: 0.5;
-    filter: blur(10px);
-  }
-  50% {
-    opacity: 1;
-    filter: blur(18px);
-  }
-  100% {
-    opacity: 0.5;
-    filter: blur(10px);
-  }
+  0% { opacity: 0.6; transform: scale(1); filter: blur(10px); }
+  50% { opacity: 1; transform: scale(1.08); filter: blur(18px); }
+  100% { opacity: 0.6; transform: scale(1); filter: blur(10px); }
 }
 
-/* === 三等分竖线 === */
-.divider {
+/* === 三等分竖线（增强3D感） === */
+#elysia-container::before,
+#elysia-container::after {
+  content: "";
   position: absolute;
   top: 0;
   width: 10px;
   height: 100%;
-  background: rgba(0, 0, 0, 1);
-  z-index: 5;
+  background: rgba(0,0,0,0.8);
   pointer-events: none;
+  z-index: 3;
 }
-.divider.left {
-  left: calc(33.333% - 5px);
-}
-.divider.right {
-  left: calc(66.666% - 5px);
-}
+#elysia-container::before { left: 33.33%; }
+#elysia-container::after { left: 66.66%; }
 
-/* === 粉紫能量波纹（Elysia风格） === */
+/* === 💧 折射水波 + 柔光能量圈 === */
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(255, 180, 255, 0.8) 0%,
-    rgba(210, 140, 255, 0.5) 30%,
-    rgba(180, 100, 255, 0.2) 60%,
-    rgba(150, 80, 255, 0) 100%);
-  transform: scale(0);
-  animation: rippleEnergy 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
+  animation: rippleGlass 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+  backdrop-filter: blur(6px) brightness(1.25);
+  -webkit-backdrop-filter: blur(6px) brightness(1.25);
+  mask-image: radial-gradient(circle, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 70%);
+  -webkit-mask-image: radial-gradient(circle, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 70%);
   mix-blend-mode: screen;
-  filter: blur(3px);
   opacity: 0.9;
+
+  box-shadow: 0 0 30px 8px rgba(255, 200, 255, 0.5),
+              0 0 60px 15px rgba(255, 255, 255, 0.3);
 }
 
-@keyframes rippleEnergy {
+@keyframes rippleGlass {
   0% {
-    transform: scale(0);
-    opacity: 1;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.9;
   }
   70% {
-    transform: scale(6);
-    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(8);
+    opacity: 0.4;
   }
   100% {
-    transform: scale(10);
-    opacity: 0;
-  }
-}
-
-@keyframes rippleAnimation {
-  to {
-    transform: scale(8);
+    transform: translate(-50%, -50%) scale(10);
     opacity: 0;
   }
 }
@@ -137,53 +122,41 @@ html, body {
   <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
   <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth">
   <div id="elysia-highlight"></div>
-  <div class="divider left"></div>
-  <div class="divider right"></div>
 </div>
 
 <script>
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
-const container = document.getElementById('elysia-container');
 
-/* === 轻3D交互 + 动态高光 === */
+/* === 柔和3D交互 + 高光追随 === */
 function update3DEffect(clientX, clientY) {
-  const x = (clientX / window.innerWidth - 0.5) * 10; // ✅ 轻微倾斜
-  const y = (clientY / window.innerHeight - 0.5) * -10;
+  const x = (clientX / window.innerWidth - 0.5) * 8; // 更轻微
+  const y = (clientY / window.innerHeight - 0.5) * -8;
 
-  mainImg.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${y}deg) scale(1.03)`;
-  depthImg.style.transform = `translate(-50%, -50%) rotateY(${x * 1.2}deg) rotateX(${y * 1.2}deg) scale(1.03)`;
+  mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
+  depthImg.style.transform = `rotateY(${x * 1.2}deg) rotateX(${y * 1.2}deg) scale(1.02)`;
 
-  const posX = 50 + x * 1.2;
-  const posY = 35 + y * 1.2;
+  const posX = 50 + x * 2;
+  const posY = 35 + y * 2;
   highlight.style.background = `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,0.38), transparent 60%)`;
 }
 
-/* === 鼠标控制 === */
 document.addEventListener('mousemove', e => update3DEffect(e.clientX, e.clientY));
 document.addEventListener('mouseleave', () => {
-  mainImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
-  depthImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
+  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 
-/* === 点击水波特效 === */
-function createRipple(x, y) {
+/* === 💫 点击出现透明折射水波 === */
+document.addEventListener('click', e => {
   const ripple = document.createElement('div');
-  ripple.classList.add('ripple');
-  const rect = container.getBoundingClientRect();
-  ripple.style.left = `${x - rect.left - 50}px`;
-  ripple.style.top = `${y - rect.top - 50}px`;
-  ripple.style.width = ripple.style.height = '100px';
-  container.appendChild(ripple);
+  ripple.className = 'ripple';
+  ripple.style.left = `${e.clientX}px`;
+  ripple.style.top = `${e.clientY}px`;
+  document.body.appendChild(ripple);
   ripple.addEventListener('animationend', () => ripple.remove());
-}
-
-container.addEventListener('click', e => createRipple(e.clientX, e.clientY));
-container.addEventListener('touchstart', e => {
-  const touch = e.touches[0];
-  createRipple(touch.clientX, touch.clientY);
 });
 </script>
 </body>

@@ -230,4 +230,19 @@ resetTimer();
   transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
   z-index: 9998;
 }
+audio.addEventListener("play", () => {
+  if ('mediaSession' in navigator) {
+    const currentSong = songs[currentSongIndex];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title,
+      artist: "Elysia Player",
+      album: "Elysia",
+      artwork: [
+        { src: location.origin + "/assets/Elysia.png", sizes: "512x512", type: "image/png" }
+      ]
+    });
+    console.log("✅ MediaSession metadata set:", currentSong.title);
+  }
+});
+
 </style>

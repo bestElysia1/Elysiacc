@@ -31,7 +31,7 @@ body {
 }
 
 /* === 主图 & 深度图 === */
-#elysia-img, #elysia-depth {
+#elysia-img, #elysia-depth, #elysia-highlight {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -45,6 +45,14 @@ body {
   mix-blend-mode: multiply;
   opacity: 0.6;
   pointer-events: none;
+}
+
+/* === 高光层 === */
+#elysia-highlight {
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
+  transition: background 0.3s ease-out;
 }
 
 /* === 菜单按钮 === */
@@ -99,46 +107,6 @@ body {
   background: transparent;
   z-index: 1;
 }
-
-/* === 动态高光呼吸与柔光晕 === */
-@keyframes highlightPulse {
-  0%, 100% {
-    filter: brightness(1.05) contrast(1.1) saturate(1.05);
-  }
-  50% {
-    filter: brightness(1.25) contrast(1.25) saturate(1.2);
-  }
-}
-
-#elysia-img {
-  animation: highlightPulse 4.5s ease-in-out infinite;
-  transition: filter 0.3s ease;
-}
-
-#elysia-img::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 45% 30%, rgba(255,255,255,0.3), transparent 65%);
-  mix-blend-mode: soft-light;
-  pointer-events: none;
-  animation: glowDrift 6s ease-in-out infinite alternate;
-}
-
-@keyframes glowDrift {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translate(2%, -2%) scale(1.05);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translate(-2%, 3%) scale(1);
-    opacity: 0.4;
-  }
-}
 </style>
 </head>
 
@@ -147,6 +115,7 @@ body {
   <!-- 主图 & 深度图 -->
   <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
   <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth">
+  <div id="elysia-highlight"></div>
 
   <!-- 菜单按钮 -->
   <div class="menu-btn" id="menuBtn">
@@ -163,20 +132,44 @@ body {
 <script>
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
+const highlight = document.getElementById('elysia-highlight');
 const menuBtn = document.getElementById('menuBtn');
 const menuPanel = document.getElementById('menuPanel');
 
-/* === 裸眼3D交互 === */
-document.addEventListener('mousemove', e => {
-  const x = (e.clientX / window.innerWidth - 0.5) * 30;
-  const y = (e.clientY / window.innerHeight - 0.5) * -30;
+/* === 裸眼3D交互 + 动态高光 === */
+function update3DEffect(clientX, clientY) {
+  const x = (clientX / window.innerWidth - 0.5) * 30;
+  const y = (clientY / window.innerHeight - 0.5) * -30;
+
   mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
   depthImg.style.transform = `rotateY(${x * 1.3}deg) rotateX(${y * 1.3}deg) scale(1.02)`;
-});
 
+  // 高光随触摸方向偏移
+  const posX = 50 + x * 1.8;
+  const posY = 35 + y * 1.8;
+  highlight.style.background = `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,0.38), transparent 60%)`;
+}
+
+/* === 鼠标支持 === */
+document.addEventListener('mousemove', e => {
+  update3DEffect(e.clientX, e.clientY);
+});
 document.addEventListener('mouseleave', () => {
   mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
   depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
+});
+
+/* === 触摸支持（手机端） === */
+document.addEventListener('touchmove', e => {
+  const touch = e.touches[0];
+  update3DEffect(touch.clientX, touch.clientY);
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 
 /* === 菜单按钮自动隐藏 === */

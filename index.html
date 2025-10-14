@@ -992,43 +992,35 @@ resetTimer();
   animation: elysiaFloat 6s ease-in-out infinite;
 }
 
-/* === 流光小鬼 === */
+/* === 流动光线环 === */
 .elysia-player::after {
   content: "";
   position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,200,255,1), rgba(150,100,255,0.2));
-  box-shadow: 0 0 15px rgba(220,160,255,0.9), 0 0 30px rgba(200,150,255,0.6);
-  animation: ghostOrbit 8s linear infinite;
+  inset: 0;
+  border-radius: 16px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,220,255,0) 0deg,
+    rgba(255,220,255,0.9) 10deg,
+    rgba(200,150,255,0.4) 25deg,
+    rgba(180,120,255,0) 60deg,
+    rgba(255,220,255,0) 360deg
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 2px; /* 光线宽度 */
+  animation: spinGlow 8s linear infinite;
   pointer-events: none;
+  box-shadow: 0 0 12px rgba(210,160,255,0.8);
+  opacity: 0.85;
 }
 
-/* 绕播放器边缘轻盈滑动 */
-@keyframes ghostOrbit {
-  0% {
-    top: -6px; left: 0%;
-    transform: translateX(0) translateY(0);
-    opacity: 1;
-  }
-  25% {
-    top: 0%; left: 100%;
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    top: 100%; left: 100%;
-    transform: translateX(-50%) translateY(-50%);
-  }
-  75% {
-    top: 100%; left: 0%;
-    transform: translateX(0) translateY(-50%);
-  }
-  100% {
-    top: -6px; left: 0%;
-    transform: translateX(0) translateY(0);
-    opacity: 1;
-  }
+/* 顺时针流动动画 */
+@keyframes spinGlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 /* 可访问性与微调 */
 .elysia-playlist { scrollbar-width: thin; }

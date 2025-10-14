@@ -3,115 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia — 3D Floating</title>
+<title>Elysia 3D</title>
 <style>
-  /* 页面基础样式 */
   html, body {
-    height: 100%;
-    width: 100%;
     margin: 0;
-    padding: 0;
+    height: 100%;
     overflow: hidden;
-    background: radial-gradient(circle at center, #ece8ff 0%, #dcd4ff 50%, #cfc9ff 100%);
-    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #000;
   }
 
-  /* 居中显示 Elysia 图片 */
-  .scene {
-    position: fixed;
-    top: 0; left: 0;
+  #scene {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative;
+    overflow: hidden;
   }
 
-  /* 图片样式 */
-  .elysia-img {
-    max-width: 90vw;
-    max-height: 90vh;
-    object-fit: contain;
-    animation: float 6s ease-in-out infinite;
-    filter: drop-shadow(0 0 25px rgba(180,150,255,0.4));
-    transition: transform 1.5s ease;
-  }
-
-  /* 漂浮动画 */
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-
-  /* 液态玻璃菜单按钮 */
-  #menu-btn {
-    position: fixed;
-    top: 22px;
-    right: 26px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 20px;
-    color: #fff;
-    cursor: pointer;
-    z-index: 9999;
-    transition: opacity 0.6s ease, background 0.3s ease;
-    box-shadow: 0 4px 20px rgba(180,150,255,0.3);
-  }
-
-  #menu-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  #menu-btn.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* 底部标题 */
-  .caption {
-    position: fixed;
-    bottom: 30px;
+  canvas {
     width: 100%;
-    text-align: center;
-    font-size: 16px;
-    color: rgba(100, 80, 150, 0.8);
-    letter-spacing: 0.8px;
-    text-shadow: 0 0 8px rgba(200,150,255,0.4);
+    height: 100%;
+    display: block;
+  }
+
+  /* 液态玻璃风格菜单按钮 */
+  .menu-btn {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    z-index: 10;
+  }
+
+  .menu-btn.show {
+    opacity: 1;
+  }
+
+  .menu-btn span {
+    width: 25px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    position: relative;
+  }
+
+  .menu-btn span::before,
+  .menu-btn span::after {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    left: 0;
+    transition: 0.3s;
+  }
+
+  .menu-btn span::before {
+    top: -8px;
+  }
+
+  .menu-btn span::after {
+    top: 8px;
   }
 </style>
 </head>
 <body>
-  <button id="menu-btn">☰</button>
 
-  <div class="scene">
-    <img class="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
-  </div>
+<div id="scene"></div>
+<div class="menu-btn"><span></span></div>
 
-  <div class="caption">Elysia — Floating</div>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
 <script>
-  // 三条杠菜单自动隐藏逻辑
-  const menuBtn = document.getElementById("menu-btn");
-  let hideTimeout;
+  // ==== 基础设置 ====
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  let renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById('scene').appendChild(renderer.domElement);
 
-  function showMenu() {
-    menuBtn.classList.remove("hidden");
-    clearTimeout(hideTimeout);
-    hideTimeout = setTimeout(() => {
-      menuBtn.classList.add("hidden");
-    }, 2500); // 2.5秒后隐藏
+  // ==== 载入纹理 ====
+  const loader = new THREE.TextureLoader();
+  const colorMap = loader.load('assets/elysia.jpg');      // 改成你的原图路径
+  const depthMap = loader.load('assets/elysia_depth.jpg'); // 改成你的深度图路径
+
+  // ==== 着色器 ====
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      u_image: { value: colorMap },
+      u_depth: { value: depthMap },
+      u_mouse: { value: new THREE.Vector2(0.5, 0.5) }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D u_image;
+      uniform sampler2D u_depth;
+      uniform vec2 u_mouse;
+      varying vec2 vUv;
+      void main() {
+        float depth = texture2D(u_depth, vUv).r;
+        vec2 offset = (u_mouse - vec2(0.5)) * 0.08 * (1.0 - depth);
+        vec2 uv = vUv + offset;
+        gl_FragColor = texture2D(u_image, uv);
+      }
+    `
+  });
+
+  const geometry = new THREE.PlaneGeometry(2, 1.1);
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+  camera.position.z = 1.5;
+
+  // ==== 鼠标控制 ====
+  document.addEventListener('mousemove', (e) => {
+    material.uniforms.u_mouse.value.x = e.clientX / window.innerWidth;
+    material.uniforms.u_mouse.value.y = 1.0 - e.clientY / window.innerHeight;
+  });
+
+  // ==== 渲染循环 ====
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
   }
+  animate();
 
-  // 监听交互事件
-  window.addEventListener("mousemove", showMenu);
-  window.addEventListener("touchstart", showMenu);
-  window.addEventListener("scroll", showMenu);
+  // ==== 自适应 ====
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
-  // 初始隐藏
-  menuBtn.classList.add("hidden");
+  // ==== 滚动时淡入按钮 ====
+  const menuBtn = document.querySelector('.menu-btn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 30) menuBtn.classList.add('show');
+    else menuBtn.classList.remove('show');
+  });
 </script>
+
 </body>
 </html>

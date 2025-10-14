@@ -825,6 +825,36 @@ resetTimer();
   mix-blend-mode: screen;
 }
 
+  /* === 环绕旋转光环效果（顺时针） === */
+.elysia-player::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 2px; /* 控制光环粗细，可调 */
+  background: conic-gradient(
+    from 0deg,
+    #cdbaff,
+    #9fd5ff,
+    #cdbaff
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spinLight 3s linear infinite;
+  opacity: 0.85;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(1px);
+}
+
+@keyframes spinLight {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+  
 /* 控制按钮 */
 .elysia-controls { display:flex; gap:10px; }
 .elysia-controls button {
@@ -931,44 +961,6 @@ resetTimer();
 .elysia-playlist .playlist-item { outline: none; }
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
-
-    /* === 播放器环绕流光边缘 === */
-.player-glow {
-  position: relative;
-  display: inline-block;
-  border-radius: 20px;
-  padding: 4px;
-  background: conic-gradient(
-  from 0deg,
-  rgba(210,160,255,0.45),
-  rgba(250,180,255,0.4),
-  rgba(180,160,255,0.45),
-  rgba(210,160,255,0.45)
-);
-animation: rotateGlow 8s linear infinite;
-
-}
-
-.player-glow::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 16px;
-  background: rgba(20,20,30,0.85);
-  z-index: 1;
-}
-
-.player {
-  position: relative;
-  z-index: 2;
-}
-
-@keyframes rotateGlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-
 </style>
 
 <script>

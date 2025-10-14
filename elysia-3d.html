@@ -19,9 +19,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #000; /* ✅ 黑色背景以衬托图片完整显示 */
 }
 
-/* === 可横向滑动的容器 === */
+/* === 可横向滑动的容器（用于手机） === */
 #elysia-scroll-wrapper {
   width: 100vw;
   height: 100vh;
@@ -35,18 +36,21 @@ body {
 /* === 全屏容器 === */
 #elysia-container {
   position: relative;
-  width: 160vw; /* ✅ 加宽以支持横向查看完整图像 */
+  width: 160vw; /* ✅ 手机端可横向滑动 */
   height: 100vh;
   overflow: hidden;
   perspective: 800px;
 }
 
-/* === 主图 & 深度图 === */
+/* === 主图 & 深度图 & 高光层 === */
 #elysia-img, #elysia-depth, #elysia-highlight {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain; /* ✅ 完整显示整张图 */
   transform-style: preserve-3d;
   transition: transform 0.15s ease-out;
   will-change: transform;
@@ -64,10 +68,10 @@ body {
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
   transition: background 0.3s ease-out;
-  animation: highlightBreathing 3s ease-in-out infinite;
+  animation: highlightBreathing 2.8s ease-in-out infinite;
 }
 
-/* === 高光呼吸动画（增强版） === */
+/* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
   0% {
     opacity: 0.5;
@@ -86,16 +90,12 @@ body {
   }
 }
 
-#elysia-highlight {
-  animation: highlightBreathing 2.8s ease-in-out infinite;
-}
-
-/* === 菜单按钮（隐藏） === */
+/* === 菜单按钮隐藏（仅保留 index 页面使用） === */
 .menu-btn {
   display: none !important;
 }
 
-/* === 菜单抽屉（液态玻璃） === */
+/* === 菜单抽屉 === */
 .menu-panel {
   position: fixed;
   top: 0;
@@ -113,7 +113,7 @@ body {
   transform: translateX(0);
 }
 
-/* === iPhone安全区顶部 === */
+/* === iPhone 安全区顶部 === */
 .safe-area-top {
   position: fixed;
   top: env(safe-area-inset-top);
@@ -124,7 +124,7 @@ body {
   z-index: 1;
 }
 
-/* === 横向滚动条隐藏 === */
+/* 隐藏滚动条 */
 #elysia-scroll-wrapper::-webkit-scrollbar {
   display: none;
 }
@@ -156,16 +156,14 @@ body {
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
-const menuBtn = document.getElementById('menuBtn');
-const menuPanel = document.getElementById('menuPanel');
 
 /* === 裸眼3D交互 + 动态高光 === */
 function update3DEffect(clientX, clientY) {
   const x = (clientX / window.innerWidth - 0.5) * 30;
   const y = (clientY / window.innerHeight - 0.5) * -30;
 
-  mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
-  depthImg.style.transform = `rotateY(${x * 1.3}deg) rotateX(${y * 1.3}deg) scale(1.02)`;
+  mainImg.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
+  depthImg.style.transform = `translate(-50%, -50%) rotateY(${x * 1.3}deg) rotateX(${y * 1.3}deg) scale(1.02)`;
 
   const posX = 50 + x * 1.8;
   const posY = 35 + y * 1.8;
@@ -173,12 +171,10 @@ function update3DEffect(clientX, clientY) {
 }
 
 /* === 鼠标支持 === */
-document.addEventListener('mousemove', e => {
-  update3DEffect(e.clientX, e.clientY);
-});
+document.addEventListener('mousemove', e => update3DEffect(e.clientX, e.clientY));
 document.addEventListener('mouseleave', () => {
-  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  mainImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 
@@ -188,8 +184,8 @@ document.addEventListener('touchmove', e => {
   update3DEffect(touch.clientX, touch.clientY);
 }, { passive: true });
 document.addEventListener('touchend', () => {
-  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  mainImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 </script>

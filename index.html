@@ -925,7 +925,14 @@ resetTimer();
 @keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
 @keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
 
-  /* === 播放器环绕流光边缘 === */
+
+/* 可访问性与微调 */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
+
+    /* === 播放器环绕流光边缘 === */
 .player-glow {
   position: relative;
   display: inline-block;
@@ -962,11 +969,6 @@ animation: rotateGlow 8s linear infinite;
 }
 
 
-/* 可访问性与微调 */
-.elysia-playlist { scrollbar-width: thin; }
-.elysia-playlist .playlist-item { outline: none; }
-
-/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
 
 <script>

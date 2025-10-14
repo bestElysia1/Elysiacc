@@ -1,144 +1,179 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia 3D Depth</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Elysia 3D 全屏展示</title>
+
 <style>
 html, body {
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
   height: 100%;
-  background: #0d0d1a;
   overflow: hidden;
+  background: #000;
 }
 
-/* 容器 */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== 全屏容器 ===== */
 #elysia-container {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   perspective: 800px;
 }
 
-/* 原图与深度图层叠 */
-#elysia-image, #elysia-depth {
+/* ===== 主图 + 深度图分层 ===== */
+#elysia-img, #elysia-depth {
   position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  top: 0; left: 0;
+  transform-style: preserve-3d;
   transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 
-/* 裸眼3D黑线 */
-#elysia-container::before, #elysia-container::after {
-  content: "";
+/* 深度图叠加（柔和混合） */
+#elysia-depth {
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ===== 两条黑色竖线 ===== */
+.divider {
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
   width: 6px;
-  background: rgba(0,0,0,0.7);
+  height: 100%;
+  background: rgba(0,0,0,0.6);
   z-index: 3;
 }
-#elysia-container::before { left: 49%; }
-#elysia-container::after { right: 49%; }
+#divider1 { left: 33.33%; }
+#divider2 { left: 66.66%; }
 
-/* 三条杠按钮 */
+/* ===== 菜单按钮（三条杠） ===== */
 .menu-btn {
   position: fixed;
-  top: 20px; left: 20px;
-  z-index: 10;
-  width: 38px; height: 32px;
-  display: flex; flex-direction: column; justify-content: space-between;
+  top: calc(env(safe-area-inset-top) + 14px);
+  left: 18px;
+  width: 38px;
+  height: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   cursor: pointer;
-  transition: opacity 0.3s ease;
-  animation: breathe 3s ease-in-out infinite;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
+.menu-btn.show { opacity: 1; }
 .menu-btn div {
   height: 4px;
-  background: rgba(255,255,255,0.9);
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(150,150,255,0.6);
+  background: linear-gradient(90deg, rgba(180,150,255,0.8), rgba(150,180,255,0.6));
+  box-shadow: 0 0 6px rgba(190,160,255,0.8);
 }
 
-/* 菜单面板 */
+/* ===== 菜单抽屉（液态玻璃风格） ===== */
 .menu-panel {
   position: fixed;
-  top: 70px; left: 20px;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 240px;
-  padding: 15px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 18px;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 0 20px rgba(150,150,255,0.25);
-  opacity: 0; transform: scale(0.95);
-  pointer-events: none;
-  transition: all 0.4s ease;
+  background: rgba(40, 30, 60, 0.4);
+  border-right: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px) saturate(180%);
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(.25,.8,.25,1);
   z-index: 9;
 }
-.menu-panel.active {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
-}
-.menu-content {
-  color: #e8ebff;
-  font-family: "Segoe UI", sans-serif;
+.menu-panel.show {
+  transform: translateX(0);
 }
 
-/* 呼吸光 */
-@keyframes breathe {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+/* ===== 安全区 ===== */
+.safe-area-top {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top);
+  background: transparent;
+  z-index: 1;
 }
-.hidden { opacity: 0; pointer-events: none; }
 </style>
 </head>
+
 <body>
-
 <div id="elysia-container">
-  <img id="elysia-image" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
-  <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Elysia Depth" style="mix-blend-mode: overlay; opacity:0.4;">
-</div>
+  <!-- 主图与深度图 -->
+  <img id="elysia-img" src="assets/elysia_main.jpg" alt="Elysia">
+  <img id="elysia-depth" src="assets/elysia_depth.jpg" alt="Depth">
 
-<div class="menu-btn" id="menuBtn">
-  <div></div><div></div><div></div>
-</div>
+  <!-- 黑色分割线 -->
+  <div id="divider1" class="divider"></div>
+  <div id="divider2" class="divider"></div>
 
-<div class="menu-panel" id="menuPanel">
-  <div class="menu-content">
-    <p>🌸 Elysia Project</p>
-    <p>后续内容待添加</p>
+  <!-- 菜单按钮 -->
+  <div class="menu-btn" id="menuBtn">
+    <div></div><div></div><div></div>
+  </div>
+
+  <!-- 菜单 -->
+  <div class="menu-panel" id="menuPanel">
+    <!-- 你后续可以在这里加链接 -->
   </div>
 </div>
+<div class="safe-area-top"></div>
 
 <script>
+const mainImg = document.getElementById('elysia-img');
+const depthImg = document.getElementById('elysia-depth');
 const menuBtn = document.getElementById('menuBtn');
 const menuPanel = document.getElementById('menuPanel');
-menuBtn.addEventListener('click', () => menuPanel.classList.toggle('active'));
 
-// 3D 视差交互
-const container = document.getElementById('elysia-container');
-const img = document.getElementById('elysia-image');
-const depth = document.getElementById('elysia-depth');
-
+// ===== 裸眼3D交互 =====
 document.addEventListener('mousemove', e => {
   const x = (e.clientX / window.innerWidth - 0.5) * 30;
-  const y = (e.clientY / window.innerHeight - 0.5) * 30;
-  img.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-  depth.style.transform = `translateX(${x * 0.5}px) translateY(${y * 0.5}px)`;
+  const y = (e.clientY / window.innerHeight - 0.5) * -30;
+  mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
+  depthImg.style.transform = `rotateY(${x * 1.3}deg) rotateX(${y * 1.3}deg) scale(1.02)`;
 });
 
-// 不滑动时隐藏三条杠
-let hideTimer;
-const showButton = () => menuBtn.classList.remove('hidden');
-const hideButton = () => menuBtn.classList.add('hidden');
-document.addEventListener('mousemove', () => {
-  showButton();
-  clearTimeout(hideTimer);
-  hideTimer = setTimeout(hideButton, 3000);
+document.addEventListener('mouseleave', () => {
+  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
 });
-hideButton();
+
+// ===== 菜单按钮自动隐藏 =====
+let scrollTimeout;
+window.addEventListener('scroll', () => {
+  menuBtn.classList.add('show');
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => menuBtn.classList.remove('show'), 2500);
+});
+setTimeout(() => menuBtn.classList.add('show'), 1000);
+setTimeout(() => menuBtn.classList.remove('show'), 6000);
+
+// ===== 菜单交互 =====
+menuBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  menuPanel.classList.toggle('show');
+});
+document.addEventListener('click', e => {
+  if (!menuPanel.contains(e.target) && e.target !== menuBtn) {
+    menuPanel.classList.remove('show');
+  }
+});
 </script>
 </body>
 </html>

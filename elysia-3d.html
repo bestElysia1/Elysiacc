@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 3D 展示</title>
+<title>Elysia 3D 展示（轻3D优化版）</title>
 
 <style>
 html, body {
@@ -11,27 +11,36 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background: black;
+  overflow: hidden;
 }
 
-/* === 容器 === */
+/* === 主容器 === */
 #elysia-container {
   position: relative;
   width: 100vw;
   height: 100vh;
+  perspective: 800px;
   overflow: hidden;
 }
 
-/* === 主图 === */
-#elysia-img {
+/* === 主图 & 深度图 === */
+#elysia-img, #elysia-depth {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
   height: 100%;
-  width: auto;
+  object-fit: cover;
   transform: translate(-50%, -50%);
-  object-fit: contain;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+#elysia-depth {
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* === 高光层 === */
@@ -42,23 +51,25 @@ html, body {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
-  transition: background 0.3s ease-out, opacity 0.3s ease-out;
   animation: highlightBreathing 3s ease-in-out infinite;
+  transition: background 0.3s ease-out;
 }
 
+/* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
   0% {
-    opacity: 0.6;
-    filter: blur(8px);
+    opacity: 0.5;
+    filter: blur(10px);
   }
   50% {
     opacity: 1;
-    filter: blur(16px);
+    filter: blur(18px);
   }
   100% {
-    opacity: 0.6;
-    filter: blur(8px);
+    opacity: 0.5;
+    filter: blur(10px);
   }
 }
 
@@ -72,8 +83,6 @@ html, body {
   z-index: 5;
   pointer-events: none;
 }
-
-/* 精确三等分位置（补偿线宽一半偏移） */
 .divider.left {
   left: calc(33.333% - 5px);
 }
@@ -85,22 +94,36 @@ html, body {
 
 <body>
 <div id="elysia-container">
-  <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia" />
+  <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
+  <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth">
   <div id="elysia-highlight"></div>
   <div class="divider left"></div>
   <div class="divider right"></div>
 </div>
 
 <script>
+const mainImg = document.getElementById('elysia-img');
+const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
 
-document.addEventListener('mousemove', e => {
-  const x = (e.clientX / window.innerWidth) * 100;
-  const y = (e.clientY / window.innerHeight) * 100;
-  highlight.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.4), transparent 60%)`;
-});
+/* === 轻3D交互 + 动态高光 === */
+function update3DEffect(clientX, clientY) {
+  const x = (clientX / window.innerWidth - 0.5) * 10; // ✅ 倾斜幅度降低
+  const y = (clientY / window.innerHeight - 0.5) * -10;
 
+  mainImg.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${y}deg) scale(1.03)`;
+  depthImg.style.transform = `translate(-50%, -50%) rotateY(${x * 1.2}deg) rotateX(${y * 1.2}deg) scale(1.03)`;
+
+  const posX = 50 + x * 1.2;
+  const posY = 35 + y * 1.2;
+  highlight.style.background = `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,0.38), transparent 60%)`;
+}
+
+/* === 鼠标控制 === */
+document.addEventListener('mousemove', e => update3DEffect(e.clientX, e.clientY));
 document.addEventListener('mouseleave', () => {
+  mainImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
+  depthImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 </script>

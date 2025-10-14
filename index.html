@@ -755,23 +755,38 @@ audio.addEventListener("pause", () => player.classList.remove("playing"));
 renderPlaylist();
 updateSong();
 
-// === 🎧 Media Session API: 灵动岛 & 锁屏封面 ===
+// === 🎧 Media Session API: 灵动岛 + 锁屏封面 ===
 if ("mediaSession" in navigator) {
   function updateMediaSession() {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: songs[currentSong].title,
-      artist: "Elysia Player",
-      album: "Piano Collection",
-      artwork: [
-        { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
-        { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
-        { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
-        { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
-        { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
-      ]
-    });
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: songs[currentSong].title,
+        artist: "Elysia Player",
+        album: "Piano Collection",
+        artwork: [
+          { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
+        ]
+      });
+
+      // 更新播放状态
+      if (!audio.paused) {
+        navigator.mediaSession.playbackState = "playing";
+      } else {
+        navigator.mediaSession.playbackState = "paused";
+      }
+    } catch (e) {
+      console.warn("MediaSession update failed:", e);
+    }
   }
 
+  // 每次切歌都更新灵动岛封面与标题
+  updateMediaSession();
+
+  // 在播放、暂停、结束时刷新状态
   audio.addEventListener("play", () => {
     navigator.mediaSession.playbackState = "playing";
     updateMediaSession();

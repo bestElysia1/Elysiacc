@@ -973,29 +973,33 @@ resetTimer();
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
 
-<!-- === 嵌入式 Elysia 音浪（修正版） === -->
+<!-- === Elysia 音浪（浮动播放器专用修正版） === -->
 <canvas id="elysiaVisualizer"></canvas>
 
 <script>
 const visualizer = document.getElementById("elysiaVisualizer");
 const ctx = visualizer.getContext("2d");
 
-function resizeVisualizer() {
-  const player = document.querySelector(".elysia-player");
-  const rect = player.getBoundingClientRect();
-  visualizer.width = rect.width;
-  visualizer.height = 60;
-  visualizer.style.left = `${rect.left + rect.width / 2}px`;
-  visualizer.style.bottom = `${window.innerHeight - rect.bottom - 6}px`;
-}
-window.addEventListener("resize", resizeVisualizer);
-window.addEventListener("scroll", resizeVisualizer);
-resizeVisualizer();
+const player = document.querySelector(".elysia-player");
+player.style.position = player.style.position || "relative"; // 确保父容器可定位
 
-// === 关键：音频分析节点 ===
+visualizer.style.position = "absolute";
+visualizer.style.left = "0";
+visualizer.style.bottom = "0";
+visualizer.style.width = "100%";
+visualizer.style.height = "60px";
+visualizer.width = player.clientWidth;
+visualizer.height = 60;
+
+// 监听尺寸变化
+new ResizeObserver(() => {
+  visualizer.width = player.clientWidth;
+}).observe(player);
+
+// === 音频分析节点 ===
 let audioCtx, analyser, dataArray, bufferLength;
 function initAudioContext() {
-  if (audioCtx) return; // 避免重复初始化
+  if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const srcNode = audioCtx.createMediaElementSource(audio);
   analyser = audioCtx.createAnalyser();
@@ -1011,6 +1015,7 @@ function draw() {
   animationId = requestAnimationFrame(draw);
   analyser.getByteFrequencyData(dataArray);
   ctx.clearRect(0, 0, visualizer.width, visualizer.height);
+
   const barWidth = visualizer.width / bufferLength * 1.1;
   let x = 0;
   for (let i = 0; i < bufferLength; i++) {
@@ -1026,14 +1031,13 @@ function draw() {
   }
 }
 
-// === 播放时启用 ===
+// === 播放控制 ===
 audio.addEventListener("play", async () => {
   if (!audioCtx) initAudioContext();
   await audioCtx.resume();
   cancelAnimationFrame(animationId);
   draw();
   visualizer.classList.add("active");
-  resizeVisualizer();
 });
 audio.addEventListener("pause", () => {
   cancelAnimationFrame(animationId);
@@ -1044,15 +1048,12 @@ audio.addEventListener("pause", () => {
 <style>
 /* === 音浪视觉层 === */
 #elysiaVisualizer {
-  position: fixed;
-  transform: translateX(-50%);
-  height: 60px;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.8s ease;
   filter: blur(1.8px) brightness(1.25);
   mix-blend-mode: screen;
-  z-index: 9998;
+  z-index: 3;
 }
 #elysiaVisualizer.active {
   opacity: 1;

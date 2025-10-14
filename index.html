@@ -972,68 +972,68 @@ resetTimer();
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
-<!-- === 嵌入式 Elysia 音浪层 === -->
+
+<!-- === 嵌入式 Elysia 音浪（修正版） === -->
 <canvas id="elysiaVisualizer"></canvas>
 
 <script>
-/* === Elysia 音浪系统 === */
 const visualizer = document.getElementById("elysiaVisualizer");
 const ctx = visualizer.getContext("2d");
 
-function resizeCanvas() {
-  const playerRect = document.querySelector(".elysia-player").getBoundingClientRect();
-  visualizer.width = playerRect.width;
-  visualizer.height = 60; // 音浪高度
-  visualizer.style.width = `${playerRect.width}px`;
-  visualizer.style.height = `60px`;
-  visualizer.style.left = `${playerRect.left + playerRect.width / 2}px`;
-  visualizer.style.bottom = `${window.innerHeight - playerRect.bottom + 8}px`;
+function resizeVisualizer() {
+  const player = document.querySelector(".elysia-player");
+  const rect = player.getBoundingClientRect();
+  visualizer.width = rect.width;
+  visualizer.height = 60;
+  visualizer.style.left = `${rect.left + rect.width / 2}px`;
+  visualizer.style.bottom = `${window.innerHeight - rect.bottom - 6}px`;
 }
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("scroll", resizeCanvas);
-resizeCanvas();
+window.addEventListener("resize", resizeVisualizer);
+window.addEventListener("scroll", resizeVisualizer);
+resizeVisualizer();
 
-// 创建音频分析节点
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const srcNode = audioCtx.createMediaElementSource(audio);
-const analyser = audioCtx.createAnalyser();
-analyser.fftSize = 128;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
+// === 关键：音频分析节点 ===
+let audioCtx, analyser, dataArray, bufferLength;
+function initAudioContext() {
+  if (audioCtx) return; // 避免重复初始化
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const srcNode = audioCtx.createMediaElementSource(audio);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 128;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+  srcNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
+}
 
-srcNode.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-// 绘制音浪
 let animationId;
-function drawVisualizer() {
-  animationId = requestAnimationFrame(drawVisualizer);
+function draw() {
+  animationId = requestAnimationFrame(draw);
   analyser.getByteFrequencyData(dataArray);
-
   ctx.clearRect(0, 0, visualizer.width, visualizer.height);
-
-  const barWidth = visualizer.width / bufferLength * 1.2;
+  const barWidth = visualizer.width / bufferLength * 1.1;
   let x = 0;
   for (let i = 0; i < bufferLength; i++) {
-    const barHeight = (dataArray[i] / 255) * 35 + 3;
+    const barHeight = (dataArray[i] / 255) * 35 + 4;
     const gradient = ctx.createLinearGradient(0, 0, 0, visualizer.height);
     gradient.addColorStop(0, "rgba(210,190,255,0.9)");
-    gradient.addColorStop(1, "rgba(160,120,255,0.2)");
+    gradient.addColorStop(1, "rgba(160,120,255,0.15)");
     ctx.fillStyle = gradient;
     ctx.beginPath();
-    ctx.roundRect(x, visualizer.height - barHeight, barWidth * 0.8, barHeight, 4);
+    ctx.roundRect(x, visualizer.height - barHeight, barWidth * 0.75, barHeight, 3);
     ctx.fill();
     x += barWidth;
   }
 }
 
-// 控制播放状态
-audio.addEventListener("play", () => {
-  audioCtx.resume();
+// === 播放时启用 ===
+audio.addEventListener("play", async () => {
+  if (!audioCtx) initAudioContext();
+  await audioCtx.resume();
   cancelAnimationFrame(animationId);
-  drawVisualizer();
+  draw();
   visualizer.classList.add("active");
-  resizeCanvas();
+  resizeVisualizer();
 });
 audio.addEventListener("pause", () => {
   cancelAnimationFrame(animationId);
@@ -1042,14 +1042,15 @@ audio.addEventListener("pause", () => {
 </script>
 
 <style>
-/* === 内嵌音浪层样式 === */
+/* === 音浪视觉层 === */
 #elysiaVisualizer {
   position: fixed;
   transform: translateX(-50%);
+  height: 60px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1s ease;
-  filter: blur(1.5px) brightness(1.25);
+  transition: opacity 0.8s ease;
+  filter: blur(1.8px) brightness(1.25);
   mix-blend-mode: screen;
   z-index: 9998;
 }

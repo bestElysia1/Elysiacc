@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Elysia 透明水波版</title>
+<title>Elysia 折射水波版</title>
 
 <style>
 html, body {
@@ -59,7 +59,7 @@ body {
   100% { opacity: 0.4; filter: blur(10px); transform: scale(1); }
 }
 
-/* === 竖线 === */
+/* === 黑色竖线 === */
 .line {
   position: absolute;
   top: 0;
@@ -82,29 +82,66 @@ body {
   top: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  z-index: 10; /* ✅ 放在最上层 */
+  z-index: 10;
   overflow: visible;
 }
 
-/* === 水波效果 === */
+/* === 水波效果：带折射 === */
 .ripple {
   position: absolute;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, rgba(255,255,255,0.05) 80%, transparent 100%);
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 10%, rgba(255,255,255,0.05) 80%, transparent 100%);
   mix-blend-mode: screen;
-  backdrop-filter: blur(14px) brightness(1.3);
-  -webkit-backdrop-filter: blur(14px) brightness(1.3);
+  backdrop-filter: blur(18px) saturate(180%) brightness(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.3);
   opacity: 0.9;
-  animation: rippleGlass 2.8s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+  animation: rippleRefract 3s cubic-bezier(0.25, 1, 0.3, 1) forwards;
 }
 
-@keyframes rippleGlass {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; filter: blur(2px); }
-  30% { transform: translate(-50%, -50%) scale(4); opacity: 0.7; filter: blur(4px); }
-  60% { transform: translate(-50%, -50%) scale(8); opacity: 0.5; filter: blur(6px); }
-  100% { transform: translate(-50%, -50%) scale(14); opacity: 0; filter: blur(8px); }
+@keyframes rippleRefract {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0.7;
+    filter: blur(3px);
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(9);
+    opacity: 0.4;
+    filter: blur(6px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(16);
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+/* === 折射变形层（核心） === */
+.refract {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 100px; height: 100px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+  backdrop-filter: blur(25px) brightness(1.4) contrast(1.2);
+  -webkit-backdrop-filter: blur(25px) brightness(1.4) contrast(1.2);
+  mix-blend-mode: overlay;
+  animation: refractExpand 3s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+}
+
+@keyframes refractExpand {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+  40% { transform: translate(-50%, -50%) scale(2.5); opacity: 0.6; }
+  80% { transform: translate(-50%, -50%) scale(6); opacity: 0.3; }
+  100% { transform: translate(-50%, -50%) scale(12); opacity: 0; }
 }
 </style>
 </head>
@@ -126,7 +163,7 @@ const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
 
-/* === 轻微3D倾斜 === */
+/* === 微倾斜效果 === */
 function update3DEffect(clientX, clientY) {
   const x = (clientX / window.innerWidth - 0.5) * 10;
   const y = (clientY / window.innerHeight - 0.5) * -10;
@@ -142,14 +179,23 @@ document.addEventListener('mouseleave', () => {
   depthImg.style.transform = 'rotateY(0deg) rotateX(0deg)';
 });
 
-/* === 点击水波 === */
+/* === 点击水波 + 折射效果 === */
 container.addEventListener('click', e => {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
   ripple.style.left = `${e.clientX}px`;
   ripple.style.top = `${e.clientY}px`;
+
+  const refract = document.createElement('div');
+  refract.className = 'refract';
+  refract.style.left = `${e.clientX}px`;
+  refract.style.top = `${e.clientY}px`;
+
   rippleLayer.appendChild(ripple);
+  rippleLayer.appendChild(refract);
+
   ripple.addEventListener('animationend', () => ripple.remove());
+  refract.addEventListener('animationend', () => refract.remove());
 });
 </script>
 </body>

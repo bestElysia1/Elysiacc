@@ -989,8 +989,11 @@ resetTimer();
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 
+
 </style>
 
+
+<script>
 /* === 💫 音量淡入淡出 + 动态平衡模块 === */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const source = audioCtx.createMediaElementSource(audio);
@@ -1066,12 +1069,63 @@ document.addEventListener("click", () => {
   if (audioCtx.state === "suspended") audioCtx.resume();
 });
 
+</script>
+
 <script>
 document.querySelectorAll('a[href]').forEach(a => {
   if (!a.target) a.setAttribute('target', '_blank');
   a.setAttribute('rel', 'noopener noreferrer');
 });
   
+</script>
+
+<style>
+/* === 🌈 播放器外壳流动高亮线条 === */
+.elysia-player {
+  position: relative;
+  overflow: visible; /* 允许伪元素发光外溢 */
+}
+
+/* 外圈流动高亮线条 */
+.elysia-player::after {
+  content: "";
+  position: absolute;
+  inset: -2px; /* 稍微包裹外壳 */
+  border-radius: 18px;
+  border: 1px solid transparent;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,255,255,0) 0deg,
+    rgba(220,190,255,0.1) 20deg,
+    rgba(200,160,255,0.3) 40deg,
+    rgba(255,255,255,0.7) 60deg,
+    rgba(180,130,255,0.3) 80deg,
+    rgba(255,255,255,0) 100deg
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: elysiaFlow 8s linear infinite;
+  pointer-events: none;
+  z-index: 99999;
+  filter: blur(1px) brightness(1.4);
+}
+
+@keyframes elysiaFlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+// 💫 可选：轻微呼吸亮度（不影响主动画）
+setInterval(() => {
+  const player = document.querySelector('.elysia-player');
+  if (!player) return;
+  player.style.filter = `brightness(${1 + Math.sin(Date.now() / 1500) * 0.05})`;
+}, 120);
 </script>
 
   

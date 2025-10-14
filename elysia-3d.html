@@ -1,75 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Elysia 3D</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elysia 3D Depth</title>
 <style>
 html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+  margin: 0; padding: 0;
   height: 100%;
   background: #0d0d1a;
+  overflow: hidden;
 }
 
-/* 全屏背景图 */
-.elysia-bg {
-  position: fixed;
-  top: 0; left: 0;
+/* 容器 */
+#elysia-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  perspective: 800px;
+}
+
+/* 原图与深度图层叠 */
+#elysia-image, #elysia-depth {
+  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 1;
+  top: 0; left: 0;
+  transition: transform 0.1s ease-out;
 }
 
-/* 模拟裸眼3D的黑线 */
-.elysia-bg::before, .elysia-bg::after {
+/* 裸眼3D黑线 */
+#elysia-container::before, #elysia-container::after {
   content: "";
   position: absolute;
   top: 0; bottom: 0;
   width: 6px;
   background: rgba(0,0,0,0.7);
-  z-index: 2;
+  z-index: 3;
 }
-.elysia-bg::before { left: 49%; }
-.elysia-bg::after { right: 49%; }
+#elysia-container::before { left: 49%; }
+#elysia-container::after { right: 49%; }
 
 /* 三条杠按钮 */
 .menu-btn {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 20px; left: 20px;
   z-index: 10;
-  width: 38px;
-  height: 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  width: 38px; height: 32px;
+  display: flex; flex-direction: column; justify-content: space-between;
   cursor: pointer;
   transition: opacity 0.3s ease;
+  animation: breathe 3s ease-in-out infinite;
 }
 .menu-btn div {
   height: 4px;
   background: rgba(255,255,255,0.9);
   border-radius: 2px;
-  transition: all 0.3s ease;
   box-shadow: 0 0 8px rgba(150,150,255,0.6);
 }
 
-/* 液态玻璃菜单 */
+/* 菜单面板 */
 .menu-panel {
   position: fixed;
-  top: 70px;
-  left: 20px;
+  top: 70px; left: 20px;
   width: 240px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.15);
   border-radius: 18px;
   backdrop-filter: blur(15px);
-  box-shadow: 0 0 20px rgba(150, 150, 255, 0.25);
-  opacity: 0;
-  transform: scale(0.95);
+  box-shadow: 0 0 20px rgba(150,150,255,0.25);
+  opacity: 0; transform: scale(0.95);
   pointer-events: none;
   transition: all 0.4s ease;
   z-index: 9;
@@ -82,59 +84,55 @@ html, body {
 .menu-content {
   color: #e8ebff;
   font-family: "Segoe UI", sans-serif;
-  font-size: 16px;
-  letter-spacing: 0.5px;
 }
 
-/* 呼吸光按钮 */
+/* 呼吸光 */
 @keyframes breathe {
   0%, 100% { opacity: 0.8; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.05); }
 }
-.menu-btn {
-  animation: breathe 3s ease-in-out infinite;
-}
-
-/* 不滑动时隐藏按钮 */
-.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
+.hidden { opacity: 0; pointer-events: none; }
 </style>
 </head>
 <body>
 
-<!-- 背景图片 -->
-<div class="elysia-bg">
-  <img src="images/assets/wallhaven-7p1v79.jpg" alt="Elysia" style="width:100%;height:100%;object-fit:cover;">
+<div id="elysia-container">
+  <img id="elysia-image" src="images/elysia.jpg" alt="Elysia">
+  <img id="elysia-depth" src="images/elysia_depth.png" alt="Elysia Depth" style="mix-blend-mode: overlay; opacity:0.4;">
 </div>
 
-<!-- 三条杠按钮 -->
 <div class="menu-btn" id="menuBtn">
   <div></div><div></div><div></div>
 </div>
 
-<!-- 弹出菜单 -->
 <div class="menu-panel" id="menuPanel">
   <div class="menu-content">
     <p>🌸 Elysia Project</p>
-    <p>后续可以在这里添加选项</p>
+    <p>后续内容待添加</p>
   </div>
 </div>
 
 <script>
 const menuBtn = document.getElementById('menuBtn');
 const menuPanel = document.getElementById('menuPanel');
+menuBtn.addEventListener('click', () => menuPanel.classList.toggle('active'));
 
-menuBtn.addEventListener('click', () => {
-  menuPanel.classList.toggle('active');
+// 3D 视差交互
+const container = document.getElementById('elysia-container');
+const img = document.getElementById('elysia-image');
+const depth = document.getElementById('elysia-depth');
+
+document.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 30;
+  const y = (e.clientY / window.innerHeight - 0.5) * 30;
+  img.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+  depth.style.transform = `translateX(${x * 0.5}px) translateY(${y * 0.5}px)`;
 });
 
-// 不滑动时隐藏按钮
+// 不滑动时隐藏三条杠
 let hideTimer;
 const showButton = () => menuBtn.classList.remove('hidden');
 const hideButton = () => menuBtn.classList.add('hidden');
-
 document.addEventListener('mousemove', () => {
   showButton();
   clearTimeout(hideTimer);
@@ -142,6 +140,5 @@ document.addEventListener('mousemove', () => {
 });
 hideButton();
 </script>
-
 </body>
 </html>

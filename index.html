@@ -988,53 +988,7 @@ resetTimer();
 .elysia-playlist .playlist-item { outline: none; }
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
-/* === 🌸 爱莉希雅梦幻流光线条 === */
-.elysia-player::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  border: 2px solid transparent;
-  background: linear-gradient(120deg, 
-      rgba(255,180,255,0.0) 0%, 
-      rgba(220,160,255,0.9) 40%, 
-      rgba(160,200,255,1) 60%, 
-      rgba(255,180,255,0.0) 100%);
-  background-size: 300% 300%;
-  -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
-      linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  animation: elysiaFlow 4s linear infinite;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  filter: blur(0.5px);
-  z-index: 1;
-}
 
-/* 发光加强层（高光头更亮） */
-.elysia-player::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 16px;
-  background: radial-gradient(circle at 30% 50%, rgba(255,220,255,0.5), rgba(160,120,255,0.1) 40%, transparent 80%);
-  opacity: 0.6;
-  animation: elysiaGlow 6s ease-in-out infinite;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-@keyframes elysiaFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 300% 50%; }
-}
-
-@keyframes elysiaGlow {
-  0%, 100% { opacity: 0.4; transform: scale(1); filter: brightness(1); }
-  50% { opacity: 0.9; transform: scale(1.03); filter: brightness(1.3); }
-}
 </style>
 
 /* === 💫 音量淡入淡出 + 动态平衡模块 === */

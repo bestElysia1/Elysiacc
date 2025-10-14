@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 3D 展示（透明水波 + 呼吸高光）</title>
+<title>Elysia 能量边界版</title>
 
 <style>
 html, body {
@@ -11,16 +11,16 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
+  background: #000;
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #000;
 }
 
-/* === 容器 === */
+/* === 主容器 === */
 #elysia-container {
   position: relative;
   width: 100vw;
@@ -29,54 +29,40 @@ body {
   perspective: 800px;
 }
 
-/* === 主图 & 深度图 === */
+/* === 图片层 === */
 #elysia-img, #elysia-depth, #elysia-highlight {
   position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform-style: preserve-3d;
   transition: transform 0.15s ease-out;
   will-change: transform;
 }
 
-/* 深度图（微暗） */
+/* 深度层 */
 #elysia-depth {
   mix-blend-mode: multiply;
   opacity: 0.6;
   pointer-events: none;
 }
 
-/* === 高光层 === */
+/* 高光呼吸层 */
 #elysia-highlight {
   pointer-events: none;
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
-  transition: background 0.3s ease-out;
   animation: highlightBreathing 3s ease-in-out infinite;
   z-index: 5;
 }
 
 /* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
-  0% {
-    opacity: 0.4;
-    filter: blur(12px);
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    filter: blur(22px);
-    transform: scale(1.06);
-  }
-  100% {
-    opacity: 0.4;
-    filter: blur(12px);
-    transform: scale(1);
-  }
+  0% { opacity: 0.4; filter: blur(10px); transform: scale(1); }
+  50% { opacity: 0.9; filter: blur(20px); transform: scale(1.06); }
+  100% { opacity: 0.4; filter: blur(10px); transform: scale(1); }
 }
 
-/* === 水波折射特效 === */
+/* === 水波特效 === */
 .ripple {
   position: absolute;
   border-radius: 50%;
@@ -93,21 +79,48 @@ body {
 
 /* 水波扩散动画 */
 @keyframes rippleGlass {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
+  30% { transform: translate(-50%, -50%) scale(5); opacity: 0.7; }
+  60% { transform: translate(-50%, -50%) scale(10); opacity: 0.4; }
+  100% { transform: translate(-50%, -50%) scale(16); opacity: 0; }
+}
+
+/* === 黑色能量竖线 === */
+.line {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.15) 0%,
+    rgba(0,0,0,1) 50%,
+    rgba(255,255,255,0.15) 100%
+  );
+  box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.08);
+  animation: lineBreathing 3s ease-in-out infinite;
+  z-index: 8;
+  opacity: 0.9;
+}
+.line.left { left: 33.33%; }
+.line.right { left: 66.66%; }
+
+/* === 竖线呼吸发光动画 === */
+@keyframes lineBreathing {
   0% {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0.9;
+    opacity: 0.6;
+    box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.05);
+    filter: brightness(1);
   }
-  30% {
-    transform: translate(-50%, -50%) scale(5);
-    opacity: 0.7;
-  }
-  60% {
-    transform: translate(-50%, -50%) scale(10);
-    opacity: 0.4;
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 35px rgba(255,200,255,0.35), 0 0 80px rgba(230,180,255,0.2);
+    filter: brightness(1.4);
   }
   100% {
-    transform: translate(-50%, -50%) scale(16);
-    opacity: 0;
+    opacity: 0.6;
+    box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.05);
+    filter: brightness(1);
   }
 }
 
@@ -115,7 +128,6 @@ body {
 .highlight-flash {
   animation: flashEffect 0.6s ease-out;
 }
-
 @keyframes flashEffect {
   0% { filter: brightness(1.6); opacity: 1; }
   100% { filter: brightness(1); opacity: 0.8; }
@@ -128,6 +140,8 @@ body {
   <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
   <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth">
   <div id="elysia-highlight"></div>
+  <div class="line left"></div>
+  <div class="line right"></div>
 </div>
 
 <script>
@@ -135,10 +149,10 @@ const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
 
-/* === 轻微3D视差 === */
+/* === 轻微3D倾斜 === */
 function update3DEffect(clientX, clientY) {
-  const x = (clientX / window.innerWidth - 0.5) * 15;
-  const y = (clientY / window.innerHeight - 0.5) * -15;
+  const x = (clientX / window.innerWidth - 0.5) * 10;
+  const y = (clientY / window.innerHeight - 0.5) * -10;
   mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
   depthImg.style.transform = `rotateY(${x * 1.2}deg) rotateX(${y * 1.2}deg) scale(1.02)`;
 

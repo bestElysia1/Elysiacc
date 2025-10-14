@@ -825,35 +825,42 @@ resetTimer();
   mix-blend-mode: screen;
 }
 
-  /* === 环绕旋转光环效果（顺时针） === */
+ /* === 柔光呼吸光环（不旋转） === */
 .elysia-player::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  padding: 2px; /* 控制光环粗细，可调 */
-  background: conic-gradient(
-    from 0deg,
-    #cdbaff,
-    #9fd5ff,
-    #cdbaff
+  padding: 2px; /* 控制光环粗细 */
+  background: radial-gradient(
+    circle at center,
+    rgba(205, 186, 255, 0.7),
+    rgba(159, 213, 255, 0.4),
+    transparent 70%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: spinLight 3s linear infinite;
-  opacity: 0.85;
+  animation: glowPulse 3s ease-in-out infinite;
+  opacity: 0.9;
   pointer-events: none;
   mix-blend-mode: screen;
-  filter: blur(1px);
+  filter: blur(2px);
 }
 
-@keyframes spinLight {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    filter: blur(1px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(2px);
+  }
 }
+
   
 /* 控制按钮 */
 .elysia-controls { display:flex; gap:10px; }

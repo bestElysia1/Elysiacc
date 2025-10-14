@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 能量边界版（修正版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elysia 透明水波版</title>
 
 <style>
 html, body {
@@ -13,7 +13,6 @@ html, body {
   overflow: hidden;
   background: #000;
 }
-
 body {
   display: flex;
   justify-content: center;
@@ -30,149 +29,120 @@ body {
 }
 
 /* === 图片层 === */
-#elysia-img, #elysia-depth, #elysia-highlight {
+#elysia-img, #elysia-depth {
   position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.15s ease-out;
+  transition: transform 0.2s ease-out;
   will-change: transform;
 }
-
-/* 深度层 */
 #elysia-depth {
   mix-blend-mode: multiply;
   opacity: 0.6;
-  pointer-events: none;
 }
 
-/* 高光呼吸层 */
+/* === 高光呼吸层 === */
 #elysia-highlight {
-  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
   animation: highlightBreathing 3s ease-in-out infinite;
-  z-index: 5;
+  z-index: 3;
+  pointer-events: none;
 }
-
-/* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
   0% { opacity: 0.4; filter: blur(10px); transform: scale(1); }
-  50% { opacity: 0.9; filter: blur(20px); transform: scale(1.06); }
+  50% { opacity: 1; filter: blur(20px); transform: scale(1.06); }
   100% { opacity: 0.4; filter: blur(10px); transform: scale(1); }
 }
 
-/* === 水波特效 === */
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  pointer-events: none;
-  animation: rippleGlass 2.8s cubic-bezier(0.25, 1, 0.3, 1) forwards;
-  z-index: 10;
-  background: radial-gradient(circle, rgba(255,255,255,0.25) 10%, rgba(255,255,255,0.05) 80%, transparent 100%);
-  backdrop-filter: blur(12px) brightness(1.4);
-  -webkit-backdrop-filter: blur(12px) brightness(1.4);
-  mix-blend-mode: screen;
-  opacity: 0.8;
-}
-
-/* 水波扩散动画 */
-@keyframes rippleGlass {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
-  30% { transform: translate(-50%, -50%) scale(5); opacity: 0.7; }
-  60% { transform: translate(-50%, -50%) scale(10); opacity: 0.4; }
-  100% { transform: translate(-50%, -50%) scale(16); opacity: 0; }
-}
-
-/* === 黑色能量竖线 === */
+/* === 竖线 === */
 .line {
   position: absolute;
   top: 0;
   width: 10px;
   height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.15) 0%,
-    rgba(0,0,0,1) 50%,
-    rgba(255,255,255,0.15) 100%
-  );
-  box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.08);
-  animation: lineBreathing 3s ease-in-out infinite;
-  z-index: 8;
-  opacity: 0.9;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(0,0,0,1) 50%, rgba(255,255,255,0.15));
+  z-index: 4;
+  animation: lineGlow 3s ease-in-out infinite;
 }
 .line.left { left: 33.33%; }
 .line.right { left: 66.66%; }
-
-/* === 竖线呼吸发光动画 === */
-@keyframes lineBreathing {
-  0% {
-    opacity: 0.6;
-    box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.05);
-    filter: brightness(1);
-  }
-  50% {
-    opacity: 1;
-    box-shadow: 0 0 35px rgba(255,200,255,0.35), 0 0 80px rgba(230,180,255,0.2);
-    filter: brightness(1.4);
-  }
-  100% {
-    opacity: 0.6;
-    box-shadow: 0 0 20px rgba(255,180,255,0.1), 0 0 60px rgba(200,150,255,0.05);
-    filter: brightness(1);
-  }
+@keyframes lineGlow {
+  0%,100% { opacity: 0.6; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.4); }
 }
 
-/* === 点击闪光反馈 === */
-.highlight-flash {
-  animation: flashEffect 0.6s ease-out;
+/* === 水波层 === */
+#ripple-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10; /* ✅ 放在最上层 */
+  overflow: visible;
 }
-@keyframes flashEffect {
-  0% { filter: brightness(1.6); opacity: 1; }
-  100% { filter: brightness(1); opacity: 0.8; }
+
+/* === 水波效果 === */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, rgba(255,255,255,0.05) 80%, transparent 100%);
+  mix-blend-mode: screen;
+  backdrop-filter: blur(14px) brightness(1.3);
+  -webkit-backdrop-filter: blur(14px) brightness(1.3);
+  opacity: 0.9;
+  animation: rippleGlass 2.8s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+}
+
+@keyframes rippleGlass {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; filter: blur(2px); }
+  30% { transform: translate(-50%, -50%) scale(4); opacity: 0.7; filter: blur(4px); }
+  60% { transform: translate(-50%, -50%) scale(8); opacity: 0.5; filter: blur(6px); }
+  100% { transform: translate(-50%, -50%) scale(14); opacity: 0; filter: blur(8px); }
 }
 </style>
 </head>
 
 <body>
 <div id="elysia-container">
-  <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia">
-  <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth">
+  <img id="elysia-img" src="assets/wallhaven-7p1v79.jpg" alt="Elysia" />
+  <img id="elysia-depth" src="assets/wallhaven-7p1v79-deepth.png" alt="Depth" />
   <div id="elysia-highlight"></div>
   <div class="line left"></div>
   <div class="line right"></div>
-  <!-- ✅ 让水波放在容器内部，这样不会被 overflow 隐藏 -->
   <div id="ripple-layer"></div>
 </div>
 
 <script>
 const container = document.getElementById('elysia-container');
+const rippleLayer = document.getElementById('ripple-layer');
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
-const rippleLayer = document.getElementById('ripple-layer');
 
 /* === 轻微3D倾斜 === */
 function update3DEffect(clientX, clientY) {
   const x = (clientX / window.innerWidth - 0.5) * 10;
   const y = (clientY / window.innerHeight - 0.5) * -10;
   mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
-  depthImg.style.transform = `rotateY(${x * 1.2}deg) rotateX(${y * 1.2}deg) scale(1.02)`;
-
-  const posX = 50 + x * 1.5;
-  const posY = 35 + y * 1.5;
+  depthImg.style.transform = `rotateY(${x*1.3}deg) rotateX(${y*1.3}deg) scale(1.02)`;
+  const posX = 50 + x*1.5;
+  const posY = 35 + y*1.5;
   highlight.style.background = `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,0.4), transparent 60%)`;
 }
-
 document.addEventListener('mousemove', e => update3DEffect(e.clientX, e.clientY));
 document.addEventListener('mouseleave', () => {
-  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-  highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
+  mainImg.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  depthImg.style.transform = 'rotateY(0deg) rotateX(0deg)';
 });
 
-/* === 点击水波特效（修复版）=== */
+/* === 点击水波 === */
 container.addEventListener('click', e => {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
@@ -180,9 +150,6 @@ container.addEventListener('click', e => {
   ripple.style.top = `${e.clientY}px`;
   rippleLayer.appendChild(ripple);
   ripple.addEventListener('animationend', () => ripple.remove());
-
-  highlight.classList.add('highlight-flash');
-  setTimeout(() => highlight.classList.remove('highlight-flash'), 600);
 });
 </script>
 </body>

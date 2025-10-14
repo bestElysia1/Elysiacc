@@ -3,7 +3,7 @@
 
 
 ## 部署地址 
-https://bestxuyi.github.io/Elysia/
+https://elysia.bestxuyi.us/
 
 
-联系邮箱： bestElysia@hotmail.com
+联系邮箱： bestElysia+support@hotmail.com

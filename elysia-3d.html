@@ -1,62 +1,147 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia Player</title>
-<style>
-body {
-  margin: 0;
-  background: radial-gradient(circle at 50% 30%, #e8d9ff, #c9b6ff 60%, #b49aff 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  color: white;
-  font-family: -apple-system, Helvetica Neue, sans-serif;
-  text-align: center;
-}
-img {
-  width: 180px;
-  height: 180px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(160, 120, 255, 0.6);
-  margin-bottom: 20px;
-}
-audio {
-  width: 80%;
-  max-width: 320px;
-  margin-top: 15px;
-  filter: drop-shadow(0 0 6px rgba(180, 150, 255, 0.6));
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elysia Player</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<img src="assets/Elysia.png" alt="Elysia Cover">
-<h2>Elysia Player</h2>
-<p>AKIBA POP the Future - Pianeet</p>
-<audio controls autoplay id="elysiaAudio" src="assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3"></audio>
+  <div id="player" class="glass">
+    <div id="songTitle">AKIBA POP the Future - Pianeet</div>
+    <audio id="audio" controls></audio>
 
-<script>
-const audio = document.getElementById('elysiaAudio');
+    <div id="controls">
+      <button id="prevBtn">⏮️</button>
+      <button id="playPauseBtn">▶️</button>
+      <button id="nextBtn">⏭️</button>
+    </div>
 
-if ('mediaSession' in navigator) {
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: 'AKIBA POP the Future',
-    artist: 'Pianeet',
-    album: 'Elysia Player',
-    artwork: [
-      { src: 'assets/Elysia.png', sizes: '512x512', type: 'image/png' }
-    ]
-  });
+    <div id="playlist">
+      <div class="song" data-src="assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3">
+        AKIBA POP the Future - Pianeet
+      </div>
+      <div class="song" data-src="assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3">
+        Aoi Tori - The iDOLM
+      </div>
+    </div>
+  </div>
 
-  // 允许锁屏 / 灵动岛 / 耳机 控制播放暂停
-  navigator.mediaSession.setActionHandler('play', () => audio.play());
-  navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-  navigator.mediaSession.setActionHandler('previoustrack', null);
-  navigator.mediaSession.setActionHandler('nexttrack', null);
-}
-</script>
+  <script>
+    const songs = [
+      { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
+      { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" }
+    ];
+
+    const audio = document.getElementById("audio");
+    const songTitle = document.getElementById("songTitle");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playlistItems = document.querySelectorAll(".song");
+
+    let currentSong = 0;
+
+    function updateSong() {
+      const song = songs[currentSong];
+      audio.src = song.src;
+      songTitle.textContent = song.title;
+      updateMediaSession();
+      audio.play();
+    }
+
+    playPauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = "⏸️";
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "▶️";
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentSong = (currentSong + 1) % songs.length;
+      updateSong();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      updateSong();
+    });
+
+    playlistItems.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        currentSong = index;
+        updateSong();
+      });
+    });
+
+    audio.addEventListener("ended", () => {
+      currentSong = (currentSong + 1) % songs.length;
+      updateSong();
+    });
+
+    // === 🎧 Media Session API ===
+    function updateMediaSession() {
+      if (!("mediaSession" in navigator)) return;
+
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: songs[currentSong].title,
+        artist: "Elysia Player",
+        album: "Piano Collection",
+        artwork: [
+          { src: "assets/Elysia.png", sizes: "96x96", type: "image/png" },
+          { src: "assets/Elysia.png", sizes: "128x128", type: "image/png" },
+          { src: "assets/Elysia.png", sizes: "192x192", type: "image/png" },
+          { src: "assets/Elysia.png", sizes: "256x256", type: "image/png" },
+          { src: "assets/Elysia.png", sizes: "512x512", type: "image/png" }
+        ]
+      });
+
+      navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+
+      try {
+        navigator.mediaSession.setActionHandler("play", () => {
+          audio.play();
+          playPauseBtn.textContent = "⏸️";
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("pause", () => {
+          audio.pause();
+          playPauseBtn.textContent = "▶️";
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("previoustrack", () => {
+          currentSong = (currentSong - 1 + songs.length) % songs.length;
+          updateSong();
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("nexttrack", () => {
+          currentSong = (currentSong + 1) % songs.length;
+          updateSong();
+        });
+      } catch (e) {}
+    }
+
+    if ("mediaSession" in navigator) {
+      audio.addEventListener("play", () => {
+        navigator.mediaSession.playbackState = "playing";
+        updateMediaSession();
+      });
+      audio.addEventListener("pause", () => {
+        navigator.mediaSession.playbackState = "paused";
+      });
+    }
+
+    // 初始化
+    updateSong();
+  </script>
 </body>
 </html>

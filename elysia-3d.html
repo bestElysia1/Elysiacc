@@ -1,268 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Elysia — 爱莉希雅</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elysia — 3D Floating</title>
 <style>
-:root{
-  --accent-start: #9a6ef0;
-  --accent-end:   #7b3fe4;
-  --glass: rgba(255,255,255,0.06);
-  --bg: linear-gradient(180deg, rgba(250,246,255,0.95), rgba(245,242,255,0.95));
-  --soft: rgba(154,110,240,0.12);
-  --page-bg: #fbf8ff;
-}
+  /* 页面基础样式 */
+  html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #ece8ff 0%, #dcd4ff 50%, #cfc9ff 100%);
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  }
 
-/* reset */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; background:var(--page-bg);}
+  /* 居中显示 Elysia 图片 */
+  .scene {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-/* center container */
-.scene {
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:36px;
-  position:relative;
-  overflow:hidden;
-}
+  /* 图片样式 */
+  .elysia-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    animation: float 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 25px rgba(180,150,255,0.4));
+    transition: transform 1.5s ease;
+  }
 
-/* glass panel */
-.panel {
-  width: min(820px, 94vw);
-  max-width:980px;
-  border-radius:20px;
-  padding:30px;
-  position:relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
-  border: 1px solid rgba(160,130,255,0.08);
-  box-shadow: 0 18px 60px rgba(120,80,255,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
-  -webkit-backdrop-filter: blur(10px) saturate(150%);
-  backdrop-filter: blur(10px) saturate(150%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+  /* 漂浮动画 */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
 
-/* softly blurred vignette to match player */
-.panel::before {
-  content:"";
-  position:absolute;
-  inset:-30%;
-  background:
-    radial-gradient(40% 30% at 10% 20%, rgba(156,107,255,0.14), transparent 20%),
-    radial-gradient(35% 28% at 85% 80%, rgba(200,160,255,0.08), transparent 18%);
-  filter: blur(36px);
-  pointer-events:none;
-  mix-blend-mode:screen;
-}
+  /* 液态玻璃菜单按钮 */
+  #menu-btn {
+    position: fixed;
+    top: 22px;
+    right: 26px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 9999;
+    transition: opacity 0.6s ease, background 0.3s ease;
+    box-shadow: 0 4px 20px rgba(180,150,255,0.3);
+  }
 
-/* the image wrapper to create layered parallax */
-.elysia-wrap {
-  position:relative;
-  width: 100%;
-  max-width:720px;
-  height: calc(720px * 1.4); /* tall portrait */
-  max-height: 86vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transform-style: preserve-3d;
-  perspective: 900px;
-}
+  #menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 
-/* the floating image layer */
-.elysia-img {
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform: translate(-50%,-50%) translateZ(0);
-  width: 68%;
-  max-width:520px;
-  height: auto;
-  border-radius: 14px;
-  object-fit: cover;
-  box-shadow: 0 18px 48px rgba(120,80,255,0.12);
-  transition: transform 0.18s ease-out;
-  will-change: transform, filter;
-  z-index:10;
-  filter: drop-shadow(0 8px 30px rgba(130,100,240,0.12));
-}
+  #menu-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
 
-/* subtle inner vignette mask below image */
-.elysia-vignette {
-  position:absolute;
-  inset:0;
-  border-radius:14px;
-  pointer-events:none;
-  box-shadow: inset 0 -60px 80px rgba(255,255,255,0.04);
-  z-index:11;
-}
-
-/* breathing halo — 细且轻的流光环绕（matching color） */
-.halo {
-  position:absolute;
-  left:50%; top:50%;
-  width: calc(68% + 60px);
-  max-width: 600px;
-  height: calc(68% + 60px);
-  transform: translate(-50%,-50%);
-  border-radius: 50%;
-  z-index:6;
-  pointer-events:none;
-  mix-blend-mode: screen;
-  opacity:0.85;
-  /* thin gradient ring */
-  background:
-    radial-gradient(closest-side, transparent 70%, rgba(150,110,255,0.06) 71%, rgba(150,110,255,0.08) 81%, transparent 82%),
-    conic-gradient(from 160deg, rgba(180,140,255,0.18), rgba(130,170,255,0.06), rgba(200,160,255,0.14), rgba(150,110,255,0.18));
-  filter: blur(10px) saturate(140%);
-  transition: transform .6s ease, opacity .6s ease;
-}
-
-/* tiny moving sheen (disabled auto-rotate by default) */
-.halo .sheen {
-  position:absolute;
-  left:50%; top:50%;
-  width: 8px; height: 8px;
-  transform-origin: -220px  -220px; /* large radius */
-  border-radius:50%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(200,170,255,0.85));
-  box-shadow: 0 0 18px rgba(200,160,255,0.9);
-  opacity: 0.95;
-  pointer-events:none;
-  /* we won't start CSS rotate automatically; movement controlled by JS if you want */
-}
-
-/* soft caption area bottom (optional) */
-.caption {
-  position:absolute;
-  bottom:14px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:0.92rem;
-  color: rgba(90,60,140,0.9);
-  z-index:20;
-  text-shadow: 0 0 8px rgba(160,120,255,0.08);
-  backdrop-filter: blur(6px);
-  padding:6px 10px;
-  border-radius:8px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.32), rgba(255,255,255,0.18));
-  border:1px solid rgba(160,120,255,0.06);
-  display:none; /* 隐藏，按需打开 */
-}
-
-/* responsive adjustments */
-@media (max-width:900px){
-  .elysia-img { width: 86%; max-width:420px; }
-  .halo { width: calc(86% + 40px); height: calc(86% + 40px); }
-  .elysia-wrap { height: calc(420px * 1.45); }
-}
-
-/* accessibility focus outline when keyboard nav */
-a:focus, button:focus { outline: 2px solid rgba(156,107,255,0.18); outline-offset:3px; }
-
+  /* 底部标题 */
+  .caption {
+    position: fixed;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    color: rgba(100, 80, 150, 0.8);
+    letter-spacing: 0.8px;
+    text-shadow: 0 0 8px rgba(200,150,255,0.4);
+  }
 </style>
 </head>
 <body>
+  <button id="menu-btn">☰</button>
 
-<div class="scene">
-  <div class="panel" role="main" aria-label="爱莉希雅展示">
-    <div class="elysia-wrap" id="wrap">
-      <div class="halo" id="halo">
-        <div class="sheen" id="sheen"></div>
-      </div>
-
-      <!-- 图片：请确保 assets/elysia.png 存在 -->
-      <img class="elysia-img" id="elysiaImg" src="assets/Elysia.png" alt="elysia">
-
-      <div class="elysia-vignette"></div>
-
-      <div class="caption" id="caption">Elysia — Floating</div>
-    </div>
+  <div class="scene">
+    <img class="elysia-img" src="assets/Elysia.png" alt="Elysia">
   </div>
-</div>
+
+  <div class="caption">Elysia — Floating</div>
 
 <script>
-/*
- Interactions:
-  - mousemove / touch -> subtle parallax: image tilt & halo parallax
-  - auto breathe of halo (scale pulse)
-  - by default no constant rotation (you asked earlier to be able to turn clockwise on/off)
-*/
-const wrap = document.getElementById('wrap');
-const img = document.getElementById('elysiaImg');
-const halo = document.getElementById('halo');
-const sheen = document.getElementById('sheen');
+  // 三条杠菜单自动隐藏逻辑
+  const menuBtn = document.getElementById("menu-btn");
+  let hideTimeout;
 
-let width = wrap.clientWidth;
-let height = wrap.clientHeight;
-function updateSize(){ width = wrap.clientWidth; height = wrap.clientHeight; }
-window.addEventListener('resize', updateSize);
-
-/* subtle breathing */
-let breathe = () => {
-  halo.animate([
-    { transform: 'translate(-50%,-50%) scale(0.995)', opacity: 0.86 },
-    { transform: 'translate(-50%,-50%) scale(1.02)',  opacity: 0.92 },
-    { transform: 'translate(-50%,-50%) scale(0.995)', opacity: 0.86 }
-  ], { duration: 6000, iterations: Infinity, easing: 'ease-in-out' });
-};
-breathe();
-
-/* parallax mouse move */
-function onMove(e){
-  const rect = wrap.getBoundingClientRect();
-  const x = ( (e.clientX ?? (e.touches && e.touches[0].clientX) ) - rect.left ) / rect.width - 0.5;
-  const y = ( (e.clientY ?? (e.touches && e.touches[0].clientY) ) - rect.top ) / rect.height - 0.5;
-
-  // image tilt
-  const rotX = (-y * 8).toFixed(2);
-  const rotY = ( x * 10).toFixed(2);
-
-  // image translate slightly for depth
-  img.style.transform = `translate(-50%,-50%) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.01)`;
-
-  // halo parallax (slower)
-  const haloTx = (-x * 12).toFixed(2);
-  const haloTy = (-y * 8).toFixed(2);
-  halo.style.transform = `translate(calc(-50% + ${haloTx}px), calc(-50% + ${haloTy}px))`;
-
-  // position sheen along arc (move along ellipse)
-  const angle = Math.atan2(y, x);
-  const radius = Math.min(rect.width, rect.height) * 0.45;
-  const sx = Math.cos(angle) * radius;
-  const sy = Math.sin(angle) * radius;
-  sheen.style.transform = `translate(${sx}px, ${sy}px)`;
-}
-
-wrap.addEventListener('mousemove', onMove);
-wrap.addEventListener('touchmove', onMove, {passive:true});
-
-// reset on leave
-wrap.addEventListener('mouseleave', () => {
-  img.style.transform = 'translate(-50%,-50%) rotateX(0deg) rotateY(0deg) scale(1)';
-  halo.style.transform = 'translate(-50%,-50%)';
-  sheen.style.transform = 'translate(0,0)';
-});
-
-/* optional: click to toggle caption */
-wrap.addEventListener('click', () => {
-  const c = document.getElementById('caption');
-  c.style.display = c.style.display === 'none' ? 'block' : 'none';
-});
-
-/* keyboard accessibility: allow Esc to return to index (or close) */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    // go back to index page
-    if (history.length > 1) history.back();
-    else location.href = 'index.html';
+  function showMenu() {
+    menuBtn.classList.remove("hidden");
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+      menuBtn.classList.add("hidden");
+    }, 2500); // 2.5秒后隐藏
   }
-});
-</script>
 
+  // 监听交互事件
+  window.addEventListener("mousemove", showMenu);
+  window.addEventListener("touchstart", showMenu);
+  window.addEventListener("scroll", showMenu);
+
+  // 初始隐藏
+  menuBtn.classList.add("hidden");
+</script>
 </body>
 </html>

@@ -755,6 +755,37 @@ audio.addEventListener("pause", () => player.classList.remove("playing"));
 renderPlaylist();
 updateSong();
 
+// === 🎧 Media Session API: 灵动岛 & 锁屏封面 ===
+if ("mediaSession" in navigator) {
+  function updateMediaSession() {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: songs[currentSong].title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [
+        { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
+        { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
+        { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
+        { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
+        { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
+      ]
+    });
+  }
+
+  audio.addEventListener("play", () => {
+    navigator.mediaSession.playbackState = "playing";
+    updateMediaSession();
+  });
+
+  audio.addEventListener("pause", () => {
+    navigator.mediaSession.playbackState = "paused";
+  });
+
+  audio.addEventListener("ended", () => {
+    navigator.mediaSession.playbackState = "none";
+  });
+}
+
 /* 播放列表交互 */
 playlist.addEventListener("click", e => {
   const item = e.target.closest(".playlist-item");

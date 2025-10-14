@@ -62,7 +62,20 @@ function updateMediaSession() {
         artist: "Elysia Player",
         album: "Piano Collection",
         artwork: [
-          { src: "assets/Elysia.png", sizes: "512x512", type: "image/png" }
+          { src: "audio.addEventListener("play", () => {
+  if ('mediaSession' in navigator) {
+    const currentSong = songs[currentSongIndex];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title,
+      artist: "Elysia Player",
+      album: "Elysia",
+      artwork: [
+        { src: location.origin + "/assets/Elysia.png", sizes: "512x512", type: "image/png" }
+      ]
+    });
+    console.log("✅ MediaSession metadata set:", currentSong.title);
+  }
+});", sizes: "512x512", type: "image/png" }
         ]
       });
 
@@ -238,7 +251,46 @@ audio.addEventListener("play", () => {
       artist: "Elysia Player",
       album: "Elysia",
       artwork: [
+        { src: location.origin + "audio.addEventListener("play", () => {
+  if ('mediaSession' in navigator) {
+    const currentSong = songs[currentSongIndex];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title,
+      artist: "Elysia Player",
+      album: "Elysia",
+      artwork: [
+        { src: location.origin + "audio.addEventListener("play", () => {
+  if ('mediaSession' in navigator) {
+    const currentSong = songs[currentSongIndex];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title,
+      artist: "Elysia Player",
+      album: "Elysia",
+      artwork: [
+        { src: location.origin + "audio.addEventListener("play", () => {
+  if ('mediaSession' in navigator) {
+    const currentSong = songs[currentSongIndex];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title,
+      artist: "Elysia Player",
+      album: "Elysia",
+      artwork: [
         { src: location.origin + "/assets/Elysia.png", sizes: "512x512", type: "image/png" }
+      ]
+    });
+    console.log("✅ MediaSession metadata set:", currentSong.title);
+  }
+});", sizes: "512x512", type: "image/png" }
+      ]
+    });
+    console.log("✅ MediaSession metadata set:", currentSong.title);
+  }
+});", sizes: "512x512", type: "image/png" }
+      ]
+    });
+    console.log("✅ MediaSession metadata set:", currentSong.title);
+  }
+});", sizes: "512x512", type: "image/png" }
       ]
     });
     console.log("✅ MediaSession metadata set:", currentSong.title);

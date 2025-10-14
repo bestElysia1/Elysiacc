@@ -212,71 +212,72 @@ main.container li:hover {
   transition: all 0.3s ease;
 }
 
-  /* === 三条杠导航样式 === */
+/* === Elysia风格三条杠导航 === */
 .nav-toggle {
   position: fixed;
-  top: 25px;
-  left: 30px;
-  width: 28px;
+  top: 24px;
+  left: 28px;
+  width: 30px;
   height: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  z-index: 2000;
-  filter: drop-shadow(0 0 6px rgba(180,100,255,0.8));
-  animation: glowPulse 3s infinite ease-in-out;
+  z-index: 9999;
+  animation: navGlow 3s ease-in-out infinite;
 }
 
 .nav-toggle .bar {
   width: 100%;
   height: 3px;
-  background: rgba(200,160,255,0.85);
+  background: rgba(200,160,255,0.9);
   border-radius: 2px;
   transition: all 0.3s ease;
+  box-shadow: 0 0 6px rgba(180,100,255,0.8);
 }
 
-@keyframes glowPulse {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(180,100,255,0.4)); }
-  50% { filter: drop-shadow(0 0 12px rgba(180,100,255,0.9)); }
+@keyframes navGlow {
+  0%,100% { filter: drop-shadow(0 0 5px rgba(180,100,255,0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(180,100,255,1)); }
 }
 
-/* === 弹出菜单样式 === */
+/* === 弹出菜单（macOS 弹窗风格） === */
 .nav-menu {
   position: fixed;
-  top: 55px;
-  left: 25px;
+  top: 60px;
+  left: 22px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px 25px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 12px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  align-items: center;
+  gap: 18px;
+  padding: 25px 30px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 16px;
+  backdrop-filter: blur(25px) saturate(180%);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
   transform: scale(0.9);
   opacity: 0;
   pointer-events: none;
-  transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
-  z-index: 1999;
+  transition: all 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  z-index: 9998;
 }
 
 .nav-menu.active {
-  opacity: 1;
   transform: scale(1);
-  pointer-events: all;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .nav-item {
+  font-size: 26px;
   text-decoration: none;
-  font-size: 24px;
-  text-align: center;
-  color: rgba(255,255,255,0.9);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(180,100,255,0.6);
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .nav-item:hover {
-  transform: scale(1.15);
+  transform: scale(1.2);
   color: #fff;
 }
 
@@ -1065,20 +1066,19 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
   <script>
-// === 三条杠导航开关 ===
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
 
-navToggle.addEventListener('click', () => {
+// 点击切换菜单
+navToggle.addEventListener('click', e => {
+  e.stopPropagation();
   navMenu.classList.toggle('active');
 });
 
-// 点击空白处关闭菜单
-document.addEventListener('click', (e) => {
-  if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
-    navMenu.classList.remove('active');
-  }
-});
+// 点击空白关闭菜单
+document.addEventListener('click', e =>
+
+
 </script>
 
 

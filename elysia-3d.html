@@ -64,6 +64,23 @@ body {
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
   transition: background 0.3s ease-out;
+  animation: highlightBreathing 3s ease-in-out infinite;
+}
+
+/* === 高光呼吸动画 === */
+@keyframes highlightBreathing {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
 }
 
 /* === 菜单按钮（隐藏） === */
@@ -163,7 +180,6 @@ document.addEventListener('touchmove', e => {
   const touch = e.touches[0];
   update3DEffect(touch.clientX, touch.clientY);
 }, { passive: true });
-
 document.addEventListener('touchend', () => {
   mainImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
   depthImg.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';

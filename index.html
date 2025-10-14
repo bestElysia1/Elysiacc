@@ -988,7 +988,42 @@ resetTimer();
 .elysia-playlist .playlist-item { outline: none; }
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
+/* === 🌸 播放器外壳流光环（8s一圈，细线，头部高亮） === */
+.elysia-player {
+  position: relative;
+  z-index: 2;
+}
 
+/* SVG覆盖层 */
+.elysia-player .elysia-flow-svg {
+  position: absolute;
+  inset: -6px; /* 微微超出播放器边缘 */
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  pointer-events: none;
+  overflow: visible;
+  z-index: 9999;
+  border-radius: inherit;
+  transform-origin: center;
+}
+
+/* 轻柔发光晕层 */
+.elysia-player .elysia-flow-glow {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  z-index: 9998;
+  border-radius: inherit;
+  filter: blur(8px) saturate(160%);
+  opacity: 0.4;
+  mix-blend-mode: screen;
+}
+
+/* 动画：顺时针滑动流光 */
+@keyframes flowStroke {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -1000; }
+}
 </style>
 
 /* === 💫 音量淡入淡出 + 动态平衡模块 === */
@@ -1072,6 +1107,97 @@ document.querySelectorAll('a[href]').forEach(a => {
   a.setAttribute('rel', 'noopener noreferrer');
 });
   
+</script>
+
+<script>
+(function() {
+  const player = document.querySelector('.elysia-player');
+  if (!player) return;
+
+  if (player.querySelector('.elysia-flow-svg')) return;
+
+  const cfg = {
+    strokeWidth: 1.2,        // 线条极细
+    headLength: 50,          // 高亮头长度
+    trailLength: 420,        // 流光尾巴长度
+    baseColor: 'rgba(160,120,255,0.15)',
+    headColor: 'rgba(255,255,255,1)',
+    accentColor: 'rgba(190,160,255,0.8)',
+    duration: 8.0            // ✅ 8秒一圈
+  };
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.classList.add('elysia-flow-svg');
+  svg.setAttribute('viewBox', '0 0 200 60');
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  // 柔光背景
+  const glow = document.createElement('div');
+  glow.className = 'elysia-flow-glow';
+  glow.style.background = `radial-gradient(circle at 50% 50%, ${cfg.accentColor}, transparent 35%)`;
+  player.appendChild(glow);
+
+  // 渐变
+  const defs = document.createElementNS(ns, 'defs');
+  const grad = document.createElementNS(ns, 'linearGradient');
+  grad.id = 'elysiaGrad';
+  grad.setAttribute('x1','0'); grad.setAttribute('y1','0');
+  grad.setAttribute('x2','1'); grad.setAttribute('y2','0');
+  const stops = [
+    {o:'0%', c:cfg.baseColor, op:0},
+    {o:'30%', c:cfg.baseColor, op:0.25},
+    {o:'48%', c:cfg.accentColor, op:0.9},
+    {o:'50%', c:cfg.headColor, op:1},
+    {o:'52%', c:cfg.accentColor, op:0.9},
+    {o:'70%', c:cfg.baseColor, op:0.25},
+    {o:'100%', c:cfg.baseColor, op:0},
+  ];
+  stops.forEach(s=>{
+    const stop=document.createElementNS(ns,'stop');
+    stop.setAttribute('offset',s.o);
+    stop.setAttribute('stop-color',s.c);
+    stop.setAttribute('stop-opacity',s.op);
+    grad.appendChild(stop);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const path=document.createElementNS(ns,'path');
+  path.setAttribute('d',`M8,0 H192 A8,8 0 0 1 200,8 V52 A8,8 0 0 1 192,60 H8 A8,8 0 0 1 0,52 V8 A8,8 0 0 1 8,0 Z`);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke','url(#elysiaGrad)');
+  path.setAttribute('stroke-width',cfg.strokeWidth);
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-linejoin','round');
+  path.style.strokeDasharray = `${cfg.headLength} ${cfg.trailLength}`;
+  path.style.strokeDashoffset = '0';
+  svg.appendChild(path);
+  player.appendChild(svg);
+
+  // 调整 SVG 尺寸
+  const fit = ()=>{
+    const rect=player.getBoundingClientRect();
+    svg.style.width=`${rect.width+12}px`;
+    svg.style.height=`${rect.height+12}px`;
+    svg.style.left='-6px';
+    svg.style.top='-6px';
+  };
+  fit();
+  window.addEventListener('resize',fit);
+
+  // 动画
+  let offset=0, last=performance.now();
+  const len = cfg.headLength + cfg.trailLength;
+  const pxPerMs = len / (cfg.duration*1000);
+  const tick=(now)=>{
+    const dt = now - last; last = now;
+    offset = (offset - pxPerMs*dt) % len;
+    path.style.strokeDashoffset = offset;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
 </script>
 
   

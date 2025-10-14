@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Elysia 3D 展示（轻3D优化版）</title>
+<title>Elysia 3D 展示（轻3D + 水波特效）</title>
 
 <style>
 html, body {
@@ -22,6 +22,7 @@ html, body {
   height: 100vh;
   perspective: 800px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 /* === 主图 & 深度图 === */
@@ -89,6 +90,25 @@ html, body {
 .divider.right {
   left: calc(66.666% - 5px);
 }
+
+/* === 水波效果 === */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: rippleAnimation 1.4s ease-out forwards;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(2px);
+}
+
+@keyframes rippleAnimation {
+  to {
+    transform: scale(8);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 
@@ -105,10 +125,11 @@ html, body {
 const mainImg = document.getElementById('elysia-img');
 const depthImg = document.getElementById('elysia-depth');
 const highlight = document.getElementById('elysia-highlight');
+const container = document.getElementById('elysia-container');
 
 /* === 轻3D交互 + 动态高光 === */
 function update3DEffect(clientX, clientY) {
-  const x = (clientX / window.innerWidth - 0.5) * 10; // ✅ 倾斜幅度降低
+  const x = (clientX / window.innerWidth - 0.5) * 10; // ✅ 轻微倾斜
   const y = (clientY / window.innerHeight - 0.5) * -10;
 
   mainImg.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${y}deg) scale(1.03)`;
@@ -125,6 +146,24 @@ document.addEventListener('mouseleave', () => {
   mainImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
   depthImg.style.transform = 'translate(-50%, -50%) rotateY(0deg) rotateX(0deg) scale(1)';
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
+});
+
+/* === 点击水波特效 === */
+function createRipple(x, y) {
+  const ripple = document.createElement('div');
+  ripple.classList.add('ripple');
+  const rect = container.getBoundingClientRect();
+  ripple.style.left = `${x - rect.left - 50}px`;
+  ripple.style.top = `${y - rect.top - 50}px`;
+  ripple.style.width = ripple.style.height = '100px';
+  container.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove());
+}
+
+container.addEventListener('click', e => createRipple(e.clientX, e.clientY));
+container.addEventListener('touchstart', e => {
+  const touch = e.touches[0];
+  createRipple(touch.clientX, touch.clientY);
 });
 </script>
 </body>

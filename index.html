@@ -992,35 +992,44 @@ resetTimer();
   animation: elysiaFloat 6s ease-in-out infinite;
 }
 
-/* === 流动光线环 === */
+/* === 流光线条（代替小球） === */
 .elysia-player::after {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255,220,255,0) 0deg,
-    rgba(255,220,255,0.9) 10deg,
-    rgba(200,150,255,0.4) 25deg,
-    rgba(180,120,255,0) 60deg,
-    rgba(255,220,255,0) 360deg
-  );
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 2px; /* 光线宽度 */
-  animation: spinGlow 8s linear infinite;
+  top: -2px;
+  left: 0;
+  width: 30px; /* 发光线条的长度 */
+  height: 3px; /* 线条的粗细 */
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,1), rgba(180,140,255,0));
+  box-shadow: 0 0 12px rgba(255,220,255,0.9), 0 0 24px rgba(180,140,255,0.6);
+  animation: flowAround 8s linear infinite;
   pointer-events: none;
-  box-shadow: 0 0 12px rgba(210,160,255,0.8);
-  opacity: 0.85;
+  transform-origin: center;
 }
 
-/* 顺时针流动动画 */
-@keyframes spinGlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* === 顺时针环绕播放器边缘移动 === */
+@keyframes flowAround {
+  0% {
+    top: -2px; left: 0%;
+    transform: rotate(0deg);
+  }
+  25% {
+    top: -2px; left: calc(100% - 30px);
+    transform: rotate(90deg);
+  }
+  50% {
+    top: calc(100% - 2px); left: calc(100% - 30px);
+    transform: rotate(180deg);
+  }
+  75% {
+    top: calc(100% - 2px); left: 0%;
+    transform: rotate(270deg);
+  }
+  100% {
+    top: -2px; left: 0%;
+    transform: rotate(360deg);
+  }
 }
 /* 可访问性与微调 */
 .elysia-playlist { scrollbar-width: thin; }

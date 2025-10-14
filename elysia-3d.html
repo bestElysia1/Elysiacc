@@ -181,6 +181,19 @@ if ('mediaSession' in navigator) {
     navigator.mediaSession.playbackState = 'paused';
   });
 }
+<script>
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: 'AKIBA POP the Future',
+    artist: 'Pianeet',
+    album: 'Elysia Player',
+    artwork: [
+      { src: 'https://elysia-player-assets.vercel.app/cover.jpg', sizes: '512x512', type: 'image/jpeg' }
+    ]
+  });
+}
+</script>
+
 </script>
 </body>
 </html>

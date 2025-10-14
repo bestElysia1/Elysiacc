@@ -728,6 +728,7 @@ function updateSong() {
   titleEl.textContent = songs[currentSong].title;
   audio.src = songs[currentSong].src;
   audio.play().catch(()=>{});
+  updateMediaSession();
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
   preloadNext();

@@ -126,6 +126,19 @@ body {
   background: transparent;
   z-index: 1;
 }
+  #elysia-foreground {
+  filter: brightness(1.2) contrast(1.15) saturate(1.05);
+}
+
+#elysia-foreground::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.25), transparent 60%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
 </style>
 </head>
 

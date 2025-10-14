@@ -925,6 +925,43 @@ resetTimer();
 @keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
 @keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
 
+  /* === 播放器环绕流光边缘 === */
+.player-glow {
+  position: relative;
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px;
+  background: conic-gradient(
+  from 0deg,
+  rgba(210,160,255,0.45),
+  rgba(250,180,255,0.4),
+  rgba(180,160,255,0.45),
+  rgba(210,160,255,0.45)
+);
+animation: rotateGlow 8s linear infinite;
+
+}
+
+.player-glow::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 16px;
+  background: rgba(20,20,30,0.85);
+  z-index: 1;
+}
+
+.player {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes rotateGlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
 /* 可访问性与微调 */
 .elysia-playlist { scrollbar-width: thin; }
 .elysia-playlist .playlist-item { outline: none; }

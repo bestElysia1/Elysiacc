@@ -554,46 +554,6 @@ DOMAIN-SUFFIX,x.ai,奶昔｜新加坡01-❄️10Gbps</pre>
   animation: floaty 5s ease-in-out infinite;
 }
 </style>
-  <canvas id="starfield"></canvas>
-
-<script>
-//  Elysia 星空背景特效
-const canvas = document.getElementById('starfield');
-const ctx = canvas.getContext('2d');
-let stars = [];
-const numStars = 80;
-let w, h;
-
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-  stars = Array.from({length: numStars}, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    r: Math.random() * 1.5 + 0.5,
-    alpha: Math.random(),
-    speed: Math.random() * 0.3 + 0.1
-  }));
-}
-window.addEventListener('resize', resize);
-resize();
-
-function draw() {
-  ctx.clearRect(0, 0, w, h);
-  for (let s of stars) {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(180,160,255,${s.alpha})`;
-    ctx.fill();
-    s.y -= s.speed;
-    if (s.y < -2) s.y = h + 2;
-    s.alpha += (Math.random() - 0.5) * 0.02;
-    s.alpha = Math.max(0.2, Math.min(1, s.alpha));
-  }
-  requestAnimationFrame(draw);
-}
-draw();
-</script>
 
 <style>
 #starfield {

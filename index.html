@@ -1090,32 +1090,30 @@ document.querySelectorAll('a[href]').forEach(a => {
 .elysia-player::after {
   content: "";
   position: absolute;
-  inset: -2px; /* 稍微包裹外壳 */
+  inset: -2px;
   border-radius: 18px;
-  border: 1px solid transparent;
   background: conic-gradient(
     from 0deg,
     rgba(255,255,255,0) 0deg,
-    rgba(220,190,255,0.1) 20deg,
-    rgba(200,160,255,0.3) 40deg,
-    rgba(255,255,255,0.7) 60deg,
-    rgba(180,130,255,0.3) 80deg,
-    rgba(255,255,255,0) 100deg
+    rgba(255,255,255,0) 330deg,
+    rgba(220,190,255,0.1) 340deg,
+    rgba(240,200,255,0.5) 350deg,
+    rgba(255,255,255,0.9) 360deg
   );
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: elysiaFlow 8s linear infinite;
+  animation: borderFlow 8s linear infinite;
   pointer-events: none;
   z-index: 99999;
-  filter: blur(1px) brightness(1.4);
+  filter: blur(1px) brightness(1.3);
 }
 
-@keyframes elysiaFlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes borderFlow {
+  from { background-position: 0deg; }
+  to { background-position: 360deg; }
 }
 </style>
 

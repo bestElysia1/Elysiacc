@@ -1079,54 +1079,6 @@ document.querySelectorAll('a[href]').forEach(a => {
   
 </script>
 
-<style>
-/* === 🌈 播放器外壳流动高亮线条 === */
-.elysia-player {
-  position: relative;
-  overflow: visible; /* 允许伪元素发光外溢 */
-}
-
-/* 外圈流动高亮线条 */
-.elysia-player::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 18px;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255,255,255,0) 0deg,
-    rgba(255,255,255,0) 330deg,
-    rgba(220,190,255,0.1) 340deg,
-    rgba(240,200,255,0.5) 350deg,
-    rgba(255,255,255,0.9) 360deg
-  );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: borderFlow 8s linear infinite;
-  pointer-events: none;
-  z-index: 99999;
-  filter: blur(1px) brightness(1.3);
-}
-
-@keyframes borderFlow {
-  from { background-position: 0deg; }
-  to { background-position: 360deg; }
-}
-</style>
-
-<script>
-// 💫 可选：轻微呼吸亮度（不影响主动画）
-setInterval(() => {
-  const player = document.querySelector('.elysia-player');
-  if (!player) return;
-  player.style.filter = `brightness(${1 + Math.sin(Date.now() / 1500) * 0.05})`;
-}, 120);
-</script>
-
-  
 
 
 <script>

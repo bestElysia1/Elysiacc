@@ -988,88 +988,8 @@ resetTimer();
 .elysia-playlist .playlist-item { outline: none; }
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
-
-
 </style>
 
-
-<script>
-/* === 💫 音量淡入淡出 + 动态平衡模块 === */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioCtx.createMediaElementSource(audio);
-const gainNode = audioCtx.createGain();
-gainNode.gain.value = 1;
-source.connect(gainNode).connect(audioCtx.destination);
-
-// 平滑调节函数
-function fadeVolume(target, duration = 1000) {
-  const start = gainNode.gain.value;
-  const diff = target - start;
-  const steps = 30;
-  let i = 0;
-  const interval = setInterval(() => {
-    i++;
-    gainNode.gain.value = start + diff * (i / steps);
-    if (i >= steps) clearInterval(interval);
-  }, duration / steps);
-}
-
-// 淡出 + 切换歌曲 + 淡入
-async function smoothSwitch(nextSongFn) {
-  await fadeVolume(0, 1000); // 1秒淡出
-  nextSongFn();
-  setTimeout(() => fadeVolume(1, 1000), 400); // 稍后淡入
-}
-
-// 修改播放和切换逻辑
-const _updateSong = updateSong;
-updateSong = function() {
-  smoothSwitch(() => _updateSong());
-};
-
-// 播放暂停时淡入淡出
-const _playPauseHandler = () => {
-  if (audio.paused) {
-    fadeVolume(1, 1000);
-    audio.play();
-    playPauseBtn.textContent = "⏸";
-  } else {
-    fadeVolume(0, 1000);
-    setTimeout(() => audio.pause(), 900);
-    playPauseBtn.textContent = "▶";
-  }
-};
-playPauseBtn.removeEventListener("click", _playPauseHandler);
-playPauseBtn.addEventListener("click", _playPauseHandler, false);
-
-/* === 🎚 动态音量平衡 === */
-const analyser = audioCtx.createAnalyser();
-source.connect(analyser);
-analyser.fftSize = 512;
-const buffer = new Uint8Array(analyser.frequencyBinCount);
-let targetGain = 1.0;
-
-function adjustVolume() {
-  analyser.getByteFrequencyData(buffer);
-  let rms = 0;
-  for (let i = 0; i < buffer.length; i++) rms += buffer[i] ** 2;
-  rms = Math.sqrt(rms / buffer.length) / 128;
-
-  // 目标 RMS 在 0.3 ~ 0.4 之间
-  const desiredRMS = 0.35;
-  targetGain += (desiredRMS / (rms + 0.0001) - targetGain) * 0.05;
-  gainNode.gain.value = Math.max(0.4, Math.min(1.2, targetGain));
-
-  requestAnimationFrame(adjustVolume);
-}
-adjustVolume();
-
-// 🔊 在播放时激活 AudioContext
-document.addEventListener("click", () => {
-  if (audioCtx.state === "suspended") audioCtx.resume();
-});
-
-</script>
 
 <script>
 document.querySelectorAll('a[href]').forEach(a => {

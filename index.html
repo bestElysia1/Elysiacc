@@ -973,7 +973,7 @@ resetTimer();
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
 
-<!-- === Elysia 音浪（浮动播放器专用修正版） === -->
+<!-- === Elysia 音浪（浮动调试可视版） === -->
 <canvas id="elysiaVisualizer"></canvas>
 
 <script>
@@ -981,8 +981,9 @@ const visualizer = document.getElementById("elysiaVisualizer");
 const ctx = visualizer.getContext("2d");
 
 const player = document.querySelector(".elysia-player");
-player.style.position = player.style.position || "relative"; // 确保父容器可定位
+player.style.position = player.style.position || "relative";
 
+// 附着到播放器底部
 visualizer.style.position = "absolute";
 visualizer.style.left = "0";
 visualizer.style.bottom = "0";
@@ -991,13 +992,18 @@ visualizer.style.height = "60px";
 visualizer.width = player.clientWidth;
 visualizer.height = 60;
 
-// 监听尺寸变化
+// === 可视调试背景 ===
+ctx.fillStyle = "rgba(255, 0, 128, 0.2)";
+ctx.fillRect(0, 0, visualizer.width, visualizer.height);
+
+// 自动跟随播放器宽度
 new ResizeObserver(() => {
   visualizer.width = player.clientWidth;
+  visualizer.height = 60;
 }).observe(player);
 
-// === 音频分析节点 ===
 let audioCtx, analyser, dataArray, bufferLength;
+
 function initAudioContext() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1008,6 +1014,7 @@ function initAudioContext() {
   dataArray = new Uint8Array(bufferLength);
   srcNode.connect(analyser);
   analyser.connect(audioCtx.destination);
+  console.log("✅ AudioContext 初始化成功");
 }
 
 let animationId;
@@ -1016,6 +1023,7 @@ function draw() {
   analyser.getByteFrequencyData(dataArray);
   ctx.clearRect(0, 0, visualizer.width, visualizer.height);
 
+  // 绘制音浪
   const barWidth = visualizer.width / bufferLength * 1.1;
   let x = 0;
   for (let i = 0; i < bufferLength; i++) {
@@ -1031,32 +1039,26 @@ function draw() {
   }
 }
 
-// === 播放控制 ===
 audio.addEventListener("play", async () => {
   if (!audioCtx) initAudioContext();
   await audioCtx.resume();
   cancelAnimationFrame(animationId);
   draw();
   visualizer.classList.add("active");
+  console.log("🎵 播放开始，音浪启动");
 });
 audio.addEventListener("pause", () => {
   cancelAnimationFrame(animationId);
-  visualizer.classList.remove("active");
+  console.log("⏸ 播放暂停，音浪停止");
 });
 </script>
 
 <style>
-/* === 音浪视觉层 === */
 #elysiaVisualizer {
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-  filter: blur(1.8px) brightness(1.25);
-  mix-blend-mode: screen;
-  z-index: 3;
-}
-#elysiaVisualizer.active {
-  opacity: 1;
+  opacity: 1 !important; /* 调试模式强制显示 */
+  filter: blur(1.2px) brightness(1.2);
+  z-index: 5;
 }
 </style>
 

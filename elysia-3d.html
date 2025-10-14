@@ -38,7 +38,7 @@ body {
   height: 100%;
   object-fit: cover;
   transform-style: preserve-3d;
-  transition: transform 0.2s ease-out;
+  transition: transform 0.25s ease-out;
   will-change: transform;
 }
 
@@ -53,14 +53,15 @@ body {
   pointer-events: none;
   mix-blend-mode: soft-light;
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
-  transition: background 0.3s ease-out;
+  transition: all 0.4s ease-out;
   animation: highlightBreathing 3s ease-in-out infinite;
+  filter: blur(8px);
 }
 
 /* === 高光呼吸动画 === */
 @keyframes highlightBreathing {
   0% { opacity: 0.6; transform: scale(1); filter: blur(10px); }
-  50% { opacity: 1; transform: scale(1.08); filter: blur(18px); }
+  50% { opacity: 1; transform: scale(1.05); filter: blur(15px); }
   100% { opacity: 0.6; transform: scale(1); filter: blur(10px); }
 }
 
@@ -72,32 +73,31 @@ body {
   top: 0;
   width: 10px;
   height: 100%;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
   pointer-events: none;
   z-index: 3;
 }
 #elysia-container::before { left: 33.33%; }
 #elysia-container::after { left: 66.66%; }
 
-/* === 💧 折射水波 + 柔光能量圈 === */
+/* === 💧 水波折射（更透明 + 放大视觉） === */
 .ripple {
   position: absolute;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
   transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
-  animation: rippleGlass 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: rippleGlass 2.2s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+  z-index: 5;
 
-  backdrop-filter: blur(6px) brightness(1.25);
-  -webkit-backdrop-filter: blur(6px) brightness(1.25);
-  mask-image: radial-gradient(circle, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 70%);
-  -webkit-mask-image: radial-gradient(circle, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 70%);
+  /* 折射透明效果 */
+  backdrop-filter: blur(10px) brightness(1.4) contrast(1.2);
+  -webkit-backdrop-filter: blur(10px) brightness(1.4) contrast(1.2);
+
+  /* 边缘能量圈 */
+  mask-image: radial-gradient(circle, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0) 75%);
+  -webkit-mask-image: radial-gradient(circle, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0) 75%);
   mix-blend-mode: screen;
-  opacity: 0.9;
-
-  box-shadow: 0 0 30px 8px rgba(255, 200, 255, 0.5),
-              0 0 60px 15px rgba(255, 255, 255, 0.3);
+  opacity: 0.85;
 }
 
 @keyframes rippleGlass {
@@ -105,14 +105,25 @@ body {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0.9;
   }
+  40% {
+    transform: translate(-50%, -50%) scale(5);
+    opacity: 0.7;
+  }
   70% {
-    transform: translate(-50%, -50%) scale(8);
-    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(9);
+    opacity: 0.5;
   }
   100% {
-    transform: translate(-50%, -50%) scale(10);
+    transform: translate(-50%, -50%) scale(13);
     opacity: 0;
   }
+}
+
+/* === 点击时高光能量增强 === */
+.highlight-flash {
+  filter: blur(15px) brightness(1.8) saturate(1.3);
+  opacity: 1;
+  transition: all 0.6s ease-out;
 }
 </style>
 </head>
@@ -131,7 +142,7 @@ const highlight = document.getElementById('elysia-highlight');
 
 /* === 柔和3D交互 + 高光追随 === */
 function update3DEffect(clientX, clientY) {
-  const x = (clientX / window.innerWidth - 0.5) * 8; // 更轻微
+  const x = (clientX / window.innerWidth - 0.5) * 8;
   const y = (clientY / window.innerHeight - 0.5) * -8;
 
   mainImg.style.transform = `rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
@@ -149,7 +160,7 @@ document.addEventListener('mouseleave', () => {
   highlight.style.background = `radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%)`;
 });
 
-/* === 💫 点击出现透明折射水波 === */
+/* === 💫 点击触发透明折射水波 + 高光闪光 === */
 document.addEventListener('click', e => {
   const ripple = document.createElement('div');
   ripple.className = 'ripple';
@@ -157,6 +168,10 @@ document.addEventListener('click', e => {
   ripple.style.top = `${e.clientY}px`;
   document.body.appendChild(ripple);
   ripple.addEventListener('animationend', () => ripple.remove());
+
+  // 高光闪亮
+  highlight.classList.add('highlight-flash');
+  setTimeout(() => highlight.classList.remove('highlight-flash'), 600);
 });
 </script>
 </body>

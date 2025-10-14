@@ -1,300 +1,155 @@
-<!-- === Elysia 播放器（完整优化版 + 灵动岛封面支持） === -->
-<div class="elysia-player">
-  <div class="elysia-controls">
-    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
-    <button id="nextBtn" aria-label="Next">⏭</button>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elysia Player</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="player" class="glass">
+    <div id="songTitle">AKIBA POP the Future - Pianeet</div>
+    <audio id="audio" controls></audio>
+
+    <div id="controls">
+      <button id="prevBtn">⏮️</button>
+      <button id="playPauseBtn">▶️</button>
+      <button id="nextBtn">⏭️</button>
+    </div>
+
+    <div id="playlist">
+      <div class="song" data-src="assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3">
+        AKIBA POP the Future - Pianeet
+      </div>
+      <div class="song" data-src="assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3">
+        Aoi Tori - The iDOLM
+      </div>
+    </div>
   </div>
-  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
-</div>
 
-<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+  <script>
+    const songs = [
+      { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
+      { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" }
+    ];
 
-<script>
-/* ===== songs 列表 ===== */
-const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
-  { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" },
-  { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
-];
+    const audio = document.getElementById("audio");
+    const songTitle = document.getElementById("songTitle");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playlistItems = document.querySelectorAll(".song");
 
-let currentSong = 0;
-const audio = new Audio(songs[currentSong].src);
-audio.preload = "auto";
+    let currentSong = 0;
 
-const playPauseBtn = document.getElementById("playPauseBtn");
-const nextBtn = document.getElementById("nextBtn");
-const titleEl = document.getElementById("songTitle");
-const player = document.querySelector(".elysia-player");
-const playlist = document.getElementById("playlist");
+    function updateSong() {
+      const song = songs[currentSong];
+      audio.src = song.src;
+      songTitle.textContent = song.title;
+      updateMediaSession(); // 保留原逻辑
+      audio.play();
+    }
 
-function preloadNext() {
-  const nextIndex = (currentSong + 1) % songs.length;
-  const nextAudio = new Audio(songs[nextIndex].src);
-  nextAudio.preload = "auto";
-}
+    playPauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = "⏸️";
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "▶️";
+      }
+    });
 
-function renderPlaylist() {
-  playlist.innerHTML = songs.map((s, i) => `
-    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
-      ${s.title}
-    </div>`).join("");
-}
+    nextBtn.addEventListener("click", () => {
+      currentSong = (currentSong + 1) % songs.length;
+      updateSong();
+    });
 
-function updateSong() {
-  titleEl.textContent = songs[currentSong].title;
-  audio.src = songs[currentSong].src;
-  audio.play().catch(()=>{});
-  playPauseBtn.textContent = "⏸";
-  renderPlaylist();
-  preloadNext();
-  updateMediaSession();
-}
+    prevBtn.addEventListener("click", () => {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      updateSong();
+    });
 
-/* === 灵动岛封面 & Media Session 支持 === */
-function updateMediaSession() {
-  if ('mediaSession' in navigator) {
-    // 🔹 先清理旧封面缓存再刷新
-    navigator.mediaSession.metadata = null;
-    setTimeout(() => {
-      console.log("🎵 MediaSession 更新:", songs[currentSong].title);
+    playlistItems.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        currentSong = index;
+        updateSong();
+      });
+    });
+
+    audio.addEventListener("ended", () => {
+      currentSong = (currentSong + 1) % songs.length;
+      updateSong();
+    });
+
+    // === 🎧 Media Session API ===
+    function updateMediaSession() {
+      if (!("mediaSession" in navigator)) return;
+
+      // 强制清理旧封面，避免 iOS 缓存
+      navigator.mediaSession.metadata = null;
+
       navigator.mediaSession.metadata = new MediaMetadata({
         title: songs[currentSong].title,
         artist: "Elysia Player",
         album: "Piano Collection",
         artwork: [
-          { src: "audio.addEventListener("play", () => {
-  if ('mediaSession' in navigator) {
-    const currentSong = songs[currentSongIndex];
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.title,
-      artist: "Elysia Player",
-      album: "Elysia",
-      artwork: [
-        { src: location.origin + "/assets/Elysia.png", sizes: "512x512", type: "image/png" }
-      ]
-    });
-    console.log("✅ MediaSession metadata set:", currentSong.title);
-  }
-});", sizes: "512x512", type: "image/png" }
+          { src: location.origin + "/assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
+          { src: location.origin + "/assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
+          { src: location.origin + "/assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
+          { src: location.origin + "/assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
+          { src: location.origin + "/assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
         ]
       });
 
-      navigator.mediaSession.setActionHandler("play", () => audio.play());
-      navigator.mediaSession.setActionHandler("pause", () => audio.pause());
-      navigator.mediaSession.setActionHandler("nexttrack", () => {
-        currentSong = (currentSong + 1) % songs.length;
-        updateSong();
+      navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+
+      try {
+        navigator.mediaSession.setActionHandler("play", () => {
+          audio.play();
+          playPauseBtn.textContent = "⏸️";
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("pause", () => {
+          audio.pause();
+          playPauseBtn.textContent = "▶️";
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("previoustrack", () => {
+          currentSong = (currentSong - 1 + songs.length) % songs.length;
+          updateSong();
+        });
+      } catch (e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler("nexttrack", () => {
+          currentSong = (currentSong + 1) % songs.length;
+          updateSong();
+        });
+      } catch (e) {}
+    }
+
+    // ✅ 新增：确保播放开始后才注册 Media Session（修复 iOS 不识别）
+    if ("mediaSession" in navigator) {
+      audio.addEventListener("play", () => {
+        setTimeout(() => {
+          updateMediaSession();
+          navigator.mediaSession.playbackState = "playing";
+          console.log("✅ MediaSession metadata 已更新:", songs[currentSong].title);
+        }, 500); // 延迟触发，确保 Safari 已注册音频流
       });
-    }, 150);
-  }
-}
 
-/* === 播放控制 === */
-playPauseBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playPauseBtn.textContent = "⏸";
-  } else {
-    audio.pause();
-    playPauseBtn.textContent = "▶";
-  }
-});
+      audio.addEventListener("pause", () => {
+        navigator.mediaSession.playbackState = "paused";
+      });
+    }
 
-nextBtn.addEventListener("click", () => {
-  currentSong = (currentSong + 1) % songs.length;
-  updateSong();
-});
-
-audio.addEventListener("ended", () => nextBtn.click());
-audio.addEventListener("play", () => {
-  player.classList.add("playing");
-  updateMediaSession();
-});
-audio.addEventListener("pause", () => player.classList.remove("playing"));
-
-renderPlaylist();
-updateSong();
-
-/* === 播放列表交互 === */
-playlist.addEventListener("click", e => {
-  const item = e.target.closest(".playlist-item");
-  if (item) {
-    currentSong = parseInt(item.dataset.index);
+    // 初始化
     updateSong();
-  }
-});
-
-/* === 播放列表展开与关闭 === */
-function openPlaylist() {
-  playlist.classList.remove("hide");
-  playlist.classList.add("show");
-  playlist.setAttribute('aria-hidden', 'false');
-}
-function closePlaylist() {
-  playlist.classList.remove("show");
-  playlist.classList.add("hide");
-  playlist.setAttribute('aria-hidden', 'true');
-  setTimeout(() => playlist.classList.remove("hide"), 480);
-}
-titleEl.addEventListener("click", e => {
-  e.stopPropagation();
-  if (playlist.classList.contains("show")) closePlaylist();
-  else openPlaylist();
-});
-document.addEventListener("click", e => {
-  if (!playlist.contains(e.target) && e.target !== titleEl) {
-    if (playlist.classList.contains("show")) closePlaylist();
-  }
-});
-
-/* === 自动隐藏 === */
-let inactivityTimer;
-function hidePlayer() {
-  player.style.opacity = '0';
-  player.style.transform = 'translate(-50%, 40px)';
-  player.style.pointerEvents = 'none';
-  if (playlist.classList.contains("show")) closePlaylist();
-}
-function showPlayer() {
-  player.style.opacity = '1';
-  player.style.transform = 'translate(-50%, 0)';
-  player.style.pointerEvents = 'auto';
-  resetTimer();
-}
-function resetTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 30000);
-}
-['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
-  window.addEventListener(evt, showPlayer)
-);
-resetTimer();
-</script>
-
-<style>
-/* === 样式部分完全保留（你的原始样式） === */
-.elysia-player {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 8px 20px;
-  border-radius: 16px;
-  z-index: 9999;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-  transition: opacity .6s ease, transform .6s ease;
-  will-change: transform, opacity;
-}
-.elysia-player::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
-  filter: blur(36px);
-  opacity: 0.9;
-  animation: moveBlobs 14s ease-in-out infinite;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-.elysia-controls { display:flex; gap:10px; }
-.elysia-controls button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
-}
-.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
-
-#songTitle {
-  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
-  text-shadow:0 0 10px rgba(160,120,255,0.45);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
-  will-change: transform;
-}
-
-.elysia-playlist {
-  position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.98);
-  transform-origin: 50% 100%;
-  width: 260px;
-  max-height: 260px;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: rgba(255,240,255,0.25);
-  border: 1px solid rgba(255,210,255,0.35);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  overflow-y: auto;
-  opacity: 0; pointer-events: none;
-  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
-  z-index: 9998;
-}
-audio.addEventListener("play", () => {
-  if ('mediaSession' in navigator) {
-    const currentSong = songs[currentSongIndex];
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.title,
-      artist: "Elysia Player",
-      album: "Elysia",
-      artwork: [
-        { src: location.origin + "audio.addEventListener("play", () => {
-  if ('mediaSession' in navigator) {
-    const currentSong = songs[currentSongIndex];
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.title,
-      artist: "Elysia Player",
-      album: "Elysia",
-      artwork: [
-        { src: location.origin + "audio.addEventListener("play", () => {
-  if ('mediaSession' in navigator) {
-    const currentSong = songs[currentSongIndex];
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.title,
-      artist: "Elysia Player",
-      album: "Elysia",
-      artwork: [
-        { src: location.origin + "audio.addEventListener("play", () => {
-  if ('mediaSession' in navigator) {
-    const currentSong = songs[currentSongIndex];
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentSong.title,
-      artist: "Elysia Player",
-      album: "Elysia",
-      artwork: [
-        { src: location.origin + "/assets/Elysia.png", sizes: "512x512", type: "image/png" }
-      ]
-    });
-    console.log("✅ MediaSession metadata set:", currentSong.title);
-  }
-});", sizes: "512x512", type: "image/png" }
-      ]
-    });
-    console.log("✅ MediaSession metadata set:", currentSong.title);
-  }
-});", sizes: "512x512", type: "image/png" }
-      ]
-    });
-    console.log("✅ MediaSession metadata set:", currentSong.title);
-  }
-});", sizes: "512x512", type: "image/png" }
-      ]
-    });
-    console.log("✅ MediaSession metadata set:", currentSong.title);
-  }
-});
-
-</style>
+  </script>
+</body>
+</html>

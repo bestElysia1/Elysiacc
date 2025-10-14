@@ -91,16 +91,36 @@ html, body {
   left: calc(66.666% - 5px);
 }
 
-/* === 水波效果 === */
+/* === 粉紫能量波纹（Elysia风格） === */
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: radial-gradient(circle,
+    rgba(255, 180, 255, 0.8) 0%,
+    rgba(210, 140, 255, 0.5) 30%,
+    rgba(180, 100, 255, 0.2) 60%,
+    rgba(150, 80, 255, 0) 100%);
   transform: scale(0);
-  animation: rippleAnimation 1.4s ease-out forwards;
+  animation: rippleEnergy 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   pointer-events: none;
   mix-blend-mode: screen;
-  filter: blur(2px);
+  filter: blur(3px);
+  opacity: 0.9;
+}
+
+@keyframes rippleEnergy {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(6);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(10);
+    opacity: 0;
+  }
 }
 
 @keyframes rippleAnimation {

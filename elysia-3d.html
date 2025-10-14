@@ -33,7 +33,7 @@ audio {
 </style>
 </head>
 <body>
-<img src="assets/banner.jpg" alt="Elysia Cover">
+<img src="assets/Elysia.png" alt="Elysia Cover">
 <h2>Elysia Player</h2>
 <p>AKIBA POP the Future - Pianeet</p>
 <audio controls autoplay id="elysiaAudio" src="assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3"></audio>
@@ -47,11 +47,11 @@ if ('mediaSession' in navigator) {
     artist: 'Pianeet',
     album: 'Elysia Player',
     artwork: [
-      { src: 'assets/banner.jpg', sizes: '512x512', type: 'image/jpeg' }
+      { src: 'assets/Elysia.png', sizes: '512x512', type: 'image/png' }
     ]
   });
 
-  // 允许锁屏 / 灵动岛 / 耳机控制播放
+  // 允许锁屏 / 灵动岛 / 耳机 控制播放暂停
   navigator.mediaSession.setActionHandler('play', () => audio.play());
   navigator.mediaSession.setActionHandler('pause', () => audio.pause());
   navigator.mediaSession.setActionHandler('previoustrack', null);

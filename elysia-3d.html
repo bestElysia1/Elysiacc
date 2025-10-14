@@ -67,20 +67,27 @@ body {
   animation: highlightBreathing 3s ease-in-out infinite;
 }
 
-/* === 高光呼吸动画 === */
+/* === 高光呼吸动画（增强版） === */
 @keyframes highlightBreathing {
   0% {
-    opacity: 0.8;
+    opacity: 0.5;
     transform: scale(1);
+    filter: blur(10px);
   }
   50% {
     opacity: 1;
-    transform: scale(1.05);
+    transform: scale(1.08);
+    filter: blur(18px);
   }
   100% {
-    opacity: 0.8;
+    opacity: 0.5;
     transform: scale(1);
+    filter: blur(10px);
   }
+}
+
+#elysia-highlight {
+  animation: highlightBreathing 2.8s ease-in-out infinite;
 }
 
 /* === 菜单按钮（隐藏） === */

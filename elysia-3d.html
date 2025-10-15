@@ -1,209 +1,337 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elysia Player</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="player" class="glass">
-    <div id="songTitle">加载中...</div>
-    <audio id="audio" controls></audio>
-
-    <div id="controls">
-      <button id="prevBtn">⏮️</button>
-      <button id="playPauseBtn">▶️</button>
-      <button id="nextBtn">⏭️</button>
-    </div>
-
-    <div id="playlist"></div>
+<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
+<div class="elysia-player">
+  <div class="elysia-controls">
+    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+    <button id="nextBtn" aria-label="Next">⏭</button>
   </div>
+  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
+</div>
 
-  <script>
-    // === 歌曲列表 ===
-    const songs = [
-      { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
-      { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" },
-      { title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3" },
-    ];
+<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
-    const audio = document.getElementById("audio");
-    const songTitle = document.getElementById("songTitle");
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const playlistDiv = document.getElementById("playlist");
+<script>
+/* ===== songs 列表（按需修改路径） ===== */
+const songs = [
+  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3,cover:My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
+  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3,cover:My Most Precious Treasure (From My Most Precious Treasure).jpg" },
+  { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3,cover:Elysia.png" },
 
-    let currentSong = 0;
+];
 
-    // === 初始化播放列表 ===
-    function renderPlaylist() {
-      playlistDiv.innerHTML = songs
-        .map((s, i) => `<div class="song ${i === currentSong ? "active" : ""}" data-index="${i}">${s.title}</div>`)
-        .join("");
-    }
+let currentSong = 0;
+const audio = new Audio(songs[currentSong].src);
+audio.preload = "auto";
 
-    // === 切换歌曲 ===
-    function updateSong() {
-      const song = songs[currentSong];
-      audio.src = song.src;
-      songTitle.textContent = song.title;
-      renderPlaylist();
-      updateMediaSession();
-      audio.play().catch(()=>{});
-      playPauseBtn.textContent = "⏸️";
-    }
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
+const playlist = document.getElementById("playlist");
 
-    // === 播放 / 暂停 ===
-    playPauseBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        playPauseBtn.textContent = "⏸️";
-      } else {
-        audio.pause();
-        playPauseBtn.textContent = "▶️";
-      }
-    });
+function preloadNext() {
+  const nextIndex = (currentSong + 1) % songs.length;
+  const nextAudio = new Audio(songs[nextIndex].src);
+  nextAudio.preload = "auto";
+}
 
-    nextBtn.addEventListener("click", () => {
-      currentSong = (currentSong + 1) % songs.length;
-      updateSong();
-    });
+function renderPlaylist() {
+  playlist.innerHTML = songs.map((s, i) => `
+    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
+      ${s.title}
+    </div>`).join("");
+}
 
-    prevBtn.addEventListener("click", () => {
-      currentSong = (currentSong - 1 + songs.length) % songs.length;
-      updateSong();
-    });
+function updateSong() {
+  titleEl.textContent = songs[currentSong].title;
+  audio.src = songs[currentSong].src;
+  audio.play().catch(()=>{});
+  playPauseBtn.textContent = "⏸";
+  renderPlaylist();
+  preloadNext();
+}
 
-    playlistDiv.addEventListener("click", e => {
-      const item = e.target.closest(".song");
-      if (item) {
-        currentSong = parseInt(item.dataset.index);
-        updateSong();
-      }
-    });
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
+  }
+});
 
-    audio.addEventListener("ended", () => {
-      currentSong = (currentSong + 1) % songs.length;
-      updateSong();
-    });
+nextBtn.addEventListener("click", () => {
+  currentSong = (currentSong + 1) % songs.length;
+  updateSong();
+});
 
-    // === Media Session API（灵动岛 + 锁屏） ===
-    function updateMediaSession() {
-      if (!("mediaSession" in navigator)) return;
+audio.addEventListener("ended", () => nextBtn.click());
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
 
-      // 每首歌尝试加载对应封面
-      const songSrc = songs[currentSong].src;
-      const baseName = songSrc.replace(/\.[^/.]+$/, ""); // 去掉.mp3后缀
-      const coverPath = baseName + ".jpg";
-      const defaultCover = "assets/banner.jpg";
+renderPlaylist();
+updateSong();
 
+// === 🎧 Media Session API: 灵动岛 + 锁屏封面 ===
+if ("mediaSession" in navigator) {
+  function updateMediaSession() {
+    try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: songs[currentSong].title,
         artist: "Elysia Player",
         album: "Piano Collection",
         artwork: [
-          { src: coverPath, sizes: "96x96", type: "image/jpeg" },
-          { src: coverPath, sizes: "128x128", type: "image/jpeg" },
-          { src: coverPath, sizes: "192x192", type: "image/jpeg" },
-          { src: coverPath, sizes: "256x256", type: "image/jpeg" },
-          { src: coverPath, sizes: "512x512", type: "image/jpeg" },
-          { src: defaultCover, sizes: "512x512", type: "image/jpeg" } // 兜底封面
+          { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
         ]
       });
 
-      navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
-
-      try {
-        navigator.mediaSession.setActionHandler("play", () => {
-          audio.play(); playPauseBtn.textContent = "⏸️";
-        });
-        navigator.mediaSession.setActionHandler("pause", () => {
-          audio.pause(); playPauseBtn.textContent = "▶️";
-        });
-        navigator.mediaSession.setActionHandler("previoustrack", () => {
-          currentSong = (currentSong - 1 + songs.length) % songs.length;
-          updateSong();
-        });
-        navigator.mediaSession.setActionHandler("nexttrack", () => {
-          currentSong = (currentSong + 1) % songs.length;
-          updateSong();
-        });
-      } catch(e){}
+      // 更新播放状态
+      if (!audio.paused) {
+        navigator.mediaSession.playbackState = "playing";
+      } else {
+        navigator.mediaSession.playbackState = "paused";
+      }
+    } catch (e) {
+      console.warn("MediaSession update failed:", e);
     }
+  }
 
-    audio.addEventListener("play", () => updateMediaSession());
-    audio.addEventListener("pause", () => updateMediaSession());
+  // 每次切歌都更新灵动岛封面与标题
+  updateMediaSession();
 
-    renderPlaylist();
+  // 在播放、暂停、结束时刷新状态
+  audio.addEventListener("play", () => {
+    navigator.mediaSession.playbackState = "playing";
+    updateMediaSession();
+  });
+
+  audio.addEventListener("pause", () => {
+    navigator.mediaSession.playbackState = "paused";
+  });
+
+  audio.addEventListener("ended", () => {
+    navigator.mediaSession.playbackState = "none";
+  });
+}
+
+/* 播放列表交互 */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) {
+    currentSong = parseInt(item.dataset.index);
     updateSong();
-  </script>
+  }
+});
 
-  <style>
-    /* 液态玻璃风格 */
-    #player {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 16px 24px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(150, 110, 240, 0.3);
-      color: #fff;
-      text-align: center;
-      z-index: 9999;
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%,100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, -6px); }
-    }
-    #controls button {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      margin: 0 6px;
-      transition: all .2s;
-    }
-    #controls button:hover {
-      background: rgba(180,150,255,0.3);
-      transform: scale(1.1);
-    }
-    #songTitle {
-      font-weight: 600;
-      margin-top: 8px;
-      text-shadow: 0 0 12px rgba(160,120,255,0.5);
-    }
-    #playlist {
-      margin-top: 12px;
-      max-height: 200px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 10px;
-    }
-    .song {
-      padding: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-radius: 8px;
-    }
-    .song:hover {
-      background: rgba(180,150,255,0.2);
-    }
-    .song.active {
-      background: rgba(160,120,255,0.3);
-      box-shadow: 0 0 8px rgba(160,120,255,0.5);
-    }
-  </style>
-</body>
-</html>
+/* 打开/关闭 播放列表：替换 toggle 为带动画的逻辑 */
+function openPlaylist() {
+  // remove hide if present, add show
+  playlist.classList.remove("hide");
+  playlist.classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  // play close animation, then remove show
+  playlist.classList.remove("show");
+  playlist.classList.add("hide");
+  playlist.setAttribute('aria-hidden', 'true');
+  // 确保 hide 动画结束后清理类（时间与 CSS 中 close 动画保持一致）
+  setTimeout(() => playlist.classList.remove("hide"), 480);
+}
+
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  if (playlist.classList.contains("show")) closePlaylist();
+  else openPlaylist();
+});
+
+/* 点击空白处关闭（带动画） */
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && e.target !== titleEl) {
+    if (playlist.classList.contains("show")) closePlaylist();
+  }
+});
+
+/* 无操作自动隐藏播放器（保持原逻辑） */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  if (playlist.classList.contains("show")) closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+  window.addEventListener(evt, showPlayer)
+);
+resetTimer();
+</script>
+
+<style>
+/* ====== 基础：液态玻璃播放器 ====== */
+.elysia-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px;
+  border-radius: 16px;
+  z-index: 9999;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: transform, opacity;
+}
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+  
+/* 控制按钮 */
+.elysia-controls { display:flex; gap:10px; }
+.elysia-controls button {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
+}
+.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
+
+/* 歌曲名 */
+#songTitle {
+  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
+  text-shadow:0 0 10px rgba(160,120,255,0.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+  will-change: transform;
+}
+
+/* ===== 播放列表（改进） ===== */
+/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
+.elysia-playlist {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.98);
+  transform-origin: 50% 100%;
+  width: 260px;
+  max-height: 260px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  overflow-y: auto;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  z-index: 9998;
+  will-change: transform, opacity;
+}
+
+/* 歌曲名文字颜色调整为淡紫色调 */
+.playlist-item {
+  padding: 6px 10px;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* 悬停时变亮 */
+}
+
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
+}
+/* 中等项 */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* 小动画 */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === 轻柔飘浮动画（Elysia 风格） === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.elysia-player {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+
+
+/* 可访问性与微调 */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
+</style>

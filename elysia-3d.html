@@ -1,214 +1,208 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Elysia Music Player</title>
-<style>
-body {
-  margin: 0;
-  font-family: "Poppins", "微软雅黑", sans-serif;
-  background: white;
-  color: #6b5b95;
-  overflow-x: hidden;
-}
-
-.elysia-player {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(200, 150, 255, 0.3);
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.elysia-player button {
-  border: none;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  border-radius: 50%;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.elysia-player button:hover {
-  background: rgba(200, 160, 255, 0.4);
-}
-
-#playlist-container {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(25px);
-  border-radius: 20px;
-  padding: 20px;
-  width: 220px;
-  box-shadow: 0 6px 30px rgba(180, 140, 255, 0.3);
-  transition: opacity 0.5s ease;
-}
-#playlist-container h3 {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #6b5b95;
-}
-#playlist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#playlist li {
-  padding: 8px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-#playlist li:hover {
-  background: rgba(200, 160, 255, 0.15);
-}
-#playlist li.active {
-  background: rgba(200, 160, 255, 0.35);
-}
-
-.group-list {
-  position: fixed;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(25px);
-  border-radius: 20px;
-  padding: 15px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  box-shadow: 0 6px 30px rgba(180, 140, 255, 0.3);
-}
-.group-item {
-  text-align: center;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  color: #7d6eb8;
-  font-weight: 500;
-}
-.group-item:hover, .group-item.active {
-  background: rgba(200, 160, 255, 0.3);
-  color: #4b3c88;
-}
-</style>
-</head>
-<body>
-
-<!-- 分组栏 -->
-<div class="group-list">
-  <div class="group-item active" data-group="piano">Piano</div>
-  <div class="group-item" data-group="chinesesong">ChineseSong</div>
-</div>
-
-<!-- 播放列表 -->
-<div id="playlist-container">
-  <h3>Playlist</h3>
-  <ul id="playlist"></ul>
-</div>
-
-<!-- 播放器 -->
+<!-- === Elysia 播放器（多封面版 + 灵动岛封面 + 分组支持） === -->
 <div class="elysia-player">
-  <button id="prevBtn">⏮</button>
-  <button id="playPauseBtn">▶</button>
-  <button id="nextBtn">⏭</button>
-  <span id="nowPlaying">Ready</span>
+  <div class="elysia-controls">
+    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+    <button id="nextBtn" aria-label="Next">⏭</button>
+  </div>
+  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
+</div>
+
+<!-- 🔹 播放列表整体容器（左侧分组 + 右侧歌曲） -->
+<div class="elysia-playlist-container">
+  <div class="elysia-group-panel" id="groupPanel">
+    <div class="group-item active" data-group="piano">🎹 piano</div>
+    <div class="group-item" data-group="chinesesong">🎵 chinesesong</div>
+  </div>
+  <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 </div>
 
 <script>
+/* ===== 🎵 歌曲列表 ===== */
 const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/MySoulYourBeats.mp3", group: "piano" },
-  { title: "My Most Precious Treasure", src: "assets/MyMostPreciousTreasure.mp3", group: "piano" },
-  { title: "Shiteki de Souseiteki", src: "assets/Shiteki.mp3", group: "chinesesong" },
-  { title: "Call of Silence", src: "assets/CallOfSilence.mp3", group: "chinesesong" }
+  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg", group: "piano" },
+  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg", group: "piano" },
+  { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
+  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
+  { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg", group: "chinesesong" }
 ];
 
+let currentSong = 0;
 let currentGroup = "piano";
-let currentIndex = 0;
-let isPlaying = false;
-const audio = new Audio();
 
-const playlistEl = document.getElementById("playlist");
+const audio = new Audio(songs[currentSong].src);
+audio.preload = "auto";
+
 const playPauseBtn = document.getElementById("playPauseBtn");
-const nowPlaying = document.getElementById("nowPlaying");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
+const playlist = document.getElementById("playlist");
+const groupPanel = document.getElementById("groupPanel");
 
-// 渲染分组歌曲
-function renderPlaylist(group) {
-  playlistEl.innerHTML = "";
-  const filtered = songs.filter(s => s.group === group);
-  filtered.forEach((song, i) => {
-    const li = document.createElement("li");
-    li.textContent = song.title;
-    li.addEventListener("click", () => playSong(i, group));
-    playlistEl.appendChild(li);
-  });
-  fadeIn(playlistEl);
+/* ======== 播放列表渲染（支持分组） ======== */
+function renderPlaylist() {
+  const filtered = songs.filter(s => s.group === currentGroup);
+  playlist.innerHTML = filtered.map((s, i) => `
+    <div class="playlist-item ${songs.indexOf(s) === currentSong ? 'active' : ''}" data-index="${songs.indexOf(s)}">
+      ${s.title}
+    </div>`).join("");
 }
 
-function fadeIn(el) {
-  el.style.opacity = 0;
-  let o = 0;
-  const timer = setInterval(() => {
-    o += 0.05;
-    el.style.opacity = o;
-    if (o >= 1) clearInterval(timer);
-  }, 30);
-}
-
-function playSong(index, group) {
-  const filtered = songs.filter(s => s.group === group);
-  currentIndex = index;
-  audio.src = filtered[index].src;
-  audio.play();
-  isPlaying = true;
+/* ======== 更新播放歌曲 ======== */
+function updateSong() {
+  const song = songs[currentSong];
+  audio.src = song.src;
+  titleEl.textContent = song.title;
+  audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
-  nowPlaying.textContent = filtered[index].title;
-  updateActiveSong(index);
+  renderPlaylist();
+  updateMediaSession(song);
 }
 
-function updateActiveSong(index) {
-  [...playlistEl.children].forEach((li, i) => {
-    li.classList.toggle("active", i === index);
-  });
-}
+/* ======== 分组切换 ======== */
+groupPanel.addEventListener("click", e => {
+  const item = e.target.closest(".group-item");
+  if (!item) return;
+  document.querySelectorAll(".group-item").forEach(i => i.classList.remove("active"));
+  item.classList.add("active");
+  currentGroup = item.dataset.group;
+  renderPlaylist();
+  playlist.classList.add("fadein");
+  setTimeout(()=>playlist.classList.remove("fadein"), 500);
+});
 
+/* ======== 其他逻辑完全保留 ======== */
 playPauseBtn.addEventListener("click", () => {
-  if (isPlaying) {
-    audio.pause();
-    playPauseBtn.textContent = "▶";
-  } else {
-    audio.play();
-    playPauseBtn.textContent = "⏸";
-  }
-  isPlaying = !isPlaying;
+  if (audio.paused) { audio.play(); playPauseBtn.textContent = "⏸"; }
+  else { audio.pause(); playPauseBtn.textContent = "▶"; }
+});
+nextBtn.addEventListener("click", () => { currentSong = (currentSong + 1) % songs.length; updateSong(); });
+audio.addEventListener("ended", () => nextBtn.click());
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
+
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
+    });
+  } catch(e) { console.warn(e); }
+}
+
+/* ======== 播放列表点击 ======== */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) { currentSong = parseInt(item.dataset.index); updateSong(); }
 });
 
-document.querySelectorAll(".group-item").forEach(item => {
-  item.addEventListener("click", () => {
-    document.querySelectorAll(".group-item").forEach(i => i.classList.remove("active"));
-    item.classList.add("active");
-    currentGroup = item.dataset.group;
-    renderPlaylist(currentGroup);
-  });
+/* ======== 打开/关闭播放列表 ======== */
+function openPlaylist() {
+  document.querySelector(".elysia-playlist-container").classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  document.querySelector(".elysia-playlist-container").classList.remove("show");
+  playlist.setAttribute('aria-hidden', 'true');
+}
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  document.querySelector(".elysia-playlist-container").classList.contains("show") ? closePlaylist() : openPlaylist();
+});
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && !groupPanel.contains(e.target) && e.target !== titleEl)
+    if (document.querySelector(".elysia-playlist-container").classList.contains("show")) closePlaylist();
 });
 
-renderPlaylist(currentGroup);
+/* ======== 自动隐藏 ======== */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayer));
+resetTimer();
+
+renderPlaylist();
+updateSong();
 </script>
 
-<footer style="text-align:center; margin-top:100px; color:#9a8bd0; font-size:13px;">© bestElysia 2025</footer>
+<style>
+/* ===== 保留你原来的所有样式，只新增以下 ===== */
 
-</body>
-</html>
+/* 播放列表外层容器（左侧分组 + 右侧列表） */
+.elysia-playlist-container {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease;
+  z-index: 9998;
+}
+.elysia-playlist-container.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 左侧分组栏 */
+.elysia-group-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25);
+  border-radius: 14px;
+  padding: 8px;
+  margin-right: 8px;
+  width: 90px;
+}
+.group-item {
+  color: #cdbaff;
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  margin: 3px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .25s ease;
+  text-align: center;
+}
+.group-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #fff;
+}
+.group-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160,120,255,0.6);
+}
+
+/* 右侧播放列表保持原样，仅加淡入动画 */
+#playlist.fadein {
+  animation: fadeInList .4s ease;
+}
+@keyframes fadeInList {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>

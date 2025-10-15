@@ -299,7 +299,7 @@ updateSong();
 </script>
 
 <style>
-/* ====== 液态玻璃播放器样式 ====== */
+/* ====== 基础：液态玻璃播放器 ====== */
 .elysia-player {
   position: fixed;
   bottom: 20px;
@@ -319,12 +319,24 @@ updateSong();
   box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   transition: opacity .6s ease, transform .6s ease;
   will-change: transform, opacity;
-  animation: elysiaFloat 6s ease-in-out infinite;
 }
-@keyframes elysiaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
+
+  
+/* 控制按钮 */
 .elysia-controls { display:flex; gap:10px; }
 .elysia-controls button {
   width: 32px; height: 32px; border-radius: 50%;
@@ -332,13 +344,17 @@ updateSong();
   color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
 }
 .elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
+
+/* 歌曲名 */
 #songTitle {
   color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
   text-shadow:0 0 10px rgba(160,120,255,0.45);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
   will-change: transform;
 }
-/* ===== 播放列表 ===== */
+
+/* ===== 播放列表（改进） ===== */
+/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
 .elysia-playlist {
   position: fixed;
   bottom: 70px;
@@ -360,24 +376,83 @@ updateSong();
   z-index: 9998;
   will-change: transform, opacity;
 }
+
+/* 歌曲名文字颜色调整为淡紫色调 */
 .playlist-item {
   padding: 6px 10px;
-  color: #cdbaff;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.playlist-item:hover { background: rgba(160, 120, 255, 0.15); color: #fff; }
+
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* 悬停时变亮 */
+}
+
 .playlist-item.active {
   background: rgba(160, 120, 255, 0.25);
   color: #fff;
   box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
-@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
-</style>
+/* 中等项 */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
 
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* 小动画 */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === 轻柔飘浮动画（Elysia 风格） === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.elysia-player {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+
+
+/* 可访问性与微调 */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
+</style>
 
 
 

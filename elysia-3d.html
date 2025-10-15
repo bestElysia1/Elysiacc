@@ -12,20 +12,155 @@
 <script>
 /* ===== 🎵 歌曲列表 ===== */
 const songs = [
-  {
-    title: "My Soul, Your Beats!",
-    src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3",
-    cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg"
+  { 
+    title: "My Soul, Your Beats!", 
+    src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", 
+    cover: "assets/banner.jpg" 
   },
-  {
-    title: "My Most Precious Treasure",
-    src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3",
-    cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg"
+  { 
+    title: "My Most Precious Treasure", 
+    src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", 
+    cover: "assets/banner.jpg" 
   },
-  {
-    title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe",
-    src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3",
-    cover: "assets/Elysia.png"
+  { 
+    title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", 
+    src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Last regrets, foretting me", 
+    src: "assets/Last regrets,foretting me.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Megumeru Gensoukyoku", 
+    src: "assets/Megumeru Gensoukyoku.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Call of Silence", 
+    src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Only my Railgun OP1 fripSide", 
+    src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Aoi Tori - The iDOLM", 
+    src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "鬼滅之刃 OPLiSA - 紅蓮華", 
+    src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Flower Dance - DJ Okawari", 
+    src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "theme of SSS -Piano Arrange ", 
+    src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "My Soul, Your Beats! Classic", 
+    src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Pachelbel's Canon", 
+    src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Heroism endures in nothingness", 
+    src: "assets/英雄主义-在虚无中永存.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "诀别书", 
+    src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Key anime piano medley", 
+    src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Crying for Rain", 
+    src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "GIRLS BAND CRY", 
+    src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Hikari no Senritsu", 
+    src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "LEVEL5 -judgelight", 
+    src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Majo no Tabitabi", 
+    src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "My Dearest ", 
+    src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Ninelie Kabaneri", 
+    src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "One Last Kiss", 
+    src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "secret base", 
+    src: "assetscret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "Blue Bird 2022 ver.", 
+    src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "AKIBA POP the Future - Pianeet", 
+    src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "SWORD ART ONLINE", 
+    src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "给我一首歌的时间", 
+    src: "assets/给我一首歌的时间 piano ver-.mp3", 
+    cover: "assets/banner.jpg" 
+  },
+  { 
+    title: "晴天", 
+    src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", 
+    cover: "assets/banner.jpg" 
   }
 ];
 

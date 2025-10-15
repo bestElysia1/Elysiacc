@@ -1,145 +1,89 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Elysia — 更新中</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elysia - 更多内容</title>
   <style>
-    /* ========== Elysia 淡紫液态风格 ========== */
-    :root {
-      --elysia-bg1: #0d0814;
-      --elysia-bg2: #151022;
-      --elysia-glass: rgba(255, 255, 255, 0.07);
-      --elysia-light: rgba(230, 200, 255, 0.25);
-      --elysia-accent: #c9a4ff;
-      --elysia-text: #f5ecff;
-      --elysia-muted: rgba(245, 235, 255, 0.7);
-      --elysia-shadow: rgba(180, 120, 255, 0.35);
-      font-family: "Inter", "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft Yahei", sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
-      background: radial-gradient(1000px 800px at 10% 10%, rgba(160, 130, 255, 0.18), transparent 40%),
-                  radial-gradient(1000px 600px at 80% 85%, rgba(120, 90, 255, 0.12), transparent 40%),
-                  linear-gradient(180deg, var(--elysia-bg1), var(--elysia-bg2));
-      color: var(--elysia-text);
+      font-family: 'Poppins', 'Microsoft YaHei', sans-serif;
+      background: #ffffff;
+      color: #a06bff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
       overflow: hidden;
     }
 
-    /* ========== 中心玻璃卡片 ========== */
-    .elysia-page {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .elysia-bubble {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(212,180,255,0.6), rgba(255,255,255,0.2));
+      filter: blur(40px);
+      animation: float 8s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .elysia-bubble:nth-child(1) {
+      top: 20%;
+      left: 25%;
+      animation-delay: 0s;
+    }
+
+    .elysia-bubble:nth-child(2) {
+      bottom: 15%;
+      right: 20%;
+      animation-delay: 3s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-20px) scale(1.05); }
     }
 
     .elysia-card {
       position: relative;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      box-shadow: 0 20px 50px var(--elysia-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-      padding: 48px 56px;
-      max-width: 640px;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 20px;
+      padding: 40px 60px;
+      box-shadow: 0 4px 30px rgba(160, 107, 255, 0.2);
       text-align: center;
-      animation: cardFloat 6s ease-in-out infinite alternate;
     }
 
-    @keyframes cardFloat {
-      from { transform: translateY(0px); }
-      to { transform: translateY(-6px); }
-    }
-
-    /* ========== 背景柔光动效 ========== */
-    .elysia-card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle at 50% 50%, rgba(200,150,255,0.25), transparent 70%);
-      filter: blur(60px);
-      animation: glowPulse 8s ease-in-out infinite alternate;
-      z-index: 0;
-    }
-
-    @keyframes glowPulse {
-      0% { opacity: 0.5; transform: scale(1); }
-      100% { opacity: 0.9; transform: scale(1.1); }
-    }
-
-    /* ========== 内容文字 ========== */
     h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: var(--elysia-accent);
-      text-shadow: 0 0 20px rgba(200,150,255,0.4);
-      position: relative;
-      z-index: 1;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #a06bff;
+      text-shadow: 0 0 10px rgba(160, 107, 255, 0.3);
+      margin: 0;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: var(--elysia-muted);
-      letter-spacing: 0.02em;
-      line-height: 1.6;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ========== 底部状态提示 ========== */
     .elysia-footer {
-      margin-top: 28px;
-      font-size: 0.85rem;
-      color: rgba(240,230,255,0.6);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ========== 按钮风格（可选） ========== */
-    .elysia-btn {
-      margin-top: 26px;
-      display: inline-block;
-      padding: 10px 22px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      color: var(--elysia-accent);
-      font-weight: 500;
-      text-decoration: none;
-      transition: all .25s ease;
-      backdrop-filter: blur(8px);
-    }
-
-    .elysia-btn:hover {
-      box-shadow: 0 0 20px rgba(200,150,255,0.35);
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 640px) {
-      .elysia-card {
-        padding: 32px 24px;
-        border-radius: 14px;
-      }
-      h1 { font-size: 1.6rem; }
-      p { font-size: 1rem; }
+      position: absolute;
+      bottom: 30px;
+      font-size: 0.9rem;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <main class="elysia-page">
-    <section class="elysia-card">
-      <h1>Elysia</h1>
-      <p>更多内容正在更新中</p>
-      <div class="elysia-footer">感谢你的等待 · 我们正在完善全新的体验</div>
-      <!-- 如果你想加返回按钮，可以取消注释下一行 -->
-      <!-- <a href="index.html" class="elysia-btn">返回播放器</a> -->
-    </section>
-  </main>
+  <div class="elysia-bubble"></div>
+  <div class="elysia-bubble"></div>
+
+  <div class="elysia-card">
+    <h1>更多内容正在更新中…</h1>
+  </div>
+
+  <div class="elysia-footer">© 2025 Elysia Project</div>
 </body>
 </html>

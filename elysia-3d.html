@@ -296,7 +296,71 @@ resetTimer();
 
 renderPlaylist();
 updateSong();
+
+  /* 播放列表交互 */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) {
+    currentSong = parseInt(item.dataset.index);
+    updateSong();
+  }
+});
+
+/* 打开/关闭 播放列表：替换 toggle 为带动画的逻辑 */
+function openPlaylist() {
+  // remove hide if present, add show
+  playlist.classList.remove("hide");
+  playlist.classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  // play close animation, then remove show
+  playlist.classList.remove("show");
+  playlist.classList.add("hide");
+  playlist.setAttribute('aria-hidden', 'true');
+  // 确保 hide 动画结束后清理类（时间与 CSS 中 close 动画保持一致）
+  setTimeout(() => playlist.classList.remove("hide"), 480);
+}
+
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  if (playlist.classList.contains("show")) closePlaylist();
+  else openPlaylist();
+});
+
+/* 点击空白处关闭（带动画） */
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && e.target !== titleEl) {
+    if (playlist.classList.contains("show")) closePlaylist();
+  }
+});
+
+/* 无操作自动隐藏播放器（保持原逻辑） */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  if (playlist.classList.contains("show")) closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+  window.addEventListener(evt, showPlayer)
+);
+resetTimer();
+
 </script>
+
+
 
 <style>
 /* ====== 液态玻璃播放器样式 ====== */
@@ -338,7 +402,8 @@ updateSong();
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
   will-change: transform;
 }
-/* ===== 播放列表 ===== */
+/* ===== 播放列表（改进） ===== */
+/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
 .elysia-playlist {
   position: fixed;
   bottom: 70px;
@@ -360,20 +425,80 @@ updateSong();
   z-index: 9998;
   will-change: transform, opacity;
 }
+
+/* 歌曲名文字颜色调整为淡紫色调 */
 .playlist-item {
   padding: 6px 10px;
-  color: #cdbaff;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.playlist-item:hover { background: rgba(160, 120, 255, 0.15); color: #fff; }
+
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* 悬停时变亮 */
+}
+
 .playlist-item.active {
   background: rgba(160, 120, 255, 0.25);
   color: #fff;
   box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
+/* 中等项 */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* 小动画 */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
 @keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === 轻柔飘浮动画（Elysia 风格） === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.elysia-player {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+
+
+/* 可访问性与微调 */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>

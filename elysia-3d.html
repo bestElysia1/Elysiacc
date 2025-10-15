@@ -392,4 +392,27 @@ function showPlayer() {
   resetTimer();
 }
 function hidePlayer() {
-  playerEl.style.opacity = '
+  playerEl.style.opacity = 'function hidePlayer() {
+  playerEl.style.opacity = '0.6';
+  playerEl.style.transform = 'translateX(-50%) translateY(6px)';
+  playerEl.style.pointerEvents = 'none';
+}
+
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000); // 30 秒无操作自动隐藏
+}
+document.addEventListener('mousemove', showPlayer);
+document.addEventListener('keydown', showPlayer);
+
+/* ===== 初始化 ===== */
+renderPlaylist();
+playIndex(filteredList()[0]._idx);
+showPlayer();
+
+/* copyright */
+console.log('© bestElysia 2025 — All Rights Reserved');
+</script>
+
+</body>
+</html>

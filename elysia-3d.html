@@ -3,10 +3,196 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>only</title>
+  <title>Elysia — 空白页</title>
+  <style>
+    /* ===== Elysia 风格全局样式 ===== */
+    :root{
+      --bg-1: #0b0710;
+      --bg-2: #0f0a17;
+      --glass-1: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,240,255,0.06);
+      --accent: rgba(160,120,255,0.95);
+      --soft: rgba(200,160,255,0.18);
+      --text: #f2eaff;
+      --muted: rgba(242,234,255,0.68);
+      --bp: 720px;
+      font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", "Microsoft Yahei", sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
+    html,body{
+      height:100%;
+      margin:0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(92,48,255,0.18), transparent 6%),
+                  radial-gradient(1000px 500px at 85% 80%, rgba(120,90,255,0.12), transparent 6%),
+                  linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      color:var(--text);
+    }
 
-      
+    /* 中心卡片容器 */
+    .elysia-blank {
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:48px 20px;
+      box-sizing:border-box;
+    }
 
+    .card {
+      width: min(880px, 92%);
+      max-width:980px;
+      border-radius:18px;
+      padding:36px 32px;
+      position:relative;
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 40px rgba(100,60,180,0.22), inset 0 1px 0 rgba(255,255,255,0.03);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      transform: translateY(0);
+      transition: transform .45s cubic-bezier(.2,.9,.2,1), box-shadow .3s ease;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-30%;
+      pointer-events:none;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(40% 40% at 8% 25%, rgba(156,107,255,0.27), transparent 20%),
+        radial-gradient(30% 30% at 70% 15%, rgba(180,120,255,0.18), transparent 18%),
+        radial-gradient(35% 35% at 45% 72%, rgba(140,200,255,0.12), transparent 22%);
+      filter: blur(40px);
+      opacity: 0.95;
+      animation: glassDrift 14s ease-in-out infinite;
+    }
+
+    @keyframes glassDrift {
+      0%,100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(6%,-3%,0) scale(1.02); }
+    }
+
+    .card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(120,70,220,0.28); }
+
+    /* 标题与正文 */
+    .logo {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom: 6px;
+    }
+
+    .logo .dot {
+      width:44px; height:44px; border-radius:10px;
+      background: linear-gradient(135deg, rgba(160,120,255,0.14), rgba(220,190,255,0.08));
+      border:1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 18px rgba(160,120,255,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; color:var(--accent); font-size:18px;
+      text-shadow:0 1px 6px rgba(0,0,0,0.25);
+    }
+
+    h1 {
+      margin:0;
+      font-size:1.15rem;
+      color:var(--text);
+      letter-spacing: -0.02em;
+      font-weight:700;
+    }
+
+    p.lead {
+      margin:22px 0 0 0;
+      font-size:1.02rem;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    /* 中央提示大字 */
+    .center-note {
+      margin-top:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      padding:26px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 6px 24px rgba(120,80,220,0.08);
+    }
+
+    .center-note .big {
+      font-size:1.28rem;
+      font-weight:700;
+      color:var(--text);
+      text-shadow: 0 0 16px rgba(160,120,255,0.12);
+      letter-spacing:-0.01em;
+    }
+
+    .small-muted {
+      margin-top:12px;
+      font-size:0.86rem;
+      color: rgba(242,234,255,0.6);
+    }
+
+    /* 页脚小字 */
+    .foot {
+      margin-top:22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      color: rgba(242,234,255,0.48);
+      font-size:0.82rem;
+    }
+
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      color:var(--muted);
+      text-decoration:none;
+      cursor:default;
+      user-select:none;
+    }
+
+    /* 响应式微调 */
+    @media (max-width:720px){
+      .card { padding:22px 18px; border-radius:14px; }
+      .center-note .big { font-size:1.05rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="elysia-blank" role="main">
+    <section class="card" aria-labelledby="pageTitle">
+      <div class="logo" aria-hidden="true">
+        <div class="dot">E</div>
+        <div>
+          <h1 id="pageTitle">Elysia</h1>
+          <div style="font-size:0.86rem; color: rgba(242,234,255,0.58); margin-top:6px;">液态玻璃风格 · 占位页面</div>
+        </div>
+      </div>
+
+      <div class="center-note" role="status" aria-live="polite">
+        <div class="big">更多内容正在更新中</div>
+      </div>
+
+      <p class="lead small-muted">感谢你的耐心等待。我们正以 Elysia 风格持续打造更多功能和页面，敬请期待 —</p>
+
+      <div class="foot" aria-hidden="true">
+        <div class="btn">当前状态：占位页</div>
+        <div style="opacity:0.7; font-style:italic;">最后更新：{{更多内容将陆续上线}}</div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

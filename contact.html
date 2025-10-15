@@ -1,5 +1,363 @@
-<div class="contact-page">
-  <h1>📩 联系我</h1>
-  <p>这里是联系页面示例内容。</p>
-  <p>你可以在这里放邮箱、社交链接，或者表单。</p>
+<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
+<div class="elysia-player">
+  <div class="elysia-controls">
+    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+    <button id="nextBtn" aria-label="Next">⏭</button>
+  </div>
+  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
 </div>
+
+<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+
+<script>
+/* ===== songs 列表（按需修改路径） ===== */
+const songs = [
+  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
+  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3" },
+  { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3" },
+  { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3" },
+  { title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3" },
+  { title: "Call of Silence", src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3" },
+  { title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3" },
+  { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" },
+  { title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3" },
+  { title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3" },
+  { title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
+  { title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3" },
+  { title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3" },
+  { title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3" },
+  { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3" },
+  { title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3" },
+  { title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3" },
+  { title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3" },
+  { title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3" },
+  { title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3" },
+  { title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3" },
+  { title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3" },
+  { title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3" },
+  { title: "One Last Kiss", src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3" },
+  { title: "secret base", src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3" },
+  { title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3" },
+  { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
+  { title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3" },
+  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3" },
+  { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3" },
+];
+
+let currentSong = 0;
+const audio = new Audio(songs[currentSong].src);
+audio.preload = "auto";
+
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
+const playlist = document.getElementById("playlist");
+
+function preloadNext() {
+  const nextIndex = (currentSong + 1) % songs.length;
+  const nextAudio = new Audio(songs[nextIndex].src);
+  nextAudio.preload = "auto";
+}
+
+function renderPlaylist() {
+  playlist.innerHTML = songs.map((s, i) => `
+    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
+      ${s.title}
+    </div>`).join("");
+}
+
+function updateSong() {
+  titleEl.textContent = songs[currentSong].title;
+  audio.src = songs[currentSong].src;
+  audio.play().catch(()=>{});
+  playPauseBtn.textContent = "⏸";
+  renderPlaylist();
+  preloadNext();
+}
+
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  currentSong = (currentSong + 1) % songs.length;
+  updateSong();
+});
+
+audio.addEventListener("ended", () => nextBtn.click());
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
+
+renderPlaylist();
+updateSong();
+
+// === 🎧 Media Session API: 灵动岛 + 锁屏封面 ===
+if ("mediaSession" in navigator) {
+  function updateMediaSession() {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: songs[currentSong].title,
+        artist: "Elysia Player",
+        album: "Piano Collection",
+        artwork: [
+          { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
+          { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
+        ]
+      });
+
+      // 更新播放状态
+      if (!audio.paused) {
+        navigator.mediaSession.playbackState = "playing";
+      } else {
+        navigator.mediaSession.playbackState = "paused";
+      }
+    } catch (e) {
+      console.warn("MediaSession update failed:", e);
+    }
+  }
+
+  // 每次切歌都更新灵动岛封面与标题
+  updateMediaSession();
+
+  // 在播放、暂停、结束时刷新状态
+  audio.addEventListener("play", () => {
+    navigator.mediaSession.playbackState = "playing";
+    updateMediaSession();
+  });
+
+  audio.addEventListener("pause", () => {
+    navigator.mediaSession.playbackState = "paused";
+  });
+
+  audio.addEventListener("ended", () => {
+    navigator.mediaSession.playbackState = "none";
+  });
+}
+
+/* 播放列表交互 */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) {
+    currentSong = parseInt(item.dataset.index);
+    updateSong();
+  }
+});
+
+/* 打开/关闭 播放列表：替换 toggle 为带动画的逻辑 */
+function openPlaylist() {
+  // remove hide if present, add show
+  playlist.classList.remove("hide");
+  playlist.classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  // play close animation, then remove show
+  playlist.classList.remove("show");
+  playlist.classList.add("hide");
+  playlist.setAttribute('aria-hidden', 'true');
+  // 确保 hide 动画结束后清理类（时间与 CSS 中 close 动画保持一致）
+  setTimeout(() => playlist.classList.remove("hide"), 480);
+}
+
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  if (playlist.classList.contains("show")) closePlaylist();
+  else openPlaylist();
+});
+
+/* 点击空白处关闭（带动画） */
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && e.target !== titleEl) {
+    if (playlist.classList.contains("show")) closePlaylist();
+  }
+});
+
+/* 无操作自动隐藏播放器（保持原逻辑） */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  if (playlist.classList.contains("show")) closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+  window.addEventListener(evt, showPlayer)
+);
+resetTimer();
+</script>
+
+<style>
+/* ====== 基础：液态玻璃播放器 ====== */
+.elysia-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px;
+  border-radius: 16px;
+  z-index: 9999;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: transform, opacity;
+}
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+  
+/* 控制按钮 */
+.elysia-controls { display:flex; gap:10px; }
+.elysia-controls button {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
+}
+.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
+
+/* 歌曲名 */
+#songTitle {
+  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
+  text-shadow:0 0 10px rgba(160,120,255,0.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+  will-change: transform;
+}
+
+/* ===== 播放列表（改进） ===== */
+/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
+.elysia-playlist {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.98);
+  transform-origin: 50% 100%;
+  width: 260px;
+  max-height: 260px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  overflow-y: auto;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  z-index: 9998;
+  will-change: transform, opacity;
+}
+
+/* 歌曲名文字颜色调整为淡紫色调 */
+.playlist-item {
+  padding: 6px 10px;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* 悬停时变亮 */
+}
+
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
+}
+/* 中等项 */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* 小动画 */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === 轻柔飘浮动画（Elysia 风格） === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.elysia-player {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+
+
+/* 可访问性与微调 */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
+</style>

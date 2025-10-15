@@ -1,4 +1,4 @@
-<!-- === Elysia 播放器（多封面版 + 灵动岛封面支持） === -->
+<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
@@ -10,7 +10,7 @@
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script>
-/* ===== 🎵 歌曲列表 ===== */
+/* ===== songs 列表（按需修改路径） ===== */
 const songs = [
   { 
     title: "My Soul, Your Beats!", 
@@ -174,7 +174,12 @@ const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
 const playlist = document.getElementById("playlist");
 
-/* ======== 播放列表渲染 ======== */
+function preloadNext() {
+  const nextIndex = (currentSong + 1) % songs.length;
+  const nextAudio = new Audio(songs[nextIndex].src);
+  nextAudio.preload = "auto";
+}
+
 function renderPlaylist() {
   playlist.innerHTML = songs.map((s, i) => `
     <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
@@ -182,18 +187,15 @@ function renderPlaylist() {
     </div>`).join("");
 }
 
-/* ======== 更新播放歌曲 ======== */
 function updateSong() {
-  const song = songs[currentSong];
-  audio.src = song.src;
-  titleEl.textContent = song.title;
+  titleEl.textContent = songs[currentSong].title;
+  audio.src = songs[currentSong].src;
   audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
-  updateMediaSession(song);
+  preloadNext();
 }
 
-/* ======== 控制按钮 ======== */
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -212,6 +214,9 @@ nextBtn.addEventListener("click", () => {
 audio.addEventListener("ended", () => nextBtn.click());
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
+
+renderPlaylist();
+updateSong();
 
 /* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
 function updateMediaSession(song) {
@@ -238,66 +243,9 @@ function updateMediaSession(song) {
 audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
-
-/* ======== 播放列表点击 ======== */
-playlist.addEventListener("click", e => {
-  const item = e.target.closest(".playlist-item");
-  if (item) {
-    currentSong = parseInt(item.dataset.index);
-    updateSong();
-  }
-});
-
-/* ======== 打开/关闭播放列表 ======== */
-function openPlaylist() {
-  playlist.classList.remove("hide");
-  playlist.classList.add("show");
-  playlist.setAttribute('aria-hidden', 'false');
-}
-function closePlaylist() {
-  playlist.classList.remove("show");
-  playlist.classList.add("hide");
-  playlist.setAttribute('aria-hidden', 'true');
-  setTimeout(() => playlist.classList.remove("hide"), 480);
 }
 
-titleEl.addEventListener("click", e => {
-  e.stopPropagation();
-  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
-});
-document.addEventListener("click", e => {
-  if (!playlist.contains(e.target) && e.target !== titleEl) {
-    if (playlist.classList.contains("show")) closePlaylist();
-  }
-});
-
-/* ======== 自动隐藏播放器 ======== */
-let inactivityTimer;
-function hidePlayer() {
-  player.style.opacity = '0';
-  player.style.transform = 'translate(-50%, 40px)';
-  player.style.pointerEvents = 'none';
-  if (playlist.classList.contains("show")) closePlaylist();
-}
-function showPlayer() {
-  player.style.opacity = '1';
-  player.style.transform = 'translate(-50%, 0)';
-  player.style.pointerEvents = 'auto';
-  resetTimer();
-}
-function resetTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 30000);
-}
-['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
-  window.addEventListener(evt, showPlayer)
-);
-resetTimer();
-
-renderPlaylist();
-updateSong();
-
-  /* 播放列表交互 */
+/* 播放列表交互 */
 playlist.addEventListener("click", e => {
   const item = e.target.closest(".playlist-item");
   if (item) {
@@ -357,13 +305,10 @@ function resetTimer() {
   window.addEventListener(evt, showPlayer)
 );
 resetTimer();
-
 </script>
 
-
-
 <style>
-/* ====== 液态玻璃播放器样式 ====== */
+/* ====== 基础：液态玻璃播放器 ====== */
 .elysia-player {
   position: fixed;
   bottom: 20px;
@@ -383,12 +328,24 @@ resetTimer();
   box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   transition: opacity .6s ease, transform .6s ease;
   will-change: transform, opacity;
-  animation: elysiaFloat 6s ease-in-out infinite;
 }
-@keyframes elysiaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
+
+  
+/* 控制按钮 */
 .elysia-controls { display:flex; gap:10px; }
 .elysia-controls button {
   width: 32px; height: 32px; border-radius: 50%;
@@ -396,12 +353,15 @@ resetTimer();
   color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
 }
 .elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
+
+/* 歌曲名 */
 #songTitle {
   color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
   text-shadow:0 0 10px rgba(160,120,255,0.45);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
   will-change: transform;
 }
+
 /* ===== 播放列表（改进） ===== */
 /* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
 .elysia-playlist {

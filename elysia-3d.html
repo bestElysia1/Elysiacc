@@ -194,7 +194,9 @@ function updateSong() {
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
   preloadNext();
-  updateMediaSession(songs[currentsong]);
+  updateMediaSession(songs[currentSong]);
+  navigator.mediaSession.playbackState = "playing";
+
 }
 
 playPauseBtn.addEventListener("click", () => {

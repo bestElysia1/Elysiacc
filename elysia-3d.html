@@ -164,6 +164,7 @@ const songs = [
   }
 ];
 
+
 let currentSong = 0;
 const audio = new Audio(songs[currentSong].src);
 audio.preload = "auto";
@@ -174,12 +175,7 @@ const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
 const playlist = document.getElementById("playlist");
 
-function preloadNext() {
-  const nextIndex = (currentSong + 1) % songs.length;
-  const nextAudio = new Audio(songs[nextIndex].src);
-  nextAudio.preload = "auto";
-}
-
+/* ======== 函数：渲染播放列表 ======== */
 function renderPlaylist() {
   playlist.innerHTML = songs.map((s, i) => `
     <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
@@ -187,6 +183,14 @@ function renderPlaylist() {
     </div>`).join("");
 }
 
+/* ======== 函数：预加载下一首 ======== */
+function preloadNext() {
+  const nextIndex = (currentSong + 1) % songs.length;
+  const nextAudio = new Audio(songs[nextIndex].src);
+  nextAudio.preload = "auto";
+}
+
+/* ======== 函数：切歌并更新状态 ======== */
 function updateSong() {
   titleEl.textContent = songs[currentSong].title;
   audio.src = songs[currentSong].src;
@@ -194,29 +198,115 @@ function updateSong() {
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
   preloadNext();
+
+  // ✅ 主动刷新灵动岛 & 锁屏封面
+  updateMediaSession(songs[currentSong]);
+  navigator.mediaSession.playbackState = "playing";
 }
 
+/* ======== 播放/暂停按钮 ======== */
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
     playPauseBtn.textContent = "⏸";
+    navigator.mediaSession.playbackState = "playing"; // ✅ 同步灵动岛播放状态
   } else {
     audio.pause();
     playPauseBtn.textContent = "▶";
+    navigator.mediaSession.playbackState = "paused";  // ✅ 同步灵动岛暂停状态
   }
 });
 
+/* ======== 下一首按钮 ======== */
 nextBtn.addEventListener("click", () => {
   currentSong = (currentSong + 1) % songs.length;
   updateSong();
 });
 
+/* ======== 自动切歌 & 播放状态变化 ======== */
 audio.addEventListener("ended", () => nextBtn.click());
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
 
+/* ======== Media Session API：灵动岛 & 锁屏封面 ======== */
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [
+        { src: song.cover, sizes: "96x96", type: "image/jpeg" },
+        { src: song.cover, sizes: "192x192", type: "image/jpeg" },
+        { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+      ]
+    });
+    navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+  } catch(e) {
+    console.warn("MediaSession update failed:", e);
+  }
+}
+
+/* ======== 点击播放列表 ======== */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) {
+    currentSong = parseInt(item.dataset.index);
+    updateSong();
+  }
+});
+
+/* ======== 播放列表动画展开/收起 ======== */
+function openPlaylist() {
+  playlist.classList.remove("hide");
+  playlist.classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  playlist.classList.remove("show");
+  playlist.classList.add("hide");
+  playlist.setAttribute('aria-hidden', 'true');
+  setTimeout(() => playlist.classList.remove("hide"), 480);
+}
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  if (playlist.classList.contains("show")) closePlaylist();
+  else openPlaylist();
+});
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && e.target !== titleEl) {
+    if (playlist.classList.contains("show")) closePlaylist();
+  }
+});
+
+/* ======== 自动隐藏播放器 ======== */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  if (playlist.classList.contains("show")) closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+  window.addEventListener(evt, showPlayer)
+);
+
+/* ======== 初始化 ======== */
 renderPlaylist();
 updateSong();
+resetTimer();
+</script>
 
 /* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
 function updateMediaSession(song) {

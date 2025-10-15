@@ -1,99 +1,203 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elysia more</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elysia Player — 分组版</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    /* ====== Elysia 分组版（淡紫液态风） ====== */
+    :root{
+      --accent: #a06bff;
+      --text: #6a4fa5;
+      --glass: rgba(255,255,255,0.65);
+      --glass-border: rgba(180,150,255,0.35);
+    }
 
-    body {
-      margin: 0;
-      font-family: 'Poppins', 'Microsoft YaHei', sans-serif;
-      background: #ffffff;
-      color: #a06bff;
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, "PingFang SC","Microsoft Yahei",sans-serif;
+      background: linear-gradient(180deg, #fff8ff, #f8f2ff);
+      color: var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* ===== 播放器 ===== */
+    .elysia-player {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      gap: 14px;
+      padding: 8px 20px;
+      border-radius: 16px;
+      z-index: 9999;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px) saturate(160%);
+      -webkit-backdrop-filter: blur(12px) saturate(160%);
+      box-shadow: 0 8px 24px rgba(150,110,240,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: opacity .6s ease, transform .6s ease;
+      will-change: transform, opacity;
+      animation: elysiaFloat 6s ease-in-out infinite;
+    }
+    @keyframes elysiaFloat {
+      0%,100%{ transform: translateX(-50%) translateY(0); }
+      50%{ transform: translateX(-50%) translateY(-6px); }
     }
 
-    /* 柔光浮动背景泡泡 */
-    .elysia-bubble {
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(205, 171, 255, 0.5), rgba(255, 255, 255, 0.2));
-      filter: blur(40px);
-      animation: float 8s ease-in-out infinite;
-      z-index: 0;
+    .elysia-controls { display:flex; gap:10px; }
+    .elysia-controls button {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.85); border: 1px solid rgba(200,170,255,0.6);
+      color: var(--text); cursor: pointer; transition: all .2s ease; font-weight:600;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 6px 18px rgba(160,120,255,0.08);
+    }
+    .elysia-controls button:hover { transform: scale(1.06); box-shadow: 0 8px 22px rgba(160,120,255,0.18); }
+
+    /* 播放器标题（点击弹出列表） */
+    #songTitle {
+      color: var(--text);
+      font-weight:600;
+      width:220px;
+      font-size:0.96rem;
+      text-shadow:0 0 6px rgba(200,170,255,0.18);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer;
     }
 
-    .elysia-bubble:nth-child(1) {
-      top: 20%;
-      left: 25%;
-      animation-delay: 0s;
+    /* ===== 播放列表（分组） ===== */
+    .elysia-playlist {
+      position: fixed;
+      bottom: 78px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.98);
+      transform-origin: 50% 100%;
+      width: 320px;
+      max-height: 360px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(180,150,255,0.32);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      box-shadow: 0 10px 28px rgba(200,160,255,0.18);
+      overflow-y: auto;
+      opacity: 0; pointer-events: none;
+      transition: opacity .28s ease, transform .36s cubic-bezier(.2,.9,.2,1);
+      z-index: 9998;
     }
 
-    .elysia-bubble:nth-child(2) {
-      bottom: 15%;
-      right: 20%;
-      animation-delay: 3s;
+    .playlist-group {
+      font-weight:700;
+      font-size:0.9rem;
+      color: var(--accent);
+      padding: 8px 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(230,220,255,0.7), rgba(245,240,255,0.6));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      letter-spacing: 0.2px;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.03); }
+    .playlist-item {
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background .18s, color .18s, transform .12s;
+      background: transparent;
+      text-align: left;
+    }
+    .playlist-item:hover {
+      background: rgba(180,140,255,0.12);
+      color: #fff;
+      transform: translateX(4px);
+    }
+    .playlist-item.active {
+      background: linear-gradient(90deg, rgba(180,140,255,0.24), rgba(200,160,255,0.16));
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(160,120,255,0.18);
     }
 
-    /* 主卡片区域 */
-    .elysia-card {
-      position: relative;
-      z-index: 2;
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(25px) saturate(160%);
-      -webkit-backdrop-filter: blur(25px) saturate(160%);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(160, 107, 255, 0.25);
-      padding: 24px 50px;
-      text-align: center;
-      animation: cardFloat 6s ease-in-out infinite;
-      border: 1px solid rgba(160, 107, 255, 0.2);
+    .elysia-playlist.show {
+      opacity: 1; pointer-events: auto;
+      transform: translateX(-50%) scale(1);
+    }
+    .elysia-playlist.hide {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) scale(0.98);
     }
 
-    .elysia-card h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #a06bff;
-      text-shadow: 0 0 12px rgba(160, 107, 255, 0.25);
-      margin: 0;
-      letter-spacing: 0.5px;
+    /* 小提示 */
+    footer.copyright {
+      position: fixed; left: 50%; transform: translateX(-50%); bottom: 6px;
+      color: rgba(120,90,180,0.6); font-size: 0.78rem;
     }
 
-    @keyframes cardFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+    /* scrollbar 美化（简单） */
+    .elysia-playlist::-webkit-scrollbar { width:10px; }
+    .elysia-playlist::-webkit-scrollbar-thumb { background: rgba(180,140,255,0.26); border-radius:8px; }
+    .elysia-playlist::-webkit-scrollbar-track { background: transparent; }
 
-    .elysia-footer {
-      position: absolute;
-      bottom: 30px;
-      font-size: 0.9rem;
-      color: #b89bff;
-      opacity: 0.6;
+    @media (max-width:420px){
+      .elysia-playlist { width: 90%; left: 50%; transform: translateX(-50%); }
+      #songTitle { width: 120px; }
     }
   </style>
 </head>
 <body>
-  <div class="elysia-bubble"></div>
-  <div class="elysia-bubble"></div>
 
-  <div class="elysia-card">
-          <p>Continually being updated</p>
+  <!-- === Elysia 播放器（分组版） === -->
+  <div class="elysia-player" role="group" aria-label="Elysia Player">
+    <div class="elysia-controls" aria-hidden="true">
+      <button id="playPauseBtn" title="播放/暂停">▶</button>
+      <button id="nextBtn" title="下一首">⏭</button>
+    </div>
+    <span id="songTitle" class="clickable" role="button" tabindex="0" aria-expanded="false">加载中...</span>
   </div>
 
-  <div class="elysia-footer">© bestElysia 2025</div>
-</body>
-</html>
+  <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+
+  <footer class="copyright">© bestElysia 2025</footer>
+
+  <script>
+    /* ====== 你的歌曲（已分组） ====== */
+    const songs = [
+      /* 🎧 Key & Visual Arts Collection */
+      { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3", cover: "assets/Megumeru Gensoukyoku.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", cover: "assets/theme of SSS.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", cover: "assets/Key anime piano medley.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", cover: "assets/Shiteki.jpg" },
+      { group: "🎧 Key & Visual Arts Collection", title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", cover: "assets/banner1.jpg" },
+
+      /* 🎹 Healing & Piano Works */
+      { group: "🎹 Healing & Piano Works", title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg" },
+      { group: "🎹 Healing & Piano Works", title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/Elysia11.jpg" },
+      { group: "🎹 Healing & Piano Works", title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3", cover: "assets/heroism endures in nothingness.jpg" },
+      { group: "🎹 Healing & Piano Works", title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", cover: "assets/Mydearest.jpg" },
+
+      /* 🪩 Anime & J-Pop Selection */
+      { group: "🪩 Anime & J-Pop Selection", title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", cover: "assets/Level5.jpg" },
+      { group: "🪩 Anime & J-Pop Selection", title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3", cover: "assets/Shinobu Kocho.jpg" },
+      { group: "🪩 Anime & J-Pop Selection", title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", cover: "assets/banner1.jpg" },
+      { group: "🪩 Anime & J-Pop Selection", title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", cover: "assets/GIRLS BAND CRY.jpg" },
+      { group: "🪩 Anime & J-Pop Selection", title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", cover: "assets/banner1.jpg" },
+      { group: "🪩 Anime & J-Pop Selection", title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", cover: "assets/banner1.jpg" },
+
+      /* 💫 Game & Fantasy Themes */
+      { group: "💫 Game & Fantasy Themes", title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", cover: "assets/banner1.jpg" },
+      { group: "💫 Game & Fantasy Themes", title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", cover: "assets/Majo no Tabitabi.jpg" },
+      { group: "💫 Game & Fantasy Themes", title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", cover: "assets/ninelie.jpg" },
+      { group: "💫 Game & Fantasy Themes", title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg" },
+      { group: "💫 Game & Fantasy Themes", title: "One Last Kiss", src: "assets/One Last Kiss - Evangel

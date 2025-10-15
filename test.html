@@ -1,4 +1,4 @@
-<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
+<!-- === Elysia 播放器（多封面版 + 灵动岛封面支持） === -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
@@ -10,7 +10,7 @@
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script>
-/* ===== songs 列表（按需修改路径） ===== */
+/* ===== 🎵 歌曲列表 ===== */
 const songs = [
   { 
     title: "My Soul, Your Beats!", 
@@ -174,12 +174,7 @@ const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
 const playlist = document.getElementById("playlist");
 
-function preloadNext() {
-  const nextIndex = (currentSong + 1) % songs.length;
-  const nextAudio = new Audio(songs[nextIndex].src);
-  nextAudio.preload = "auto";
-}
-
+/* ======== 播放列表渲染 ======== */
 function renderPlaylist() {
   playlist.innerHTML = songs.map((s, i) => `
     <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
@@ -187,15 +182,18 @@ function renderPlaylist() {
     </div>`).join("");
 }
 
+/* ======== 更新播放歌曲 ======== */
 function updateSong() {
-  titleEl.textContent = songs[currentSong].title;
-  audio.src = songs[currentSong].src;
+  const song = songs[currentSong];
+  audio.src = song.src;
+  titleEl.textContent = song.title;
   audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
-  preloadNext();
+  updateMediaSession(song);
 }
 
+/* ======== 控制按钮 ======== */
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -214,9 +212,6 @@ nextBtn.addEventListener("click", () => {
 audio.addEventListener("ended", () => nextBtn.click());
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
-
-renderPlaylist();
-updateSong();
 
 /* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
 function updateMediaSession(song) {
@@ -243,10 +238,8 @@ function updateMediaSession(song) {
 audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
-}
 
-
-/* 播放列表交互 */
+/* ======== 播放列表点击 ======== */
 playlist.addEventListener("click", e => {
   const item = e.target.closest(".playlist-item");
   if (item) {
@@ -255,36 +248,29 @@ playlist.addEventListener("click", e => {
   }
 });
 
-/* 打开/关闭 播放列表：替换 toggle 为带动画的逻辑 */
+/* ======== 打开/关闭播放列表 ======== */
 function openPlaylist() {
-  // remove hide if present, add show
   playlist.classList.remove("hide");
   playlist.classList.add("show");
   playlist.setAttribute('aria-hidden', 'false');
 }
 function closePlaylist() {
-  // play close animation, then remove show
   playlist.classList.remove("show");
   playlist.classList.add("hide");
   playlist.setAttribute('aria-hidden', 'true');
-  // 确保 hide 动画结束后清理类（时间与 CSS 中 close 动画保持一致）
-  setTimeout(() => playlist.classList.remove("hide"), 480);
 }
 
 titleEl.addEventListener("click", e => {
   e.stopPropagation();
-  if (playlist.classList.contains("show")) closePlaylist();
-  else openPlaylist();
+  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
 });
-
-/* 点击空白处关闭（带动画） */
 document.addEventListener("click", e => {
   if (!playlist.contains(e.target) && e.target !== titleEl) {
     if (playlist.classList.contains("show")) closePlaylist();
   }
 });
 
-/* 无操作自动隐藏播放器（保持原逻辑） */
+/* ======== 自动隐藏播放器 ======== */
 let inactivityTimer;
 function hidePlayer() {
   player.style.opacity = '0';
@@ -306,6 +292,9 @@ function resetTimer() {
   window.addEventListener(evt, showPlayer)
 );
 resetTimer();
+
+renderPlaylist();
+updateSong();
 </script>
 
 <style>
@@ -463,6 +452,9 @@ resetTimer();
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
+
+
+
 
 
 

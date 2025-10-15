@@ -134,7 +134,7 @@ const songs = [
   },
   { 
     title: "secret base", 
-    src: "assetscret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", 
+    src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", 
     cover: "assets/banner1.jpg" 
   },
   { 
@@ -244,6 +244,7 @@ audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
 audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
 }
+
 
 /* 播放列表交互 */
 playlist.addEventListener("click", e => {
@@ -462,3 +463,11 @@ resetTimer();
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
+
+
+
+
+
+
+
+

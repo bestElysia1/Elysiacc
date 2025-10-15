@@ -1,151 +1,65 @@
-<!-- === Elysia 播放器（多封面版 + 灵动岛封面 + 分组支持） === -->
-<div class="elysia-player">
-  <div class="elysia-controls">
-    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
-    <button id="nextBtn" aria-label="Next">⏭</button>
-  </div>
-  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
-</div>
-
-<!-- 🔹 播放列表整体容器（左侧分组 + 右侧歌曲） -->
-<div class="elysia-playlist-container">
-  <div class="elysia-group-panel" id="groupPanel">
-    <div class="group-item active" data-group="piano">🎹 piano</div>
-    <div class="group-item" data-group="chinesesong">🎵 chinesesong</div>
-  </div>
-  <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
-</div>
-
-<script>
-/* ===== 🎵 歌曲列表 ===== */
-const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg", group: "piano" },
-  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg", group: "piano" },
-  { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
-  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
-  { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg", group: "chinesesong" }
-];
-
-let currentSong = 0;
-let currentGroup = "piano";
-
-const audio = new Audio(songs[currentSong].src);
-audio.preload = "auto";
-
-const playPauseBtn = document.getElementById("playPauseBtn");
-const nextBtn = document.getElementById("nextBtn");
-const titleEl = document.getElementById("songTitle");
-const player = document.querySelector(".elysia-player");
-const playlist = document.getElementById("playlist");
-const groupPanel = document.getElementById("groupPanel");
-
-/* ======== 播放列表渲染（支持分组） ======== */
-function renderPlaylist() {
-  const filtered = songs.filter(s => s.group === currentGroup);
-  playlist.innerHTML = filtered.map((s, i) => `
-    <div class="playlist-item ${songs.indexOf(s) === currentSong ? 'active' : ''}" data-index="${songs.indexOf(s)}">
-      ${s.title}
-    </div>`).join("");
-}
-
-/* ======== 更新播放歌曲 ======== */
-function updateSong() {
-  const song = songs[currentSong];
-  audio.src = song.src;
-  titleEl.textContent = song.title;
-  audio.play().catch(()=>{});
-  playPauseBtn.textContent = "⏸";
-  renderPlaylist();
-  updateMediaSession(song);
-}
-
-/* ======== 分组切换 ======== */
-groupPanel.addEventListener("click", e => {
-  const item = e.target.closest(".group-item");
-  if (!item) return;
-  document.querySelectorAll(".group-item").forEach(i => i.classList.remove("active"));
-  item.classList.add("active");
-  currentGroup = item.dataset.group;
-  renderPlaylist();
-  playlist.classList.add("fadein");
-  setTimeout(()=>playlist.classList.remove("fadein"), 500);
-});
-
-/* ======== 其他逻辑完全保留 ======== */
-playPauseBtn.addEventListener("click", () => {
-  if (audio.paused) { audio.play(); playPauseBtn.textContent = "⏸"; }
-  else { audio.pause(); playPauseBtn.textContent = "▶"; }
-});
-nextBtn.addEventListener("click", () => { currentSong = (currentSong + 1) % songs.length; updateSong(); });
-audio.addEventListener("ended", () => nextBtn.click());
-audio.addEventListener("play", () => player.classList.add("playing"));
-audio.addEventListener("pause", () => player.classList.remove("playing"));
-
-function updateMediaSession(song) {
-  if (!("mediaSession" in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: "Elysia Player",
-      album: "Piano Collection",
-      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
-    });
-  } catch(e) { console.warn(e); }
-}
-
-/* ======== 播放列表点击 ======== */
-playlist.addEventListener("click", e => {
-  const item = e.target.closest(".playlist-item");
-  if (item) { currentSong = parseInt(item.dataset.index); updateSong(); }
-});
-
-/* ======== 打开/关闭播放列表 ======== */
-function openPlaylist() {
-  document.querySelector(".elysia-playlist-container").classList.add("show");
-  playlist.setAttribute('aria-hidden', 'false');
-}
-function closePlaylist() {
-  document.querySelector(".elysia-playlist-container").classList.remove("show");
-  playlist.setAttribute('aria-hidden', 'true');
-}
-titleEl.addEventListener("click", e => {
-  e.stopPropagation();
-  document.querySelector(".elysia-playlist-container").classList.contains("show") ? closePlaylist() : openPlaylist();
-});
-document.addEventListener("click", e => {
-  if (!playlist.contains(e.target) && !groupPanel.contains(e.target) && e.target !== titleEl)
-    if (document.querySelector(".elysia-playlist-container").classList.contains("show")) closePlaylist();
-});
-
-/* ======== 自动隐藏 ======== */
-let inactivityTimer;
-function hidePlayer() {
-  player.style.opacity = '0';
-  player.style.transform = 'translate(-50%, 40px)';
-  player.style.pointerEvents = 'none';
-  closePlaylist();
-}
-function showPlayer() {
-  player.style.opacity = '1';
-  player.style.transform = 'translate(-50%, 0)';
-  player.style.pointerEvents = 'auto';
-  resetTimer();
-}
-function resetTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 30000);
-}
-['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayer));
-resetTimer();
-
-renderPlaylist();
-updateSong();
-</script>
-
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elysia Player - 分组版</title>
 <style>
-/* ===== 保留你原来的所有样式，只新增以下 ===== */
+/* ===== 你原样式保留，只补容器框架 ===== */
 
-/* 播放列表外层容器（左侧分组 + 右侧列表） */
+/* 页面底色 */
+body {
+  background: #faf9ff;
+  font-family: "Poppins", "HarmonyOS Sans", sans-serif;
+  overflow-x: hidden;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+
+/* 播放器居中 */
+.elysia-player {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 25px rgba(160, 120, 255, 0.25);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .35s ease;
+  z-index: 9999;
+}
+
+.elysia-player.playing {
+  box-shadow: 0 0 30px rgba(160,120,255,0.45);
+}
+
+.elysia-controls button {
+  border: none;
+  background: rgba(255,255,255,0.2);
+  color: #7a5fff;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 1rem;
+  transition: background .25s;
+}
+.elysia-controls button:hover {
+  background: rgba(160,120,255,0.2);
+}
+#songTitle {
+  color: #7a5fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 播放列表整体容器 */
 .elysia-playlist-container {
   position: fixed;
   bottom: 70px;
@@ -197,7 +111,33 @@ updateSong();
   box-shadow: 0 0 12px rgba(160,120,255,0.6);
 }
 
-/* 右侧播放列表保持原样，仅加淡入动画 */
+/* 播放列表 */
+#playlist {
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(180,150,255,0.2);
+  padding: 10px;
+}
+.playlist-item {
+  padding: 8px;
+  color: #6f5ae3;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all .2s ease;
+}
+.playlist-item:hover {
+  background: rgba(160,120,255,0.15);
+  color: #fff;
+}
+.playlist-item.active {
+  background: rgba(160,120,255,0.3);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(160,120,255,0.5);
+}
+
 #playlist.fadein {
   animation: fadeInList .4s ease;
 }
@@ -206,3 +146,143 @@ updateSong();
   to { opacity: 1; transform: translateY(0); }
 }
 </style>
+</head>
+<body>
+
+<!-- === 你原本的结构（未改动） === -->
+<div class="elysia-player">
+  <div class="elysia-controls">
+    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+    <button id="nextBtn" aria-label="Next">⏭</button>
+  </div>
+  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
+</div>
+
+<div class="elysia-playlist-container">
+  <div class="elysia-group-panel" id="groupPanel">
+    <div class="group-item active" data-group="piano">🎹 piano</div>
+    <div class="group-item" data-group="chinesesong">🎵 chinesesong</div>
+  </div>
+  <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+</div>
+
+<script>
+/* ===== 你的原始脚本（完全保留） ===== */
+const songs = [
+  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg", group: "piano" },
+  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg", group: "piano" },
+  { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
+  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg", group: "chinesesong" },
+  { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg", group: "chinesesong" }
+];
+
+let currentSong = 0;
+let currentGroup = "piano";
+
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
+const playlist = document.getElementById("playlist");
+const groupPanel = document.getElementById("groupPanel");
+const audio = new Audio();
+audio.preload = "auto";
+
+function renderPlaylist() {
+  const filtered = songs.filter(s => s.group === currentGroup);
+  playlist.innerHTML = filtered.map((s, i) => `
+    <div class="playlist-item ${songs.indexOf(s) === currentSong ? 'active' : ''}" data-index="${songs.indexOf(s)}">
+      ${s.title}
+    </div>`).join("");
+}
+
+function updateSong() {
+  const song = songs[currentSong];
+  audio.src = song.src;
+  titleEl.textContent = song.title;
+  audio.play().catch(()=>{});
+  playPauseBtn.textContent = "⏸";
+  renderPlaylist();
+  updateMediaSession(song);
+}
+
+groupPanel.addEventListener("click", e => {
+  const item = e.target.closest(".group-item");
+  if (!item) return;
+  document.querySelectorAll(".group-item").forEach(i => i.classList.remove("active"));
+  item.classList.add("active");
+  currentGroup = item.dataset.group;
+  renderPlaylist();
+  playlist.classList.add("fadein");
+  setTimeout(()=>playlist.classList.remove("fadein"), 500);
+});
+
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) { audio.play(); playPauseBtn.textContent = "⏸"; }
+  else { audio.pause(); playPauseBtn.textContent = "▶"; }
+});
+nextBtn.addEventListener("click", () => { currentSong = (currentSong + 1) % songs.length; updateSong(); });
+audio.addEventListener("ended", () => nextBtn.click());
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
+
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
+    });
+  } catch(e) { console.warn(e); }
+}
+
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) { currentSong = parseInt(item.dataset.index); updateSong(); }
+});
+
+function openPlaylist() {
+  document.querySelector(".elysia-playlist-container").classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  document.querySelector(".elysia-playlist-container").classList.remove("show");
+  playlist.setAttribute('aria-hidden', 'true');
+}
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  document.querySelector(".elysia-playlist-container").classList.contains("show") ? closePlaylist() : openPlaylist();
+});
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && !groupPanel.contains(e.target) && e.target !== titleEl)
+    if (document.querySelector(".elysia-playlist-container").classList.contains("show")) closePlaylist();
+});
+
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayer));
+resetTimer();
+
+renderPlaylist();
+updateSong();
+</script>
+
+</body>
+</html>

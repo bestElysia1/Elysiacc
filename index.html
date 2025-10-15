@@ -655,7 +655,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 }
 </style>
 
-<!-- === Elysia 播放器（完整优化版：macOS 弹跳 + 缩回 + 柔光波纹） === -->
+<!-- === Elysia 播放器（无敌版本） === -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
@@ -667,38 +667,158 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script>
-/* ===== songs 列表（按需修改路径） ===== */
+/* ===== 🎵 歌曲列表 ===== */
 const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3" },
-  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3" },
-  { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3" },
-  { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3" },
-  { title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3" },
-  { title: "Call of Silence", src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3" },
-  { title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3" },
-  { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3" },
-  { title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3" },
-  { title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3" },
-  { title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3" },
-  { title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3" },
-  { title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3" },
-  { title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3" },
-  { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3" },
-  { title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3" },
-  { title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3" },
-  { title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3" },
-  { title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3" },
-  { title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3" },
-  { title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3" },
-  { title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3" },
-  { title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3" },
-  { title: "One Last Kiss", src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3" },
-  { title: "secret base", src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3" },
-  { title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3" },
-  { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3" },
-  { title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3" },
-  { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3" },
-  { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3" },
+  { 
+    title: "My Soul, Your Beats!", 
+    src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", 
+    cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" 
+  },
+  { 
+    title: "My Most Precious Treasure", 
+    src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", 
+    cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg" 
+  },
+  { 
+    title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", 
+    src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", 
+    cover: "assets/Shiteki.jpg" 
+  },
+  { 
+    title: "Last regrets, foretting me", 
+    src: "assets/Last regrets,foretting me.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Megumeru Gensoukyoku", 
+    src: "assets/Megumeru Gensoukyoku.mp3", 
+    cover: "assets/Megumeru Gensoukyoku.jpg" 
+  },
+  { 
+    title: "Call of Silence", 
+    src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Only my Railgun OP1 fripSide", 
+    src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Aoi Tori - The iDOLM", 
+    src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "鬼滅之刃 OPLiSA - 紅蓮華", 
+    src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Flower Dance - DJ Okawari", 
+    src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", 
+    cover: "Flower Dance - DJ Okawari.jpg" 
+  },
+  { 
+    title: "theme of SSS -Piano Arrange ", 
+    src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "My Soul, Your Beats! Classic", 
+    src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", 
+    cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" 
+  },
+  { 
+    title: "Pachelbel's Canon", 
+    src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Heroism endures in nothingness", 
+    src: "assets/英雄主义-在虚无中永存.mp3", 
+    cover: "assets/Elysia.png" 
+  },
+  { 
+    title: "诀别书", 
+    src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Key anime piano medley", 
+    src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Crying for Rain", 
+    src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "GIRLS BAND CRY", 
+    src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Hikari no Senritsu", 
+    src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "LEVEL5 -judgelight", 
+    src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Majo no Tabitabi", 
+    src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "My Dearest ", 
+    src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", 
+    cover: "assets/Mydearest.png" 
+  },
+  { 
+    title: "Ninelie Kabaneri", 
+    src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "One Last Kiss", 
+    src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "secret base", 
+    src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Blue Bird 2022 ver.", 
+    src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "AKIBA POP the Future - Pianeet", 
+    src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "SWORD ART ONLINE", 
+    src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "给我一首歌的时间", 
+    src: "assets/给我一首歌的时间 piano ver-.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "晴天", 
+    src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", 
+    cover: "assets/banner1.jpg" 
+  }
 ];
 
 let currentSong = 0;
@@ -711,12 +831,7 @@ const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
 const playlist = document.getElementById("playlist");
 
-function preloadNext() {
-  const nextIndex = (currentSong + 1) % songs.length;
-  const nextAudio = new Audio(songs[nextIndex].src);
-  nextAudio.preload = "auto";
-}
-
+/* ======== 播放列表渲染 ======== */
 function renderPlaylist() {
   playlist.innerHTML = songs.map((s, i) => `
     <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
@@ -724,15 +839,18 @@ function renderPlaylist() {
     </div>`).join("");
 }
 
+/* ======== 更新播放歌曲 ======== */
 function updateSong() {
-  titleEl.textContent = songs[currentSong].title;
-  audio.src = songs[currentSong].src;
+  const song = songs[currentSong];
+  audio.src = song.src;
+  titleEl.textContent = song.title;
   audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
-  preloadNext();
+  updateMediaSession(song);
 }
 
+/* ======== 控制按钮 ======== */
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -752,56 +870,33 @@ audio.addEventListener("ended", () => nextBtn.click());
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
 
-renderPlaylist();
-updateSong();
-
-// === 🎧 Media Session API: 灵动岛 + 锁屏封面 ===
-if ("mediaSession" in navigator) {
-  function updateMediaSession() {
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: songs[currentSong].title,
-        artist: "Elysia Player",
-        album: "Piano Collection",
-        artwork: [
-          { src: "assets/banner.jpg", sizes: "96x96", type: "image/jpeg" },
-          { src: "assets/banner.jpg", sizes: "128x128", type: "image/jpeg" },
-          { src: "assets/banner.jpg", sizes: "192x192", type: "image/jpeg" },
-          { src: "assets/banner.jpg", sizes: "256x256", type: "image/jpeg" },
-          { src: "assets/banner.jpg", sizes: "512x512", type: "image/jpeg" }
-        ]
-      });
-
-      // 更新播放状态
-      if (!audio.paused) {
-        navigator.mediaSession.playbackState = "playing";
-      } else {
-        navigator.mediaSession.playbackState = "paused";
-      }
-    } catch (e) {
-      console.warn("MediaSession update failed:", e);
-    }
+/* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [
+        { src: song.cover, sizes: "96x96", type: "image/jpeg" },
+        { src: song.cover, sizes: "128x128", type: "image/jpeg" },
+        { src: song.cover, sizes: "192x192", type: "image/jpeg" },
+        { src: song.cover, sizes: "256x256", type: "image/jpeg" },
+        { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+      ]
+    });
+    navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+  } catch(e) {
+    console.warn("MediaSession update failed:", e);
   }
-
-  // 每次切歌都更新灵动岛封面与标题
-  updateMediaSession();
-
-  // 在播放、暂停、结束时刷新状态
-  audio.addEventListener("play", () => {
-    navigator.mediaSession.playbackState = "playing";
-    updateMediaSession();
-  });
-
-  audio.addEventListener("pause", () => {
-    navigator.mediaSession.playbackState = "paused";
-  });
-
-  audio.addEventListener("ended", () => {
-    navigator.mediaSession.playbackState = "none";
-  });
 }
 
-/* 播放列表交互 */
+audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
+audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
+audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
+
+/* ======== 播放列表点击 ======== */
 playlist.addEventListener("click", e => {
   const item = e.target.closest(".playlist-item");
   if (item) {
@@ -810,36 +905,29 @@ playlist.addEventListener("click", e => {
   }
 });
 
-/* 打开/关闭 播放列表：替换 toggle 为带动画的逻辑 */
+/* ======== 打开/关闭播放列表 ======== */
 function openPlaylist() {
-  // remove hide if present, add show
   playlist.classList.remove("hide");
   playlist.classList.add("show");
   playlist.setAttribute('aria-hidden', 'false');
 }
 function closePlaylist() {
-  // play close animation, then remove show
   playlist.classList.remove("show");
   playlist.classList.add("hide");
   playlist.setAttribute('aria-hidden', 'true');
-  // 确保 hide 动画结束后清理类（时间与 CSS 中 close 动画保持一致）
-  setTimeout(() => playlist.classList.remove("hide"), 480);
 }
 
 titleEl.addEventListener("click", e => {
   e.stopPropagation();
-  if (playlist.classList.contains("show")) closePlaylist();
-  else openPlaylist();
+  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
 });
-
-/* 点击空白处关闭（带动画） */
 document.addEventListener("click", e => {
   if (!playlist.contains(e.target) && e.target !== titleEl) {
     if (playlist.classList.contains("show")) closePlaylist();
   }
 });
 
-/* 无操作自动隐藏播放器（保持原逻辑） */
+/* ======== 自动隐藏播放器 ======== */
 let inactivityTimer;
 function hidePlayer() {
   player.style.opacity = '0';
@@ -861,6 +949,9 @@ function resetTimer() {
   window.addEventListener(evt, showPlayer)
 );
 resetTimer();
+
+renderPlaylist();
+updateSong();
 </script>
 
 <style>
@@ -1018,6 +1109,7 @@ resetTimer();
 
 /* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
+
 
 <script>
 document.querySelectorAll('a[href]').forEach(a => {

@@ -302,11 +302,6 @@ function resetTimer() {
   window.addEventListener(evt, showPlayer)
 );
 
-/* ======== 初始化 ======== */
-renderPlaylist();
-updateSong();
-resetTimer();
-
 
 /* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
 function updateMediaSession(song) {
@@ -395,6 +390,10 @@ function resetTimer() {
 ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
   window.addEventListener(evt, showPlayer)
 );
+
+/* ======== 初始化 ======== */
+renderPlaylist();
+updateSong();
 resetTimer();
 </script>
 

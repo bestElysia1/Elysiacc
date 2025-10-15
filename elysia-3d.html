@@ -1,203 +1,349 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Elysia Player — 分组版</title>
-  <style>
-    /* ====== Elysia 分组版（淡紫液态风） ====== */
-    :root{
-      --accent: #a06bff;
-      --text: #6a4fa5;
-      --glass: rgba(255,255,255,0.65);
-      --glass-border: rgba(180,150,255,0.35);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Elysia — Player</title>
+<style>
+  :root{
+    --accent: #a06bff;
+    --text: #6a4fa5;
+    --glass: rgba(255,255,255,0.92);
+    --glass-semi: rgba(255,255,255,0.75);
+    --glass-border: rgba(180,150,255,0.35);
+  }
+  html,body{height:100%;margin:0;font-family:Inter, "PingFang SC","Microsoft Yahei",sans-serif;background:#ffffff;color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  /* subtle purple glow background */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(800px 400px at 10% 15%, rgba(205,171,255,0.10), transparent 12%),
+      radial-gradient(700px 350px at 85% 85%, rgba(180,140,255,0.08), transparent 12%),
+      linear-gradient(180deg,#ffffff,#fff8ff);
+    pointer-events:none;
+  }
 
-    html,body{
-      height:100%;
-      margin:0;
-      font-family: Inter, "PingFang SC","Microsoft Yahei",sans-serif;
-      background: linear-gradient(180deg, #fff8ff, #f8f2ff);
-      color: var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+  /* ========== Preloader overlay ========== */
+  .preloader {
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10000;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,255,0.96));
+    transition: opacity .45s ease, visibility .45s;
+  }
+  .preloader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+  .preloader .logo { display:flex;flex-direction:column;align-items:center;gap:12px; }
+  .preloader .badge{
+    width:86px;height:86px;border-radius:18px;
+    background: linear-gradient(135deg, rgba(192,150,255,0.22), rgba(230,200,255,0.12));
+    border:1px solid rgba(200,160,255,0.35);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:28px;
+    box-shadow: 0 12px 40px rgba(160,120,255,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+    transform-origin:center; animation: preBadge 1600ms cubic-bezier(.2,.9,.2,1) infinite;
+  }
+  @keyframes preBadge { 0%{transform:scale(1);}50%{transform:scale(1.06);}100%{transform:scale(1);} }
+  .preloader .text { color:var(--text); font-weight:700; letter-spacing:0.2px; }
 
-    /* ===== 播放器 ===== */
-    .elysia-player {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 8px 20px;
-      border-radius: 16px;
-      z-index: 9999;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px) saturate(160%);
-      -webkit-backdrop-filter: blur(12px) saturate(160%);
-      box-shadow: 0 8px 24px rgba(150,110,240,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: opacity .6s ease, transform .6s ease;
-      will-change: transform, opacity;
-      animation: elysiaFloat 6s ease-in-out infinite;
-    }
-    @keyframes elysiaFloat {
-      0%,100%{ transform: translateX(-50%) translateY(0); }
-      50%{ transform: translateX(-50%) translateY(-6px); }
-    }
+  /* ========== Player (liquid card) ========== */
+  .elysia-player {
+    position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:9999;
+    display:flex; align-items:center; gap:14px; padding:10px 20px; border-radius:16px;
+    background: var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: 0 12px 40px rgba(160,120,255,0.16), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: opacity .45s ease, transform .45s ease;
+    will-change: transform, opacity;
+    animation: elysiaFloat 6s ease-in-out infinite;
+  }
+  @keyframes elysiaFloat { 0%,100%{ transform: translateX(-50%) translateY(0);} 50%{ transform: translateX(-50%) translateY(-6px);} }
 
-    .elysia-controls { display:flex; gap:10px; }
-    .elysia-controls button {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,0.85); border: 1px solid rgba(200,170,255,0.6);
-      color: var(--text); cursor: pointer; transition: all .2s ease; font-weight:600;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 6px 18px rgba(160,120,255,0.08);
-    }
-    .elysia-controls button:hover { transform: scale(1.06); box-shadow: 0 8px 22px rgba(160,120,255,0.18); }
+  .controls { display:flex; gap:10px; align-items:center; }
+  .btn {
+    width:36px; height:36px; border-radius:50%; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+    border:1px solid rgba(200,170,255,0.6); display:flex;align-items:center;justify-content:center;
+    color:var(--text); font-weight:700; cursor:pointer; box-shadow: 0 6px 18px rgba(160,120,255,0.08);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover{ transform:scale(1.06); box-shadow: 0 10px 26px rgba(160,120,255,0.14); }
 
-    /* 播放器标题（点击弹出列表） */
-    #songTitle {
-      color: var(--text);
-      font-weight:600;
-      width:220px;
-      font-size:0.96rem;
-      text-shadow:0 0 6px rgba(200,170,255,0.18);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer;
-    }
+  #songTitle {
+    color:var(--text); font-weight:700; max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    cursor:pointer; text-shadow:0 0 8px rgba(200,170,255,0.18);
+  }
 
-    /* ===== 播放列表（分组） ===== */
-    .elysia-playlist {
-      position: fixed;
-      bottom: 78px;
-      left: 50%;
-      transform: translateX(-50%) scale(0.98);
-      transform-origin: 50% 100%;
-      width: 320px;
-      max-height: 360px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(180,150,255,0.32);
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      box-shadow: 0 10px 28px rgba(200,160,255,0.18);
-      overflow-y: auto;
-      opacity: 0; pointer-events: none;
-      transition: opacity .28s ease, transform .36s cubic-bezier(.2,.9,.2,1);
-      z-index: 9998;
-    }
+  /* small cover left */
+  .cover {
+    width:46px; height:46px; border-radius:10px; overflow:hidden; flex:0 0 46px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,240,255,0.6));
+    border:1px solid rgba(200,170,255,0.35);
+    box-shadow: 0 6px 18px rgba(160,120,255,0.06);
+  }
+  .cover img { width:100%; height:100%; object-fit:cover; display:block; }
 
-    .playlist-group {
-      font-weight:700;
-      font-size:0.9rem;
-      color: var(--accent);
-      padding: 8px 10px;
-      margin-top: 6px;
-      border-radius: 8px;
-      background: linear-gradient(180deg, rgba(230,220,255,0.7), rgba(245,240,255,0.6));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-      letter-spacing: 0.2px;
-    }
+  /* ===== playlist (grouped) ===== */
+  .elysia-playlist {
+    position:fixed; left:50%; bottom:78px; transform:translateX(-50%) scale(0.98); transform-origin:50% 100%;
+    width:340px; max-height:380px; padding:12px; border-radius:14px;
+    background: rgba(255,255,255,0.95); border:1px solid rgba(180,150,255,0.32);
+    backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: 0 12px 34px rgba(200,160,255,0.12); overflow:auto; opacity:0; pointer-events:none;
+    transition: opacity .28s ease, transform .36s cubic-bezier(.2,.9,.2,1);
+    z-index:9998;
+  }
+  .elysia-playlist.show{ opacity:1; pointer-events:auto; transform:translateX(-50%) scale(1); }
+  .group-title {
+    font-weight:700; color:var(--accent); padding:8px 10px; margin-top:8px; border-radius:8px;
+    background: linear-gradient(180deg, rgba(240,230,255,0.8), rgba(250,245,255,0.85));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .track {
+    padding:8px 10px; margin-top:6px; border-radius:8px; cursor:pointer; color:var(--text); text-align:left;
+    transition: background .18s, transform .12s;
+  }
+  .track:hover{ background: rgba(180,140,255,0.12); transform: translateX(6px); color:#fff; }
+  .track.active{ background: linear-gradient(90deg, rgba(180,140,255,0.24), rgba(200,160,255,0.16)); color:#fff; box-shadow:0 8px 22px rgba(160,120,255,0.12); }
 
-    .playlist-item {
-      padding: 8px 10px;
-      color: var(--text);
-      font-size: 0.95rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 6px;
-      transition: background .18s, color .18s, transform .12s;
-      background: transparent;
-      text-align: left;
-    }
-    .playlist-item:hover {
-      background: rgba(180,140,255,0.12);
-      color: #fff;
-      transform: translateX(4px);
-    }
-    .playlist-item.active {
-      background: linear-gradient(90deg, rgba(180,140,255,0.24), rgba(200,160,255,0.16));
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(160,120,255,0.18);
-    }
+  /* footer */
+  footer.copyright { position:fixed; left:50%; transform:translateX(-50%); bottom:6px; color:rgba(120,90,180,0.56); font-size:0.78rem; }
 
-    .elysia-playlist.show {
-      opacity: 1; pointer-events: auto;
-      transform: translateX(-50%) scale(1);
-    }
-    .elysia-playlist.hide {
-      opacity: 0; pointer-events: none;
-      transform: translateX(-50%) scale(0.98);
-    }
-
-    /* 小提示 */
-    footer.copyright {
-      position: fixed; left: 50%; transform: translateX(-50%); bottom: 6px;
-      color: rgba(120,90,180,0.6); font-size: 0.78rem;
-    }
-
-    /* scrollbar 美化（简单） */
-    .elysia-playlist::-webkit-scrollbar { width:10px; }
-    .elysia-playlist::-webkit-scrollbar-thumb { background: rgba(180,140,255,0.26); border-radius:8px; }
-    .elysia-playlist::-webkit-scrollbar-track { background: transparent; }
-
-    @media (max-width:420px){
-      .elysia-playlist { width: 90%; left: 50%; transform: translateX(-50%); }
-      #songTitle { width: 120px; }
-    }
-  </style>
+  /* responsive */
+  @media (max-width:420px){
+    .elysia-playlist { width:92%; left:50%; transform:translateX(-50%); }
+    #songTitle { max-width:120px; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- === Elysia 播放器（分组版） === -->
-  <div class="elysia-player" role="group" aria-label="Elysia Player">
-    <div class="elysia-controls" aria-hidden="true">
-      <button id="playPauseBtn" title="播放/暂停">▶</button>
-      <button id="nextBtn" title="下一首">⏭</button>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader" role="status" aria-live="polite">
+    <div class="logo">
+      <div class="badge">E</div>
+      <div class="text">Elysia — 加载中…</div>
     </div>
-    <span id="songTitle" class="clickable" role="button" tabindex="0" aria-expanded="false">加载中...</span>
   </div>
 
+  <!-- Player -->
+  <div class="elysia-player" role="group" aria-label="Elysia Player">
+    <div class="cover" id="cover"><img src="assets/banner1.jpg" alt="cover"></div>
+    <div class="controls" aria-hidden="true">
+      <button class="btn" id="playPauseBtn" title="播放/暂停">▶</button>
+      <button class="btn" id="nextBtn" title="下一首">⏭</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
+      <div id="songTitle" class="clickable" role="button" tabindex="0" aria-expanded="false">加载中...</div>
+      <div id="songArtist" style="font-size:0.78rem;color:rgba(120,90,180,0.6)">Elysia Collection</div>
+    </div>
+  </div>
+
+  <!-- Playlist -->
   <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
   <footer class="copyright">© bestElysia 2025</footer>
 
-  <script>
-    /* ====== 你的歌曲（已分组） ====== */
-    const songs = [
-      /* 🎧 Key & Visual Arts Collection */
-      { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3", cover: "assets/Megumeru Gensoukyoku.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", cover: "assets/theme of SSS.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", cover: "assets/Key anime piano medley.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", cover: "assets/Shiteki.jpg" },
-      { group: "🎧 Key & Visual Arts Collection", title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", cover: "assets/banner1.jpg" },
+<script>
+/* ===== songs list (full from your data) ===== */
+const songs = [
+  /* 🎧 Key & Visual Arts Collection */
+  { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", cover: "assets/Shiteki.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3", cover: "assets/Megumeru Gensoukyoku.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", cover: "assets/theme of SSS.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", cover: "assets/Key anime piano medley.jpg" },
+  { group: "🎧 Key & Visual Arts Collection", title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", cover: "assets/banner1.jpg" },
 
-      /* 🎹 Healing & Piano Works */
-      { group: "🎹 Healing & Piano Works", title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg" },
-      { group: "🎹 Healing & Piano Works", title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/Elysia11.jpg" },
-      { group: "🎹 Healing & Piano Works", title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3", cover: "assets/heroism endures in nothingness.jpg" },
-      { group: "🎹 Healing & Piano Works", title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", cover: "assets/Mydearest.jpg" },
+  /* 🎹 Healing & Piano Works */
+  { group: "🎹 Healing & Piano Works", title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg" },
+  { group: "🎹 Healing & Piano Works", title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/Elysia11.jpg" },
+  { group: "🎹 Healing & Piano Works", title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3", cover: "assets/heroism endures in nothingness.jpg" },
+  { group: "🎹 Healing & Piano Works", title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", cover: "assets/Mydearest.jpg" },
 
-      /* 🪩 Anime & J-Pop Selection */
-      { group: "🪩 Anime & J-Pop Selection", title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", cover: "assets/Level5.jpg" },
-      { group: "🪩 Anime & J-Pop Selection", title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3", cover: "assets/Shinobu Kocho.jpg" },
-      { group: "🪩 Anime & J-Pop Selection", title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", cover: "assets/banner1.jpg" },
-      { group: "🪩 Anime & J-Pop Selection", title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", cover: "assets/GIRLS BAND CRY.jpg" },
-      { group: "🪩 Anime & J-Pop Selection", title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", cover: "assets/banner1.jpg" },
-      { group: "🪩 Anime & J-Pop Selection", title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", cover: "assets/banner1.jpg" },
+  /* 🪩 Anime & J-Pop Selection */
+  { group: "🪩 Anime & J-Pop Selection", title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", cover: "assets/Level5.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", cover: "assets/Aoi Tori - The iDOLM.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/鬼滅之刃 OPLiSA - 紅蓮華 Piano Cover.mp3", cover: "assets/Shinobu Kocho.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", cover: "assets/GIRLS BAND CRY.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", cover: "assets/banner1.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", cover: "assets/banner1.jpg" },
+  { group: "🪩 Anime & J-Pop Selection", title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", cover: "assets/banner1.jpg" },
 
-      /* 💫 Game & Fantasy Themes */
-      { group: "💫 Game & Fantasy Themes", title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", cover: "assets/banner1.jpg" },
-      { group: "💫 Game & Fantasy Themes", title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", cover: "assets/Majo no Tabitabi.jpg" },
-      { group: "💫 Game & Fantasy Themes", title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", cover: "assets/ninelie.jpg" },
-      { group: "💫 Game & Fantasy Themes", title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg" },
-      { group: "💫 Game & Fantasy Themes", title: "One Last Kiss", src: "assets/One Last Kiss - Evangel
+  /* 💫 Game & Fantasy Themes */
+  { group: "💫 Game & Fantasy Themes", title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", cover: "assets/banner1.jpg" },
+  { group: "💫 Game & Fantasy Themes", title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", cover: "assets/Majo no Tabitabi.jpg" },
+  { group: "💫 Game & Fantasy Themes", title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", cover: "assets/ninelie.jpg" },
+  { group: "💫 Game & Fantasy Themes", title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg" },
+  { group: "💫 Game & Fantasy Themes", title: "One Last Kiss", src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", cover: "assets/one last kiss.jpg" },
+
+  /* 🎵 Classic & Emotional Piano */
+  { group: "🎵 Classic & Emotional Piano", title: "secret base", src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", cover: "assets/secret base.jpg" },
+  { group: "🎵 Classic & Emotional Piano", title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", cover: "assets/banner1.jpg" },
+
+  /* 🌙 华语钢琴改编 */
+  { group: "🌙 华语钢琴改编", title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg" },
+  { group: "🌙 华语钢琴改编", title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg" }
+];
+
+/* ===== state ===== */
+let currentIndex = 0;
+const audio = new Audio();
+audio.preload = 'auto';
+const coverEl = document.getElementById('cover').querySelector('img');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const nextBtn = document.getElementById('nextBtn');
+const titleEl = document.getElementById('songTitle');
+const playlistEl = document.getElementById('playlist');
+const preloader = document.getElementById('preloader');
+
+/* ===== preload images & first audio ===== */
+function preloadAssets() {
+  // preload covers
+  songs.forEach(s => {
+    if (s.cover) {
+      const img = new Image();
+      img.src = s.cover;
+    }
+  });
+  // preload first audio partially
+  audio.src = songs[0].src;
+  audio.load();
+}
+
+/* ===== media session update ===== */
+function updateMediaSession(song) {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: 'Elysia',
+      album: song.group || 'Collection',
+      artwork: [
+        { src: song.cover, sizes: '96x96', type: 'image/jpeg' },
+        { src: song.cover, sizes: '192x192', type: 'image/jpeg' },
+        { src: song.cover, sizes: '512x512', type: 'image/jpeg' }
+      ]
+    });
+    navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+    navigator.mediaSession.setActionHandler('previoustrack', ()=>{ /* no-op */ });
+    navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+    navigator.mediaSession.setActionHandler('play', () => audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+  } catch(e){ console.warn(e); }
+}
+
+/* ===== render grouped playlist ===== */
+function renderPlaylist() {
+  let html = '';
+  let lastGroup = '';
+  songs.forEach((s, i) => {
+    if (s.group !== lastGroup) {
+      lastGroup = s.group;
+      html += `<div class="group-title">${escapeHtml(lastGroup)}</div>`;
+    }
+    html += `<div class="track ${i===currentIndex?'active':''}" data-index="${i}">${escapeHtml(s.title)}</div>`;
+  });
+  playlistEl.innerHTML = html;
+}
+
+/* ===== escape helper ===== */
+function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== update UI for current track ===== */
+function updateUI() {
+  const s = songs[currentIndex];
+  titleEl.textContent = s.title;
+  coverEl.src = s.cover || 'assets/banner1.jpg';
+  // mark active
+  playlistEl.querySelectorAll('.track').forEach(el => el.classList.remove('active'));
+  const active = playlistEl.querySelector(`.track[data-index="${currentIndex}"]`);
+  if (active) active.classList.add('active');
+  updateMediaSession(s);
+}
+
+/* ===== play functions ===== */
+function playIndex(i) {
+  currentIndex = i;
+  audio.src = songs[currentIndex].src;
+  audio.play().catch(()=>{});
+  updateUI();
+  playPauseBtn.textContent = '⏸';
+}
+function playNext() {
+  currentIndex = (currentIndex + 1) % songs.length;
+  playIndex(currentIndex);
+}
+
+/* ===== button handlers ===== */
+playPauseBtn.addEventListener('click', () => {
+  if (audio.paused) { audio.play(); playPauseBtn.textContent='⏸'; }
+  else { audio.pause(); playPauseBtn.textContent='▶'; }
+});
+nextBtn.addEventListener('click', playNext);
+
+/* ===== audio events ===== */
+audio.addEventListener('play', ()=> { playPauseBtn.textContent='⏸'; document.querySelector('.elysia-player').classList.add('playing'); updateMediaSession(songs[currentIndex]); });
+audio.addEventListener('pause', ()=> { playPauseBtn.textContent='▶'; document.querySelector('.elysia-player').classList.remove('playing'); updateMediaSession(songs[currentIndex]); });
+audio.addEventListener('ended', () => { playNext(); });
+
+/* ===== playlist click ===== */
+playlistEl.addEventListener('click', e => {
+  const t = e.target.closest('.track');
+  if (!t) return;
+  const idx = parseInt(t.dataset.index,10);
+  if (!isNaN(idx)) playIndex(idx);
+});
+
+/* ===== toggle playlist ===== */
+titleEl.addEventListener('click', e => {
+  e.stopPropagation();
+  const shown = playlistEl.classList.toggle('show');
+  titleEl.setAttribute('aria-expanded', shown ? 'true' : 'false');
+});
+document.addEventListener('click', e => {
+  if (!playlistEl.contains(e.target) && e.target !== titleEl) playlistEl.classList.remove('show');
+});
+
+/* ===== auto-hide player after inactivity ===== */
+let inactivityTimer;
+function resetInactivity() {
+  clearTimeout(inactivityTimer);
+  document.querySelector('.elysia-player').style.opacity = '1';
+  document.querySelector('.elysia-player').style.transform = 'translateX(-50%) translateY(0)';
+  inactivityTimer = setTimeout(() => {
+    const pl = document.querySelector('.elysia-player');
+    pl.style.opacity='0'; pl.style.transform='translateX(-50%) translateY(40px)'; playlistEl.classList.remove('show');
+  }, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(ev => window.addEventListener(ev, resetInactivity));
+resetInactivity();
+
+/* ===== utility: preload & init ===== */
+function init() {
+  preloadAssets();
+  renderPlaylist();
+  // start with first track loaded but not auto-play (we loaded audio.src earlier)
+  updateUI();
+  // hide preloader after small delay to show polish
+  setTimeout(()=>{ preloader.classList.add('hidden'); }, 600);
+}
+
+/* ===== small helper to ensure images/audio cached before showing (graceful) ===== */
+window.addEventListener('load', ()=> {
+  // try to decode first cover image for smoother display
+  const img = new Image();
+  img.src = (songs[0] && songs[0].cover) ? songs[0].cover : 'assets/banner1.jpg';
+  img.onload = ()=>{ init(); };
+  img.onerror = ()=>{ init(); };
+});
+
+/* ===== keyboard shortcuts ===== */
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); playPauseBtn.click(); }
+  if (e.code === 'ArrowRight') playNext();
+});
+
+/* ===== expose for debugging if needed ===== */
+window.ElysiaPlayer = { songs, playIndex, playNext };
+</script>
+</body>
+</html>

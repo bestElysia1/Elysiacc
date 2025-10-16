@@ -211,43 +211,26 @@ main.container li:hover {
   text-shadow: 0 0 6px rgba(156,107,255,0.4);
   transition: all 0.3s ease;
 }
+
 .elysia-video-bg {
   position: relative;
   width: 100%;
-  max-width: 900px; /* 控制视频最大宽度 */
-  margin: 40px auto;
+  aspect-ratio: 16 / 9;
   border-radius: 20px;
   overflow: hidden;
-  background: url("assets/elysiatest.png") center center / cover no-repeat; /* 预加载封面 */
-  aspect-ratio: 16 / 9; /* 保持视频比例 */
+  background: #000;
 }
 
+.elysia-video-bg img,
 .elysia-video-bg video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* 不拉伸视频 */
-  display: block;
-}
-.elysia-video-bg {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9; /* 保持视频比例一致，可改成 4/3 或 21/9 */
-  border-radius: 12px;
-  overflow: hidden;
-  background: url("assets/cover.jpg") center/cover no-repeat;
-}
-
-.elysia-video-bg video,
-.elysia-video-bg img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 关键：填满容器并保持比例 */
+  object-fit: cover;
   border-radius: inherit;
 }
-
 
   </style>
 </head>

@@ -483,10 +483,10 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- 🎞 平滑切换视频容器 -->
+<!-- 🎞 稳定版视频容器 -->
 <div class="elysia-video-wrapper">
-  <video id="videoA" autoplay muted playsinline preload="auto"></video>
-  <video id="videoB" muted playsinline preload="auto"></video>
+  <video id="elysiaVideo" autoplay muted playsinline preload="auto"></video>
+  <div class="fade-layer"></div>
 </div>
 
 <style>
@@ -502,70 +502,64 @@ domain:chatgpt.com</pre>
   box-shadow: 0 0 30px rgba(150,120,255,0.15);
 }
 
-.elysia-video-wrapper video {
-  position: absolute;
-  top: 0; left: 0;
+#elysiaVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
   border-radius: 18px;
-  transition: opacity 0.8s ease-in-out;
-  background: #000;
 }
 
-#videoA { opacity: 1; }
-#videoB { opacity: 0; }
+.fade-layer {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  pointer-events: none;
+  border-radius: 18px;
+}
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const videos = [
+  const video = document.getElementById("elysiaVideo");
+  const fade = document.querySelector(".fade-layer");
+  const playlist = [
     "assets/elysiatest.mp4",
     "assets/elysiatest2.mp4",
     "assets/elysiatest3.mp4",
     "assets/elysiatest4.mp4",
     "assets/elysiatest5.mp4",
-    "assets/elysiatest6.mp4",
-    "assets/elysiatest7.mp4",
-    "assets/elysiatest8.mp4"
+    "assets/elysiatest6.mp4"
   ];
 
-  const videoA = document.getElementById("videoA");
-  const videoB = document.getElementById("videoB");
-  let current = videoA;
-  let next = videoB;
   let index = 0;
+  let nextVideo = document.createElement("video");
+  nextVideo.preload = "auto";
 
-  // 预加载
-  videos.forEach(src => {
-    const v = document.createElement("video");
-    v.src = src;
-    v.preload = "auto";
-  });
-
-  function playNextVideo() {
-    index = (index + 1) % videos.length;
-    next.src = videos[index];
-    next.currentTime = 0;
-
-    next.play().then(() => {
-      // 交叉淡入
-      next.style.opacity = "1";
-      current.style.opacity = "0";
-      setTimeout(() => {
-        current.pause();
-        const temp = current;
-        current = next;
-        next = temp;
-      }, 800);
-    }).catch(err => console.log("播放被阻止：", err));
+  function preloadNext() {
+    nextVideo.src = playlist[(index + 1) % playlist.length];
   }
 
-  // 初始播放
-  current.src = videos[index];
-  current.play().catch(err => console.log("自动播放被阻止：", err));
+  function switchVideo() {
+    fade.style.opacity = 1; // 开始淡出
+    setTimeout(() => {
+      index = (index + 1) % playlist.length;
+      video.src = nextVideo.src;
+      video.currentTime = 0;
+      video.play().catch(e => console.log("播放被阻止:", e));
+      preloadNext();
+      setTimeout(() => fade.style.opacity = 0, 300); // 淡入
+    }, 400);
+  }
 
-  current.addEventListener("ended", playNextVideo);
+  // 初始设置
+  video.src = playlist[index];
+  video.play().catch(e => console.log("自动播放被阻止:", e));
+  preloadNext();
+
+  video.addEventListener("ended", switchVideo);
 });
 </script>
 

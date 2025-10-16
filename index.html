@@ -211,24 +211,35 @@ main.container li:hover {
   text-shadow: 0 0 6px rgba(156,107,255,0.4);
   transition: all 0.3s ease;
 }
-<style>
 .elysia-video-bg {
   position: relative;
   width: 100%;
+  max-width: 900px; /* 控制视频最大宽度 */
+  margin: 40px auto;
+  border-radius: 20px;
   overflow: hidden;
+  background: url("assets/elysiatest.png") center center / cover no-repeat; /* 预加载封面 */
+  aspect-ratio: 16 / 9; /* 保持视频比例 */
 }
 
 .elysia-video-bg video {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain; /* 不拉伸视频 */
   display: block;
-  object-fit: contain; /* 保留原视频比例 */
 }
 
 
   </style>
 </head>
 <body>
+  <!-- === Elysia 视频区 === -->
+<div class="elysia-video-bg">
+  <video id="elysiaVideo" preload="auto" muted playsinline>
+    <source src="assets/elysiatest.mp4" type="video/mp4">
+    您的浏览器不支持视频播放。
+  </video>
+</div>
 <!-- 爱莉希雅入口按钮 -->
 <a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
   <span class="hb-line"></span>

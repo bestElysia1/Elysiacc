@@ -1220,26 +1220,25 @@ document.querySelectorAll('a[href]').forEach(a => {
 })();
 </script>
 
+<!-- === 视频与音乐播放同步脚本 === -->
 <script>
-<script>
-const video = document.getElementById("elysiaVideo");
-const cover = document.getElementById("elysiaVideoCover");
+document.addEventListener("DOMContentLoaded", function () {
+  const audio = document.querySelector("audio"); 
+  const video = document.querySelector(".elysia-video-bg video"); 
 
-// 示例：当音乐播放时开始视频，当音乐暂停时暂停视频
-// 假设你的音频播放器元素是 audioPlayer
-const audioPlayer = document.querySelector("audio");
+  if (!audio || !video) return;
 
-if (audioPlayer) {
-  audioPlayer.addEventListener("play", () => {
-    video.play();
-    cover.style.opacity = 0;
+  video.pause();
+
+  audio.addEventListener("play", function () {
+    video.muted = true;
+    video.play().catch(() => {});
   });
 
-  audioPlayer.addEventListener("pause", () => {
+  audio.addEventListener("pause", function () {
     video.pause();
-    // 保留视频画面，不再恢复封面
   });
-}
+});
 </script>
 
 </body>

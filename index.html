@@ -487,7 +487,7 @@ domain:chatgpt.com</pre>
 <!-- ===== 视频展示区 ===== -->
 <div class="elysia-video-container">
   <img id="elysia-cover" src="assets/elysiatest.png" alt="Elysia Cover" />
-  <video id="elysia-video" autoplay muted playsinline preload="auto" poster="assets/elysiatest.png">
+  <video id="elysia-video" playsinline muted preload="auto" poster="assets/elysiatest.png">
     <source src="assets/elysiatest.mp4" type="video/mp4">
   </video>
 </div>
@@ -509,7 +509,7 @@ domain:chatgpt.com</pre>
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 1s ease;
+  transition: opacity 0.8s ease;
 }
 
 #elysia-cover {
@@ -524,53 +524,6 @@ domain:chatgpt.com</pre>
   z-index: 1;
 }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('elysia-video');
-  const cover = document.getElementById('elysia-cover');
-  const audio = document.querySelector('audio');
-
-  if (!audio) {
-    console.warn("⚠️ 未找到 <audio> 元素，视频联动已禁用。");
-    return;
-  }
-
-  // 提前加载视频
-  video.load();
-
-  // 自动播放尝试（兼容 iOS）
-  const tryAutoPlay = () => {
-    const promise = video.play();
-    if (promise !== undefined) {
-      promise.catch(() => {
-        console.log("⚠️ 自动播放被阻止，等待用户交互");
-        const resume = () => {
-          video.play();
-          document.removeEventListener('touchstart', resume);
-          document.removeEventListener('click', resume);
-        };
-        document.addEventListener('touchstart', resume);
-        document.addEventListener('click', resume);
-      });
-    }
-  };
-  tryAutoPlay();
-
-  // 🎵 音乐播放时
-  audio.addEventListener('play', () => {
-    cover.style.opacity = '0';
-    setTimeout(() => {
-      tryAutoPlay();
-    }, 300);
-  });
-
-  // ⏸ 音乐暂停时
-  audio.addEventListener('pause', () => {
-    video.pause();
-  });
-});
-</script>
 
   <h2>一些实用&有趣的网址</h2>
   <ul>
@@ -1256,6 +1209,41 @@ document.querySelectorAll('a[href]').forEach(a => {
   }
   detect();
 })();
+</script>
+
+<script>
+// ===== Elysia 视频与音乐联动逻辑 =====
+document.addEventListener('DOMContentLoaded', () => {
+  const video = document.getElementById('elysia-video');
+  const cover = document.getElementById('elysia-cover');
+
+  // 因为 Elysia 播放器是动态创建 <audio> 的，所以我们轮询等待
+  const waitForAudio = setInterval(() => {
+    const audio = document.querySelector('audio');
+    if (audio) {
+      clearInterval(waitForAudio);
+      console.log("🎵 已检测到 Elysia 音频播放器");
+
+      // 音乐播放 → 视频播放 + 淡出封面
+      audio.addEventListener('play', () => {
+        cover.style.opacity = '0';
+        setTimeout(() => video.play().catch(err => console.warn('视频播放失败：', err)), 300);
+      });
+
+      // 音乐暂停 → 视频暂停
+      audio.addEventListener('pause', () => {
+        video.pause();
+      });
+
+      // 音乐播放结束 → 视频回到开头 + 显示封面
+      audio.addEventListener('ended', () => {
+        video.pause();
+        video.currentTime = 0;
+        cover.style.opacity = '1';
+      });
+    }
+  }, 500); // 每 0.5 秒检查一次 audio 是否存在
+});
 </script>
 
 

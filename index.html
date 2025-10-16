@@ -1212,40 +1212,57 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-// ===== Elysia 视频与音乐联动逻辑 =====
-document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('elysia-video');
-  const cover = document.getElementById('elysia-cover');
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("elysia-video");
+  const cover = document.getElementById("elysia-cover");
+  const playBtn = document.getElementById("playPauseBtn");
+  const nextBtn = document.getElementById("nextBtn");
 
-  // 因为 Elysia 播放器是动态创建 <audio> 的，所以我们轮询等待
-  const waitForAudio = setInterval(() => {
-    const audio = document.querySelector('audio');
-    if (audio) {
-      clearInterval(waitForAudio);
-      console.log("🎵 已检测到 Elysia 音频播放器");
+  // 视频列表（可以多段）
+  const videoList = [
+    "assets/elysiatest.mp4",
+    "assets/elysia2.mp4",
+    "assets/elysia3.mp4"
+  ];
+  let currentVideo = 0;
+  let isPlaying = false;
 
-      // 音乐播放 → 视频播放 + 淡出封面
-      audio.addEventListener('play', () => {
-        cover.style.opacity = '0';
-        setTimeout(() => video.play().catch(err => console.warn('视频播放失败：', err)), 300);
-      });
-
-      // 音乐暂停 → 视频暂停
-      audio.addEventListener('pause', () => {
-        video.pause();
-      });
-
-      // 音乐播放结束 → 视频回到开头 + 显示封面
-      audio.addEventListener('ended', () => {
-        video.pause();
-        video.currentTime = 0;
-        cover.style.opacity = '1';
-      });
+  // 点击播放按钮联动视频
+  playBtn.addEventListener("click", () => {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      cover.style.opacity = "0";
+      video.src = videoList[currentVideo];
+      video.muted = true;
+      video.play().catch(e => console.log("⚠️ 视频播放失败：", e));
+    } else {
+      video.pause();
     }
-  }, 500); // 每 0.5 秒检查一次 audio 是否存在
+  });
+
+  // 下一曲切换视频
+  nextBtn.addEventListener("click", () => {
+    currentVideo = (currentVideo + 1) % videoList.length;
+    video.src = videoList[currentVideo];
+    video.load();
+    if (isPlaying) video.play();
+  });
+
+  // 视频播放完自动换下一个
+  video.addEventListener("ended", () => {
+    currentVideo = (currentVideo + 1) % videoList.length;
+    video.src = videoList[currentVideo];
+    video.load();
+    if (isPlaying) video.play();
+  });
+
+  // 兼容 iPhone：第一次点击页面启用播放权限
+  document.addEventListener("click", () => {
+    video.muted = true;
+    video.play().then(() => video.pause());
+  }, { once: true });
 });
 </script>
-
 
 
 </body>

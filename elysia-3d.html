@@ -1,85 +1,94 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anime 弹出测试页</title>
-  <style>
-    /* === 页面液态柔光背景 === */
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at 30% 30%, #f8f3ff 0%, #eae6ff 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      font-family: "Poppins", "微软雅黑", sans-serif;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Elysia Anime 测试</title>
+<style>
+  :root {
+    --img-w: 320px;      /* 图片宽度 */
+    --off-rate: 0.45;    /* 图片有 45% 在屏幕外 */
+  }
 
-    /* 中间提示文字 */
-    h1 {
-      font-size: 1.6rem;
-      color: #a38aff;
-      text-shadow: 0 0 12px rgba(160,120,255,0.4);
-      user-select: none;
-    }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(180deg, #ffffff, #faf6ff);
+    font-family: "PingFang SC", "Microsoft Yahei", system-ui;
+    overflow: hidden;
+  }
 
-    /* === 动漫弹出图样式 === */
-    .elysia-anime-popup {
-      position: fixed;
-      top: 18%;
-      right: -120px; /* ✅ 图片有一半在屏幕外 */
-      width: 240px;
-      border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(180,140,255,0.45),
-                  inset 0 0 30px rgba(200,160,255,0.3);
-      opacity: 0;
-      transform: translateX(60px) scale(0.9);
-      pointer-events: none;
-      z-index: 99999;
-      animation: animeSlide 3s ease forwards;
-    }
+  .center-note {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #9b7fe7;
+    font-size: 1.3rem;
+    text-shadow: 0 0 20px rgba(170, 130, 255, 0.25);
+    user-select: none;
+  }
 
-    /* 🌸 弹出 + 漂浮 + 淡出动画 */
-    @keyframes animeSlide {
-      0% {
-        opacity: 0;
-        transform: translateX(60px) scale(0.9);
-        filter: blur(3px);
-      }
-      15% {
-        opacity: 1;
-        transform: translateX(0) scale(1.05);
-        filter: blur(0);
-      }
-      80% {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(20px) scale(0.9);
-        filter: blur(3px);
-      }
-    }
-  </style>
+  /* === 动漫图片容器 === */
+  .anime-popup-wrap {
+    position: fixed;
+    top: 15vh;
+    right: calc(var(--img-w) * -1 * var(--off-rate));
+    width: var(--img-w);
+    height: auto;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(50px) scale(0.95);
+    transition: all 0.8s ease;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 20px rgba(150, 110, 255, 0.25));
+  }
+
+  .anime-popup-wrap.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  .anime-popup {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 0 40px rgba(180, 140, 255, 0.35),
+                inset 0 0 20px rgba(210, 190, 255, 0.3);
+    animation: floaty 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes floaty {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+  }
+
+  footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #a38fe0;
+    opacity: 0.8;
+  }
+</style>
 </head>
 <body>
-  <h1>✨ 动漫人物半出画面弹出动画（3 秒后自动消失）</h1>
+  <div class="center-note">更多内容正在更新中...</div>
 
-  <!-- 🌙 动漫角色图 -->
-  <img src="banner1.jpg"
-       alt="anime"
-       class="elysia-anime-popup"
-       id="animePopup">
+  <div class="anime-popup-wrap" id="animePopup">
+    <img src="assets/banner1.jpg" alt="Elysia Anime" class="anime-popup">
+  </div>
+
+  <footer>© bestElysia 2025</footer>
 
   <script>
+    const popup = document.getElementById("animePopup");
     window.addEventListener("load", () => {
-      const popup = document.getElementById("animePopup");
-      popup.style.animationPlayState = "running";
-      // 动画结束后自动移除
-      setTimeout(() => popup.remove(), 3000);
+      popup.classList.add("show");
+      setTimeout(() => {
+        popup.classList.remove("show");
+      }, 3000); // 显示 3 秒后消失
     });
   </script>
 </body>

@@ -483,18 +483,10 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- 🎞 视频容器 -->
+<!-- 🎞 平滑切换视频容器 -->
 <div class="elysia-video-wrapper">
-  <video id="elysiaVideo" autoplay muted playsinline preload="auto">
-    <source src="assets/elysiatest.mp4" type="video/mp4">
-    <source src="assets/elysiatest2.mp4" type="video/mp4">
-    <source src="assets/elysiatest3.mp4" type="video/mp4">
-    <source src="assets/elysiatest4.mp4" type="video/mp4">
-    <source src="assets/elysiatest5.mp4" type="video/mp4">
-    <source src="assets/elysiatest6.mp4" type="video/mp4">
-    <source src="assets/elysiatest7.mp4" type="video/mp4">
-    <source src="assets/elysiatest8.mp4" type="video/mp4">
-  </video>
+  <video id="videoA" autoplay muted playsinline preload="auto"></video>
+  <video id="videoB" muted playsinline preload="auto"></video>
 </div>
 
 <style>
@@ -510,38 +502,68 @@ domain:chatgpt.com</pre>
   box-shadow: 0 0 30px rgba(150,120,255,0.15);
 }
 
-#elysiaVideo {
+.elysia-video-wrapper video {
+  position: absolute;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 18px;
-  display: block;
+  transition: opacity 0.8s ease-in-out;
   background: #000;
 }
+
+#videoA { opacity: 1; }
+#videoB { opacity: 0; }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const video = document.getElementById("elysiaVideo");
-  const sources = Array.from(video.querySelectorAll("source")).map(s => s.src);
+  const videos = [
+    "assets/elysiatest.mp4",
+    "assets/elysiatest2.mp4",
+    "assets/elysiatest3.mp4",
+    "assets/elysiatest4.mp4",
+    "assets/elysiatest5.mp4",
+    "assets/elysiatest6.mp4"
+  ];
+
+  const videoA = document.getElementById("videoA");
+  const videoB = document.getElementById("videoB");
+  let current = videoA;
+  let next = videoB;
   let index = 0;
 
-  // 自动切换到下一个视频
-  video.addEventListener("ended", () => {
-    index = (index + 1) % sources.length;
-    video.src = sources[index];
-    video.play().catch(err => console.log("视频播放被阻止：", err));
-  });
-
-  // 预加载所有视频
-  sources.forEach(src => {
+  // 预加载
+  videos.forEach(src => {
     const v = document.createElement("video");
     v.src = src;
     v.preload = "auto";
   });
 
-  // 自动播放尝试
-  video.play().catch(err => console.log("自动播放被阻止：", err));
+  function playNextVideo() {
+    index = (index + 1) % videos.length;
+    next.src = videos[index];
+    next.currentTime = 0;
+
+    next.play().then(() => {
+      // 交叉淡入
+      next.style.opacity = "1";
+      current.style.opacity = "0";
+      setTimeout(() => {
+        current.pause();
+        const temp = current;
+        current = next;
+        next = temp;
+      }, 800);
+    }).catch(err => console.log("播放被阻止：", err));
+  }
+
+  // 初始播放
+  current.src = videos[index];
+  current.play().catch(err => console.log("自动播放被阻止：", err));
+
+  current.addEventListener("ended", playNextVideo);
 });
 </script>
 

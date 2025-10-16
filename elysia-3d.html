@@ -1,67 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Banner Test</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banner 视频预加载测试</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at center, #1b1b2f, #0a0a16);
+      background: #000;
       overflow: hidden;
-      font-family: 'Poppins', sans-serif;
+      font-family: "Segoe UI", sans-serif;
     }
 
-    /* ===== 动画视频容器 ===== */
     .banner-container {
-      position: fixed;
-      top: 10%;
-      right: -5%; /* 一半在屏幕外 */
-      transform: translateY(0);
-      opacity: 0;
-      transition: opacity 1s ease, transform 1s ease;
-      z-index: 999;
+      position: relative;
+      width: 100%;
+      height: 400px; /* 你可以改成和原网页一致的高度 */
+      overflow: hidden;
+      background: #000;
     }
 
-    .banner-container.show {
-      opacity: 1;
-      transform: translateY(10px);
-    }
-
-    .banner-container.hide {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-
-    /* ===== 视频样式 ===== */
-    .banner-container video {
-      width: 320px;
-      height: auto;
-      border-radius: 12px;
+    .banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      box-shadow: 0 0 35px rgba(180,120,255,0.4);
-      filter: brightness(0.95) saturate(1.1);
+      transition: opacity 1s ease;
+    }
+
+    #bannerVideo {
+      display: none;
+      opacity: 0;
+    }
+
+    .text-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 30px;
+      color: white;
+      font-size: 24px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      z-index: 10;
     }
   </style>
 </head>
 <body>
 
-  <!-- 弹出的视频元素 -->
-  <div class="banner-container" id="popupVideo">
-    <video src="assets/banner.mp4" autoplay muted playsinline></video>
+  <div class="banner-container">
+    <!-- 初始图片 -->
+    <img id="bannerImage" src="assets/banner1.jpg" alt="Banner" class="banner" />
+
+    <!-- 视频（隐藏预加载） -->
+    <video id="bannerVideo" class="banner" muted loop playsinline preload="auto">
+      <source src="assets/banner.mp4" type="video/mp4">
+    </video>
+
+    <div class="text-overlay">测试版：视频预加载展示</div>
   </div>
 
   <script>
-    window.addEventListener("load", () => {
-      const popup = document.getElementById("popupVideo");
-      popup.classList.add("show");
+    const bannerImage = document.getElementById('bannerImage');
+    const bannerVideo = document.getElementById('bannerVideo');
 
-      // 3 秒后自动淡出
+    bannerVideo.addEventListener('canplaythrough', () => {
+      // 视频可播放后淡入替换图片
+      bannerVideo.style.display = 'block';
       setTimeout(() => {
-        popup.classList.add("hide");
-        setTimeout(() => popup.remove(), 1000); // 彻底移除
-      }, 3000);
+        bannerImage.style.opacity = '0';
+        bannerVideo.style.opacity = '1';
+        bannerVideo.play();
+        setTimeout(() => {
+          bannerImage.style.display = 'none';
+        }, 1000);
+      }, 200);
     });
   </script>
 

@@ -485,7 +485,16 @@ domain:chatgpt.com</pre>
 
 <!-- 🎞 视频容器 -->
 <div class="elysia-video-wrapper">
-  <video id="elysiaVideo" autoplay muted playsinline preload="auto"></video>
+  <video id="elysiaVideo" autoplay muted playsinline preload="auto">
+    <source src="assets/elysiatest.mp4" type="video/mp4">
+    <source src="assets/elysiatest2.mp4" type="video/mp4">
+    <source src="assets/elysiatest3.mp4" type="video/mp4">
+    <source src="assets/elysiatest4.mp4" type="video/mp4">
+    <source src="assets/elysiatest5.mp4" type="video/mp4">
+    <source src="assets/elysiatest6.mp4" type="video/mp4">
+    <source src="assets/elysiatest7.mp4" type="video/mp4">
+    <source src="assets/elysiatest8.mp4" type="video/mp4">
+  </video>
 </div>
 
 <style>
@@ -534,50 +543,32 @@ domain:chatgpt.com</pre>
   object-fit: cover;
   display: block;
   border-radius: 18px;
-  transition: opacity 0.8s ease;
 }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("elysiaVideo");
-  const videoList = [
-    "assets/elysiatest.mp4",
-    "assets/elysiatest2.mp4",
-    "assets/elysiatest3.mp4",
-    "assets/elysiatest4.mp4",
-    "assets/elysiatest5.mp4",
-    "assets/elysiatest6.mp4",
-    "assets/elysiatest7.mp4",
-    "assets/elysiatest8.mp4"
-  ];
+  const sources = video.querySelectorAll("source");
   let index = 0;
 
-  // 初始化视频
-  video.src = videoList[index];
-  video.load();
-  video.play().catch(err => console.log("自动播放被阻止：", err));
-
-  // 视频结束时切换到下一个
+  // 监听播放结束事件，切换到下一个视频
   video.addEventListener("ended", () => {
-    video.style.opacity = 0; // 淡出
-    index = (index + 1) % videoList.length;
-    setTimeout(() => {
-      video.src = videoList[index];
-      video.load();
-      video.play().catch(err => console.log("视频切换失败：", err));
-      video.style.opacity = 1; // 淡入
-    }, 400);
+    index = (index + 1) % sources.length;
+    video.src = sources[index].src;
+    video.load();
+    video.play().catch(err => console.log("视频自动播放被阻止：", err));
   });
 
-  // 预加载全部视频
-  videoList.forEach(src => {
-    const preload = document.createElement("link");
-    preload.rel = "preload";
-    preload.as = "video";
-    preload.href = src;
-    document.head.appendChild(preload);
+  // 预加载所有视频
+  sources.forEach(src => {
+    const preloadVid = document.createElement("video");
+    preloadVid.src = src.src;
+    preloadVid.preload = "auto";
   });
+
+  // 初始自动播放
+  video.play().catch(err => console.log("自动播放被阻止：", err));
 });
 </script>
 

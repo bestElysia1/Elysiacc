@@ -96,11 +96,38 @@ body {
   background: #000;
 }
 
-/* === 标题样式 === */
-h2 {
+/* === 播放器样式 === */
+.elysia-player {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 30px;
+  padding: 10px 20px;
+  width: fit-content;
+  margin: 0 auto 30px auto;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+}
+
+.elysia-btn {
+  background: none;
+  border: none;
+  color: white;
   font-size: 1.5rem;
-  margin-bottom: 10px;
-  text-shadow: 0 0 15px rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.elysia-btn:hover {
+  transform: scale(1.2);
+}
+
+#songTitle {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin-left: 10px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 </style>
 </head>
@@ -121,6 +148,16 @@ h2 {
     </video>
   </section>
 
+  <!-- === 播放器 === -->
+  <div class="elysia-player">
+    <button id="playPauseBtn" class="elysia-btn">▶</button>
+    <button id="nextBtn" class="elysia-btn">⏭</button>
+    <span id="songTitle">加载中...</span>
+  </div>
+
+  <!-- === 隐藏音频 === -->
+  <audio id="musicPlayer" preload="auto"></audio>
+
   <section>
     <h2>一些实用 & 有趣的网址</h2>
     <ul>
@@ -128,10 +165,6 @@ h2 {
       <li><a href="#" style="color:#66aaff;">示例链接 2</a></li>
     </ul>
   </section>
-
-  <audio id="musicPlayer" controls>
-    <source src="assets/music1.mp3" type="audio/mp3">
-  </audio>
 </div>
 
 <script>
@@ -141,9 +174,22 @@ const lockscreen = document.getElementById("lockscreen");
 const main = document.getElementById("mainContent");
 const video = document.getElementById("elysiaVideo");
 const music = document.getElementById("musicPlayer");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const songTitle = document.getElementById("songTitle");
 
+// === 歌曲列表 ===
+const playlist = [
+  { title: "Elysia - Demo Music", src: "assets/music1.mp3" },
+  { title: "AKIBA POP the Future - Pianeet", src: "assets/music2.mp3" },
+  { title: "Aoi Tori - The iDOLM@STER OST", src: "assets/music3.mp3" }
+];
+let currentIndex = 0;
+
+// === 密码解锁 ===
 function unlock() {
   if (input.value === "123456") {
+    lockscreen.style.transition = "opacity 0.8s ease";
     lockscreen.style.opacity = 0;
     setTimeout(() => {
       lockscreen.style.display = "none";
@@ -154,11 +200,44 @@ function unlock() {
     setTimeout(()=> input.style.boxShadow = "", 1000);
   }
 }
-
 unlockBtn.addEventListener("click", unlock);
 input.addEventListener("keypress", e => { if (e.key === "Enter") unlock(); });
 
-// === 音乐播放控制视频 ===
+// === 播放器逻辑 ===
+function loadSong(index) {
+  const song = playlist[index];
+  music.src = song.src;
+  songTitle.textContent = song.title;
+}
+function playSong() {
+  music.play();
+  video.play();
+  playPauseBtn.textContent = "⏸";
+}
+function pauseSong() {
+  music.pause();
+  video.pause();
+  playPauseBtn.textContent = "▶";
+}
+function nextSong() {
+  currentIndex = (currentIndex + 1) % playlist.length;
+  loadSong(currentIndex);
+  playSong();
+}
+
+playPauseBtn.addEventListener("click", () => {
+  if (music.paused) playSong();
+  else pauseSong();
+});
+nextBtn.addEventListener("click", nextSong);
+
+// 自动下一首
+music.addEventListener("ended", nextSong);
+
+// 初始化
+loadSong(currentIndex);
+
+// 音乐联动视频
 music.addEventListener("play", () => video.play());
 music.addEventListener("pause", () => video.pause());
 </script>

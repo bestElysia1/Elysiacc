@@ -1214,43 +1214,32 @@ document.querySelectorAll('a[href]').forEach(a => {
 document.addEventListener("DOMContentLoaded", function() {
   const video = document.getElementById("elysiaVideo");
   const audio = document.querySelector("audio");
-  const videoContainer = document.querySelector(".elysia-video-bg");
+  const coverImg = document.querySelector(".elysia-video-bg img");
 
+  // 自动播放视频（静音模式兼容）
   if (video) {
-    // 尝试自动播放（解决 iOS 静音限制）
     video.muted = true;
     video.play().catch(() => {
       document.addEventListener("click", () => video.play(), { once: true });
     });
   }
 
+  // 封面淡出 & 音乐联动
   if (audio && video) {
-    // === 音乐播放时 ===
     const playVideo = () => {
-      video.play().then(() => {
-        // 视频播放后去掉封面背景
-        if (videoContainer) {
-          videoContainer.style.background = "none";
-        }
-      }).catch(() => {});
+      video.play();
+      if (coverImg) {
+        coverImg.style.transition = "opacity 0.8s ease";
+        coverImg.style.opacity = "0";
+        setTimeout(() => coverImg.style.display = "none", 800);
+      }
     };
+    const pauseVideo = () => video.pause();
 
-    // === 音乐暂停时 ===
-    const pauseVideo = () => {
-      if (!video.paused) video.pause();
-    };
-
-    // 音乐事件监听
     audio.addEventListener("play", playVideo);
-    audio.addEventListener("playing", playVideo); // 双保险
+    audio.addEventListener("playing", playVideo);
     audio.addEventListener("pause", pauseVideo);
     audio.addEventListener("ended", pauseVideo);
-
-    // 页面隐藏时自动暂停（防止后台播放）
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) pauseVideo();
-      else if (!audio.paused) playVideo();
-    });
   }
 });
 </script>

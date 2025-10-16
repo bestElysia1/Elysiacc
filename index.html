@@ -228,6 +228,25 @@ main.container li:hover {
   object-fit: contain; /* 不拉伸视频 */
   display: block;
 }
+.elysia-video-bg {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* 保持视频比例一致，可改成 4/3 或 21/9 */
+  border-radius: 12px;
+  overflow: hidden;
+  background: url("assets/cover.jpg") center/cover no-repeat;
+}
+
+.elysia-video-bg video,
+.elysia-video-bg img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 关键：填满容器并保持比例 */
+  border-radius: inherit;
+}
 
 
   </style>
@@ -501,10 +520,8 @@ domain:chatgpt.com</pre>
     </section>
 
 <div class="elysia-video-bg">
-  <video id="elysiaVideo" preload="auto" muted playsinline autoplay loop>
-    <source src="assets/elysiatest.mp4" type="video/mp4">
-    您的浏览器不支持视频播放。
-  </video>
+  <img class="cover-img" src="assets/cover.jpg" alt="封面">
+  <video id="elysiaVideo" src="assets/video.mp4" muted loop></video>
 </div>
 
   <h2>一些实用&有趣的网址</h2>

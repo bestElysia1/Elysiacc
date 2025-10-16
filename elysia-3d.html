@@ -1,175 +1,133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia Secret Page</title>
+<title>Elysia Locked</title>
 <style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", "Noto Sans", sans-serif;
-  background: linear-gradient(180deg, #ffffff 0%, #f5f0ff 100%);
-  color: #333;
-  overflow: hidden;
-}
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    color: #5c4b8a;
+  }
 
-/* === Lock Screen === */
-#lockscreen {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  animation: subtleGlow 6s ease-in-out infinite alternate;
-  z-index: 9999;
-}
+  #lockScreen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease;
+    z-index: 9999;
+  }
 
-@keyframes subtleGlow {
-  0% { background-color: rgba(255,255,255,0.4); }
-  100% { background-color: rgba(250,240,255,0.7); }
-}
+  #lockScreen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
 
-#lockscreen h2 {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  color: #6b5bb8;
-  text-shadow: 0 0 10px rgba(180,150,255,0.4);
-  text-align: center;
-  line-height: 1.6em;
-  font-weight: 500;
-}
+  h2 {
+    font-size: 1.4em;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 8px rgba(180, 160, 255, 0.4);
+  }
 
-#passwordInput {
-  width: 240px;
-  padding: 10px 18px;
-  border-radius: 25px;
-  border: 1px solid rgba(160,130,255,0.3);
-  outline: none;
-  font-size: 1rem;
-  color: #5a4da1;
-  text-align: center;
-  background: rgba(255,255,255,0.6);
-  box-shadow: 0 0 15px rgba(180,150,255,0.15);
-  transition: all 0.3s ease;
-}
-#passwordInput:focus {
-  border-color: rgba(150,110,255,0.5);
-  box-shadow: 0 0 20px rgba(190,160,255,0.25);
-}
+  input {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.6);
+    color: #5c4b8a;
+    font-size: 1em;
+    box-shadow: 0 4px 20px rgba(160, 140, 255, 0.2);
+    transition: 0.3s;
+  }
 
-#unlockBtn {
-  margin-top: 20px;
-  padding: 10px 30px;
-  border: none;
-  border-radius: 25px;
-  background: linear-gradient(90deg, #d6c7ff, #bca9ff);
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(180,150,255,0.3);
-}
-#unlockBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(180,150,255,0.5);
-}
+  input:focus {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 25px rgba(180, 160, 255, 0.35);
+  }
 
-/* === Main Content === */
-#mainContent {
-  display: none;
-  padding: 60px 20px;
-  text-align: center;
-  animation: fadeIn 1.2s ease;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  button {
+    margin-top: 20px;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(140, 120, 255, 0.3);
+    color: #fff;
+    font-size: 1em;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+    cursor: pointer;
+  }
 
-#mainContent h1 {
-  font-size: 1.5rem;
-  color: #6a58b5;
-  font-weight: 500;
-}
+  button:hover {
+    background: rgba(140, 120, 255, 0.6);
+  }
+
+  #content {
+    display: none;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
 
-<!-- 🔒 Lock Screen -->
-<div id="lockscreen">
-  <h2>If you know <b>bestElysia</b>, please enter your name in Chinese pinyin (case-insensitive)</h2>
-  <input type="password" id="passwordInput" placeholder="enter your name">
-  <button id="unlockBtn">Unlock</button>
+<div id="lockScreen">
+  <h2>If you truly know <b>bestElysia</b>, please enter your name in Chinese pinyin:</h2>
+  <input type="password" id="passwordInput" placeholder="Enter password...">
+  <button onclick="checkPassword()">Unlock</button>
 </div>
 
-<!-- 🌸 Main Content -->
-<div id="mainContent">
-  <h1>订阅链接1：https://basic.bestxuyi.us/basic</h1>
-  <h1>订阅链接2：https://bestxuyi.us/onlymyrailgun</h1>
-  <h1>This page has been fully encrypted</h1>
-  <h1>More content is under development...</h1>
+<div id="content">
+  <h1>Welcome, Elysia’s friend 💜</h1>
+  <p>More content is being developed...</p>
 </div>
 
 <script>
-/* === Elysia Password Logic === */
-const unlockBtn = document.getElementById("unlockBtn");
-const input = document.getElementById("passwordInput");
-const lockscreen = document.getElementById("lockscreen");
-const main = document.getElementById("mainContent");
+  const validPasswords = [
+    "yanxu", "xuyi", "wutong", "lijing",
+    "zhangying", "xuyuancheng", "zhangyaping",
+    "elysiayouarethebest"
+  ];
 
-const validPasswords = [
-  "yanxu", "xuyi", "wutong", "lijing",
-  "zhangying", "xuyuancheng", "zhangyaping",
-  "elysiayouarethebest"
-];
-
-function unlockPage() {
-  lockscreen.style.transition = "opacity 0.8s ease";
-  lockscreen.style.opacity = "0";
-  setTimeout(() => {
-    lockscreen.style.display = "none";
-    main.style.display = "block";
-  }, 800);
-}
-
-function showError() {
-  input.style.borderColor = "rgba(255,0,0,0.5)";
-  input.style.boxShadow = "0 0 20px rgba(255,0,0,0.2)";
-  setTimeout(()=> {
-    input.style.borderColor = "rgba(160,130,255,0.3)";
-    input.style.boxShadow = "0 0 15px rgba(180,150,255,0.15)";
-  }, 1000);
-}
-
-function checkPassword() {
-  const userInput = input.value.trim().toLowerCase();
-  if (validPasswords.includes(userInput)) {
-    unlockPage();
-  } else {
-    showError();
+  function checkPassword() {
+    const input = document.getElementById("passwordInput").value.trim().toLowerCase();
+    if (validPasswords.includes(input)) {
+      const lockScreen = document.getElementById("lockScreen");
+      lockScreen.classList.add("fade-out");
+      setTimeout(() => {
+        lockScreen.style.display = "none";
+        document.getElementById("content").style.display = "block";
+      }, 800);
+    } else {
+      document.getElementById("passwordInput").value = "";
+    }
   }
-}
 
-unlockBtn.addEventListener("click", checkPassword);
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") checkPassword();
-});
-
-/* === Silent Disable Right-click / Devtools === */
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-    (e.ctrlKey && e.key === 'U')
-  ) e.preventDefault();
-});
+  // 禁止右键和F12、Ctrl+Shift+I
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === "F12" || 
+       (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")) ||
+       (e.ctrlKey && e.key === "U")) {
+      e.preventDefault();
+    }
+  });
 </script>
-
 </body>
 </html>

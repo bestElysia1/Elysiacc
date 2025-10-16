@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Elysia — 分组播放器（piano 默认）</title>
 <style>
-/* =========================
-   === 原始样式（你给的） ===
-   ========================= */
-
 /* ====== 基础：液态玻璃播放器 ====== */
 .elysia-player {
   position: fixed;
@@ -173,7 +169,6 @@
   <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
 </div>
 
-<!-- 原有播放列表占位（保持原样） -->
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script>
@@ -466,211 +461,225 @@ updateSong();
 
 <!-- ===============================
      --- ADDED: group panel (non-destructive) ---
-     I append styles + a script that inserts a group panel DOM
-     and overrides only the renderPlaylist function at runtime,
-     so your original code stays exactly the same above.
+     此处为最小、非破坏性地追加：左侧分组（Piano / Popular），
+     与原始播放列表并列展开（两者总宽度不超过 260px）。
      ================================================== -->
 <style>
-/* minimal styles for the inserted group panel and wrapper,
-   keep visual consistent with original liquid style */
+/* --- ADDED STYLES --- */
 
-/* container wrapper (centered, same bottom as playlist) */
-#elysiaPlaylistWrapper {
+/* wrapper that will hold group panel + playlist (mirrors original playlist position) */
+#elysia_group_wrapper {
   position: fixed;
   bottom: 70px;
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   display: flex;
-  gap: 6px; /* the 6px spacing you wanted */
-  z-index: 9998;
-  pointer-events: none;
+  gap: 6px; /* keep 6px spacing */
+  align-items: flex-start;
   opacity: 0;
+  pointer-events: none;
+  z-index: 9998;
   transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
 }
-#elysiaPlaylistWrapper.show {
+
+/* show state uses existing dock animation for consistency */
+#elysia_group_wrapper.show {
   opacity: 1;
   pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.22,1.6,0.36,1) both;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
 }
 
-/* group panel */
-#elysiaGroupPanel {
-  width: 72px; /* narrow left column */
+/* left group column - single column */
+#elysia_group_panel {
+  width: 72px; /* narrow column; playlist will shrink so combined width <= 260 */
   max-height: 260px;
   padding: 8px;
   border-radius: 14px;
   background: rgba(255,240,255,0.25);
   border: 1px solid rgba(255,210,255,0.35);
   backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25);
   display:flex;
   flex-direction: column;
-  gap:6px;
+  gap: 6px;
   pointer-events: auto;
 }
-#elysiaGroupPanel .group-item {
-  padding:6px 8px;
-  border-radius:10px;
-  text-align:center;
-  font-size:0.86rem;
-  color:#cdbaff;
-  cursor:pointer;
+
+#elysia_group_panel .group-item {
+  padding: 6px 6px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  color: #cdbaff;
+  text-align: center;
+  cursor: pointer;
   transition: all .18s ease;
 }
-#elysiaGroupPanel .group-item:hover { background: rgba(160,120,255,0.14); color:#fff; transform: translateY(-2px); }
-#elysiaGroupPanel .group-item.active { background: rgba(160,120,255,0.26); color:#fff; box-shadow:0 6px 20px rgba(160,120,255,0.25); }
+#elysia_group_panel .group-item:hover { background: rgba(160,120,255,0.14); color:#fff; transform: translateY(-2px); }
+#elysia_group_panel .group-item.active { background: rgba(160,120,255,0.26); color:#fff; box-shadow: 0 6px 20px rgba(160,120,255,0.25); }
 
-/* adjust the original playlist to be flexible inside wrapper:
-   we override its position to static when it's moved into the wrapper */
-#elysiaPlaylistWrapper .elysia-playlist {
+/* override playlist positioning when it's inside wrapper */
+#elysia_group_wrapper .elysia-playlist {
   position: static !important;
   transform: none !important;
   left: auto !important;
   bottom: auto !important;
-  width: calc(260px - 72px - 6px); /* shrink playlist so group + list <= 260 */
+  width: calc(260px - 72px - 6px) !important; /* ensure combined width <= 260 */
   max-height: 260px;
   margin: 0;
   pointer-events: auto;
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
-/* make original show/hidden class still work by reflecting to wrapper */
-.elysia-playlist.show ~ #elysiaPlaylistWrapper,
-#elysiaPlaylistWrapper.show { /* fallback if wrapper toggled directly */ }
+/* ensure original helper classes still function */
+.elysia-playlist.show ~ #elysia_group_wrapper,
+#elysia_group_wrapper.show {}
 
 /* small responsive tweak */
 @media (max-width:420px){
-  #elysiaGroupPanel { width: 64px; }
-  #elysiaPlaylistWrapper .elysia-playlist { width: calc(240px - 64px - 6px); }
+  #elysia_group_panel { width: 64px; }
+  #elysia_group_wrapper .elysia-playlist { width: calc(240px - 64px - 6px) !important; }
 }
 </style>
 
 <script>
 /* --- ADDED SCRIPT (non-destructive) ---
-   This script:
-   1) Creates a centered wrapper and moves your existing #playlist into it.
-   2) Inserts a left group panel with Piano / ChineseSong.
-   3) Builds a groupMap (default: all piano, title "晴天" -> chinesesong).
-   4) Overrides renderPlaylist at runtime to show filtered items while keeping original functions intact.
-   Note: your original variables/functions remain available above.
+   目标：
+   1) 将原 #playlist 移入一个 wrapper（#elysia_group_wrapper）并在左侧插入 group panel (#elysia_group_panel)；
+   2) 分组： Piano（默认，包含绝大多数歌曲） & Popular（包含“晴天”和“给我一首歌的时间”）；
+   3) 保持你原有的函数/变量（songs、renderPlaylist、updateSong 等）不被永久删除或破坏；
+   4) 使展开/收回和原行为一致（同时弹出分组与播放列表）。
 */
 
-(function(){
-  // 1) Create wrapper and group panel DOM, but keep original #playlist node and move it inside the wrapper
+(function () {
+  // Ensure original playlist exists
   const origPlaylist = document.getElementById('playlist');
   if (!origPlaylist) return;
 
-  // create wrapper
-  const wrapper = document.createElement('div');
-  wrapper.id = 'elysiaPlaylistWrapper';
-  wrapper.className = ''; // show controlled below
+  // Create wrapper and group panel only once
+  if (document.getElementById('elysia_group_wrapper')) return;
 
-  // create group panel
-  const gp = document.createElement('div');
-  gp.id = 'elysiaGroupPanel';
-  gp.innerHTML = '<div class="group-item active" data-group="piano">🎹 piano</div><div class="group-item" data-group="chinesesong">🎵 chinesesong</div>';
-  // insert wrapper into DOM at same location as playlist
+  const wrapper = document.createElement('div');
+  wrapper.id = 'elysia_group_wrapper';
+
+  const groupPanel = document.createElement('div');
+  groupPanel.id = 'elysia_group_panel';
+  groupPanel.innerHTML = `<div class="group-item active" data-group="piano">🎹 piano</div>
+                          <div class="group-item" data-group="popular">🌟 popular</div>`;
+
+  // Insert wrapper into DOM where original playlist currently is
   origPlaylist.parentNode.insertBefore(wrapper, origPlaylist);
-  // move playlist into wrapper
-  wrapper.appendChild(gp);
+  // Move original playlist into wrapper
+  wrapper.appendChild(groupPanel);
   wrapper.appendChild(origPlaylist);
 
-  // 2) Build group map (dont touch original songs array)
-  // default: all entries => 'piano'
+  // Build a group map: default piano for all, then mark popular songs explicitly
   const groupMap = new Array(window.songs ? window.songs.length : 0).fill('piano');
-  // find the index of the song with title containing '晴天' (match safe)
+
+  // Mark popular group entries: exact title match for safety
   if (window.songs && window.songs.length) {
-    for (let i=0;i<window.songs.length;i++){
+    for (let i = 0; i < window.songs.length; i++) {
       const t = (window.songs[i].title || '').trim();
-      if (t === '晴天' || t.includes('晴天')) {
-        groupMap[i] = 'chinesesong';
-      }
+      if (t === '晴天' || t === '给我一首歌的时间') groupMap[i] = 'popular';
     }
   }
 
-  // 3) expose currentGroup and override renderPlaylist safely
+  // Keep currentGroup state here (default piano)
   let currentGroup = 'piano';
 
-  // keep a reference to original renderPlaylist if exists
+  // Backup original renderPlaylist if exists
   const origRender = window.renderPlaylist && typeof window.renderPlaylist === 'function' ? window.renderPlaylist : null;
 
-  // create a new render that filters according to currentGroup but preserves original markup style
-  function renderPlaylistFiltered(){
-    // if original songs array exists, use it; otherwise fallback to origRender
+  // Override renderPlaylist with a filtered version that respects groupMap & currentGroup
+  function renderPlaylistFiltered() {
     if (!window.songs || !Array.isArray(window.songs)) {
       if (origRender) return origRender();
       return;
     }
-    const html = window.songs.map((s,i) => {
-      if (groupMap[i] !== currentGroup) return '';
+    const out = [];
+    for (let i = 0; i < window.songs.length; i++) {
+      if (groupMap[i] !== currentGroup) continue;
+      const s = window.songs[i];
       const active = (i === window.currentSong) ? 'active' : '';
-      return `<div class="playlist-item ${active}" data-index="${i}">${s.title}</div>`;
-    }).filter(Boolean).join('');
-    origPlaylist.innerHTML = html || `<div style="color:rgba(120,90,180,0.45);padding:10px;text-align:center;">No songs</div>`;
+      out.push(`<div class="playlist-item ${active}" data-index="${i}">${s.title}</div>`);
+    }
+    origPlaylist.innerHTML = out.length ? out.join('') : `<div style="color:rgba(120,90,180,0.45);padding:10px;text-align:center;">No songs</div>`;
   }
 
-  // override the global renderPlaylist so calls from your existing code will now produce filtered list
-  if (origRender) {
-    window._orig_renderPlaylist_backup = origRender;
-  }
+  // Replace global renderPlaylist with our filtered renderer (non-destructive)
+  if (origRender) window._orig_renderPlaylist_backup = origRender;
   window.renderPlaylist = renderPlaylistFiltered;
 
-  // 4) Group panel interaction
-  gp.addEventListener('click', e => {
-    const it = e.target.closest('.group-item');
-    if (!it) return;
-    const group = it.dataset.group;
+  // Group panel click handler
+  groupPanel.addEventListener('click', function (e) {
+    const item = e.target.closest('.group-item');
+    if (!item) return;
+    const group = item.dataset.group;
     currentGroup = group;
-    // toggle active visual on buttons
-    gp.querySelectorAll('.group-item').forEach(x=>x.classList.remove('active'));
-    it.classList.add('active');
-    // render filtered list and if no song in group, pause and show message
+
+    // update visuals
+    groupPanel.querySelectorAll('.group-item').forEach(x => x.classList.remove('active'));
+    item.classList.add('active');
+
+    // render filtered playlist
     renderPlaylistFiltered();
-    // if currentSong not in group, set currentSong to first index in that group
-    let hasCurrent = false;
-    for (let i=0;i<groupMap.length;i++){
-      if (groupMap[i] === currentGroup && i === window.currentSong) { hasCurrent = true; break; }
+
+    // if currentSong not in this group -> select first available in group
+    let curInGroup = false;
+    for (let i = 0; i < groupMap.length; i++) {
+      if (i === window.currentSong && groupMap[i] === currentGroup) { curInGroup = true; break; }
     }
-    if (!hasCurrent) {
-      // find first index in this group
-      let firstIndex = -1;
-      for (let i=0;i<groupMap.length;i++) if (groupMap[i] === currentGroup) { firstIndex = i; break; }
-      if (firstIndex >= 0) {
-        window.currentSong = firstIndex;
-        // call your updateSong if available
+    if (!curInGroup) {
+      let firstIdx = -1;
+      for (let i = 0; i < groupMap.length; i++) { if (groupMap[i] === currentGroup) { firstIdx = i; break; } }
+      if (firstIdx >= 0) {
+        window.currentSong = firstIdx;
         if (typeof window.updateSong === 'function') window.updateSong();
       } else {
-        // no song: pause
-        try{ window.audio.pause(); }catch(e){}
+        // no songs in group
+        try { window.audio.pause(); } catch (e) {}
         if (typeof window.playPauseBtn !== 'undefined') window.playPauseBtn && (window.playPauseBtn.textContent = '▶');
       }
     } else {
-      // update active highlight in the playlist
-      // call updateSongUI via updateSong (keeps semantics)
+      // keep currentSong; update UI classes
       if (typeof window.updateSong === 'function') window.updateSong();
     }
   });
 
-  // 5) Ensure wrapper show/hide is synced when original code toggles playlist classes
-  // Observe class changes on original playlist to reflect wrapper visibility
-  const obs = new MutationObserver(muts => {
-    muts.forEach(m => {
+  // Sync visibility: when original playlist gets show/hide classes, mirror to wrapper
+  const mo = new MutationObserver(function (mutations) {
+    mutations.forEach(m => {
       if (m.type === 'attributes' && m.attributeName === 'class') {
         const cls = origPlaylist.classList;
-        if (cls.contains('show')) wrapper.classList.add('show'); else wrapper.classList.remove('show');
-        // also ensure our filtered render displays whenever shown
+        if (cls.contains('show')) wrapper.classList.add('show');
+        else wrapper.classList.remove('show');
+        // ensure filtered render when shown
         if (cls.contains('show')) renderPlaylistFiltered();
       }
     });
   });
-  obs.observe(origPlaylist, { attributes: true });
+  mo.observe(origPlaylist, { attributes: true });
 
-  // initial render using the filtered renderer
+  // Also override open/close helper to toggle wrapper for immediate clicks that call them
+  const origOpen = window.openPlaylist;
+  const origClose = window.closePlaylist;
+  window.openPlaylist = function () {
+    if (typeof origOpen === 'function') origOpen();
+    wrapper.classList.add('show');
+    origPlaylist.classList.add('show');
+    renderPlaylistFiltered();
+  };
+  window.closePlaylist = function () {
+    if (typeof origClose === 'function') origClose();
+    wrapper.classList.remove('show');
+    origPlaylist.classList.remove('show');
+  };
+
+  // initial render
   renderPlaylistFiltered();
 
-  // make sure clicks on inserted playlist items still work with your existing handler
-  // (original code attached a listener to #playlist; it still receives events)
+  // ensure clicks on playlist still bubble to original listener (it uses #playlist)
+  // nothing else needed: events will work as before.
 })();
 </script>
 

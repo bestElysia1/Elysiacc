@@ -1212,56 +1212,28 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const video = document.getElementById("elysia-video");
-  const cover = document.getElementById("elysia-cover");
-  const playBtn = document.getElementById("playPauseBtn");
-  const nextBtn = document.getElementById("nextBtn");
+const audio = document.querySelector('audio');  // 你的播放器音频元素
+const video = document.getElementById('elysiaVideo'); // 视频元素
 
-  // 视频列表（可以多段）
-  const videoList = [
-    "assets/elysiatest.mp4",
-    "assets/elysia2.mp4",
-    "assets/elysia3.mp4"
-  ];
-  let currentVideo = 0;
-  let isPlaying = false;
+if (audio && video) {
+  // 初始暂停视频
+  video.pause();
 
-  // 点击播放按钮联动视频
-  playBtn.addEventListener("click", () => {
-    isPlaying = !isPlaying;
-    if (isPlaying) {
-      cover.style.opacity = "0";
-      video.src = videoList[currentVideo];
-      video.muted = true;
-      video.play().catch(e => console.log("⚠️ 视频播放失败：", e));
-    } else {
-      video.pause();
-    }
+  // 当音乐播放时
+  audio.addEventListener('play', () => {
+    video.play().catch(err => console.log('视频播放被拦截：', err));
   });
 
-  // 下一曲切换视频
-  nextBtn.addEventListener("click", () => {
-    currentVideo = (currentVideo + 1) % videoList.length;
-    video.src = videoList[currentVideo];
-    video.load();
-    if (isPlaying) video.play();
+  // 当音乐暂停时
+  audio.addEventListener('pause', () => {
+    video.pause();
   });
 
-  // 视频播放完自动换下一个
-  video.addEventListener("ended", () => {
-    currentVideo = (currentVideo + 1) % videoList.length;
-    video.src = videoList[currentVideo];
-    video.load();
-    if (isPlaying) video.play();
+  // 当音乐停止或结束
+  audio.addEventListener('ended', () => {
+    video.pause();
   });
-
-  // 兼容 iPhone：第一次点击页面启用播放权限
-  document.addEventListener("click", () => {
-    video.muted = true;
-    video.play().then(() => video.pause());
-  }, { once: true });
-});
+}
 </script>
 
 

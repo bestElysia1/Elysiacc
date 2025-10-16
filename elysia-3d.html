@@ -1,53 +1,87 @@
-<!-- 🌙 页面载入时右侧弹出的动漫角色 -->
-<img src="assets/F612BFEF-E644-4C07-B0B2-5FA8630F8D98.jpeg" alt="anime"
-     class="elysia-anime-popup" id="animePopup">
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime 弹出测试页</title>
+  <style>
+    /* === 页面整体液态柔光背景 === */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at 30% 30%, #f8f3ff 0%, #eae6ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: "Poppins", "微软雅黑", sans-serif;
+    }
 
-<style>
-/* === 动漫弹出图样式 === */
-.elysia-anime-popup {
-  position: fixed;
-  top: 20%;
-  right: 5%;
-  width: 230px;                /* ✅ 你可以自己改大小 */
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(180,140,255,0.4);
-  opacity: 0;
-  transform: scale(0.9) translateY(-20px);
-  pointer-events: none;
-  z-index: 99999;
-  animation: animeFade 3s ease forwards;
-}
+    /* 中间提示文字 */
+    h1 {
+      font-size: 1.6rem;
+      color: #a38aff;
+      text-shadow: 0 0 12px rgba(160,120,255,0.4);
+      user-select: none;
+    }
 
-/* 🌸 淡入 + 漂浮 + 淡出动画 */
-@keyframes animeFade {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-    filter: blur(3px);
-  }
-  20% {
-    opacity: 1;
-    transform: scale(1.03) translateY(0);
-    filter: blur(0);
-  }
-  80% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.9) translateY(10px);
-    filter: blur(3px);
-  }
-}
-</style>
+    /* === 动漫弹出图样式 === */
+    .elysia-anime-popup {
+      position: fixed;
+      top: 18%;
+      right: 5%;
+      width: 240px;                      /* ✅ 图片大小 */
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(180,140,255,0.45),
+                  inset 0 0 30px rgba(200,160,255,0.3);
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+      pointer-events: none;
+      z-index: 99999;
+      animation: animeFade 3s ease forwards;
+    }
 
-<script>
-/* 页面加载后启动动画 */
-window.addEventListener("load", () => {
-  const popup = document.getElementById("animePopup");
-  popup.style.animationPlayState = "running";
-  // 动画结束后移除元素（可选）
-  setTimeout(() => popup.remove(), 3000);
-});
-</script>
+    /* 🌸 淡入 + 漂浮 + 淡出动画 */
+    @keyframes animeFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+        filter: blur(3px);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.05) translateY(0);
+        filter: blur(0);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+        filter: blur(3px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ 测试：动漫人物自动弹出动画（3 秒后自动消失）</h1>
+
+  <!-- 🌙 动漫角色图 -->
+  <img src="banner1.jpg"
+       alt="anime"
+       class="elysia-anime-popup"
+       id="animePopup">
+
+  <script>
+    /* 页面加载后启动动画 */
+    window.addEventListener("load", () => {
+      const popup = document.getElementById("animePopup");
+      popup.style.animationPlayState = "running";
+      // 动画结束后移除元素
+      setTimeout(() => popup.remove(), 3000);
+    });
+  </script>
+</body>
+</html>

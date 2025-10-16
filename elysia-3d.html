@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>订阅使用指南（测试版） | bestElysia 2025</title>
+  <title>订阅使用指南（视频封面版） | bestElysia 2025</title>
   <link rel="icon" href="assets/favicon.ico" />
+
   <style>
     body {
       margin: 0;
@@ -13,7 +14,7 @@
       overflow-x: hidden;
     }
 
-    /* 顶部 banner 视频容器 */
+    /* ======== 🔹 Banner 容器 ======== */
     .banner-video {
       position: relative;
       width: 100%;
@@ -22,21 +23,30 @@
       border-bottom: 2px solid rgba(200,160,255,0.15);
       box-shadow: 0 6px 20px rgba(180,140,255,0.25);
     }
+
+    /* 封面图 */
+    .banner-placeholder {
+      position: absolute;
+      inset: 0;
+      background: url("assets/elysiatest.png") center/cover no-repeat;
+      filter: brightness(0.95) saturate(1.05);
+      transition: opacity 1s ease;
+      z-index: 1;
+    }
+
+    /* 视频 */
     .banner-video video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       filter: brightness(0.95) saturate(1.1);
-      transition: transform 1.2s ease;
+      opacity: 0;
+      transition: opacity 1s ease;
     }
-    .banner-video video:hover {
-      transform: scale(1.02);
-    }
-    .banner-video::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.4));
+
+    /* 视频淡入显示 */
+    .banner-video video.visible {
+      opacity: 1;
     }
 
     h1 {
@@ -71,23 +81,37 @@
   </style>
 </head>
 <body>
+
   <!-- 🔹 Banner 视频部分 -->
   <div class="banner-video">
-    <video autoplay muted loop playsinline preload="auto">
+    <div class="banner-placeholder" id="placeholder"></div>
+    <video id="bannerVideo" autoplay muted loop playsinline preload="auto">
       <source src="assets/elysiatest.mp4" type="video/mp4" />
       您的浏览器不支持 HTML5 视频。
     </video>
   </div>
 
-  <!-- 🔹 标题与内容 -->
   <h1>订阅使用指南（测试版）</h1>
 
   <div class="content">
-    <p>欢迎来到 <b>bestElysia</b> 的测试版使用指南。本页面主要用于验证视频 banner 与性能加载效果。</p>
-    <p>请确认视频已自动播放、静音循环，并且在页面打开时平滑加载。如果加载过慢，请检查视频大小与预加载配置。</p>
-    <p>其他内容保持原版一致，仅替换顶部图片为视频展示。</p>
+    <p>欢迎来到 <b>bestElysia</b> 的测试页面。</p>
+    <p>在视频加载前，先显示封面图 <code>assets/elysiatest.png</code>，</p>
+    <p>等视频准备好后，自动淡入切换为流畅播放。</p>
   </div>
 
   <footer>© bestElysia 2025</footer>
+
+  <script>
+    const video = document.getElementById("bannerVideo");
+    const placeholder = document.getElementById("placeholder");
+
+    // 当视频可以播放时，淡入视频并隐藏封面
+    video.addEventListener("canplaythrough", () => {
+      video.classList.add("visible");
+      setTimeout(() => placeholder.style.opacity = "0", 800);
+      setTimeout(() => placeholder.style.display = "none", 1800);
+    });
+  </script>
+
 </body>
 </html>

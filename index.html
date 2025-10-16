@@ -502,18 +502,91 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- === Elysia 视频区域 === -->
-<div class="elysia-video-container">
-  <video 
-    class="elysia-video" 
-    src="assets/elysiatest.mp4" 
-    poster="assets/elysiatest.png"
-    autoplay 
-    muted 
-    loop 
-    playsinline>
-  </video>
+
+<!-- Elysia 视频封面区 -->
+<div class="elysia-video-box">
+  <img src="assets/elysiatest.png" class="cover-img" alt="Elysia 封面">
+  <video id="elysiaVideo" src="assets/elysiatest.mp4" playsinline muted loop></video>
 </div>
+
+<style>
+.elysia-video-box {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* 可自行调整大小 */
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cover-img,
+#elysiaVideo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9; /* 保持封面与视频一致比例 */
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.cover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 1s ease;
+  z-index: 2;
+}
+
+#elysiaVideo {
+  z-index: 1;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("elysiaVideo");
+  const audio = document.querySelector("audio");
+  const coverImg = document.querySelector(".cover-img");
+
+  if (!video) return;
+
+  // ===== 自动静音播放（iOS 兼容）=====
+  video.muted = true;
+  video.loop = true;
+  video.play().catch(() => {
+    document.addEventListener("click", () => {
+      video.play();
+    }, { once: true });
+  });
+
+  // ===== 音乐播放联动（如果页面有播放器）=====
+  if (audio) {
+    const playVideo = () => {
+      video.play();
+      if (coverImg) {
+        coverImg.style.opacity = "0";
+        setTimeout(() => (coverImg.style.display = "none"), 1000);
+      }
+    };
+
+    const pauseVideo = () => {
+      video.pause();
+      if (coverImg) {
+        coverImg.style.display = "block";
+        setTimeout(() => {
+          coverImg.style.opacity = "1";
+        }, 50);
+      }
+    };
+
+    audio.addEventListener("play", playVideo);
+    audio.addEventListener("playing", playVideo);
+    audio.addEventListener("pause", pauseVideo);
+    audio.addEventListener("ended", pauseVideo);
+  }
+});
+</script>
 
   <h2>一些实用&有趣的网址</h2>
   <ul>
@@ -1201,55 +1274,7 @@ document.querySelectorAll('a[href]').forEach(a => {
 })();
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const video = document.getElementById("elysiaVideo");
-  const audio = document.querySelector("audio");
-  const coverImg = document.querySelector(".cover-img");
 
-  if (!video || !audio) return;
-
-  // ===== 自动播放视频（静音模式） =====
-  video.muted = true;
-  video.loop = true;
-
-  const tryPlayVideo = () => {
-    video.play().catch(() => {
-      // 如果因为用户没交互被阻止，等用户第一次点击页面后再播放
-      document.addEventListener("click", () => {
-        video.play();
-      }, { once: true });
-    });
-  };
-  tryPlayVideo();
-
-  // ===== 音乐联动逻辑 =====
-  const playVideo = () => {
-    video.currentTime = 0; // 每次播放从头开始
-    video.play();
-    if (coverImg) {
-      coverImg.style.transition = "opacity 1s ease";
-      coverImg.style.opacity = "0";
-      setTimeout(() => (coverImg.style.display = "none"), 1000);
-    }
-  };
-
-  const pauseVideo = () => {
-    video.pause();
-    if (coverImg) {
-      coverImg.style.display = "block";
-      setTimeout(() => {
-        coverImg.style.opacity = "1";
-      }, 50);
-    }
-  };
-
-  audio.addEventListener("play", playVideo);
-  audio.addEventListener("playing", playVideo);
-  audio.addEventListener("pause", pauseVideo);
-  audio.addEventListener("ended", pauseVideo);
-});
-</script>
 
 </body>
 </html>

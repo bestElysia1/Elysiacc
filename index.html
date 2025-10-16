@@ -485,43 +485,28 @@ domain:chatgpt.com</pre>
 
 
 <!-- ===== 视频展示区 ===== -->
-<div class="elysia-video-container">
-  <img id="elysia-cover" src="assets/elysiatest.png" alt="Elysia Cover" />
-  <video id="elysia-video" playsinline muted preload="auto" poster="assets/elysiatest.png">
+<section class="video-container">
+  <video id="elysiaVideo" muted preload="auto" playsinline>
     <source src="assets/elysiatest.mp4" type="video/mp4">
   </video>
-</div>
+</section>
 
 <style>
-.elysia-video-container {
-  position: relative;
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 30px auto;
   width: 100%;
   max-width: 800px;
-  margin: 50px auto;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border-radius: 12px;
-  background: #000;
+  position: relative;
 }
-
-#elysia-video, #elysia-cover {
+.video-container video {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
-  display: block;
-  transition: opacity 0.8s ease;
-}
-
-#elysia-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  opacity: 1;
-}
-
-#elysia-video {
-  z-index: 1;
+  border-radius: 20px;
+  background: #000;
 }
 </style>
 
@@ -1212,26 +1197,24 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-const audio = document.querySelector('audio');  // 你的播放器音频元素
-const video = document.getElementById('elysiaVideo'); // 视频元素
+const video = document.getElementById("elysiaVideo");
+const audio = document.querySelector("audio");
 
 if (audio && video) {
-  // 初始暂停视频
-  video.pause();
-
-  // 当音乐播放时
-  audio.addEventListener('play', () => {
-    video.play().catch(err => console.log('视频播放被拦截：', err));
+  // 音乐播放 → 视频播放
+  audio.addEventListener("play", () => {
+    video.play().catch(err => console.log("视频播放失败：", err));
   });
 
-  // 当音乐暂停时
-  audio.addEventListener('pause', () => {
+  // 音乐暂停 → 视频暂停
+  audio.addEventListener("pause", () => {
     video.pause();
   });
 
-  // 当音乐停止或结束
-  audio.addEventListener('ended', () => {
+  // 音乐播放完毕 → 视频也停止在第一帧
+  audio.addEventListener("ended", () => {
     video.pause();
+    video.currentTime = 0;
   });
 }
 </script>

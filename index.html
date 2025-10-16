@@ -532,75 +532,54 @@ document.addEventListener("DOMContentLoaded", () => {
   let current = videoA;
   let next = videoB;
   let index = 0;
-  let nextReady = false;
-  let switching = false;
+  let transitioning = false;
 
-  // === 预加载所有视频 ===
-  const cachePool = videos.map(src => {
+  // 预加载所有视频
+  videos.forEach(src => {
     const v = document.createElement("video");
     v.src = src;
     v.preload = "auto";
-    v.muted = true;
-    v.load();
-    return v;
   });
 
-  function preloadNext() {
-    const nextIndex = (index + 1) % videos.length;
-    next.src = cachePool[nextIndex].src;
-    nextReady = false;
-    next.load();
-    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
-  }
+  function playNextVideo() {
+    if (transitioning) return; // 防止重复切换
+    transitioning = true;
 
-  function switchVideo() {
-    if (switching) return;
-    switching = true;
-
-    if (!nextReady) {
-      console.log("⏳ 等待下一段缓冲...");
-      setTimeout(() => { switching = false; switchVideo(); }, 300);
-      return;
-    }
-
+    index = (index + 1) % videos.length;
+    next.src = videos[index];
     next.currentTime = 0;
+
     next.play().then(() => {
+      // 平滑过渡
       next.style.opacity = "1";
       current.style.opacity = "0";
 
       setTimeout(() => {
         current.pause();
-        [current, next] = [next, current];
-        index = (index + 1) % videos.length;
-        switching = false;
-        preloadNext();
-        bindEvents(); // 🔥 切换后重新绑定事件
+        const temp = current;
+        current = next;
+        next = temp;
+        transitioning = false;
       }, 800);
     }).catch(err => {
-      switching = false;
-      console.warn("⚠️ 播放被阻止:", err);
+      console.warn("播放被阻止：", err);
+      transitioning = false;
     });
   }
 
-  function bindEvents() {
-    current.onended = switchVideo;
-    current.ontimeupdate = () => {
-      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
-        preloadNext();
-      }
-      // 容错: 若时间卡死不触发 ended
-      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
-        switchVideo();
-      }
-    };
-  }
-
-  // === 初始播放 ===
+  // 初始播放
   current.src = videos[index];
-  bindEvents();
-  preloadNext();
+  current.play().catch(err => console.log("自动播放被阻止：", err));
 
-  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
+  // 监听播放结束
+  current.addEventListener("ended", playNextVideo);
+
+  // 若播放卡死或时间异常（保险机制）
+  setInterval(() => {
+    if (!current.paused && current.currentTime > 0 && current.currentTime >= current.duration - 0.3) {
+      playNextVideo();
+    }
+  }, 500);
 });
 </script>
 

@@ -483,123 +483,82 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- 🎬 Elysia 多视频播放区 -->
-<div class="elysia-video-container">
-  <div class="elysia-video-glow"></div>
-  <video id="elysiaVideo" autoplay muted playsinline preload="auto" poster="assets/elysiatest.png">
+<!-- 🎞 视频容器 -->
+<div class="elysia-video-wrapper">
+  <video id="elysiaVideo" autoplay muted playsinline loop preload="auto">
     <source src="assets/elysiatest.mp4" type="video/mp4">
-    您的浏览器不支持 video 标签。
+    <source src="assets/elysiatest2.mp4" type="video/mp4">
+    <source src="assets/elysiatest3.mp4" type="video/mp4">
   </video>
 </div>
 
 <style>
-/* === 🌌 视频容器（浮动 + 光晕） === */
-.elysia-video-container {
+.elysia-video-wrapper {
   position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 30px auto;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
   overflow: hidden;
-  border-radius: 22px;
-  background: #000;
-  box-shadow:
-    0 0 30px rgba(180,150,255,0.35),
-    inset 0 0 20px rgba(255,255,255,0.05);
-  animation: elysiaFloat 7s ease-in-out infinite;
-  transition: transform 0.5s ease;
+  background: radial-gradient(circle at center, rgba(100, 80, 160, 0.4), rgba(0,0,0,0.8));
+  box-shadow: 0 0 40px rgba(180, 150, 255, 0.2);
+  animation: floatUpDown 6s ease-in-out infinite;
 }
 
-/* ✨ 柔光晕层 */
-.elysia-video-glow {
+@keyframes floatUpDown {
+  0%, 100% { transform: translateY(0px); box-shadow: 0 0 40px rgba(180,150,255,0.2); }
+  50% { transform: translateY(-8px); box-shadow: 0 0 60px rgba(180,150,255,0.35); }
+}
+
+.elysia-video-wrapper::after {
+  content: "";
   position: absolute;
   inset: 0;
-  border-radius: 22px;
-  box-shadow:
-    0 0 35px rgba(160,130,255,0.35),
-    0 0 65px rgba(200,160,255,0.18),
-    inset 0 0 25px rgba(255,255,255,0.08);
-  z-index: 1;
-  pointer-events: none;
-  animation: elysiaGlow 6s ease-in-out infinite;
+  border-radius: 18px;
+  background: radial-gradient(circle at center, rgba(220,180,255,0.15), transparent 70%);
+  mix-blend-mode: screen;
+  animation: glowBreathe 4s ease-in-out infinite;
 }
 
-/* 🎥 视频样式 */
-.elysia-video-container video {
+@keyframes glowBreathe {
+  0%,100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+#elysiaVideo {
   width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  display: block;
+  height: 100%;
   object-fit: cover;
-  object-position: center;
-  border-radius: 22px;
-  z-index: 0;
-  opacity: 1;
-  transition: opacity 1s ease;
-}
-
-/* 🌊 漂浮动画 */
-@keyframes elysiaFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-/* 💜 光晕呼吸 */
-@keyframes elysiaGlow {
-  0%, 100% {
-    box-shadow:
-      0 0 30px rgba(180,150,255,0.3),
-      0 0 60px rgba(220,190,255,0.18),
-      inset 0 0 18px rgba(255,255,255,0.05);
-  }
-  50% {
-    box-shadow:
-      0 0 45px rgba(190,160,255,0.45),
-      0 0 90px rgba(240,200,255,0.25),
-      inset 0 0 30px rgba(255,255,255,0.1);
-  }
-}
-
-/* 📱 移动端优化 */
-@media (max-width: 768px) {
-  .elysia-video-container {
-    max-width: 100%;
-    border-radius: 14px;
-  }
-  .elysia-video-glow, .elysia-video-container video {
-    border-radius: 14px;
-  }
+  display: block;
+  filter: blur(0);
+  transition: filter 1.2s ease;
+  border-radius: 18px;
 }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("elysiaVideo");
-  const videoSources = [
-    "assets/elysiatest.mp4",
-    "assets/elysiatest2.mp4",
-    "assets/elysiatest3.mp4"
-  ];
-  let currentIndex = 0;
+  const sources = video.querySelectorAll("source");
+  let index = 0;
 
-  video.load();
-  video.muted = true;
-
-  // 自动播放处理（适配移动端）
-  video.play().catch(() => {
-    document.addEventListener("touchstart", () => video.play(), { once: true });
-  });
-
-  // 自动循环播放多个视频
   video.addEventListener("ended", () => {
-    video.style.opacity = 0; // 淡出
-    setTimeout(() => {
-      currentIndex = (currentIndex + 1) % videoSources.length;
-      video.src = videoSources[currentIndex];
-      video.load();
-      video.play();
-      video.style.opacity = 1; // 淡入
-    }, 600);
+    index = (index + 1) % sources.length;
+    video.src = sources[index].src;
+    video.load();
+    video.play().catch(err => console.log("视频自动播放被阻止：", err));
   });
+
+  // 预加载视频
+  sources.forEach(src => {
+    const preloadVid = document.createElement("video");
+    preloadVid.src = src.src;
+    preloadVid.preload = "auto";
+  });
+
+  // 初始自动播放
+  video.play().catch(err => console.log("自动播放被阻止：", err));
 });
 </script>
 

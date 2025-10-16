@@ -1162,6 +1162,29 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 
+<script>
+const video = document.getElementById("elysiaVideo");
+const audio = document.querySelector("audio");
+
+if (audio && video) {
+  // 音乐播放 → 视频播放
+  audio.addEventListener("play", () => {
+    video.play().catch(err => console.log("视频播放失败：", err));
+  });
+
+  // 音乐暂停 → 视频暂停
+  audio.addEventListener("pause", () => {
+    video.pause();
+  });
+
+  // 音乐播放完毕 → 视频也停止在第一帧
+  audio.addEventListener("ended", () => {
+    video.pause();
+    video.currentTime = 0;
+  });
+}
+</script>
+
 
 <script>
 (function() {
@@ -1194,29 +1217,6 @@ document.querySelectorAll('a[href]').forEach(a => {
   }
   detect();
 })();
-</script>
-
-<script>
-const video = document.getElementById("elysiaVideo");
-const audio = document.querySelector("audio");
-
-if (audio && video) {
-  // 音乐播放 → 视频播放
-  audio.addEventListener("play", () => {
-    video.play().catch(err => console.log("视频播放失败：", err));
-  });
-
-  // 音乐暂停 → 视频暂停
-  audio.addEventListener("pause", () => {
-    video.pause();
-  });
-
-  // 音乐播放完毕 → 视频也停止在第一帧
-  audio.addEventListener("ended", () => {
-    video.pause();
-    video.currentTime = 0;
-  });
-}
 </script>
 
 

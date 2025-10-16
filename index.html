@@ -1197,19 +1197,33 @@ document.querySelectorAll('a[href]').forEach(a => {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const video = document.getElementById("elysiaVideo");
-  const audio = document.querySelector("audio"); // 播放器音频元素
+  const audio = document.querySelector("audio");
 
   if (!audio || !video) return;
 
-  // 当音乐播放时，视频播放
-  audio.addEventListener("play", () => {
-    video.play().catch(() => {});
+  // 初始化：静音、可自动播放
+  video.muted = true;
+  video.playsInline = true;
+  video.autoplay = false;
+
+  // 监听音乐播放
+  audio.addEventListener("play", async () => {
+    try {
+      await video.play();
+    } catch (e) {
+      console.warn("视频播放被阻止，将在下次用户操作时继续");
+    }
   });
 
-  // 当音乐暂停时，视频暂停
+  // 监听音乐暂停
   audio.addEventListener("pause", () => {
     video.pause();
   });
+
+  // 防止 Safari 不触发（第一次点击页面时激活视频）
+  document.body.addEventListener("touchstart", () => {
+    video.play().then(() => video.pause());
+  }, { once: true });
 });
 </script>
 

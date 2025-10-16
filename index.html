@@ -211,6 +211,28 @@ main.container li:hover {
   text-shadow: 0 0 6px rgba(156,107,255,0.4);
   transition: all 0.3s ease;
 }
+/* === 视频封面区 === */
+#elysiaVideoContainer {
+  position: relative;
+  width: 100%;
+  height: 50vh; /* 可以改成 100vh 全屏 */
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+#elysiaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#elysiaVideoCover {
+  position: absolute;
+  inset: 0;
+  background: url('assets/elysiatest.png') center/cover no-repeat;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
 
 
   </style>
@@ -483,7 +505,13 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-
+<!-- === Elysia Video Banner (随音乐播放) === -->
+<div id="elysiaVideoContainer">
+  <video id="elysiaVideo" preload="auto" muted playsinline>
+    <source src="assets/elysiatest.mp4" type="video/mp4">
+  </video>
+  <div id="elysiaVideoCover"></div>
+</div>
 
         <section>
   <h2>一些实用&有趣的网址</h2>
@@ -1173,6 +1201,26 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
+<script>
+const video = document.getElementById("elysiaVideo");
+const cover = document.getElementById("elysiaVideoCover");
+
+// 示例：当音乐播放时开始视频，当音乐暂停时暂停视频
+// 假设你的音频播放器元素是 audioPlayer
+const audioPlayer = document.querySelector("audio");
+
+if (audioPlayer) {
+  audioPlayer.addEventListener("play", () => {
+    video.play();
+    cover.style.opacity = 0;
+  });
+
+  audioPlayer.addEventListener("pause", () => {
+    video.pause();
+    // 保留视频画面，不再恢复封面
+  });
+}
+</script>
 
 </body>
 </html>

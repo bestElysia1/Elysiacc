@@ -1,117 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>订阅使用指南（视频封面版） | bestElysia 2025</title>
-  <link rel="icon" href="assets/favicon.ico" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elysia Test (Video Banner + Password)</title>
+<style>
+/* === 页面全局 === */
+body {
+  margin: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #cdbaff 0%, #1a102a 80%);
+  font-family: "Segoe UI", sans-serif;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", "Microsoft Yahei", sans-serif;
-      background: linear-gradient(180deg, #faf6ff 0%, #f8edff 100%);
-      overflow-x: hidden;
-    }
+/* === 液态登录界面 === */
+#lockscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(50, 30, 80, 0.6);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: glowFlow 6s infinite alternate ease-in-out;
+}
 
-    /* ======== 🔹 Banner 容器 ======== */
-    .banner-video {
-      position: relative;
-      width: 100%;
-      height: 45vh;
-      overflow: hidden;
-      border-bottom: 2px solid rgba(200,160,255,0.15);
-      box-shadow: 0 6px 20px rgba(180,140,255,0.25);
-    }
+@keyframes glowFlow {
+  0% { background-color: rgba(90, 60, 150, 0.4); }
+  100% { background-color: rgba(140, 100, 255, 0.4); }
+}
 
-    /* 封面图 */
-    .banner-placeholder {
-      position: absolute;
-      inset: 0;
-      background: url("assets/elysiatest.png") center/cover no-repeat;
-      filter: brightness(0.95) saturate(1.05);
-      transition: opacity 1s ease;
-      z-index: 1;
-    }
+#lockscreen h2 {
+  color: #fff;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px rgba(200,180,255,0.6);
+}
 
-    /* 视频 */
-    .banner-video video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.95) saturate(1.1);
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
+#passwordInput {
+  width: 200px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 25px;
+  outline: none;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 10px rgba(200,160,255,0.3);
+  transition: all 0.3s ease;
+}
+#passwordInput:focus {
+  box-shadow: 0 0 20px rgba(200,160,255,0.7);
+}
 
-    /* 视频淡入显示 */
-    .banner-video video.visible {
-      opacity: 1;
-    }
+#unlockBtn {
+  margin-top: 15px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #a084ff, #cbb2ff);
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(200,160,255,0.4);
+  transition: all .3s ease;
+}
+#unlockBtn:hover {
+  box-shadow: 0 0 25px rgba(200,160,255,0.7);
+  transform: scale(1.05);
+}
 
-    h1 {
-      text-align: center;
-      font-weight: 600;
-      color: #a67dff;
-      margin-top: 40px;
-      letter-spacing: 1px;
-    }
+/* === 视频背景区 === */
+#mainContent {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    .content {
-      max-width: 780px;
-      margin: 30px auto;
-      background: rgba(255,255,255,0.75);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 8px 24px rgba(190,160,255,0.2);
-      border-radius: 16px;
-      padding: 28px 36px;
-      color: #654ea3;
-      line-height: 1.75;
-      font-size: 16px;
-    }
+#videoBanner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #bda8ff;
-      font-size: 14px;
-      margin-top: 60px;
-    }
-  </style>
+#videoCover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: url('assets/elysiatest.png') center/cover no-repeat;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+/* === 渐隐效果 === */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+</style>
 </head>
 <body>
 
-  <!-- 🔹 Banner 视频部分 -->
-  <div class="banner-video">
-    <div class="banner-placeholder" id="placeholder"></div>
-    <video id="bannerVideo" autoplay muted loop playsinline preload="auto">
-      <source src="assets/elysiatest.mp4" type="video/mp4" />
-      您的浏览器不支持 HTML5 视频。
-    </video>
-  </div>
+<!-- === 液态密码层 === -->
+<div id="lockscreen">
+  <h2>输入密码以解锁</h2>
+  <input type="password" id="passwordInput" placeholder="••••••••">
+  <button id="unlockBtn">解锁</button>
+</div>
 
-  <h1>订阅使用指南（测试版）</h1>
+<!-- === 主页面内容 === -->
+<div id="mainContent">
+  <video id="videoBanner" preload="auto" muted autoplay loop playsinline>
+    <source src="assets/elysiatest.mp4" type="video/mp4">
+  </video>
+  <div id="videoCover"></div>
+</div>
 
-  <div class="content">
-    <p>欢迎来到 <b>bestElysia</b> 的测试页面。</p>
-    <p>在视频加载前，先显示封面图 <code>assets/elysiatest.png</code>，</p>
-    <p>等视频准备好后，自动淡入切换为流畅播放。</p>
-  </div>
+<script>
+const unlockBtn = document.getElementById("unlockBtn");
+const input = document.getElementById("passwordInput");
+const lockscreen = document.getElementById("lockscreen");
+const main = document.getElementById("mainContent");
+const cover = document.getElementById("videoCover");
 
-  <footer>© bestElysia 2025</footer>
+function unlock() {
+  if (input.value === "Elysia2025") {
+    lockscreen.classList.add("fade-out");
+    setTimeout(() => {
+      lockscreen.style.display = "none";
+      main.style.display = "block";
+      setTimeout(() => cover.style.opacity = 0, 800);
+    }, 800);
+  } else {
+    input.style.boxShadow = "0 0 20px rgba(255,0,0,0.6)";
+    setTimeout(()=> input.style.boxShadow = "", 1000);
+  }
+}
 
-  <script>
-    const video = document.getElementById("bannerVideo");
-    const placeholder = document.getElementById("placeholder");
-
-    // 当视频可以播放时，淡入视频并隐藏封面
-    video.addEventListener("canplaythrough", () => {
-      video.classList.add("visible");
-      setTimeout(() => placeholder.style.opacity = "0", 800);
-      setTimeout(() => placeholder.style.display = "none", 1800);
-    });
-  </script>
+unlockBtn.addEventListener("click", unlock);
+input.addEventListener("keypress", e => { if (e.key === "Enter") unlock(); });
+</script>
 
 </body>
 </html>

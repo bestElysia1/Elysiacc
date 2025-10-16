@@ -549,25 +549,24 @@ domain:chatgpt.com</pre>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("elysiaVideo");
-  const sources = video.querySelectorAll("source");
+  const sources = Array.from(video.querySelectorAll("source")).map(s => s.src);
   let index = 0;
 
-  // 监听播放结束事件，切换到下一个视频
+  // 手动控制切换，移除所有过渡效果
   video.addEventListener("ended", () => {
     index = (index + 1) % sources.length;
-    video.src = sources[index].src;
-    video.load();
-    video.play().catch(err => console.log("视频自动播放被阻止：", err));
+    video.src = sources[index];
+    video.play().catch(err => console.log("视频播放被阻止：", err));
   });
 
   // 预加载所有视频
   sources.forEach(src => {
-    const preloadVid = document.createElement("video");
-    preloadVid.src = src.src;
-    preloadVid.preload = "auto";
+    const v = document.createElement("video");
+    v.src = src;
+    v.preload = "auto";
   });
 
-  // 初始自动播放
+  // 初始播放
   video.play().catch(err => console.log("自动播放被阻止：", err));
 });
 </script>

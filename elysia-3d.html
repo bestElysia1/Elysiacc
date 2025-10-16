@@ -1,126 +1,172 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Elysia 加密页面</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elysia Secret Page</title>
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Noto Sans", sans-serif;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f0ff 100%);
+  color: #333;
+  overflow: hidden;
+}
 
-  <style>
-    body {
-      margin: 0;
-      background: radial-gradient(circle at center, rgba(40, 20, 60, 1), rgba(10, 5, 20, 1));
-      color: #eee;
-      font-family: "Poppins", "微软雅黑", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .lock-screen {
-      text-align: center;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 40px 50px;
-      border-radius: 18px;
-      box-shadow: 0 0 25px rgba(160, 120, 255, 0.3);
-      backdrop-filter: blur(10px);
-    }
-    .lock-screen input {
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      padding: 12px 16px;
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      text-align: center;
-      outline: none;
-      width: 220px;
-    }
-    .lock-screen button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #a58bff, #6b4bff);
-      color: white;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-    .lock-screen button:hover {
-      background: linear-gradient(135deg, #b69fff, #7b5cff);
-    }
-    .elysia-content {
-      display: none;
-      text-align: center;
-      color: white;
-      font-size: 22px;
-      animation: fadeIn 1.5s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+/* === Lock Screen === */
+#lockscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: subtleGlow 6s ease-in-out infinite alternate;
+  z-index: 9999;
+}
+
+@keyframes subtleGlow {
+  0% { background-color: rgba(255,255,255,0.4); }
+  100% { background-color: rgba(250,240,255,0.7); }
+}
+
+#lockscreen h2 {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  color: #6b5bb8;
+  text-shadow: 0 0 10px rgba(180,150,255,0.4);
+  text-align: center;
+  line-height: 1.6em;
+  font-weight: 500;
+}
+
+#passwordInput {
+  width: 240px;
+  padding: 10px 18px;
+  border-radius: 25px;
+  border: 1px solid rgba(160,130,255,0.3);
+  outline: none;
+  font-size: 1rem;
+  color: #5a4da1;
+  text-align: center;
+  background: rgba(255,255,255,0.6);
+  box-shadow: 0 0 15px rgba(180,150,255,0.15);
+  transition: all 0.3s ease;
+}
+#passwordInput:focus {
+  border-color: rgba(150,110,255,0.5);
+  box-shadow: 0 0 20px rgba(190,160,255,0.25);
+}
+
+#unlockBtn {
+  margin-top: 20px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #d6c7ff, #bca9ff);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(180,150,255,0.3);
+}
+#unlockBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(180,150,255,0.5);
+}
+
+/* === Main Content === */
+#mainContent {
+  display: none;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeIn 1.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#mainContent h1 {
+  font-size: 1.5rem;
+  color: #6a58b5;
+  font-weight: 500;
+}
+</style>
 </head>
 <body>
-  <!-- 加锁界面 -->
-  <div class="lock-screen" id="lockScreen">
-    <h2>🔒 如果你认识 BestElysia</h2>
-    <p>请输入您姓名的拼音（全小写）</p>
-    <input type="password" id="unlockInput" placeholder="请输入密码">
-    <br>
-    <button id="unlockBtn">解锁</button>
-    <p id="hint" style="margin-top:10px;color:#c8aaff;font-size:13px;"></p>
-  </div>
 
-  <!-- 加密内容 -->
-  <div class="elysia-content" id="elysiaContent"></div>
+<!-- 🔒 Lock Screen -->
+<div id="lockscreen">
+  <h2>If you know <b>Elysia</b>, please enter your name in pinyin (lowercase)</h2>
+  <input type="password" id="passwordInput" placeholder="enter your name">
+  <button id="unlockBtn">Unlock</button>
+</div>
 
-  <!-- AES 加密库 -->
-  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+<!-- 🌸 Main Content -->
+<div id="mainContent">
+  <h1>More content is under development...</h1>
+</div>
 
-  <script>
-  const encryptedText = "U2FsdGVkX1+Z85S7FzU5+u0eAbgkZb0pyuqU6zQWwAg="; 
-  // ↑ 这里是加密后的内容（"更多内容正在开发中"）
+<script>
+/* === Elysia Password Logic === */
+const unlockBtn = document.getElementById("unlockBtn");
+const input = document.getElementById("passwordInput");
+const lockscreen = document.getElementById("lockscreen");
+const main = document.getElementById("mainContent");
 
-  const validKeys = ["yanxu", "xuyi", "wutong", "lijing", "zhangying", "xuyuancheng", "zhangyaping", "elysiayouarethebest"];
+const validPasswords = [
+  "yanxu", "xuyi", "wutong", "lijing",
+  "zhangying", "xuyuancheng", "zhangyaping",
+  "elysiayouarethebest"
+];
 
-  const unlockBtn = document.getElementById("unlockBtn");
-  const input = document.getElementById("unlockInput");
-  const hint = document.getElementById("hint");
+function unlockPage() {
+  lockscreen.style.transition = "opacity 0.8s ease";
+  lockscreen.style.opacity = "0";
+  setTimeout(() => {
+    lockscreen.style.display = "none";
+    main.style.display = "block";
+  }, 800);
+}
 
-  unlockBtn.addEventListener("click", () => {
-    const key = input.value.trim().toLowerCase();
-    if (validKeys.includes(key)) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(encryptedText, key);
-        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-        if (decrypted) {
-          document.getElementById("elysiaContent").innerHTML = decrypted;
-          document.getElementById("lockScreen").style.display = "none";
-          document.getElementById("elysiaContent").style.display = "block";
-        } else {
-          hint.textContent = "❌ 密码错误";
-        }
-      } catch {
-        hint.textContent = "❌ 解密失败";
-      }
-    } else {
-      hint.textContent = "❌ 未识别的姓名";
-    }
-  });
+function showError() {
+  input.style.borderColor = "rgba(255,0,0,0.5)";
+  input.style.boxShadow = "0 0 20px rgba(255,0,0,0.2)";
+  setTimeout(()=> {
+    input.style.borderColor = "rgba(160,130,255,0.3)";
+    input.style.boxShadow = "0 0 15px rgba(180,150,255,0.15)";
+  }, 1000);
+}
 
-  // 禁止右键和开发者工具
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("keydown", e => {
-    if (e.key === "F12" || 
-        (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key.toUpperCase() === "U")) {
-      e.preventDefault();
-    }
-  });
-  </script>
+function checkPassword() {
+  const userInput = input.value.trim().toLowerCase();
+  if (validPasswords.includes(userInput)) {
+    unlockPage();
+  } else {
+    showError();
+  }
+}
+
+unlockBtn.addEventListener("click", checkPassword);
+input.addEventListener("keypress", e => {
+  if (e.key === "Enter") checkPassword();
+});
+
+/* === Silent Disable Right-click / Devtools === */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+    (e.ctrlKey && e.key === 'U')
+  ) e.preventDefault();
+});
+</script>
+
 </body>
 </html>

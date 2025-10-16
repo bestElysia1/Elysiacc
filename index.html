@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "assets/elysiatest9.mp4.MOV",
     "assets/elysiatest10.mp4.MOV",
     "assets/elysiatest11.mp4.MOV",
-    "assets/elysiatest12.mp4.MOV",
+    "assets/elysiatest12.mov",
     "assets/elysiatest13.MOV",
     "assets/elysiatest14.mp4.MOV",
     "assets/elysiatest15.mp4.MOV",
@@ -543,52 +543,75 @@ document.addEventListener("DOMContentLoaded", () => {
   let current = videoA;
   let next = videoB;
   let index = 0;
-  let isSwitching = false;
+  let nextReady = false;
+  let switching = false;
+
+  // === 预加载所有视频 ===
+  const cachePool = videos.map(src => {
+    const v = document.createElement("video");
+    v.src = src;
+    v.preload = "auto";
+    v.muted = true;
+    v.load();
+    return v;
+  });
 
   function preloadNext() {
     const nextIndex = (index + 1) % videos.length;
-    next.src = videos[nextIndex];
+    next.src = cachePool[nextIndex].src;
+    nextReady = false;
     next.load();
-
-    next.oncanplay = () => {
-      next.oncanplay = null;
-      next.preloaded = true;
-    };
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
   }
 
-  function playNext() {
-    if (isSwitching) return;
-    isSwitching = true;
+  function switchVideo() {
+    if (switching) return;
+    switching = true;
 
-    const nextIndex = (index + 1) % videos.length;
-    next.src = videos[nextIndex];
-    next.load();
+    if (!nextReady) {
+      console.log("⏳ 等待下一段缓冲...");
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
 
-    next.oncanplay = () => {
-      next.play();
-      next.style.transition = "opacity 1s ease";
-      current.style.transition = "opacity 1s ease";
+    next.currentTime = 0;
+    next.play().then(() => {
       next.style.opacity = "1";
       current.style.opacity = "0";
 
       setTimeout(() => {
         current.pause();
-        current.src = "";
-        current.load();
-
         [current, next] = [next, current];
-        index = nextIndex;
-        isSwitching = false;
+        index = (index + 1) % videos.length;
+        switching = false;
         preloadNext();
-      }, 1200);
+        bindEvents(); // 🔥 切换后重新绑定事件
+      }, 800);
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ 播放被阻止:", err);
+    });
+  }
+
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      // 容错: 若时间卡死不触发 ended
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
     };
   }
 
-  current.src = videos[0];
-  current.play();
+  // === 初始播放 ===
+  current.src = videos[index];
+  bindEvents();
   preloadNext();
 
-  current.onended = playNext;
+  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
 });
 </script>
 

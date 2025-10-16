@@ -1186,39 +1186,6 @@ if (audio && video) {
 </script>
 
 
-<script>
-(function() {
-  // 禁用 F12、Ctrl+Shift+I/J/C/U 等调试快捷键
-  document.addEventListener('keydown', function(e) {
-    if (
-      e.key === 'F12' ||
-      (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
-      (e.ctrlKey && e.key.toUpperCase() === 'U')
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }, true);
-
-  // 简单检测开发者工具（静默处理）
-  let devtoolsOpen = false;
-  const threshold = 160;
-  function detect() {
-    if (
-      window.outerWidth - window.innerWidth > threshold ||
-      window.outerHeight - window.innerHeight > threshold
-    ) {
-      devtoolsOpen = true;
-    } else {
-      devtoolsOpen = false;
-    }
-    setTimeout(detect, 1500);
-  }
-  detect();
-})();
-</script>
-
 
 </body>
 </html>

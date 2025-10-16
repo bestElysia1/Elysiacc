@@ -1,95 +1,60 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Elysia Anime 测试</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视频弹出测试</title>
 <style>
-  :root {
-    --img-w: 320px;      /* 图片宽度 */
-    --off-rate: 0.45;    /* 图片有 45% 在屏幕外 */
-  }
-
-  html, body {
-    height: 100%;
+  /* 背景仅用于测试 */
+  body {
     margin: 0;
-    background: linear-gradient(180deg, #ffffff, #faf6ff);
-    font-family: "PingFang SC", "Microsoft Yahei", system-ui;
-    overflow: hidden;
+    height: 100vh;
+    background: radial-gradient(circle at center, #18122B, #0A061A);
+    overflow-x: hidden;
   }
 
-  .center-note {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: #9b7fe7;
-    font-size: 1.3rem;
-    text-shadow: 0 0 20px rgba(170, 130, 255, 0.25);
-    user-select: none;
-  }
-
-  /* === 动漫图片容器 === */
-  .anime-popup-wrap {
+  /* === 弹出视频 === */
+  .popup-video {
     position: fixed;
-    top: 15vh;
-    right: calc(var(--img-w) * -1 * var(--off-rate));
-    width: var(--img-w);
+    top: 100px;
+    right: -140px; /* 一半露出 */
+    width: 280px;
     height: auto;
-    z-index: 9999;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(180,140,255,0.5);
     opacity: 0;
-    transform: translateX(50px) scale(0.95);
-    transition: all 0.8s ease;
+    transform: translateX(60px) scale(0.95);
     pointer-events: none;
-    filter: drop-shadow(0 10px 20px rgba(150, 110, 255, 0.25));
+    z-index: 9999;
+    transition: all 1s ease;
   }
 
-  .anime-popup-wrap.show {
+  .popup-video.show {
     opacity: 1;
     transform: translateX(0) scale(1);
   }
 
-  .anime-popup {
-    width: 100%;
-    border-radius: 16px;
-    box-shadow: 0 0 40px rgba(180, 140, 255, 0.35),
-                inset 0 0 20px rgba(210, 190, 255, 0.3);
-    animation: floaty 3s ease-in-out infinite alternate;
-  }
-
-  @keyframes floaty {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-8px); }
-  }
-
-  footer {
-    position: fixed;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 12px;
-    color: #a38fe0;
-    opacity: 0.8;
+  .popup-video.hide {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
   }
 </style>
 </head>
 <body>
-  <div class="center-note">更多内容正在更新中...</div>
 
-  <div class="anime-popup-wrap" id="animePopup">
-    <img src="assets/banner1.jpg" alt="Elysia Anime" class="anime-popup">
-  </div>
+<video id="popupVideo" class="popup-video" src="assets/banner.mp4" muted autoplay playsinline></video>
 
-  <footer>© bestElysia 2025</footer>
+<script>
+window.addEventListener("load", () => {
+  const video = document.getElementById("popupVideo");
+  video.classList.add("show");
 
-  <script>
-    const popup = document.getElementById("animePopup");
-    window.addEventListener("load", () => {
-      popup.classList.add("show");
-      setTimeout(() => {
-        popup.classList.remove("show");
-      }, 3000); // 显示 3 秒后消失
-    });
-  </script>
+  // 5 秒后淡出隐藏
+  setTimeout(() => {
+    video.classList.add("hide");
+  }, 5000);
+});
+</script>
+
 </body>
 </html>

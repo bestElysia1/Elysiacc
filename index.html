@@ -483,6 +483,7 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
+<!-- 🎞 平滑循环切换视频容器 -->
 <div class="elysia-video-wrapper">
   <video id="videoA" autoplay muted playsinline preload="auto"></video>
   <video id="videoB" muted playsinline preload="auto"></video>
@@ -502,7 +503,7 @@ domain:chatgpt.com</pre>
 }
 .elysia-video-wrapper video {
   position: absolute;
-  inset: 0;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -510,8 +511,8 @@ domain:chatgpt.com</pre>
   transition: opacity 0.8s ease-in-out;
   background: #000;
 }
-#videoA { opacity: 1; z-index: 2; }
-#videoB { opacity: 0; z-index: 1; }
+#videoA { opacity: 1; }
+#videoB { opacity: 0; }
 </style>
 
 <script>
@@ -532,9 +533,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let current = videoA;
   let next = videoB;
   let index = 0;
-  let transitioning = false;
 
-  // 预加载所有视频
+  // ✅ 提前预加载所有视频，防止卡顿
   videos.forEach(src => {
     const v = document.createElement("video");
     v.src = src;
@@ -542,44 +542,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function playNextVideo() {
-    if (transitioning) return; // 防止重复切换
-    transitioning = true;
-
-    index = (index + 1) % videos.length;
+    index = (index + 1) % videos.length; // ✅ 到最后会回到第一个
     next.src = videos[index];
     next.currentTime = 0;
 
     next.play().then(() => {
-      // 平滑过渡
+      // 交叉淡入淡出
       next.style.opacity = "1";
       current.style.opacity = "0";
-
       setTimeout(() => {
         current.pause();
         const temp = current;
         current = next;
         next = temp;
-        transitioning = false;
+        current.addEventListener("ended", playNextVideo, { once: true });
       }, 800);
-    }).catch(err => {
-      console.warn("播放被阻止：", err);
-      transitioning = false;
-    });
+    }).catch(err => console.log("播放被阻止：", err));
   }
 
-  // 初始播放
+  // 初始播放第一个视频
   current.src = videos[index];
   current.play().catch(err => console.log("自动播放被阻止：", err));
 
-  // 监听播放结束
-  current.addEventListener("ended", playNextVideo);
-
-  // 若播放卡死或时间异常（保险机制）
-  setInterval(() => {
-    if (!current.paused && current.currentTime > 0 && current.currentTime >= current.duration - 0.3) {
-      playNextVideo();
-    }
-  }, 500);
+  current.addEventListener("ended", playNextVideo, { once: true });
 });
 </script>
 

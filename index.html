@@ -483,13 +483,60 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- 🎬 视频展示 -->
-<div class="video-container">
-  <video id="elysiaVideo" autoplay muted loop playsinline>
+<!-- 🎬 视频展示区（自适应移动端） -->
+<div class="elysia-video-container">
+  <video id="elysiaVideo" autoplay muted loop playsinline preload="auto" poster="assets/elysiatest.png">
     <source src="assets/elysiatest.mp4" type="video/mp4">
-    您的浏览器不支持视频播放。
+    您的浏览器不支持 video 标签。
   </video>
 </div>
+
+<style>
+.elysia-video-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #000;
+}
+
+/* ✅ 视频保持比例且居中裁剪 */
+.elysia-video-container video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 14px;
+}
+
+/* ✅ 移动端适配 */
+@media (max-width: 768px) {
+  .elysia-video-container {
+    max-width: 100%;
+    border-radius: 0;
+  }
+  .elysia-video-container video {
+    width: 100vw;
+    height: auto;
+    object-fit: cover;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("elysiaVideo");
+  video.load();
+  video.muted = true;
+  video.play().catch(() => {
+    document.addEventListener("touchstart", () => video.play(), { once: true });
+  });
+});
+</script>
 
   <h2>一些实用&有趣的网址</h2>
   <ul>

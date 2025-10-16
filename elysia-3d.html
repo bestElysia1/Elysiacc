@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia Music + Video Sync (Password)</title>
+<title>Elysia Music + Video Sync (Responsive + Password)</title>
 <style>
-/* === 页面基础样式 === */
+/* === 页面基础 === */
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
   background: radial-gradient(circle at 50% 40%, #cdbaff 0%, #1a102a 80%);
   color: #fff;
   overflow-x: hidden;
 }
 
-/* === 锁屏层 === */
+/* === 锁屏 === */
 #lockscreen {
   position: fixed;
   inset: 0;
@@ -42,7 +42,8 @@ body {
 }
 
 #passwordInput {
-  width: 200px;
+  width: 70%;
+  max-width: 220px;
   padding: 10px 16px;
   font-size: 1rem;
   color: #fff;
@@ -76,13 +77,13 @@ body {
   transform: scale(1.05);
 }
 
-/* === 主体 === */
+/* === 主体内容 === */
 #mainContent {
   display: none;
   padding: 20px;
 }
 
-/* === 视频区域 === */
+/* === 视频容器 === */
 .video-section {
   position: relative;
   width: 100%;
@@ -91,13 +92,16 @@ body {
   margin: 20px 0;
 }
 
+/* 自适应视频尺寸 */
 #videoBanner {
   width: 100%;
   height: auto;
+  aspect-ratio: 16 / 9;
   border-radius: 15px;
   object-fit: cover;
 }
 
+/* 封面 */
 #videoCover {
   position: absolute;
   inset: 0;
@@ -107,10 +111,28 @@ body {
   opacity: 1;
 }
 
-/* === 标题 === */
+/* 标题 */
 h2 {
   margin-top: 40px;
   text-shadow: 0 0 10px rgba(200,180,255,0.6);
+}
+
+/* === 响应式 === */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+  #videoBanner {
+    aspect-ratio: 16 / 10;
+  }
+  #passwordInput {
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 480px) {
+  #videoBanner {
+    aspect-ratio: 9 / 10;
+  }
 }
 </style>
 </head>
@@ -140,7 +162,7 @@ h2 {
     </ul>
   </section>
 
-  <!-- 你原有的音乐播放器放在这里 -->
+  <!-- 音乐播放器 -->
   <audio id="player" controls>
     <source src="assets/music.mp3" type="audio/mp3">
   </audio>
@@ -155,7 +177,7 @@ const cover = document.getElementById("videoCover");
 const video = document.getElementById("videoBanner");
 const audio = document.getElementById("player");
 
-// === 密码验证 ===
+// === 解锁逻辑 ===
 function unlock() {
   if (input.value === "123456") {
     lockscreen.classList.add("fade-out");
@@ -172,15 +194,15 @@ function unlock() {
 unlockBtn.addEventListener("click", unlock);
 input.addEventListener("keypress", e => { if (e.key === "Enter") unlock(); });
 
-// === 音乐控制视频 ===
+// === 音乐控制视频播放 ===
 audio.addEventListener("play", () => {
   video.currentTime = 0;
   video.play();
-  cover.style.opacity = 0; // 首次播放淡出封面
+  cover.style.opacity = 0;
 });
 
 audio.addEventListener("pause", () => {
-  video.pause(); // 暂停视频但不恢复封面
+  video.pause();
 });
 </script>
 

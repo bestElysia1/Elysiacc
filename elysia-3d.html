@@ -1,60 +1,69 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>视频弹出测试</title>
-<style>
-  /* 背景仅用于测试 */
-  body {
-    margin: 0;
-    height: 100vh;
-    background: radial-gradient(circle at center, #18122B, #0A061A);
-    overflow-x: hidden;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Banner Test</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at center, #1b1b2f, #0a0a16);
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+    }
 
-  /* === 弹出视频 === */
-  .popup-video {
-    position: fixed;
-    top: 100px;
-    right: -140px; /* 一半露出 */
-    width: 280px;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(180,140,255,0.5);
-    opacity: 0;
-    transform: translateX(60px) scale(0.95);
-    pointer-events: none;
-    z-index: 9999;
-    transition: all 1s ease;
-  }
+    /* ===== 动画视频容器 ===== */
+    .banner-container {
+      position: fixed;
+      top: 10%;
+      right: -5%; /* 一半在屏幕外 */
+      transform: translateY(0);
+      opacity: 0;
+      transition: opacity 1s ease, transform 1s ease;
+      z-index: 999;
+    }
 
-  .popup-video.show {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
+    .banner-container.show {
+      opacity: 1;
+      transform: translateY(10px);
+    }
 
-  .popup-video.hide {
-    opacity: 0;
-    transform: translateX(60px) scale(0.95);
-  }
-</style>
+    .banner-container.hide {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    /* ===== 视频样式 ===== */
+    .banner-container video {
+      width: 320px;
+      height: auto;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 0 35px rgba(180,120,255,0.4);
+      filter: brightness(0.95) saturate(1.1);
+    }
+  </style>
 </head>
 <body>
 
-<video id="popupVideo" class="popup-video" src="assets/banner.mp4" muted autoplay playsinline></video>
+  <!-- 弹出的视频元素 -->
+  <div class="banner-container" id="popupVideo">
+    <video src="assets/banner.mp4" autoplay muted playsinline></video>
+  </div>
 
-<script>
-window.addEventListener("load", () => {
-  const video = document.getElementById("popupVideo");
-  video.classList.add("show");
+  <script>
+    window.addEventListener("load", () => {
+      const popup = document.getElementById("popupVideo");
+      popup.classList.add("show");
 
-  // 5 秒后淡出隐藏
-  setTimeout(() => {
-    video.classList.add("hide");
-  }, 5000);
-});
-</script>
+      // 3 秒后自动淡出
+      setTimeout(() => {
+        popup.classList.add("hide");
+        setTimeout(() => popup.remove(), 1000); // 彻底移除
+      }, 3000);
+    });
+  </script>
 
 </body>
 </html>

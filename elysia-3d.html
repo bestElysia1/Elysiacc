@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anime 弹出测试页</title>
   <style>
-    /* === 页面整体液态柔光背景 === */
+    /* === 页面液态柔光背景 === */
     body {
       margin: 0;
       height: 100vh;
@@ -29,44 +29,44 @@
     .elysia-anime-popup {
       position: fixed;
       top: 18%;
-      right: 5%;
-      width: 240px;                      /* ✅ 图片大小 */
+      right: -120px; /* ✅ 图片有一半在屏幕外 */
+      width: 240px;
       border-radius: 18px;
       box-shadow: 0 8px 24px rgba(180,140,255,0.45),
                   inset 0 0 30px rgba(200,160,255,0.3);
       opacity: 0;
-      transform: scale(0.9) translateY(-20px);
+      transform: translateX(60px) scale(0.9);
       pointer-events: none;
       z-index: 99999;
-      animation: animeFade 3s ease forwards;
+      animation: animeSlide 3s ease forwards;
     }
 
-    /* 🌸 淡入 + 漂浮 + 淡出动画 */
-    @keyframes animeFade {
+    /* 🌸 弹出 + 漂浮 + 淡出动画 */
+    @keyframes animeSlide {
       0% {
         opacity: 0;
-        transform: scale(0.9) translateY(-20px);
+        transform: translateX(60px) scale(0.9);
         filter: blur(3px);
       }
-      20% {
+      15% {
         opacity: 1;
-        transform: scale(1.05) translateY(0);
+        transform: translateX(0) scale(1.05);
         filter: blur(0);
       }
       80% {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateX(0) scale(1);
       }
       100% {
         opacity: 0;
-        transform: scale(0.9) translateY(10px);
+        transform: translateX(20px) scale(0.9);
         filter: blur(3px);
       }
     }
   </style>
 </head>
 <body>
-  <h1>✨ 测试：动漫人物自动弹出动画（3 秒后自动消失）</h1>
+  <h1>✨ 动漫人物半出画面弹出动画（3 秒后自动消失）</h1>
 
   <!-- 🌙 动漫角色图 -->
   <img src="banner1.jpg"
@@ -75,11 +75,10 @@
        id="animePopup">
 
   <script>
-    /* 页面加载后启动动画 */
     window.addEventListener("load", () => {
       const popup = document.getElementById("animePopup");
       popup.style.animationPlayState = "running";
-      // 动画结束后移除元素
+      // 动画结束后自动移除
       setTimeout(() => popup.remove(), 3000);
     });
   </script>

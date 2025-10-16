@@ -1,0 +1,53 @@
+<!-- 🌙 页面载入时右侧弹出的动漫角色 -->
+<img src="assets/F612BFEF-E644-4C07-B0B2-5FA8630F8D98.jpeg" alt="anime"
+     class="elysia-anime-popup" id="animePopup">
+
+<style>
+/* === 动漫弹出图样式 === */
+.elysia-anime-popup {
+  position: fixed;
+  top: 20%;
+  right: 5%;
+  width: 230px;                /* ✅ 你可以自己改大小 */
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(180,140,255,0.4);
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+  pointer-events: none;
+  z-index: 99999;
+  animation: animeFade 3s ease forwards;
+}
+
+/* 🌸 淡入 + 漂浮 + 淡出动画 */
+@keyframes animeFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+    filter: blur(3px);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.03) translateY(0);
+    filter: blur(0);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+    filter: blur(3px);
+  }
+}
+</style>
+
+<script>
+/* 页面加载后启动动画 */
+window.addEventListener("load", () => {
+  const popup = document.getElementById("animePopup");
+  popup.style.animationPlayState = "running";
+  // 动画结束后移除元素（可选）
+  setTimeout(() => popup.remove(), 3000);
+});
+</script>

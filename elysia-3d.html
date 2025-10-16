@@ -1,4 +1,3 @@
-<!-- === Elysia 播放器（无敌版本 — 光效增强版 + 分组） === -->
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -6,7 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Elysia — 分组播放器（piano 默认）</title>
 <style>
-/* ====== 基础：液态玻璃播放器 ====== */
+/* ========== 基础 & 你的原始样式（保留并增强） ========== */
+
+/* ====== 基础：液态玻璃播放器（此元素也会被最小化为 50px 球体） ====== */
 .elysia-player {
   position: fixed;
   bottom: 20px;
@@ -18,151 +19,157 @@
   padding: 8px 20px;
   border-radius: 16px;
   z-index: 9999;
-  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.18);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
   overflow: hidden;
-  box-shadow: 0 18px 46px rgba(150,110,240,0.28), inset 0 1px 0 rgba(255,255,255,0.10);
-  transition: opacity .5s ease, transform .5s ease;
-  will-change: transform, opacity;
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition:
+    width .45s cubic-bezier(.2,.9,.2,1),
+    height .45s cubic-bezier(.2,.9,.2,1),
+    border-radius .45s cubic-bezier(.2,.9,.2,1),
+    padding .45s cubic-bezier(.2,.9,.2,1),
+    transform .45s cubic-bezier(.2,.9,.2,1),
+    opacity .45s ease,
+    left .45s cubic-bezier(.2,.9,.2,1),
+    bottom .45s cubic-bezier(.2,.9,.2,1);
+  will-change: transform, width, height, opacity;
+  cursor: grab;
+  user-select: none;
 }
+
+/* 球体最小化状态样式（50px，圆） */
+.elysia-player.collapsed {
+  width: 50px !important;
+  height: 50px !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  gap: 0;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(160,120,255,0.16), inset 0 2px 10px rgba(255,255,255,0.12);
+  background: radial-gradient(120% 100% at 20% 30%, rgba(180,140,255,0.22), rgba(170,120,255,0.14));
+}
+
+/* 当拖拽时视觉反馈 */
+.elysia-player.dragging { cursor: grabbing; transform: none !important; transition: none !important; }
+
+/* 球体内光效（加强液态感） */
 .elysia-player::before {
-  /* 更强的液态光斑层：多层、不同大小和色调、更大模糊半径、较高不透明度 */
   content: "";
   position: absolute;
-  inset: -40%;
+  inset: -30%;
   background:
-    radial-gradient(36% 36% at 5% 30%, rgba(190,120,255,0.50), transparent 18%),
-    radial-gradient(28% 28% at 75% 12%, rgba(160,200,255,0.30), transparent 16%),
-    radial-gradient(30% 30% at 40% 70%, rgba(255,200,230,0.22), transparent 22%),
-    radial-gradient(22% 22% at 80% 80%, rgba(200,150,255,0.20), transparent 20%);
-  filter: blur(56px) saturate(140%);
-  opacity: 1;
-  animation: moveBlobsEnhanced 12s ease-in-out infinite;
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.45), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.32), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.98;
+  animation: moveBlobs 12s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
 
-/* 额外的前景高光条纹（细腻光泽） */
-.elysia-player::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.00) 40%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0.02));
-  pointer-events: none;
-  border-radius: 16px;
-}
-
-/* 控制按钮 */
-.elysia-controls { display:flex; gap:10px; z-index: 2; }
+/* 控制按钮（保留） */
+.elysia-controls { display:flex; gap:10px; }
 .elysia-controls button {
   width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.22);
-  color: #fff; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease;
-  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
 }
-.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 10px 28px rgba(160,120,255,0.44); }
+.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
 
-/* 歌曲名 */
+/* 歌曲名（在 collapsed 状态隐藏，仅在展开显示） */
 #songTitle {
-  color: #f7ecff; font-weight:600; width:220px; font-size:0.96rem;
-  text-shadow:0 0 18px rgba(170,120,255,0.55);
+  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
+  text-shadow:0 0 10px rgba(160,120,255,0.45);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
-  z-index:2;
   will-change: transform;
 }
+.elysia-player.collapsed #songTitle { display: none; }
 
-/* ===== 播放列表（改进） ===== */
+/* === 播放列表（原始样式保留，并在后面添加 group wrapper） === */
+/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
 .elysia-playlist {
   position: fixed;
   bottom: 70px;
   left: 50%;
-  transform: translateX(-50%) scale(0.985);
+  transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   width: 260px;
   max-height: 260px;
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,245,255,0.28), rgba(245,240,255,0.18));
-  border: 1px solid rgba(230,210,255,0.42);
-  backdrop-filter: blur(18px) saturate(190%);
-  -webkit-backdrop-filter: blur(18px) saturate(190%);
-  box-shadow: 0 18px 46px rgba(200,160,255,0.26), inset 0 2px 0 rgba(255,255,255,0.35);
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   overflow-y: auto;
   opacity: 0; pointer-events: none;
-  transition: opacity .36s ease, transform .46s cubic-bezier(.2,.9,.2,1);
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
   z-index: 9998;
   will-change: transform, opacity;
 }
 
-/* 更强的发光效果（后景） */
-.elysia-playlist::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(220,190,255,0.60), rgba(200,160,255,0.22) 45%, transparent 60%),
-    radial-gradient(circle at 80% 70%, rgba(200,220,255,0.20), transparent 55%);
-  filter: blur(20px) contrast(1.02);
-  opacity: 1;
-  transform: scale(1.05);
-  pointer-events: none;
-  mix-blend-mode: screen;
-  transition: opacity .5s ease, transform .5s ease;
-}
-
 /* 歌曲名文字颜色调整为淡紫色调 */
 .playlist-item {
-  padding: 8px 12px;
-  color: #6f5aa3;
-  font-size: 0.95rem;
-  border-radius: 10px;
+  padding: 6px 10px;
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  font-size: 0.9rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, transform .12s;
-  display:flex;
-  align-items:center;
-  gap:8px;
+  transition: background 0.2s, color 0.2s;
 }
 
 .playlist-item:hover {
-  background: linear-gradient(90deg, rgba(180,140,255,0.12), rgba(200,160,255,0.06));
+  background: rgba(160, 120, 255, 0.15);
   color: #ffffff; /* 悬停时变亮 */
-  transform: translateX(6px);
 }
 
 .playlist-item.active {
-  background: linear-gradient(90deg, rgba(200,160,255,0.28), rgba(220,180,255,0.18));
+  background: rgba(160, 120, 255, 0.25);
   color: #fff;
-  box-shadow: 0 10px 26px rgba(160, 120, 255, 0.28);
-  animation: softPulse 3.2s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
 }
-
-/* 子元素出现动画 */
+/* 中等项 */
 @keyframes dockBounceOpen {
-  0%   { transform: translateX(-50%) scale(0.72); opacity: 0; }
-  60%  { transform: translateX(-50%) scale(1.06); opacity: 1; }
-  85%  { transform: translateX(-50%) scale(0.98); }
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
   100% { transform: translateX(-50%) scale(1); }
 }
 
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  30%  { transform: translateX(-50%) scale(1.06); }
-  100% { transform: translateX(-50%) scale(0.64); opacity: 0; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
 }
 
 /* 小动画 */
-@keyframes moveBlobsEnhanced {
-  0%   { transform: translate3d(0,0,0) scale(1); }
-  25%  { transform: translate3d(3%,-2%,0) scale(1.02); }
-  50%  { transform: translate3d(-2%,3%,0) scale(1.01); }
-  75%  { transform: translate3d(2%,-1%,0) scale(1.03); }
-  100% { transform: translate3d(0,0,0) scale(1); }
-}
-@keyframes softPulse { 0%,100%{box-shadow:0 0 12px rgba(160,120,255,0.42);} 50%{box-shadow:0 0 28px rgba(160,120,255,0.9);} }
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
 
 /* === 轻柔飘浮动画（Elysia 风格） === */
 @keyframes elysiaFloat {
@@ -175,59 +182,64 @@
 .elysia-playlist { scrollbar-width: thin; }
 .elysia-playlist .playlist-item { outline: none; }
 
-/* --- ADDED: group wrapper & panel styles (non-destructive) --- */
+/* --- ADDED: group wrapper & panel styles (非破坏性追加) --- */
+/* wrapper that will hold group panel + playlist (mirrors original playlist position) */
 #elysia_group_wrapper {
   position: fixed;
   bottom: 70px;
   left: 50%;
-  transform: translateX(-50%) scale(0.985);
+  transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   display: flex;
-  gap: 6px;
+  gap: 6px; /* keep 6px spacing */
   align-items: flex-start;
   opacity: 0;
   pointer-events: none;
   z-index: 9998;
   transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
 }
+
+/* show state uses existing dock animation for consistency */
 #elysia_group_wrapper.show {
   opacity: 1;
   pointer-events: auto;
   animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
 }
 
-/* left group column - fixed 30px as requested (更紧凑) */
+/* left group column - now fixed 30px width as requested */
 #elysia_group_panel {
-  width: 30px;
+  width: 30px; /* 你指定的固定宽度 */
   max-height: 260px;
   padding: 6px 4px;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,245,255,0.20), rgba(245,240,255,0.14));
-  border: 1px solid rgba(230,210,255,0.30);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  box-shadow: 0 12px 28px rgba(200,160,255,0.18);
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.18);
   display:flex;
   flex-direction: column;
   gap: 6px;
-  align-items:center;
   pointer-events: auto;
-}
-#elysia_group_panel .group-item {
-  width: 22px;
-  height: 22px;
-  display:flex;
   align-items:center;
-  justify-content:center;
-  border-radius: 8px;
-  font-size: 1.02rem;
-  color: #d6bdff;
+  justify-content:flex-start;
+  padding-top:8px;
+}
+
+#elysia_group_panel .group-item {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #cdbaff;
+  text-align: center;
   cursor: pointer;
   transition: all .18s ease;
-  user-select: none;
+  display:inline-flex; align-items:center; justify-content:center;
 }
 #elysia_group_panel .group-item:hover { background: rgba(160,120,255,0.14); color:#fff; transform: translateY(-2px); }
-#elysia_group_panel .group-item.active { background: linear-gradient(180deg, rgba(180,140,255,0.26), rgba(200,160,255,0.18)); color:#fff; box-shadow: 0 8px 22px rgba(160,120,255,0.24); }
+#elysia_group_panel .group-item.active { background: rgba(160,120,255,0.26); color:#fff; box-shadow: 0 6px 20px rgba(160,120,255,0.25); }
 
 /* override playlist positioning when it's inside wrapper */
 #elysia_group_wrapper .elysia-playlist {
@@ -235,37 +247,46 @@
   transform: none !important;
   left: auto !important;
   bottom: auto !important;
-  width: calc(260px - 30px - 6px) !important;
+  width: calc(260px - 30px - 6px) !important; /* ensure combined width <= 260 */
   max-height: 260px;
   margin: 0;
   pointer-events: auto;
 }
 
-/* responsive tweak */
+/* responsive small tweak */
 @media (max-width:420px){
-  #elysia_group_panel { width: 26px; }
-  #elysia_group_wrapper .elysia-playlist { width: calc(240px - 26px - 6px) !important; }
+  #elysia_group_panel { width: 28px; }
+  #elysia_group_wrapper .elysia-playlist { width: calc(240px - 28px - 6px) !important; }
 }
 </style>
 </head>
 <body>
 
 <!-- === Elysia 播放器（无敌版本） === -->
-<div class="elysia-player" id="elysiaPlayer">
-  <div class="elysia-controls">
+<!-- 注意：播放器元素同时也用作 50px 球体（collapsed 类控制） -->
+<div class="elysia-player collapsed" id="elysiaPlayer" role="region" aria-label="Elysia Player" tabindex="0">
+  <div class="elysia-controls" aria-hidden="true">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
     <button id="nextBtn" aria-label="Next">⏭</button>
   </div>
   <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
 </div>
 
-<!-- 原始播放列表 DOM（会被 wrapper 包裹，但保留 id 与行为） -->
+<!-- 播放列表（将被移动到 group wrapper 内） -->
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
+<!-- 预先创建 group wrapper 占位，脚本会把 playlist 放入其中 -->
+<div id="elysia_group_wrapper" aria-hidden="true" style="display:none;">
+  <div id="elysia_group_panel" aria-hidden="true">
+    <div class="group-item active" data-group="piano" title="piano">🎹</div>
+    <div class="group-item" data-group="popular" title="popular">🌟</div>
+  </div>
+  <!-- playlist will be moved here by script -->
+</div>
+
 <script>
-/* ===== 🎵 歌曲列表 ===== */
-/* NOTE: 我在每首 song 对象中新增了 group 字段（非破坏性），
-   默认 group: "piano"，只有 "晴天" 标记为 "popular"。 */
+/* ===== 🎵 歌曲列表（在此为每首 song 新增 group 字段，非破坏性） =====
+   注意：默认 group: "piano"，只有 "晴天" 标为 "popular"。保留你原来的所有条目并字段扩展。 */
 const songs = [
   { group: "piano", title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
   { group: "piano", title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
@@ -299,76 +320,69 @@ const songs = [
   { group: "popular", title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg" }
 ];
 
+/* ===== state ===== */
 let currentSong = 0;
-const audio = new Audio(songs[currentSong].src);
-audio.preload = "auto"; // 保留预加载设置（并在后续增加当前/下一首的显式 preload）
+let audio = new Audio(songs[currentSong].src); // 主 audio
+audio.preload = "auto";
 
+/* ===== 预加载（ADDED）：创建一组用于预加载 metadata 的 Audio 对象（不会自动播放） ===== */
+const preloadAudios = [];
+(function preloadAll() {
+  try {
+    for (let i = 0; i < songs.length; i++) {
+      const a = new Audio();
+      a.preload = 'metadata'; // 预加载元数据，节省带宽但可加载时长/封面信息
+      a.src = songs[i].src;
+      preloadAudios.push(a);
+    }
+    // 标注：如果你需要更激进的缓存，请把 preload 改为 'auto'。
+  } catch (e) {
+    console.warn('预加载失败', e);
+  }
+})();
+
+/* ===== 原始 DOM 元素引用（保留你原来的变量名） ===== */
 const playPauseBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
 const titleEl = document.getElementById("songTitle");
 const player = document.querySelector(".elysia-player");
-const playlist = document.getElementById("playlist");
+const origPlaylist = document.getElementById("playlist");
 
-/* ======== 播放列表渲染（按分组过滤） ======== */
-/* 原始 renderPlaylist 我们保留为注释备份（不破坏你的原始实现） */
-function original_renderPlaylist_backup() {
-  /* 原始（全部歌曲）渲染函数（已做备份，不会覆盖）： */
-  /* playlist.innerHTML = songs.map((s, i) => `
-    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
-      ${s.title}
-    </div>`).join(""); */
-}
-// 备份到全局以便你将来需要可以恢复
-window._orig_renderPlaylist_backup = original_renderPlaylist_backup;
-
-/* 全局当前分组（默认 piano） */
-window.currentGroup = window.currentGroup || 'piano';
-
-/* 新的 renderPlaylist（按 group 过滤，保持原有 DOM id/事件不变） */
+/* ======== 播放列表渲染（按 group 过滤，保留原思路但支持分组） ======== */
+/* 说明：renderPlaylist 被替换为按 window.currentGroup 过滤的版本（非破坏性） */
+window.currentGroup = window.currentGroup || 'piano'; // 全局默认
 function renderPlaylist() {
-  const list = songs.map((s,i)=>({ ...s, _idx:i })).filter(x => (x.group || 'piano') === window.currentGroup);
+  const list = songs.map((s,i)=>({ ...s, _idx:i }))
+                    .filter(x => (x.group || 'piano') === window.currentGroup);
   if (!list.length) {
-    playlist.innerHTML = '<div style="color:rgba(120,90,180,0.45);padding:8px;text-align:center;">No songs</div>';
+    origPlaylist.innerHTML = '<div style="color:rgba(120,90,180,0.45);padding:8px;text-align:center;">No songs</div>';
     return;
   }
-  playlist.innerHTML = list.map(item => {
+  origPlaylist.innerHTML = list.map(item => {
     const active = (item._idx === currentSong) ? 'active' : '';
     return `<div class="playlist-item ${active}" data-index="${item._idx}">${item.title}</div>`;
   }).join('');
 }
 
-/* ======== 预加载辅助（预加载当前和下一首） ======== */
-let _preloadAudioNext = null;
-function preloadAround(index) {
-  try { if (_preloadAudioNext) { _preloadAudioNext.src = ""; _preloadAudioNext = null; } } catch (e) {}
-  if (typeof index !== 'number') return;
-  const nextIndex = (index + 1) % songs.length;
-  try {
-    _preloadAudioNext = new Audio();
-    _preloadAudioNext.preload = 'auto';
-    _preloadAudioNext.src = songs[nextIndex].src;
-    _preloadAudioNext.load();
-  } catch (e) {
-    _preloadAudioNext = null;
-  }
-}
-
 /* ======== 更新播放歌曲 ======== */
 function updateSong() {
   const song = songs[currentSong];
+  if (!song) return;
+  // 切换主 audio src 保留之前逻辑
   audio.src = song.src;
   titleEl.textContent = song.title;
+  // 尝试播放（若浏览器策略阻止，catch 掉）
   audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
+  // 重新渲染播放列表（以反映 active 状态）
   renderPlaylist();
   updateMediaSession(song);
-  preloadAround(currentSong);
 }
 
 /* ======== 控制按钮 ======== */
 playPauseBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
+  if (audio.paused || !audio.src) {
+    audio.play().catch(()=>{});
     playPauseBtn.textContent = "⏸";
   } else {
     audio.pause();
@@ -392,194 +406,362 @@ function updateMediaSession(song) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.title,
       artist: "Elysia Player",
-      album: "Piano Collection",
+      album: song.group || "Piano Collection",
       artwork: [
-        { src: song.cover, sizes: "96x96", type: "image/jpeg" },
-        { src: song.cover, sizes: "128x128", type: "image/jpeg" },
-        { src: song.cover, sizes: "192x192", type: "image/jpeg" },
-        { src: song.cover, sizes: "256x256", type: "image/jpeg" },
-        { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+        { src: song.cover || 'assets/banner1.jpg', sizes: "96x96", type: "image/jpeg" },
+        { src: song.cover || 'assets/banner1.jpg', sizes: "128x128", type: "image/jpeg" },
+        { src: song.cover || 'assets/banner1.jpg', sizes: "192x192", type: "image/jpeg" },
+        { src: song.cover || 'assets/banner1.jpg', sizes: "256x256", type: "image/jpeg" },
+        { src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }
       ]
     });
     navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
-    try { navigator.mediaSession.setActionHandler('nexttrack', () => nextBtn.click()); } catch(e){}
-    try { navigator.mediaSession.setActionHandler('play', () => audio.play()); } catch(e){}
-    try { navigator.mediaSession.setActionHandler('pause', () => audio.pause()); } catch(e){}
-  } catch(e) {
-    console.warn("MediaSession update failed:", e);
-  }
+    // 添加 next/play/pause handler
+    navigator.mediaSession.setActionHandler('nexttrack', () => { nextBtn.click(); });
+    navigator.mediaSession.setActionHandler('play', () => audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+  } catch(e) { console.warn("MediaSession update failed:", e); }
 }
 
-audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
-audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
-audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
-
-/* ======== 播放列表点击 ======== */
-playlist.addEventListener("click", e => {
+/* ======== 点击播放列表条目 ======== */
+origPlaylist.addEventListener("click", e => {
   const item = e.target.closest(".playlist-item");
   if (item) {
-    currentSong = parseInt(item.dataset.index);
-    updateSong();
+    const idx = parseInt(item.dataset.index, 10);
+    if (!isNaN(idx)) {
+      currentSong = idx;
+      updateSong();
+    }
   }
 });
 
-/* ======== 打开/关闭播放列表（保持原有 open/close 行为，但现在要同步 wrapper） ======== */
+/* ======== 打开/关闭播放列表（原有函数保留，且与 group wrapper 同步） ======== */
 function openPlaylist() {
-  playlist.classList.remove("hide");
-  playlist.classList.add("show");
-  playlist.setAttribute('aria-hidden', 'false');
+  // 原先行为：为 #playlist 增加 show 类（动画）
+  origPlaylist.classList.remove("hide");
+  origPlaylist.classList.add("show");
+  origPlaylist.setAttribute('aria-hidden', 'false');
+  // 同步 group wrapper 可见性
   const wrapper = document.getElementById('elysia_group_wrapper');
-  if (wrapper) wrapper.classList.add('show');
+  if (wrapper) {
+    wrapper.style.display = ''; // ensure visible in DOM
+    wrapper.classList.add('show');
+    wrapper.setAttribute('aria-hidden', 'false');
+  }
 }
 function closePlaylist() {
-  playlist.classList.remove("show");
-  playlist.classList.add("hide");
-  playlist.setAttribute('aria-hidden', 'true');
+  origPlaylist.classList.remove("show");
+  origPlaylist.classList.add("hide");
+  origPlaylist.setAttribute('aria-hidden', 'true');
   const wrapper = document.getElementById('elysia_group_wrapper');
-  if (wrapper) wrapper.classList.remove('show');
+  if (wrapper) {
+    wrapper.classList.remove('show');
+    wrapper.setAttribute('aria-hidden', 'true');
+  }
 }
 
+/* 点击歌曲名（标题）切换列表显示（保留原先交互） */
 titleEl.addEventListener("click", e => {
   e.stopPropagation();
-  if (playlist.classList.contains("show")) closePlaylist();
+  if (origPlaylist.classList.contains("show")) closePlaylist();
   else openPlaylist();
 });
 document.addEventListener("click", e => {
-  if (!playlist.contains(e.target) && e.target !== titleEl && !document.getElementById('elysia_group_panel')?.contains(e.target)) {
-    if (playlist.classList.contains("show")) closePlaylist();
+  const wrapper = document.getElementById('elysia_group_wrapper');
+  const gp = document.getElementById('elysia_group_panel');
+  if (wrapper && (wrapper.contains(e.target) || (gp && gp.contains(e.target)))) return;
+  if (!origPlaylist.contains(e.target) && e.target !== titleEl) {
+    if (origPlaylist.classList.contains("show")) closePlaylist();
   }
 });
 
-/* ======== 自动隐藏播放器 ======== */
+/* ======== 自动隐藏播放器（20s，无操作隐藏） ======== */
 let inactivityTimer;
-function hidePlayer() {
-  player.style.opacity = '0';
-  player.style.transform = 'translate(-50%, 40px)';
-  player.style.pointerEvents = 'none';
-  if (playlist.classList.contains("show")) closePlaylist();
-}
-function showPlayer() {
-  player.style.opacity = '1';
-  player.style.transform = 'translate(-50%, 0)';
-  player.style.pointerEvents = 'auto';
-  resetTimer();
-}
 function resetTimer() {
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hidePlayer, 30000);
+  inactivityTimer = setTimeout(()=> {
+    // hide player (淡出)
+    player.style.opacity = '0';
+    player.style.pointerEvents = 'none';
+  }, 20000); // 20s
 }
-['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
-  window.addEventListener(evt, showPlayer)
-);
+['scroll','mousemove','mousedown','touchstart','keydown','pointermove'].forEach(evt => window.addEventListener(evt, ()=> {
+  // 如果已隐藏，恢复
+  if (player.style.opacity === '0') {
+    player.style.opacity = '1';
+    player.style.pointerEvents = 'auto';
+  }
+  resetTimer();
+}));
+
 resetTimer();
 
-/* ======== 初始渲染（按 group） ======== */
-renderPlaylist();
-updateSong();
-</script>
+/* ======== ADDED: 将原始 playlist 移动到 group wrapper，并启用分组切换逻辑（非破坏性追加） ======== */
+(function setupGroupWrapper() {
+  const orig = document.getElementById('playlist');
+  const gw = document.getElementById('elysia_group_wrapper');
+  const gp = document.getElementById('elysia_group_panel');
+  if (!orig || !gw || !gp) return;
 
-<!-- ===============================
-     --- ADDED: group panel (非破坏性追加) ---
-     此处为最小、非破坏性地追加：左侧分组（Piano / Popular），
-     与原始播放列表并列展开（两者总宽度不超过 260px）。
-     ================================================== -->
-<script>
-(function () {
-  const origPlaylist = document.getElementById('playlist');
-  if (!origPlaylist) return;
-  if (document.getElementById('elysia_group_wrapper')) return; // 已存在则跳过
+  // 如果 wrapper 还没插入 DOM（占位已在上方创建），把 playlist 放入 wrapper
+  if (!gw.contains(orig)) {
+    gw.style.display = ''; // 解除 display:none
+    orig.parentNode.insertBefore(gw, orig);
+    gw.appendChild(gp);
+    gw.appendChild(orig);
+  }
 
-  // wrapper & group panel
-  const wrapper = document.createElement('div');
-  wrapper.id = 'elysia_group_wrapper';
-
-  const groupPanel = document.createElement('div');
-  groupPanel.id = 'elysia_group_panel';
-  groupPanel.innerHTML = `
-    <div class="group-item active" data-group="piano" title="piano">🎹</div>
-    <div class="group-item" data-group="popular" title="popular">🌟</div>
-  `;
-
-  // 将 wrapper 插入到 playlist 的位置，并把 playlist 移入 wrapper
-  origPlaylist.parentNode.insertBefore(wrapper, origPlaylist);
-  wrapper.appendChild(groupPanel);
-  wrapper.appendChild(origPlaylist);
-
-  // groupMap 由 songs[].group 决定（已经在 songs 定义中写好）
-  const groupMap = songs.map(s => s.group || 'piano');
-
-  // 当前组状态（同步到 window.currentGroup）
-  let currentGroupLocal = window.currentGroup || 'piano';
-  window.currentGroup = currentGroupLocal;
-
-  // 当切换组时的逻辑（不会收起播放列表）
-  groupPanel.addEventListener('click', function (e) {
+  // group 点击
+  gp.addEventListener('click', e => {
     const item = e.target.closest('.group-item');
     if (!item) return;
     const group = item.dataset.group;
-    currentGroupLocal = group;
-    window.currentGroup = group; // 同步全局
-
-    // 更新视觉
-    groupPanel.querySelectorAll('.group-item').forEach(x => x.classList.remove('active'));
+    // 切换 global currentGroup
+    window.currentGroup = group;
+    // 更新 active 样式
+    gp.querySelectorAll('.group-item').forEach(x=>x.classList.remove('active'));
     item.classList.add('active');
-
-    // 重新渲染（按组过滤）
-    if (typeof window.renderPlaylist === 'function') window.renderPlaylist();
-
-    // 如果当前播放曲不在该组里，自动切到此组的第一首（如果有）
-    const hasInGroup = groupMap[window.currentSong] === currentGroupLocal;
-    if (!hasInGroup) {
-      let firstIdx = -1;
-      for (let i = 0; i < groupMap.length; i++) { if (groupMap[i] === currentGroupLocal) { firstIdx = i; break; } }
-      if (firstIdx >= 0) {
-        window.currentSong = firstIdx;
-        if (typeof window.updateSong === 'function') window.updateSong();
-      } else {
-        try { window.audio.pause(); } catch(e){}
-        try { window.playPauseBtn && (window.playPauseBtn.textContent = '▶'); } catch(e){}
-      }
-    } else {
-      if (typeof window.updateSong === 'function') window.updateSong();
+    // render filtered playlist
+    renderPlaylist();
+    // 如果当前 currentSong 不属于该 group，选组内第一个并播放（如果存在）
+    const list = songs.map((s,i)=>({...s, _idx:i})).filter(x => (x.group||'piano') === window.currentGroup);
+    if (list.length === 0) {
+      // no songs in group -> 停止播放但不收起播放器
+      try { audio.pause(); } catch(e) {}
+      playPauseBtn.textContent = '▶';
+      orig.innerHTML = '<div style="color:rgba(120,90,180,0.45);padding:8px;text-align:center;">No songs</div>';
+      return;
     }
-
-    // 确保面板和列表处于展开状态（用户切组时通常希望看到结果）
-    wrapper.classList.add('show');
-    origPlaylist.classList.add('show');
+    const isCurInGroup = list.some(it => it._idx === currentSong);
+    if (!isCurInGroup) {
+      currentSong = list[0]._idx;
+      updateSong();
+    } else {
+      // 保留当前播放，更新 UI
+      renderPlaylist();
+      updateMediaSession(songs[currentSong]);
+    }
+    // 保证 wrapper / playlist 展开（用户点图标后应该能看到）
+    gw.classList.add('show');
+    orig.classList.add('show');
   });
 
-  // 监听原始 playlist 的 class 改变，同步 wrapper 的显示状态
-  const mo = new MutationObserver(function (mutations) {
-    mutations.forEach(m => {
+  // 当原始 playlist 类变化时，同步 wrapper 的 show/hide（MutationObserver）
+  const mo = new MutationObserver(muts => {
+    muts.forEach(m => {
       if (m.type === 'attributes' && m.attributeName === 'class') {
-        const cls = origPlaylist.classList;
-        if (cls.contains('show')) wrapper.classList.add('show');
-        else wrapper.classList.remove('show');
-        if (cls.contains('show') && typeof window.renderPlaylist === 'function') window.renderPlaylist();
+        const cls = orig.classList;
+        if (cls.contains('show')) gw.classList.add('show');
+        else gw.classList.remove('show');
       }
     });
   });
-  mo.observe(origPlaylist, { attributes: true });
+  mo.observe(orig, { attributes: true });
 
-  // 覆盖 openPlaylist / closePlaylist（与原函数协作）
-  const origOpen = window.openPlaylist;
-  const origClose = window.closePlaylist;
-  window.openPlaylist = function () {
-    if (typeof origOpen === 'function') origOpen();
-    wrapper.classList.add('show');
-    origPlaylist.classList.add('show');
-    if (typeof window.renderPlaylist === 'function') window.renderPlaylist();
-  };
-  window.closePlaylist = function () {
-    if (typeof origClose === 'function') origClose();
-    wrapper.classList.remove('show');
-    origPlaylist.classList.remove('show');
-  };
-
-  // 初次渲染（保证分组默认 piano）
-  if (typeof window.renderPlaylist === 'function') window.renderPlaylist();
+  // override openPlaylist / closePlaylist 以确保 wrapper 也跟着（已经在上面定义）
+  // initial render
+  renderPlaylist();
 })();
-</script>
 
+/* ======== 球体 → 播放器 液态变形 + 可拖动逻辑（ADDED） ======== */
+(function floatingDraggable() {
+  const el = document.getElementById('elysiaPlayer');
+  let collapsed = true; // 初始状态是球体（collapsed）
+  let dragging = false;
+  let dragStart = {x:0,y:0};
+  let elStart = {left: window.innerWidth/2, bottom: 20}; // 保存最后位置
+  // restore starting position to center-bottom
+  function setPositionFromState() {
+    // when collapsed we honor stored elStart
+    el.style.left = (elStart.left) + 'px';
+    el.style.bottom = (elStart.bottom) + 'px';
+    // transform none because we set absolute coords
+    el.style.transform = 'translateX(0)';
+  }
+  // initialize collapsed position center-bottom
+  elStart.left = (window.innerWidth - 50) / 2; // left in px (we use left coordinate)
+  elStart.bottom = 20;
+  // Put element into absolute coordinate mode while collapsed
+  el.style.left = elStart.left + 'px';
+  el.style.bottom = elStart.bottom + 'px';
+  el.style.transform = 'translateX(0)';
+
+  // Helper to collapse (morph back to ball)
+  function collapseToBall() {
+    collapsed = true;
+    el.classList.add('collapsed');
+    // restore last position (left/bottom)
+    el.style.transition = 'width .45s, height .45s, border-radius .45s, padding .45s, left .45s, bottom .45s';
+    setTimeout(()=> {
+      // keep as is; nothing else
+    }, 460);
+    // hide playlist if open
+    closePlaylist();
+  }
+
+  // Helper to expand (morph to full player at bottom center)
+  function expandToPlayer() {
+    collapsed = false;
+    // center bottom position
+    const targetLeft = (window.innerWidth - el.getBoundingClientRect().width) / 2;
+    // We animate by moving to center bottom and removing collapsed class
+    // First lock current coordinates then set left to 50% center after small delay
+    el.classList.remove('collapsed');
+    // Put it to centered positioned mode
+    el.style.left = '50%';
+    el.style.bottom = '20px';
+    el.style.transform = 'translateX(-50%)';
+    // show playlist wrapper
+    const gw = document.getElementById('elysia_group_wrapper');
+    if (gw) {
+      gw.style.display = '';
+      gw.classList.add('show');
+      gw.setAttribute('aria-hidden','false');
+      // ensure playlist content updated
+      renderPlaylist();
+      origPlaylist.classList.add('show');
+    } else {
+      // fallback: just show playlist
+      origPlaylist.classList.add('show');
+    }
+    // ensure visible
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+  }
+
+  // Tap/click vs drag detection
+  let pressTimer = null;
+  let moved = false;
+
+  // Use Pointer events for desktop/mobile unified handling
+  el.addEventListener('pointerdown', (ev) => {
+    // Only start drag when collapsed (when expanded we want click to expand/controls)
+    el.setPointerCapture(ev.pointerId);
+    dragStart = { x: ev.clientX, y: ev.clientY };
+    const rect = el.getBoundingClientRect();
+    // compute left,bottom numeric values
+    const leftPx = rect.left;
+    const bottomPx = window.innerHeight - rect.bottom;
+    elStart.left = leftPx;
+    elStart.bottom = bottomPx;
+    moved = false;
+    // start timer to allow distinguishing click vs drag
+    pressTimer = setTimeout(()=> { pressTimer = null; }, 200);
+  });
+
+  el.addEventListener('pointermove', (ev) => {
+    if (pressTimer !== null) {
+      // if moved beyond threshold before timer, treat as dragging
+      const dx = Math.abs(ev.clientX - dragStart.x);
+      const dy = Math.abs(ev.clientY - dragStart.y);
+      if (dx > 6 || dy > 6) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        dragging = true;
+        el.classList.add('dragging');
+      }
+    }
+    if (dragging) {
+      moved = true;
+      // compute new left/bottom
+      let newLeft = elStart.left + (ev.clientX - dragStart.x);
+      let newBottom = elStart.bottom - (ev.clientY - dragStart.y);
+      // clamp within viewport
+      const pad = 8;
+      newLeft = Math.max(pad, Math.min(window.innerWidth - el.offsetWidth - pad, newLeft));
+      newBottom = Math.max(8, Math.min(window.innerHeight - el.offsetHeight - pad, newBottom));
+      el.style.left = newLeft + 'px';
+      el.style.bottom = newBottom + 'px';
+      el.style.transform = 'translateX(0)';
+    }
+  });
+
+  el.addEventListener('pointerup', (ev) => {
+    el.releasePointerCapture(ev.pointerId);
+    if (pressTimer !== null) {
+      // short press -> toggle expand/collapse
+      clearTimeout(pressTimer);
+      pressTimer = null;
+      // If collapsed -> expand; if expanded -> collapse
+      if (collapsed) {
+        expandToPlayer();
+      } else {
+        // collapse: store current left/bottom
+        const rect = el.getBoundingClientRect();
+        elStart.left = rect.left;
+        elStart.bottom = window.innerHeight - rect.bottom;
+        collapseToBall();
+        // position the ball back to stored coordinates
+        setPositionFromState();
+      }
+    } else if (dragging) {
+      // dragging ended, save position and stop dragging class
+      dragging = false;
+      el.classList.remove('dragging');
+      // store final position
+      const rect = el.getBoundingClientRect();
+      elStart.left = rect.left;
+      elStart.bottom = window.innerHeight - rect.bottom;
+      // keep collapsed if we were collapsed
+      if (collapsed) {
+        el.classList.add('collapsed');
+        setPositionFromState();
+      }
+    } else {
+      // nothing: no-op
+    }
+    moved = false;
+  });
+
+  // double click / keyboard toggle as accessibility
+  el.addEventListener('dblclick', () => {
+    if (collapsed) expandToPlayer();
+    else collapseToBall();
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (collapsed) expandToPlayer();
+      else collapseToBall();
+    }
+  });
+
+  // When the player expands or collapses via other triggers (openPlaylist), ensure classes sync
+  // If playlist opened externally, ensure the player expands
+  const observer = new MutationObserver(muts => {
+    muts.forEach(m => {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        if (origPlaylist.classList.contains('show')) {
+          // expand to show playlist
+          expandToPlayer();
+        }
+      }
+    });
+  });
+  observer.observe(origPlaylist, { attributes: true });
+
+  // initial state: collapsed and positioned center-bottom
+  el.classList.add('collapsed');
+  setPositionFromState();
+
+  // Expose collapse/expand for other code (if necessary)
+  window._elysia_controls = {
+    expand: expandToPlayer,
+    collapse: collapseToBall
+  };
+})();
+
+/* ======== 兼容性 / 启动时渲染 ======== */
+renderPlaylist();
+updateSong();
+
+/* ======== 额外说明（保留中文注释便于维护） ========
+ - 分组数据通过 songs[].group 管理；默认 piano；
+ - 左侧分组宽度固定 30px，播放列表宽度根据 (260 - 30 - 6) 计算保持整体宽度一致；
+ - 当切换分组时，如果该分组没有歌曲，UI 会显示 "No songs" 并停止播放（不会自动收回）；
+ - 预加载逻辑只做 metadata 预热以兼顾性能，可按需调整为 'auto'。
+ - 如果需要将更多歌曲标为 popular，请在 songs 中把对应条目的 group 改为 "popular"。
+======================================================== */
+
+</script>
 </body>
 </html>

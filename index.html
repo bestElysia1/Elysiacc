@@ -483,7 +483,6 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<!-- 🎞 平滑切换视频容器（无缝版） -->
 <div class="elysia-video-wrapper">
   <video id="videoA" autoplay muted playsinline preload="auto"></video>
   <video id="videoB" muted playsinline preload="auto"></video>
@@ -501,7 +500,6 @@ domain:chatgpt.com</pre>
   background: #000;
   box-shadow: 0 0 30px rgba(150,120,255,0.15);
 }
-
 .elysia-video-wrapper video {
   position: absolute;
   inset: 0;
@@ -512,14 +510,13 @@ domain:chatgpt.com</pre>
   transition: opacity 0.8s ease-in-out;
   background: #000;
 }
-
 #videoA { opacity: 1; z-index: 2; }
 #videoB { opacity: 0; z-index: 1; }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const playlist = [
+  const videos = [
     "assets/elysiatest.mp4",
     "assets/elysiatest2.mp4",
     "assets/elysiatest3.mp4",
@@ -532,58 +529,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const videoA = document.getElementById("videoA");
   const videoB = document.getElementById("videoB");
-
   let current = videoA;
   let next = videoB;
   let index = 0;
+  let nextReady = false;
+  let switching = false;
 
-  // ✅ 预加载所有视频（静默）
-  playlist.forEach(src => {
+  // === 预加载所有视频 ===
+  const cachePool = videos.map(src => {
     const v = document.createElement("video");
     v.src = src;
     v.preload = "auto";
     v.muted = true;
+    v.load();
+    return v;
   });
 
-  // ✅ 播放第一个视频
-  current.src = playlist[index];
-  current.play().catch(err => console.log("自动播放被阻止：", err));
-
-  // ✅ 提前准备下一个视频（缓冲预播）
   function preloadNext() {
-    const nextIndex = (index + 1) % playlist.length;
-    next.src = playlist[nextIndex];
-    next.load(); // 预加载缓冲
+    const nextIndex = (index + 1) % videos.length;
+    next.src = cachePool[nextIndex].src;
+    nextReady = false;
+    next.load();
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
   }
 
-  // ✅ 切换逻辑（完全无缝）
-  function crossfade() {
-    index = (index + 1) % playlist.length;
-    preloadNext(); // 预加载再下一段
+  function switchVideo() {
+    if (switching) return;
+    switching = true;
+
+    if (!nextReady) {
+      console.log("⏳ 等待下一段缓冲...");
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
 
     next.currentTime = 0;
     next.play().then(() => {
-      requestAnimationFrame(() => {
-        next.style.opacity = "1";
-        current.style.opacity = "0";
-      });
+      next.style.opacity = "1";
+      current.style.opacity = "0";
 
       setTimeout(() => {
         current.pause();
         [current, next] = [next, current];
+        index = (index + 1) % videos.length;
+        switching = false;
+        preloadNext();
+        bindEvents(); // 🔥 切换后重新绑定事件
       }, 800);
-    }).catch(err => console.log("播放被阻止：", err));
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ 播放被阻止:", err);
+    });
   }
 
-  // ✅ 自动预加载下一个视频
-  current.addEventListener("timeupdate", () => {
-    // 在视频播放到 90% 时开始预加载下一段
-    if (current.duration && current.currentTime / current.duration > 0.9) {
-      preloadNext();
-    }
-  });
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      // 容错: 若时间卡死不触发 ended
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
+    };
+  }
 
-  current.addEventListener("ended", crossfade);
+  // === 初始播放 ===
+  current.src = videos[index];
+  bindEvents();
+  preloadNext();
+
+  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
 });
 </script>
 

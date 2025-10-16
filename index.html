@@ -483,32 +483,13 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-
-<!-- ===== 视频展示区 ===== -->
-<section class="video-container">
-<video id="elysiaVideo" src="assets/bg.mp4" autoplay muted loop playsinline></video>
+<!-- 🎬 视频展示 -->
+<div class="video-container">
+  <video id="elysiaVideo" autoplay muted loop playsinline>
     <source src="assets/elysiatest.mp4" type="video/mp4">
+    您的浏览器不支持视频播放。
   </video>
-</section>
-
-<style>
-.video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto 30px auto;
-  width: 100%;
-  max-width: 800px;
-  position: relative;
-}
-.video-container video {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 20px;
-  background: #000;
-}
-</style>
+</div>
 
   <h2>一些实用&有趣的网址</h2>
   <ul>
@@ -1159,30 +1140,6 @@ document.querySelectorAll('a[href]').forEach(a => {
   a.setAttribute('rel', 'noopener noreferrer');
 });
   
-</script>
-
-
-<script>
-const video = document.getElementById("elysiaVideo");
-const audio = document.getElementById("elysia-player");
-
-if (audio && video) {
-  // 音乐播放 → 视频播放
-  audio.addEventListener("play", () => {
-    video.play().catch(err => console.log("视频播放失败：", err));
-  });
-
-  // 音乐暂停 → 视频暂停
-  audio.addEventListener("pause", () => {
-    video.pause();
-  });
-
-  // 音乐播放完毕 → 视频也停止在第一帧
-  audio.addEventListener("ended", () => {
-    video.pause();
-    video.currentTime = 0;
-  });
-}
 </script>
 
 

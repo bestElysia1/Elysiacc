@@ -1,213 +1,126 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BestElysia – 加密页面</title>
-<style>
-/* ===== 全局样式 ===== */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", "Noto Sans SC", sans-serif;
-  height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(210,190,255,0.25), rgba(30,20,50,0.9));
-  overflow: hidden;
-  color: #fff;
-  transition: background 0.8s ease;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Elysia 加密页面</title>
 
-/* ===== 锁屏层 ===== */
-#elysia-lock {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(25px) saturate(160%);
-  background: radial-gradient(circle at 30% 30%, rgba(200,180,255,0.3), rgba(40,20,60,0.8));
-  z-index: 9999;
-  transition: opacity 0.8s ease;
-}
-
-#elysia-lock.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 锁屏框体 */
-.elysia-lock-box {
-  text-align: center;
-  padding: 40px 50px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 20px;
-  box-shadow: 0 0 30px rgba(160,130,255,0.25);
-  color: #fff;
-  backdrop-filter: blur(10px);
-}
-
-.elysia-lock-box input {
-  margin-top: 15px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  font-size: 16px;
-  width: 200px;
-  text-align: center;
-}
-
-.elysia-lock-box button {
-  margin-top: 15px;
-  padding: 8px 18px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(180,140,255,0.35);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.elysia-lock-box button:hover {
-  background: rgba(180,140,255,0.55);
-}
-
-#elysia-msg {
-  margin-top: 10px;
-  color: #ffcccc;
-  font-size: 14px;
-}
-
-.highlight {
-  color: #dcbcff;
-  font-weight: 600;
-}
-
-/* ===== 主内容区 ===== */
-#elysia-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
-}
-
-#elysia-content.hidden {
-  display: none;
-}
-
-.elysia-dev-text {
-  font-size: 22px;
-  color: #cdbbff;
-  text-shadow: 0 0 10px rgba(160,130,255,0.3);
-  letter-spacing: 1px;
-  animation: fadeIn 1.8s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== 退出按钮 ===== */
-#elysia-logout {
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
-  background: rgba(180,140,255,0.3);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  border-radius: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 14px;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
-}
-
-#elysia-logout:hover {
-  background: rgba(180,140,255,0.55);
-}
-</style>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, rgba(40, 20, 60, 1), rgba(10, 5, 20, 1));
+      color: #eee;
+      font-family: "Poppins", "微软雅黑", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .lock-screen {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px 50px;
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(160, 120, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    .lock-screen input {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+      width: 220px;
+    }
+    .lock-screen button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #a58bff, #6b4bff);
+      color: white;
+      font-size: 15px;
+      transition: 0.3s;
+    }
+    .lock-screen button:hover {
+      background: linear-gradient(135deg, #b69fff, #7b5cff);
+    }
+    .elysia-content {
+      display: none;
+      text-align: center;
+      color: white;
+      font-size: 22px;
+      animation: fadeIn 1.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-
-<!-- ===== 加密锁屏层 ===== -->
-<div id="elysia-lock">
-  <div class="elysia-lock-box">
-    <h2>🌸 如果你认识 <span class="highlight">BestElysia</span></h2>
-    <p>请输入您姓名的拼音（全小写），即可查看加密内容：</p>
-    <input type="password" id="elysia-pass" placeholder="输入密码">
-    <button id="elysia-submit">解锁</button>
-    <div id="elysia-msg"></div>
+  <!-- 加锁界面 -->
+  <div class="lock-screen" id="lockScreen">
+    <h2>🔒 如果你认识 BestElysia</h2>
+    <p>请输入您姓名的拼音（全小写）</p>
+    <input type="password" id="unlockInput" placeholder="请输入密码">
+    <br>
+    <button id="unlockBtn">解锁</button>
+    <p id="hint" style="margin-top:10px;color:#c8aaff;font-size:13px;"></p>
   </div>
-</div>
 
-<!-- ===== 主内容区域 ===== -->
-<div id="elysia-content" class="hidden">
-  <h2 class="elysia-dev-text">更多内容正在开发中 ✨</h2>
-  <button id="elysia-logout">🔒 重新上锁</button>
-</div>
+  <!-- 加密内容 -->
+  <div class="elysia-content" id="elysiaContent"></div>
 
-<script>
-/* ===== 密码验证 + 记忆功能 ===== */
-const validPasswords = [
-  "yanxu",
-  "xuyi",
-  "wutong",
-  "lijing",
-  "zhangying",
-  "xuyuancheng",
-  "zhangyaping",
-  "elysiayouarethebest"
-];
+  <!-- AES 加密库 -->
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
 
-const lock = document.getElementById("elysia-lock");
-const content = document.getElementById("elysia-content");
-const msg = document.getElementById("elysia-msg");
-const input = document.getElementById("elysia-pass");
-const logout = document.getElementById("elysia-logout");
+  <script>
+  const encryptedText = "U2FsdGVkX1+Z85S7FzU5+u0eAbgkZb0pyuqU6zQWwAg="; 
+  // ↑ 这里是加密后的内容（"更多内容正在开发中"）
 
-/* 已解锁则直接进入内容 */
-if (localStorage.getItem("elysiaUnlocked") === "true") {
-  lock.classList.add("hidden");
-  content.classList.remove("hidden");
-}
+  const validKeys = ["yanxu", "xuyi", "wutong", "lijing", "zhangying", "xuyuancheng", "zhangyaping", "elysiayouarethebest"];
 
-/* 点击解锁按钮 */
-document.getElementById("elysia-submit").addEventListener("click", () => {
-  const pass = input.value.trim().toLowerCase();
-  if (validPasswords.includes(pass)) {
-    msg.textContent = "✅ 欢迎回来，Elysian ~";
-    localStorage.setItem("elysiaUnlocked", "true");
-    setTimeout(() => {
-      lock.classList.add("hidden");
-      content.classList.remove("hidden");
-    }, 600);
-  } else {
-    msg.textContent = "❌ 密码错误，请再试一次。";
-  }
-});
+  const unlockBtn = document.getElementById("unlockBtn");
+  const input = document.getElementById("unlockInput");
+  const hint = document.getElementById("hint");
 
-/* 支持回车键 */
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    document.getElementById("elysia-submit").click();
-  }
-});
+  unlockBtn.addEventListener("click", () => {
+    const key = input.value.trim().toLowerCase();
+    if (validKeys.includes(key)) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedText, key);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        if (decrypted) {
+          document.getElementById("elysiaContent").innerHTML = decrypted;
+          document.getElementById("lockScreen").style.display = "none";
+          document.getElementById("elysiaContent").style.display = "block";
+        } else {
+          hint.textContent = "❌ 密码错误";
+        }
+      } catch {
+        hint.textContent = "❌ 解密失败";
+      }
+    } else {
+      hint.textContent = "❌ 未识别的姓名";
+    }
+  });
 
-/* 退出登录（清除记忆） */
-logout.addEventListener("click", () => {
-  localStorage.removeItem("elysiaUnlocked");
-  content.classList.add("hidden");
-  lock.classList.remove("hidden");
-});
-</script>
-
+  // 禁止右键和开发者工具
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    if (e.key === "F12" || 
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")) {
+      e.preventDefault();
+    }
+  });
+  </script>
 </body>
 </html>

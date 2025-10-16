@@ -1,15 +1,23 @@
-<!-- ===== Elysia 风格加密锁屏层 ===== -->
-<div id="elysia-lock">
-  <div class="elysia-lock-box">
-    <h2>🔮 如果你认识 <span class="highlight">bestelysia</span></h2>
-    <p>请输入您姓名的拼音（全小写），即可查看加密内容。</p>
-    <input type="password" id="elysia-pass" placeholder="请输入拼音..." />
-    <button id="elysia-submit">解锁</button>
-    <div id="elysia-msg"></div>
-  </div>
-</div>
-
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BestElysia – 加密页面</title>
 <style>
+/* ===== 全局样式 ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", "Noto Sans SC", sans-serif;
+  height: 100%;
+  background: radial-gradient(circle at 30% 30%, rgba(210,190,255,0.25), rgba(30,20,50,0.9));
+  overflow: hidden;
+  color: #fff;
+  transition: background 0.8s ease;
+}
+
+/* ===== 锁屏层 ===== */
 #elysia-lock {
   position: fixed;
   inset: 0;
@@ -17,130 +25,189 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(20px) saturate(160%);
-  background: radial-gradient(circle at 30% 30%, rgba(90,60,200,0.35), rgba(10,6,30,0.9));
+  backdrop-filter: blur(25px) saturate(160%);
+  background: radial-gradient(circle at 30% 30%, rgba(200,180,255,0.3), rgba(40,20,60,0.8));
   z-index: 9999;
   transition: opacity 0.8s ease;
 }
+
 #elysia-lock.hidden {
   opacity: 0;
   pointer-events: none;
 }
 
+/* 锁屏框体 */
 .elysia-lock-box {
   text-align: center;
   padding: 40px 50px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 20px;
-  box-shadow: 0 0 40px rgba(140,110,255,0.25);
-  backdrop-filter: blur(25px);
-  color: #eee;
-  font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+  box-shadow: 0 0 30px rgba(160,130,255,0.25);
+  color: #fff;
+  backdrop-filter: blur(10px);
 }
 
-.elysia-lock-box h2 {
-  margin-bottom: 10px;
-  font-size: 1.3rem;
-  letter-spacing: 0.5px;
-}
-.elysia-lock-box .highlight {
-  color: #caaaff;
-  font-weight: 600;
-}
-
-.elysia-lock-box p {
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-  opacity: 0.8;
-}
-
-#elysia-pass {
-  width: 200px;
+.elysia-lock-box input {
+  margin-top: 15px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
   outline: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 16px;
+  width: 200px;
   text-align: center;
-  font-size: 0.95rem;
-  box-shadow: 0 0 10px rgba(160,130,255,0.25);
-  transition: all 0.3s ease;
-}
-#elysia-pass:focus {
-  box-shadow: 0 0 18px rgba(180,150,255,0.45);
 }
 
-#elysia-submit {
-  margin-top: 18px;
-  padding: 10px 28px;
-  border-radius: 8px;
+.elysia-lock-box button {
+  margin-top: 15px;
+  padding: 8px 18px;
+  border-radius: 10px;
   border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  background: linear-gradient(135deg, #a67bff, #7358ff);
+  background: rgba(180,140,255,0.35);
   color: #fff;
-  font-weight: 500;
-  box-shadow: 0 0 15px rgba(150,120,255,0.4);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
-#elysia-submit:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(170,140,255,0.6);
+
+.elysia-lock-box button:hover {
+  background: rgba(180,140,255,0.55);
 }
 
 #elysia-msg {
-  margin-top: 12px;
-  color: #ff9e9e;
-  font-size: 0.85rem;
-  min-height: 18px;
-  letter-spacing: 0.3px;
+  margin-top: 10px;
+  color: #ffcccc;
+  font-size: 14px;
+}
+
+.highlight {
+  color: #dcbcff;
+  font-weight: 600;
+}
+
+/* ===== 主内容区 ===== */
+#elysia-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+#elysia-content.hidden {
+  display: none;
+}
+
+.elysia-dev-text {
+  font-size: 22px;
+  color: #cdbbff;
+  text-shadow: 0 0 10px rgba(160,130,255,0.3);
+  letter-spacing: 1px;
+  animation: fadeIn 1.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 退出按钮 ===== */
+#elysia-logout {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(180,140,255,0.3);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+#elysia-logout:hover {
+  background: rgba(180,140,255,0.55);
 }
 </style>
+</head>
+<body>
+
+<!-- ===== 加密锁屏层 ===== -->
+<div id="elysia-lock">
+  <div class="elysia-lock-box">
+    <h2>🌸 如果你认识 <span class="highlight">BestElysia</span></h2>
+    <p>请输入您姓名的拼音（全小写），即可查看加密内容：</p>
+    <input type="password" id="elysia-pass" placeholder="输入密码">
+    <button id="elysia-submit">解锁</button>
+    <div id="elysia-msg"></div>
+  </div>
+</div>
+
+<!-- ===== 主内容区域 ===== -->
+<div id="elysia-content" class="hidden">
+  <h2 class="elysia-dev-text">更多内容正在开发中 ✨</h2>
+  <button id="elysia-logout">🔒 重新上锁</button>
+</div>
 
 <script>
-// ===== 多密码加密逻辑（Elysia风格锁屏） =====
-
-// ⚙️ 允许的密码（哈希形式，可添加多个）
-const allowedHashes = [
-  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", // 示例：空字符串哈希
-  // 在控制台输入以下命令生成你的哈希（替换 "shen" 为你的拼音）：
-  // crypto.subtle.digest("SHA-256", new TextEncoder().encode("shen")).then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("")))
+/* ===== 密码验证 + 记忆功能 ===== */
+const validPasswords = [
+  "yanxu",
+  "xuyi",
+  "wutong",
+  "lijing",
+  "zhangying",
+  "xuyuancheng",
+  "zhangyaping",
+  "elysiayouarethebest"
 ];
 
-// 如果已解锁，则直接隐藏锁屏
+const lock = document.getElementById("elysia-lock");
+const content = document.getElementById("elysia-content");
+const msg = document.getElementById("elysia-msg");
+const input = document.getElementById("elysia-pass");
+const logout = document.getElementById("elysia-logout");
+
+/* 已解锁则直接进入内容 */
 if (localStorage.getItem("elysiaUnlocked") === "true") {
-  document.getElementById("elysia-lock").classList.add("hidden");
+  lock.classList.add("hidden");
+  content.classList.remove("hidden");
 }
 
-async function hashText(txt) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
-  return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2, "0")).join("");
-}
-
-document.getElementById("elysia-submit").addEventListener("click", async () => {
-  const input = document.getElementById("elysia-pass").value.trim().toLowerCase();
-  const msg = document.getElementById("elysia-msg");
-  if (!input) {
-    msg.textContent = "请输入您的拼音";
-    return;
-  }
-
-  const inputHash = await hashText(input);
-  if (allowedHashes.includes(inputHash)) {
+/* 点击解锁按钮 */
+document.getElementById("elysia-submit").addEventListener("click", () => {
+  const pass = input.value.trim().toLowerCase();
+  if (validPasswords.includes(pass)) {
+    msg.textContent = "✅ 欢迎回来，Elysian ~";
     localStorage.setItem("elysiaUnlocked", "true");
-    msg.style.color = "#9effd0";
-    msg.textContent = "验证通过 ✨";
     setTimeout(() => {
-      document.getElementById("elysia-lock").classList.add("hidden");
-    }, 500);
+      lock.classList.add("hidden");
+      content.classList.remove("hidden");
+    }, 600);
   } else {
-    msg.textContent = "密码错误，请重试。";
+    msg.textContent = "❌ 密码错误，请再试一次。";
   }
 });
 
-document.getElementById("elysia-pass").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("elysia-submit").click();
+/* 支持回车键 */
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    document.getElementById("elysia-submit").click();
+  }
+});
+
+/* 退出登录（清除记忆） */
+logout.addEventListener("click", () => {
+  localStorage.removeItem("elysiaUnlocked");
+  content.classList.add("hidden");
+  lock.classList.remove("hidden");
 });
 </script>
+
+</body>
+</html>

@@ -233,6 +233,26 @@ main.container li:hover {
   opacity: 1;
   transition: opacity 1s ease;
 }
+/* === 视频背景样式（保持原比例） === */
+.elysia-video-bg {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.elysia-video-bg video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain; /* 保留原始比例 */
+  filter: brightness(0.4) blur(4px);
+}
 
 
   </style>

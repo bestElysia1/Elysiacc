@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia Music + Video Sync (Responsive + Password)</title>
+<title>Elysia Player Test</title>
 <style>
-/* === 页面基础 === */
 body {
   margin: 0;
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background: radial-gradient(circle at 50% 40%, #cdbaff 0%, #1a102a 80%);
-  color: #fff;
+  color: white;
   overflow-x: hidden;
 }
 
-/* === 锁屏 === */
+/* === 密码锁屏层 === */
 #lockscreen {
   position: fixed;
   inset: 0;
   background: rgba(50, 30, 80, 0.6);
   backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,25 +36,20 @@ body {
 #lockscreen h2 {
   color: #fff;
   font-size: 1.3rem;
-  letter-spacing: 2px;
   margin-bottom: 20px;
   text-shadow: 0 0 15px rgba(200,180,255,0.6);
 }
 
 #passwordInput {
-  width: 70%;
-  max-width: 220px;
+  width: 200px;
   padding: 10px 16px;
   font-size: 1rem;
   color: #fff;
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.3);
   border-radius: 25px;
-  outline: none;
   text-align: center;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 10px rgba(200,160,255,0.3);
-  transition: all 0.3s ease;
+  outline: none;
 }
 #passwordInput:focus {
   box-shadow: 0 0 20px rgba(200,160,255,0.7);
@@ -69,102 +64,73 @@ body {
   color: #fff;
   font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(200,160,255,0.4);
   transition: all .3s ease;
 }
 #unlockBtn:hover {
-  box-shadow: 0 0 25px rgba(200,160,255,0.7);
   transform: scale(1.05);
 }
 
-/* === 主体内容 === */
+/* === 主体区 === */
 #mainContent {
   display: none;
-  padding: 20px;
+  padding: 30px;
+  text-align: center;
 }
 
-/* === 视频容器 === */
-.video-section {
+/* === 视频样式 === */
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 30px auto;
+  width: 100%;
+  max-width: 800px;
   position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 15px;
-  margin: 20px 0;
 }
 
-/* 自适应视频尺寸 */
-#videoBanner {
+.video-container video {
   width: 100%;
-  height: auto;
   aspect-ratio: 16 / 9;
-  border-radius: 15px;
   object-fit: cover;
+  border-radius: 20px;
+  background: #000;
 }
 
-/* 封面 */
-#videoCover {
-  position: absolute;
-  inset: 0;
-  background: url('assets/elysiatest.png') center/cover no-repeat;
-  border-radius: 15px;
-  transition: opacity 1s ease;
-  opacity: 1;
-}
-
-/* 标题 */
+/* === 标题样式 === */
 h2 {
-  margin-top: 40px;
-  text-shadow: 0 0 10px rgba(200,180,255,0.6);
-}
-
-/* === 响应式 === */
-@media (max-width: 768px) {
-  body {
-    font-size: 15px;
-  }
-  #videoBanner {
-    aspect-ratio: 16 / 10;
-  }
-  #passwordInput {
-    font-size: 0.9rem;
-  }
-}
-@media (max-width: 480px) {
-  #videoBanner {
-    aspect-ratio: 9 / 10;
-  }
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.3);
 }
 </style>
 </head>
 <body>
 
-<!-- === 密码锁屏 === -->
+<!-- === 密码界面 === -->
 <div id="lockscreen">
-  <h2>输入密码以解锁</h2>
-  <input type="password" id="passwordInput" placeholder="••••••••">
+  <h2>请输入密码以解锁</h2>
+  <input type="password" id="passwordInput" placeholder="123456">
   <button id="unlockBtn">解锁</button>
 </div>
 
 <!-- === 主内容 === -->
 <div id="mainContent">
-  <section class="video-section">
-    <video id="videoBanner" preload="auto" muted loop playsinline>
+  <section class="video-container">
+    <video id="elysiaVideo" muted preload="auto" playsinline>
       <source src="assets/elysiatest.mp4" type="video/mp4">
     </video>
-    <div id="videoCover"></div>
   </section>
 
   <section>
     <h2>一些实用 & 有趣的网址</h2>
     <ul>
-      <li><a href="https://example.com" target="_blank">示例链接 1</a></li>
-      <li><a href="https://example2.com" target="_blank">示例链接 2</a></li>
+      <li><a href="#" style="color:#66aaff;">示例链接 1</a></li>
+      <li><a href="#" style="color:#66aaff;">示例链接 2</a></li>
     </ul>
   </section>
 
-  <!-- 音乐播放器 -->
-  <audio id="player" controls>
-    <source src="assets/music.mp3" type="audio/mp3">
+  <audio id="musicPlayer" controls>
+    <source src="assets/music1.mp3" type="audio/mp3">
   </audio>
 </div>
 
@@ -173,37 +139,28 @@ const unlockBtn = document.getElementById("unlockBtn");
 const input = document.getElementById("passwordInput");
 const lockscreen = document.getElementById("lockscreen");
 const main = document.getElementById("mainContent");
-const cover = document.getElementById("videoCover");
-const video = document.getElementById("videoBanner");
-const audio = document.getElementById("player");
+const video = document.getElementById("elysiaVideo");
+const music = document.getElementById("musicPlayer");
 
-// === 解锁逻辑 ===
 function unlock() {
   if (input.value === "123456") {
-    lockscreen.classList.add("fade-out");
+    lockscreen.style.opacity = 0;
     setTimeout(() => {
       lockscreen.style.display = "none";
       main.style.display = "block";
-      setTimeout(() => cover.style.opacity = 0, 800);
     }, 800);
   } else {
     input.style.boxShadow = "0 0 20px rgba(255,0,0,0.6)";
     setTimeout(()=> input.style.boxShadow = "", 1000);
   }
 }
+
 unlockBtn.addEventListener("click", unlock);
 input.addEventListener("keypress", e => { if (e.key === "Enter") unlock(); });
 
-// === 音乐控制视频播放 ===
-audio.addEventListener("play", () => {
-  video.currentTime = 0;
-  video.play();
-  cover.style.opacity = 0;
-});
-
-audio.addEventListener("pause", () => {
-  video.pause();
-});
+// === 音乐播放控制视频 ===
+music.addEventListener("play", () => video.play());
+music.addEventListener("pause", () => video.pause());
 </script>
 
 </body>

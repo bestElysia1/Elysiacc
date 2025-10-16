@@ -1202,36 +1202,52 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("elysiaVideo");
   const audio = document.querySelector("audio");
-  const coverImg = document.querySelector(".elysia-video-bg img");
+  const coverImg = document.querySelector(".cover-img");
 
-  // 自动播放视频（静音模式兼容）
-  if (video) {
-    video.muted = true;
+  if (!video || !audio) return;
+
+  // ===== 自动播放视频（静音模式） =====
+  video.muted = true;
+  video.loop = true;
+
+  const tryPlayVideo = () => {
     video.play().catch(() => {
-      document.addEventListener("click", () => video.play(), { once: true });
+      // 如果因为用户没交互被阻止，等用户第一次点击页面后再播放
+      document.addEventListener("click", () => {
+        video.play();
+      }, { once: true });
     });
-  }
+  };
+  tryPlayVideo();
 
-  // 封面淡出 & 音乐联动
-  if (audio && video) {
-    const playVideo = () => {
-      video.play();
-      if (coverImg) {
-        coverImg.style.transition = "opacity 0.8s ease";
-        coverImg.style.opacity = "0";
-        setTimeout(() => coverImg.style.display = "none", 800);
-      }
-    };
-    const pauseVideo = () => video.pause();
+  // ===== 音乐联动逻辑 =====
+  const playVideo = () => {
+    video.currentTime = 0; // 每次播放从头开始
+    video.play();
+    if (coverImg) {
+      coverImg.style.transition = "opacity 1s ease";
+      coverImg.style.opacity = "0";
+      setTimeout(() => (coverImg.style.display = "none"), 1000);
+    }
+  };
 
-    audio.addEventListener("play", playVideo);
-    audio.addEventListener("playing", playVideo);
-    audio.addEventListener("pause", pauseVideo);
-    audio.addEventListener("ended", pauseVideo);
-  }
+  const pauseVideo = () => {
+    video.pause();
+    if (coverImg) {
+      coverImg.style.display = "block";
+      setTimeout(() => {
+        coverImg.style.opacity = "1";
+      }, 50);
+    }
+  };
+
+  audio.addEventListener("play", playVideo);
+  audio.addEventListener("playing", playVideo);
+  audio.addEventListener("pause", pauseVideo);
+  audio.addEventListener("ended", pauseVideo);
 });
 </script>
 

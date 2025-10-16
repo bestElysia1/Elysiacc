@@ -485,16 +485,7 @@ domain:chatgpt.com</pre>
 
 <!-- 🎞 视频容器 -->
 <div class="elysia-video-wrapper">
-  <video id="elysiaVideo" autoplay muted playsinline loop preload="auto">
-    <source src="assets/elysiatest.mp4" type="video/mp4">
-    <source src="assets/elysiatest2.mp4" type="video/mp4">
-    <source src="assets/elysiatest3.mp4" type="video/mp4">
-    <source src="assets/elysiatest4.mp4" type="video/mp4">
-    <source src="assets/elysiatest5.mp4" type="video/mp4">
-    <source src="assets/elysiatest6.mp4" type="video/mp4">
-    <source src="assets/elysiatest7.mp4" type="video/mp4">
-    <source src="assets/elysiatest8.mp4" type="video/mp4">
-  </video>
+  <video id="elysiaVideo" autoplay muted playsinline preload="auto"></video>
 </div>
 
 <style>
@@ -512,8 +503,14 @@ domain:chatgpt.com</pre>
 }
 
 @keyframes floatUpDown {
-  0%, 100% { transform: translateY(0px); box-shadow: 0 0 40px rgba(180,150,255,0.2); }
-  50% { transform: translateY(-8px); box-shadow: 0 0 60px rgba(180,150,255,0.35); }
+  0%, 100% {
+    transform: translateY(0px);
+    box-shadow: 0 0 40px rgba(180,150,255,0.2);
+  }
+  50% {
+    transform: translateY(-8px);
+    box-shadow: 0 0 60px rgba(180,150,255,0.35);
+  }
 }
 
 .elysia-video-wrapper::after {
@@ -536,34 +533,51 @@ domain:chatgpt.com</pre>
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: blur(0);
-  transition: filter 1.2s ease;
   border-radius: 18px;
+  transition: opacity 0.8s ease;
 }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("elysiaVideo");
-  const sources = video.querySelectorAll("source");
+  const videoList = [
+    "assets/elysiatest.mp4",
+    "assets/elysiatest2.mp4",
+    "assets/elysiatest3.mp4",
+    "assets/elysiatest4.mp4",
+    "assets/elysiatest5.mp4",
+    "assets/elysiatest6.mp4",
+    "assets/elysiatest7.mp4",
+    "assets/elysiatest8.mp4"
+  ];
   let index = 0;
 
-  video.addEventListener("ended", () => {
-    index = (index + 1) % sources.length;
-    video.src = sources[index].src;
-    video.load();
-    video.play().catch(err => console.log("视频自动播放被阻止：", err));
-  });
-
-  // 预加载视频
-  sources.forEach(src => {
-    const preloadVid = document.createElement("video");
-    preloadVid.src = src.src;
-    preloadVid.preload = "auto";
-  });
-
-  // 初始自动播放
+  // 初始化视频
+  video.src = videoList[index];
+  video.load();
   video.play().catch(err => console.log("自动播放被阻止：", err));
+
+  // 视频结束时切换到下一个
+  video.addEventListener("ended", () => {
+    video.style.opacity = 0; // 淡出
+    index = (index + 1) % videoList.length;
+    setTimeout(() => {
+      video.src = videoList[index];
+      video.load();
+      video.play().catch(err => console.log("视频切换失败：", err));
+      video.style.opacity = 1; // 淡入
+    }, 400);
+  });
+
+  // 预加载全部视频
+  videoList.forEach(src => {
+    const preload = document.createElement("link");
+    preload.rel = "preload";
+    preload.as = "video";
+    preload.href = src;
+    document.head.appendChild(preload);
+  });
 });
 </script>
 

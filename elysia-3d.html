@@ -1,360 +1,146 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elysia Player Page</title>
-<style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: radial-gradient(circle at 50% 40%, #cdbaff 0%, #1a102a 80%);
-  color: white;
-  overflow-x: hidden;
-}
+<!-- ===== Elysia 风格加密锁屏层 ===== -->
+<div id="elysia-lock">
+  <div class="elysia-lock-box">
+    <h2>🔮 如果你认识 <span class="highlight">bestelysia</span></h2>
+    <p>请输入您姓名的拼音（全小写），即可查看加密内容。</p>
+    <input type="password" id="elysia-pass" placeholder="请输入拼音..." />
+    <button id="elysia-submit">解锁</button>
+    <div id="elysia-msg"></div>
+  </div>
+</div>
 
-/* === 密码锁屏层 === */
-#lockscreen {
+<style>
+#elysia-lock {
   position: fixed;
   inset: 0;
-  background: rgba(50, 30, 80, 0.6);
-  backdrop-filter: blur(30px) saturate(180%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(20px) saturate(160%);
+  background: radial-gradient(circle at 30% 30%, rgba(90,60,200,0.35), rgba(10,6,30,0.9));
   z-index: 9999;
-  animation: glowFlow 6s infinite alternate ease-in-out;
+  transition: opacity 0.8s ease;
 }
-@keyframes glowFlow {
-  0% { background-color: rgba(90, 60, 150, 0.4); }
-  100% { background-color: rgba(140, 100, 255, 0.4); }
-}
-#lockscreen h2 {
-  color: #fff;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  text-shadow: 0 0 15px rgba(200,180,255,0.6);
-}
-#passwordInput {
-  width: 200px;
-  padding: 10px 16px;
-  font-size: 1rem;
-  color: #fff;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 25px;
-  text-align: center;
-  outline: none;
-}
-#passwordInput:focus {
-  box-shadow: 0 0 20px rgba(200,160,255,0.7);
-}
-#unlockBtn {
-  margin-top: 15px;
-  padding: 8px 20px;
-  border: none;
-  border-radius: 25px;
-  background: linear-gradient(90deg, #a084ff, #cbb2ff);
-  color: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all .3s ease;
-}
-#unlockBtn:hover {
-  transform: scale(1.05);
-}
-
-/* === 主体区 === */
-#mainContent {
-  display: none;
-  padding: 30px;
-  text-align: center;
-}
-
-/* === 视频样式 === */
-.video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto 30px auto;
-  width: 100%;
-  max-width: 800px;
-  position: relative;
-}
-.video-container video {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 20px;
-  background: #000;
-}
-
-/* === 标题样式 === */
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  text-shadow: 0 0 15px rgba(255,255,255,0.3);
-}
-</style>
-</head>
-<body>
-
-<!-- === 密码界面 === -->
-<div id="lockscreen">
-  <h2>请输入密码以解锁</h2>
-  <input type="password" id="passwordInput" placeholder="123456">
-  <button id="unlockBtn">解锁</button>
-</div>
-
-<!-- === 主内容 === -->
-<div id="mainContent">
-  <section class="video-container">
-    <video id="elysiaVideo" muted preload="auto" playsinline>
-      <source src="assets/elysiatest.mp4" type="video/mp4">
-    </video>
-  </section>
-
-  <section>
-    <h2>一些实用 & 有趣的网址</h2>
-    <ul>
-      <li><a href="#" style="color:#66aaff;">示例链接 1</a></li>
-      <li><a href="#" style="color:#66aaff;">示例链接 2</a></li>
-    </ul>
-  </section>
-</div>
-
-<!-- === 🎵 Elysia 播放器 === -->
-<div class="elysia-player">
-  <div class="elysia-controls">
-    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
-    <button id="nextBtn" aria-label="Next">⏭</button>
-  </div>
-  <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
-</div>
-<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
-
-<!-- ===== 脚本区域 ===== -->
-<script>
-const unlockBtn = document.getElementById("unlockBtn");
-const input = document.getElementById("passwordInput");
-const lockscreen = document.getElementById("lockscreen");
-const main = document.getElementById("mainContent");
-const video = document.getElementById("elysiaVideo");
-
-function unlock() {
-  if (input.value === "123456") {
-    lockscreen.style.opacity = 0;
-    setTimeout(() => {
-      lockscreen.style.display = "none";
-      main.style.display = "block";
-    }, 800);
-  } else {
-    input.style.boxShadow = "0 0 20px rgba(255,0,0,0.6)";
-    setTimeout(()=> input.style.boxShadow = "", 1000);
-  }
-}
-unlockBtn.addEventListener("click", unlock);
-input.addEventListener("keypress", e => { if (e.key === "Enter") unlock(); });
-
-/* === Elysia 播放器脚本（整合版） === */
-const songs = [
-  { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
-  { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/My Most Precious Treasure (From My Most Precious Treasure).jpg" }
-  // 你原来的完整列表继续保持不变…
-];
-let currentSong = 0;
-const audio = new Audio(songs[currentSong].src);
-audio.preload = "auto";
-const playPauseBtn = document.getElementById("playPauseBtn");
-const nextBtn = document.getElementById("nextBtn");
-const titleEl = document.getElementById("songTitle");
-const player = document.querySelector(".elysia-player");
-const playlist = document.getElementById("playlist");
-
-function renderPlaylist() {
-  playlist.innerHTML = songs.map((s, i) => `
-    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
-      ${s.title}
-    </div>`).join("");
-}
-function updateSong() {
-  const song = songs[currentSong];
-  audio.src = song.src;
-  titleEl.textContent = song.title;
-  audio.play().catch(()=>{});
-  playPauseBtn.textContent = "⏸";
-  renderPlaylist();
-}
-playPauseBtn.addEventListener("click", () => {
-  if (audio.paused) { audio.play(); playPauseBtn.textContent = "⏸"; video.play(); }
-  else { audio.pause(); playPauseBtn.textContent = "▶"; video.pause(); }
-});
-nextBtn.addEventListener("click", () => { currentSong = (currentSong + 1) % songs.length; updateSong(); });
-audio.addEventListener("ended", () => nextBtn.click());
-renderPlaylist();
-updateSong();
-</script>
-
-<style>
-/* ====== 基础：液态玻璃播放器 ====== */
-.elysia-player {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 8px 20px;
-  border-radius: 16px;
-  z-index: 9999;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-  transition: opacity .6s ease, transform .6s ease;
-  will-change: transform, opacity;
-}
-.elysia-player::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
-  filter: blur(36px);
-  opacity: 0.9;
-  animation: moveBlobs 14s ease-in-out infinite;
+#elysia-lock.hidden {
+  opacity: 0;
   pointer-events: none;
-  mix-blend-mode: screen;
 }
 
-  
-/* 控制按钮 */
-.elysia-controls { display:flex; gap:10px; }
-.elysia-controls button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
-}
-.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
-
-/* 歌曲名 */
-#songTitle {
-  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
-  text-shadow:0 0 10px rgba(160,120,255,0.45);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
-  will-change: transform;
+.elysia-lock-box {
+  text-align: center;
+  padding: 40px 50px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(140,110,255,0.25);
+  backdrop-filter: blur(25px);
+  color: #eee;
+  font-family: 'Poppins', 'Noto Sans SC', sans-serif;
 }
 
-/* ===== 播放列表（改进） ===== */
-/* 关键：transform-origin 设置为底部中心，这样缩放看起来像往播放器位置收回 */
-.elysia-playlist {
-  position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.98);
-  transform-origin: 50% 100%;
-  width: 260px;
-  max-height: 260px;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: rgba(255,240,255,0.25);
-  border: 1px solid rgba(255,210,255,0.35);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  overflow-y: auto;
-  opacity: 0; pointer-events: none;
-  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
-  z-index: 9998;
-  will-change: transform, opacity;
+.elysia-lock-box h2 {
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+.elysia-lock-box .highlight {
+  color: #caaaff;
+  font-weight: 600;
 }
 
-/* 歌曲名文字颜色调整为淡紫色调 */
-.playlist-item {
-  padding: 6px 10px;
-  color: #cdbaff; /* 更亮的淡紫色文字 */
+.elysia-lock-box p {
   font-size: 0.9rem;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+#elysia-pass {
+  width: 200px;
+  padding: 10px 14px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.playlist-item:hover {
-  background: rgba(160, 120, 255, 0.15);
-  color: #ffffff; /* 悬停时变亮 */
-}
-
-.playlist-item.active {
-  background: rgba(160, 120, 255, 0.25);
+  border: none;
+  background: rgba(255,255,255,0.1);
   color: #fff;
-  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
-  animation: softPulse 3s ease-in-out infinite;
+  outline: none;
+  text-align: center;
+  font-size: 0.95rem;
+  box-shadow: 0 0 10px rgba(160,130,255,0.25);
+  transition: all 0.3s ease;
 }
-/* 中等项 */
-@keyframes dockBounceOpen {
-  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
-  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
-  75%  { transform: translateX(-50%) scale(0.97); }
-  100% { transform: translateX(-50%) scale(1); }
-}
-
-@keyframes dockBounceClose {
-  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  35%  { transform: translateX(-50%) scale(1.04); }
-  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+#elysia-pass:focus {
+  box-shadow: 0 0 18px rgba(180,150,255,0.45);
 }
 
-/* 发光波纹层（使用 ::after） */
-.elysia-playlist::after {
-  content: ""; position: absolute; inset: 0; border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
-  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+#elysia-submit {
+  margin-top: 18px;
+  padding: 10px 28px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #a67bff, #7358ff);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 0 15px rgba(150,120,255,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
-.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
-
-/* 应用动画类 */
-.elysia-playlist.show {
-  opacity: 1; pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
-  transform-origin: 50% 100%;
-}
-.elysia-playlist.hide {
-  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 50% 100%;
+#elysia-submit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(170,140,255,0.6);
 }
 
-/* 小动画 */
-@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
-@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
-
-/* === 轻柔飘浮动画（Elysia 风格） === */
-@keyframes elysiaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+#elysia-msg {
+  margin-top: 12px;
+  color: #ff9e9e;
+  font-size: 0.85rem;
+  min-height: 18px;
+  letter-spacing: 0.3px;
 }
-
-.elysia-player {
-  animation: elysiaFloat 6s ease-in-out infinite;
-}
-
-
-/* 可访问性与微调 */
-.elysia-playlist { scrollbar-width: thin; }
-.elysia-playlist .playlist-item { outline: none; }
-
-/* 若需要更强的“回收”视觉，可更改 dockBounceClose 最后一帧 scale 值（越小收回越彻底） */
 </style>
 
+<script>
+// ===== 多密码加密逻辑（Elysia风格锁屏） =====
 
+// ⚙️ 允许的密码（哈希形式，可添加多个）
+const allowedHashes = [
+  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", // 示例：空字符串哈希
+  // 在控制台输入以下命令生成你的哈希（替换 "shen" 为你的拼音）：
+  // crypto.subtle.digest("SHA-256", new TextEncoder().encode("shen")).then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("")))
+];
 
+// 如果已解锁，则直接隐藏锁屏
+if (localStorage.getItem("elysiaUnlocked") === "true") {
+  document.getElementById("elysia-lock").classList.add("hidden");
+}
 
+async function hashText(txt) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+  return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2, "0")).join("");
+}
 
-</body>
-</html>
+document.getElementById("elysia-submit").addEventListener("click", async () => {
+  const input = document.getElementById("elysia-pass").value.trim().toLowerCase();
+  const msg = document.getElementById("elysia-msg");
+  if (!input) {
+    msg.textContent = "请输入您的拼音";
+    return;
+  }
+
+  const inputHash = await hashText(input);
+  if (allowedHashes.includes(inputHash)) {
+    localStorage.setItem("elysiaUnlocked", "true");
+    msg.style.color = "#9effd0";
+    msg.textContent = "验证通过 ✨";
+    setTimeout(() => {
+      document.getElementById("elysia-lock").classList.add("hidden");
+    }, 500);
+  } else {
+    msg.textContent = "密码错误，请重试。";
+  }
+});
+
+document.getElementById("elysia-pass").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("elysia-submit").click();
+});
+</script>

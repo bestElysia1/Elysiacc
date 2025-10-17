@@ -3,69 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>可见樱花飘落测试</title>
+<title>网易樱花飘落（使用 banner1.jpg）</title>
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    height: 100vh;
-    background: linear-gradient(to bottom, #fff, #f7f7f7);
-    font-family: system-ui, sans-serif;
-  }
+body {
+  margin: 0;
+  background: #f8f8f8;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  /* 飘落容器 */
-  .sakura {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 9999;
-  }
+/* 樱花容器 */
+#sakura {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
 
-  /* 使用 emoji 🌸 显示花瓣 */
-  .sakura span {
-    position: absolute;
-    top: -50px;
-    font-size: 24px;
-    animation: fall linear infinite;
-    opacity: 0.9;
-  }
+/* 花瓣（此处使用 banner1.jpg） */
+.petal {
+  position: absolute;
+  top: -40px;
+  width: 24px;
+  height: 24px;
+  background: url('banner1.jpg') no-repeat center / cover;
+  opacity: 0.85;
+  animation: fall linear infinite;
+  border-radius: 50%;
+}
 
-  @keyframes fall {
-    0% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh) rotate(360deg);
-      opacity: 0;
-    }
+/* 下落动画 */
+@keyframes fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotateZ(0deg);
+    opacity: 1;
   }
+  100% {
+    transform: translate3d(100px, 100vh, 0) rotateZ(360deg);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 <body>
 
 <h1 style="text-align:center; padding-top:40vh; color:#333; font-weight:500;">
-  🌸 樱花飘落测试成功 🌸
+  🌸 网易风格飘落效果（banner1.jpg） 🌸
 </h1>
 
-<div class="sakura" id="sakura"></div>
+<div id="sakura"></div>
 
 <script>
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function createPetal() {
+  const sakura = document.getElementById('sakura');
+  const petal = document.createElement('div');
+  petal.classList.add('petal');
+  petal.style.left = random(0, 100) + 'vw';
+  petal.style.animationDuration = random(6, 12) + 's';
+  petal.style.animationDelay = random(0, 3) + 's';
+  petal.style.transform = `rotateZ(${random(0, 360)}deg)`;
+  sakura.appendChild(petal);
+
+  // 飘落完自动删除
+  setTimeout(() => petal.remove(), 12000);
+}
+
 function showSakura() {
-  const container = document.getElementById('sakura');
-  for (let i = 0; i < 30; i++) {
-    const petal = document.createElement('span');
-    petal.textContent = '🌸';
-    petal.style.left = Math.random() * 100 + 'vw';
-    petal.style.animationDuration = 5 + Math.random() * 5 + 's';
-    petal.style.animationDelay = Math.random() * 2 + 's';
-    container.appendChild(petal);
+  for (let i = 0; i < 40; i++) {
+    setTimeout(createPetal, i * 200);
   }
-  setTimeout(() => container.remove(), 8000);
+  // 整体容器10秒后移除
+  setTimeout(() => document.getElementById('sakura').remove(), 10000);
 }
 
 if (!localStorage.getItem('sakuraShown')) {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>网易樱花飘落效果示例</title>
+<title>樱花飘落测试（香港国旗版）</title>
 <style>
   body {
     margin: 0;
@@ -12,7 +12,7 @@
     height: 100vh;
   }
 
-  /* === 樱花容器 === */
+  /* 飘落容器 */
   .sakura {
     position: fixed;
     top: 0;
@@ -24,18 +24,18 @@
     z-index: 9999;
   }
 
-  /* === 樱花花瓣 === */
+  /* 花瓣（此处改为香港区旗） */
   .sakura span {
     position: absolute;
     top: -50px;
-    width: 20px;
-    height: 20px;
-    background: url('https://cdn.jsdelivr.net/gh/xtzero/sakura-fall/sakura.png') no-repeat center / contain;
+    width: 24px;
+    height: 24px;
+    background: url('https://flagcdn.com/w40/hk.png') no-repeat center / contain;
     animation: fall linear infinite;
     opacity: 0.9;
   }
 
-  /* === 花瓣飘落动画 === */
+  /* 飘落动画 */
   @keyframes fall {
     0% {
       transform: translateY(0) rotate(0deg);
@@ -51,10 +51,9 @@
 <body>
 
 <h1 style="text-align:center; padding-top:40vh; color:#333; font-weight:500;">
-  🌸 欢迎来到网易风格首页 🌸
+  🇭🇰 香港国旗飘落测试 🌸
 </h1>
 
-<!-- 樱花容器 -->
 <div class="sakura" id="sakura"></div>
 
 <script>
@@ -67,12 +66,9 @@ function showSakura() {
     petal.style.animationDelay = Math.random() * 2 + 's';
     container.appendChild(petal);
   }
-
-  // 8秒后移除容器（动画结束）
   setTimeout(() => container.remove(), 8000);
 }
 
-// 首次打开显示樱花
 if (!localStorage.getItem('sakuraShown')) {
   showSakura();
   localStorage.setItem('sakuraShown', 'true');

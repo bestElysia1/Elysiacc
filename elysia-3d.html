@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>樱花飘落测试（香港国旗版）</title>
+<title>可见樱花飘落测试</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
-    background: #f8f8f8;
     height: 100vh;
+    background: linear-gradient(to bottom, #fff, #f7f7f7);
+    font-family: system-ui, sans-serif;
   }
 
   /* 飘落容器 */
@@ -24,18 +25,15 @@
     z-index: 9999;
   }
 
-  /* 花瓣（此处改为香港区旗） */
+  /* 使用 emoji 🌸 显示花瓣 */
   .sakura span {
     position: absolute;
     top: -50px;
-    width: 24px;
-    height: 24px;
-    background: url('https://flagcdn.com/w40/hk.png') no-repeat center / contain;
+    font-size: 24px;
     animation: fall linear infinite;
     opacity: 0.9;
   }
 
-  /* 飘落动画 */
   @keyframes fall {
     0% {
       transform: translateY(0) rotate(0deg);
@@ -51,7 +49,7 @@
 <body>
 
 <h1 style="text-align:center; padding-top:40vh; color:#333; font-weight:500;">
-  🇭🇰 香港国旗飘落测试 🌸
+  🌸 樱花飘落测试成功 🌸
 </h1>
 
 <div class="sakura" id="sakura"></div>
@@ -59,8 +57,9 @@
 <script>
 function showSakura() {
   const container = document.getElementById('sakura');
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 30; i++) {
     const petal = document.createElement('span');
+    petal.textContent = '🌸';
     petal.style.left = Math.random() * 100 + 'vw';
     petal.style.animationDuration = 5 + Math.random() * 5 + 's';
     petal.style.animationDelay = Math.random() * 2 + 's';

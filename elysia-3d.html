@@ -1,94 +1,59 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>网易樱花飘落（使用 banner1.jpg）</title>
-<style>
-body {
-  margin: 0;
-  background: #f8f8f8;
-  height: 100vh;
-  overflow: hidden;
-}
+  <meta charset="UTF-8">
+  <title>樱花雨动态背景</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fff4f3;
+      overflow: hidden;
+      cursor: pointer;
+    }
 
-/* 樱花容器 */
-#sakura {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 9999;
-}
+    /* 樱花样式：使用本地路径 assets/banner1.jpg 作为背景图 */
+   .sakura {
+      position: absolute;
+      width: 15px; /* 可调整樱花大小 */
+      height: 15px;
+      background-image: url('assets/banner1.jpg'); /* 替换为你的本地图片路径 */
+      background-size: cover; /* 让图片适应元素大小 */
+      background-repeat: no-repeat; /* 避免图片重复 */
+      animation: fall 8s linear infinite; /* 下落动画，8秒/次 */
+      opacity: 0;
+      pointer-events: none;
+    }
 
-/* 花瓣（此处使用 banner1.jpg） */
-.petal {
-  position: absolute;
-  top: -40px;
-  width: 24px;
-  height: 24px;
-  background: url('banner1.jpg') no-repeat center / cover;
-  opacity: 0.85;
-  animation: fall linear infinite;
-  border-radius: 50%;
-}
-
-/* 下落动画 */
-@keyframes fall {
-  0% {
-    transform: translate3d(0, 0, 0) rotateZ(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(100px, 100vh, 0) rotateZ(360deg);
-    opacity: 0;
-  }
-}
-</style>
+    @keyframes fall {
+      0% {
+        transform: translate(calc(Math.random() * 50px - 25px), -100%); /* 左右轻微晃动 */
+        opacity: 0;
+        animation-delay: calc(Math.random() * 5s); /* 随机延迟出现，避免同步 */
+      }
+      10% {
+        opacity: 0.8; /* 樱花最清晰的状态 */
+      }
+      100% {
+        transform: translate(calc(Math.random() * 50px - 25px), 100vh); /* 落到页面底部 */
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<h1 style="text-align:center; padding-top:40vh; color:#333; font-weight:500;">
-  🌸 网易风格飘落效果（banner1.jpg） 🌸
-</h1>
-
-<div id="sakura"></div>
-
-<script>
-function random(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function createPetal() {
-  const sakura = document.getElementById('sakura');
-  const petal = document.createElement('div');
-  petal.classList.add('petal');
-  petal.style.left = random(0, 100) + 'vw';
-  petal.style.animationDuration = random(6, 12) + 's';
-  petal.style.animationDelay = random(0, 3) + 's';
-  petal.style.transform = `rotateZ(${random(0, 360)}deg)`;
-  sakura.appendChild(petal);
-
-  // 飘落完自动删除
-  setTimeout(() => petal.remove(), 12000);
-}
-
-function showSakura() {
-  for (let i = 0; i < 40; i++) {
-    setTimeout(createPetal, i * 200);
-  }
-  // 整体容器10秒后移除
-  setTimeout(() => document.getElementById('sakura').remove(), 10000);
-}
-
-if (!localStorage.getItem('sakuraShown')) {
-  showSakura();
-  localStorage.setItem('sakuraShown', 'true');
-}
-</script>
-
+  <script>
+    const documentBody = document.body;
+    // 生成150朵樱花（数量可调整，越多越密集）
+    for (let i = 0; i < 150; i++) {
+      const sakura = document.createElement('div');
+      sakura.className ='sakura';
+      // 随机分布在页面左侧
+      sakura.style.left = `${Math.random() * window.innerWidth}px`;
+      // 随机调整动画时长（5-10秒），让下落速度有差异
+      sakura.style.animationDuration = `${5 + Math.random() * 5}s`;
+      documentBody.appendChild(sakura);
+    }
+  </script>
 </body>
 </html>

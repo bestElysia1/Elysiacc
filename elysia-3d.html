@@ -53,13 +53,51 @@
       color: #bca7ff;
     }
 
-    .elysia-footer-icons span {
+    .elysia-footer-icons span,
+    .elysia-footer-icons a {
       cursor: default;
-      transition: transform 0.25s ease;
+      transition: transform 0.25s ease, opacity 0.6s ease;
+      text-decoration: none;
+      color: inherit;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInIcons 1.2s ease forwards;
     }
 
-    .elysia-footer-icons span:hover {
+    /* 按序列依次淡入 */
+    .elysia-footer-icons span:nth-child(1),
+    .elysia-footer-icons a:nth-child(1) { animation-delay: 0.2s; }
+    .elysia-footer-icons span:nth-child(2) { animation-delay: 0.4s; }
+    .elysia-footer-icons span:nth-child(3) { animation-delay: 0.6s; }
+    .elysia-footer-icons span:nth-child(4) { animation-delay: 0.8s; }
+    .elysia-footer-icons span:nth-child(5) { animation-delay: 1.0s; }
+
+    @keyframes fadeInIcons {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 悬停轻微放大 */
+    .elysia-footer-icons span:hover,
+    .elysia-footer-icons a:hover {
       transform: scale(1.2);
+    }
+
+    /* ✉️ 邮箱呼吸光晕动画 */
+    .elysia-footer-icons a.mail-icon {
+      animation: fadeInIcons 1.2s ease forwards, glowPulse 3s ease-in-out infinite;
+      animation-delay: 0.2s;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 0 0 4px rgba(188,167,255,0.3), 0 0 10px rgba(188,167,255,0.2);
+      }
+      50% {
+        text-shadow: 0 0 12px rgba(188,167,255,0.75), 0 0 20px rgba(188,167,255,0.5);
+      }
     }
   </style>
 </head>
@@ -106,8 +144,6 @@
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
     
     <h1>More content is under development...</h1>
   </main>
@@ -115,7 +151,7 @@
   <!-- 🌐 联系方式页脚（静态展示） -->
   <footer>
     <div class="elysia-footer-icons">
-      <span title= <a href="mailto:bestElysia+support@hotmail.com">✉️</span>
+      <a href="mailto:bestElysia+support@hotmail.com" class="mail-icon" title="Email">✉️</a>
       <span title="Telegram">💬</span>
       <span title="X (Twitter)">🕊️</span>
       <span title="Discord">💠</span>

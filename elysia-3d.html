@@ -74,7 +74,6 @@
       text-decoration: none;
       color: inherit;
       display: inline-block;
-      cursor: default;
       transition: transform 0.25s ease;
       animation: glowPulse 3s ease-in-out infinite;
     }
@@ -89,7 +88,7 @@
       100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
     }
 
-    /* === Telegram 图片图标 === */
+    /* === Telegram 与 邮箱图标统一风格 === */
     .tele-icon {
       width: 40px;
       height: 40px;
@@ -101,6 +100,25 @@
     }
 
     .tele-icon:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(180,150,255,0.8);
+    }
+
+    .email-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(180,150,255,0.4);
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+      color: #6a58b5;
+      font-size: 20px;
+    }
+
+    .email-icon:hover {
       transform: scale(1.15);
       box-shadow: 0 0 20px rgba(180,150,255,0.8);
     }
@@ -142,7 +160,7 @@
 
   <footer>
     <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
+      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">✉️</a>
       <a href="https://t.me/bestElysia_bot" title="Telegram">
         <img src="assets/tele1.jpg" alt="Telegram" class="tele-icon">
       </a>

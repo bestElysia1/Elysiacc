@@ -2,182 +2,137 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elysia Secret Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elysia contact</title>
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", "Noto Sans", sans-serif;
-      background: linear-gradient(180deg, #ffffff 0%, #f5f0ff 100%);
-      color: #333;
-      min-height: 100vh;
+      height: 100vh;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      overflow: hidden;
+      color: #fff;
       display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      text-align: center;
-      padding: 60px 20px;
+      font-family: 'Segoe UI', sans-serif;
+      user-select: none;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     h1 {
-      color: #6a58b5;
-      font-weight: 500;
-      font-size: 1.4rem;
-      margin: 12px 0;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 1s ease-out, transform 1s ease-out;
+      font-size: 4em;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      animation: glow 2s ease-in-out infinite alternate;
     }
 
-    h1.visible {
-      opacity: 1;
-      transform: translateY(0);
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #fff; }
+      to { text-shadow: 0 0 30px #b499ff; }
     }
 
-    /* === 液态玻璃风格页脚 === */
-    footer {
-      width: 100%;
-      padding: 18px 0 20px 0;
-      background: rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(10px) saturate(180%);
-      -webkit-backdrop-filter: blur(10px) saturate(180%);
-      border-top: 1px solid rgba(160, 130, 255, 0.2);
-      box-shadow: 0 -4px 20px rgba(180,150,255,0.15);
-      animation: footerGlow 4s ease-in-out infinite alternate;
-      text-align: center;
-      color: #6a58b5;
-    }
-
-    @keyframes footerGlow {
-      0% { box-shadow: 0 -4px 15px rgba(180,150,255,0.15); }
-      100% { box-shadow: 0 -4px 25px rgba(180,150,255,0.35); }
-    }
-
-    .elysia-footer-icons {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      font-size: 34px;
-      color: #bca7ff;
-      margin-bottom: 8px;
-    }
-
-    .elysia-footer-icons a {
-      text-decoration: none;
-      color: inherit;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: rgba(180,150,255,0.15);
-      transition: transform 0.25s ease, background 0.3s;
-      animation: glowPulse 3s ease-in-out infinite;
-    }
-
-    .elysia-footer-icons a:hover {
-      transform: scale(1.15);
-      background: rgba(180,150,255,0.3);
-    }
-
-    @keyframes glowPulse {
-      0% { text-shadow: 0 0 6px rgba(180,150,255,0.4); }
-      100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
-    }
-
-    /* === 雪花样式 === */
+    /* === 雪花 === */
     .snowflake {
       position: fixed;
       top: -10px;
-      z-index: 999;
-      user-select: none;
+      color: white;
+      font-size: 1em;
       pointer-events: none;
-      animation: fall linear forwards;
+      user-select: none;
+      animation: fall 10s linear forwards;
     }
 
     @keyframes fall {
-      0% { transform: translateX(0) translateY(0) rotate(0deg); }
-      50% { transform: translateX(20px) translateY(55vh) rotate(360deg); }
+      0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
+      50% { transform: translateX(20px) translateY(55vh) rotate(360deg); opacity: 1; }
       100% { transform: translateX(-20px) translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* === 页脚 === */
+    .elysia-footer {
+      position: absolute;
+      bottom: 30px;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 10px 25px;
+      display: flex;
+      gap: 25px;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+      animation: float 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+
+    .elysia-footer a {
+      text-decoration: none;
+      font-size: 24px;
+      color: white;
+      transition: transform 0.25s ease, text-shadow 0.3s ease;
+    }
+
+    .elysia-footer a:hover {
+      transform: scale(1.15);
+      text-shadow: 0 0 15px rgba(180,150,255,0.8);
+    }
+
+    /* === Telegram 图标 === */
+    .tele-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 10px rgba(180,150,255,0.4);
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+    }
+
+    .tele-icon:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(180,150,255,0.8);
     }
   </style>
 </head>
 <body>
+  <h1>Elysia</h1>
 
-  <main>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>下面是联系方式</h1>
-    <h1>More content is under development...</h1>
-  </main>
-
-  <footer>
-    <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
-      <a href="https://t.me/bestElysia_bot" title="Telegram">✈️</a>
-    </div>
-    <div style="font-size:0.9rem; line-height:1.6;">
-      订阅使用指南 ver.3.24  
-      <br>© bestElysia 2025
-    </div>
-  </footer>
+  <div class="elysia-footer">
+    <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
+    <a href="https://t.me/bestElysia_bot" title="Telegram">
+      <img src="assets/tele.JPG" alt="Telegram" class="tele-icon">
+    </a>
+  </div>
 
   <script>
-  // === 滚动淡入效果 ===
-  document.addEventListener("DOMContentLoaded", () => {
-    const fadeElements = document.querySelectorAll("h1");
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-        }
-      });
-    }, { threshold: 0.2 });
+    // === 雪花效果 (持续10秒) ===
+    function createSnow() {
+      const snow = document.createElement("div");
+      snow.classList.add("snowflake");
+      snow.textContent = "❄";
+      snow.style.left = Math.random() * window.innerWidth + "px";
+      snow.style.fontSize = Math.random() * 10 + 10 + "px";
+      snow.style.opacity = Math.random();
+      document.body.appendChild(snow);
 
-    fadeElements.forEach((el, i) => {
-      observer.observe(el);
-      el.style.transitionDelay = `${i * 0.15}s`;
-    });
-  });
-
-  // === 雪花飘落 (仅持续10秒) ===
-  function createSnow() {
-    const snow = document.createElement("div");
-    snow.classList.add("snowflake");
-    snow.textContent = "❄️";
-    snow.style.left = Math.random() * 100 + "vw";
-    snow.style.fontSize = Math.random() * 12 + 12 + "px";
-    snow.style.opacity = 0.8 + Math.random() * 0.2;
-    snow.style.animationDuration = 8 + Math.random() * 5 + "s";
-    document.body.appendChild(snow);
-    setTimeout(() => snow.remove(), 12000);
-  }
-
-  const snowTimer = setInterval(createSnow, 250);
-  setTimeout(() => clearInterval(snowTimer), 10000);
-
-  // === 禁止右键与快捷键 ===
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('keydown', e => {
-    if (
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && e.key === "I") ||
-      (e.ctrlKey && e.key === "U") ||
-      (e.ctrlKey && e.key === "S") ||
-    ) {
-      e.preventDefault();
-      alert("This action is disabled on this page.");
+      setTimeout(() => snow.remove(), 10000);
     }
-  });
-  </script>
 
+    const snowTimer = setInterval(createSnow, 300);
+    setTimeout(() => clearInterval(snowTimer), 10000);
+
+    // === 禁止右键和快捷键 ===
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => {
+      if (e.ctrlKey && ['u','U','s','S','c','C'].includes(e.key)) e.preventDefault();
+      if (e.key === 'F12') e.preventDefault();
+    });
+  </script>
 </body>
 </html>

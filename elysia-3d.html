@@ -41,19 +41,18 @@
       transform: translateY(0);
     }
 
-    /* === 页脚液态玻璃风格 === */
+    /* === 液态玻璃风格页脚 === */
     footer {
-      margin-top: 60px;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      padding: 15px 0;
+      padding: 18px 0 20px 0;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px) saturate(180%);
       -webkit-backdrop-filter: blur(10px) saturate(180%);
       border-top: 1px solid rgba(160, 130, 255, 0.2);
       box-shadow: 0 -4px 20px rgba(180,150,255,0.15);
       animation: footerGlow 4s ease-in-out infinite alternate;
+      text-align: center;
+      color: #6a58b5;
     }
 
     @keyframes footerGlow {
@@ -63,9 +62,11 @@
 
     .elysia-footer-icons {
       display: flex;
+      justify-content: center;
       gap: 25px;
       font-size: 22px;
       color: #bca7ff;
+      margin-bottom: 8px;
     }
 
     .elysia-footer-icons a,
@@ -88,7 +89,7 @@
       100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
     }
 
-    /* === 樱花样式 === */
+    /* === 雪花样式 === */
     .sakura {
       position: fixed;
       top: -10px;
@@ -109,24 +110,23 @@
 <body>
 
   <main>
-    <!-- 主要内容 -->
+    <!-- 页面主要内容 -->
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- 页脚 -->
+  <!-- ✅ 合并版页脚 -->
   <footer>
     <div class="elysia-footer-icons">
       <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
       <a href="@bestElysia_bot" title="Telegram">💬</a>
     </div>
-  </footer>
-
-  <footer>
-    订阅使用指南 ver.3.24  
-    <br>© bestElysia 2025
+    <div style="font-size:0.9rem; line-height:1.6;">
+      订阅使用指南 ver.3.24  
+      <br>© bestElysia 2025
+    </div>
   </footer>
 
   <script>
@@ -147,20 +147,20 @@
     });
   });
 
-  // === 樱花飘落 ===
-  function createSakura() {
-    const sakura = document.createElement("div");
-    sakura.classList.add("sakura");
-    sakura.textContent = "🌸";
-    sakura.style.left = Math.random() * 100 + "vw";
-    sakura.style.fontSize = Math.random() * 14 + 14 + "px";
-    sakura.style.opacity = Math.random();
-    sakura.style.animationDuration = 6 + Math.random() * 4 + "s";
-    sakura.style.transform = `rotate(${Math.random() * 360}deg)`;
-    document.body.appendChild(sakura);
-    setTimeout(() => sakura.remove(), 10000);
+  // === 雪花飘落 ===
+  function createSnow() {
+    const snow = document.createElement("div");
+    snow.classList.add("sakura"); // 复用样式
+    snow.textContent = "❄️";
+    snow.style.left = Math.random() * 100 + "vw";
+    snow.style.fontSize = Math.random() * 12 + 12 + "px";
+    snow.style.opacity = 0.8 + Math.random() * 0.2;
+    snow.style.animationDuration = 8 + Math.random() * 5 + "s"; // 飘得更慢
+    snow.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(snow);
+    setTimeout(() => snow.remove(), 12000);
   }
-  setInterval(createSakura, 250);
+  setInterval(createSnow, 300);
 
   // === 禁止右键、复制、查看源码 ===
   document.addEventListener('contextmenu', e => e.preventDefault());

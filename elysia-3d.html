@@ -63,25 +63,29 @@
     .elysia-footer-icons {
       display: flex;
       justify-content: center;
-      gap: 25px;
-      font-size: 22px;
+      gap: 30px;
+      font-size: 34px;
       color: #bca7ff;
       margin-bottom: 8px;
     }
 
-    .elysia-footer-icons a,
-    .elysia-footer-icons span {
+    .elysia-footer-icons a {
       text-decoration: none;
       color: inherit;
-      display: inline-block;
-      cursor: default;
-      transition: transform 0.25s ease;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(180,150,255,0.15);
+      transition: transform 0.25s ease, background 0.3s;
       animation: glowPulse 3s ease-in-out infinite;
     }
 
-    .elysia-footer-icons a:hover,
-    .elysia-footer-icons span:hover {
-      transform: scale(1.2);
+    .elysia-footer-icons a:hover {
+      transform: scale(1.15);
+      background: rgba(180,150,255,0.3);
     }
 
     @keyframes glowPulse {
@@ -90,7 +94,7 @@
     }
 
     /* === 雪花样式 === */
-    .sakura {
+    .snowflake {
       position: fixed;
       top: -10px;
       z-index: 999;
@@ -100,28 +104,25 @@
     }
 
     @keyframes fall {
-      to {
-        transform: translateY(110vh) rotate(720deg);
-        opacity: 0;
-      }
+      0% { transform: translateX(0) translateY(0) rotate(0deg); }
+      50% { transform: translateX(20px) translateY(55vh) rotate(360deg); }
+      100% { transform: translateX(-20px) translateY(110vh) rotate(720deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
 
   <main>
-    <!-- 页面主要内容 -->
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
+    <h1>下面是联系方式</h1>
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- ✅ 合并版页脚 -->
   <footer>
     <div class="elysia-footer-icons">
       <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
-      <a href="@bestElysia_bot" title="Telegram">💬</a>
+      <a href="https://t.me/bestElysia_bot" title="Telegram">✈️</a>
     </div>
     <div style="font-size:0.9rem; line-height:1.6;">
       订阅使用指南 ver.3.24  
@@ -147,22 +148,23 @@
     });
   });
 
-  // === 雪花飘落 ===
+  // === 雪花飘落 (仅持续10秒) ===
   function createSnow() {
     const snow = document.createElement("div");
-    snow.classList.add("sakura"); // 复用样式
+    snow.classList.add("snowflake");
     snow.textContent = "❄️";
     snow.style.left = Math.random() * 100 + "vw";
     snow.style.fontSize = Math.random() * 12 + 12 + "px";
     snow.style.opacity = 0.8 + Math.random() * 0.2;
-    snow.style.animationDuration = 8 + Math.random() * 5 + "s"; // 飘得更慢
-    snow.style.transform = `rotate(${Math.random() * 360}deg)`;
+    snow.style.animationDuration = 8 + Math.random() * 5 + "s";
     document.body.appendChild(snow);
     setTimeout(() => snow.remove(), 12000);
   }
-  setInterval(createSnow, 300);
 
-  // === 禁止右键、复制、查看源码 ===
+  const snowTimer = setInterval(createSnow, 250);
+  setTimeout(() => clearInterval(snowTimer), 10000);
+
+  // === 禁止右键与快捷键 ===
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (
@@ -170,7 +172,6 @@
       (e.ctrlKey && e.shiftKey && e.key === "I") ||
       (e.ctrlKey && e.key === "U") ||
       (e.ctrlKey && e.key === "S") ||
-      (e.ctrlKey && e.key === "C")
     ) {
       e.preventDefault();
       alert("This action is disabled on this page.");

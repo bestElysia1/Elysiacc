@@ -30,6 +30,14 @@
       font-weight: 500;
       font-size: 1.4rem;
       margin: 12px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    h1.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     /* === 页脚液态玻璃风格 === */
@@ -44,6 +52,12 @@
       -webkit-backdrop-filter: blur(10px) saturate(180%);
       border-top: 1px solid rgba(160, 130, 255, 0.2);
       box-shadow: 0 -4px 20px rgba(180,150,255,0.15);
+      animation: footerGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes footerGlow {
+      0% { box-shadow: 0 -4px 15px rgba(180,150,255,0.15); }
+      100% { box-shadow: 0 -4px 25px rgba(180,150,255,0.35); }
     }
 
     .elysia-footer-icons {
@@ -53,58 +67,30 @@
       color: #bca7ff;
     }
 
-    .elysia-footer-icons span,
-    .elysia-footer-icons a {
-      cursor: default;
-      transition: transform 0.25s ease, opacity 0.6s ease;
+    .elysia-footer-icons a,
+    .elysia-footer-icons span {
       text-decoration: none;
       color: inherit;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInIcons 1.2s ease forwards;
+      display: inline-block;
+      cursor: default;
+      transition: transform 0.25s ease;
+      animation: glowPulse 3s ease-in-out infinite;
     }
 
-    /* 按序列依次淡入 */
-    .elysia-footer-icons span:nth-child(1),
-    .elysia-footer-icons a:nth-child(1) { animation-delay: 0.2s; }
-    .elysia-footer-icons span:nth-child(2) { animation-delay: 0.4s; }
-    .elysia-footer-icons span:nth-child(3) { animation-delay: 0.6s; }
-    .elysia-footer-icons span:nth-child(4) { animation-delay: 0.8s; }
-    .elysia-footer-icons span:nth-child(5) { animation-delay: 1.0s; }
-
-    @keyframes fadeInIcons {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* 悬停轻微放大 */
-    .elysia-footer-icons span:hover,
-    .elysia-footer-icons a:hover {
+    .elysia-footer-icons a:hover,
+    .elysia-footer-icons span:hover {
       transform: scale(1.2);
     }
 
-    /* ✉️ 邮箱呼吸光晕动画 */
-    .elysia-footer-icons a.mail-icon {
-      animation: fadeInIcons 1.2s ease forwards, glowPulse 3s ease-in-out infinite;
-      animation-delay: 0.2s;
-    }
-
     @keyframes glowPulse {
-      0%, 100% {
-        text-shadow: 0 0 4px rgba(188,167,255,0.3), 0 0 10px rgba(188,167,255,0.2);
-      }
-      50% {
-        text-shadow: 0 0 12px rgba(188,167,255,0.75), 0 0 20px rgba(188,167,255,0.5);
-      }
+      0% { text-shadow: 0 0 6px rgba(180,150,255,0.4); }
+      100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
     }
   </style>
 </head>
 <body>
 
   <main>
-
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
@@ -115,49 +101,39 @@
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- 🌐 联系方式页脚（静态展示） -->
+  <!-- 🌐 联系方式页脚 -->
   <footer>
     <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" class="mail-icon" title="Email">✉️</a>
+      <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
       <span title="Telegram">💬</span>
       <span title="X (Twitter)">🕊️</span>
       <span title="Discord">💠</span>
       <span title="Website">🌐</span>
     </div>
   </footer>
+
+  <script>
+  // === 滚动淡入效果 ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const fadeElements = document.querySelectorAll("h1");
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, { threshold: 0.2 });
+
+    fadeElements.forEach((el, i) => {
+      observer.observe(el);
+      // 为每行淡入加时间延迟
+      el.style.transitionDelay = `${i * 0.15}s`;
+    });
+  });
+  </script>
 
 </body>
 </html>

@@ -31,13 +31,16 @@
       font-size: 1.4rem;
       margin: 12px 0;
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 1s ease-out, transform 1s ease-out;
+      transform: translateY(20px) scale(0.98);
+      filter: blur(2px);
+      transition: opacity 1s ease-out, transform 1s ease-out, filter 1s ease-out;
     }
 
     h1.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+      text-shadow: 0 0 10px rgba(180,150,255,0.25);
     }
 
     /* === 页脚液态玻璃风格 === */
@@ -45,14 +48,18 @@
       margin-top: 60px;
       width: 100%;
       display: flex;
-      justify-content: center;
-      padding: 15px 0;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px 0 25px;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px) saturate(180%);
       -webkit-backdrop-filter: blur(10px) saturate(180%);
       border-top: 1px solid rgba(160, 130, 255, 0.2);
       box-shadow: 0 -4px 20px rgba(180,150,255,0.15);
       animation: footerGlow 4s ease-in-out infinite alternate;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6d5dbb;
     }
 
     @keyframes footerGlow {
@@ -65,37 +72,41 @@
       gap: 25px;
       font-size: 22px;
       color: #bca7ff;
+      margin-bottom: 10px;
     }
 
-    .elysia-footer-icons a,
-    .elysia-footer-icons span {
+    .elysia-footer-icons a {
       text-decoration: none;
       color: inherit;
       display: inline-block;
-      cursor: default;
       transition: transform 0.25s ease;
       animation: glowPulse 3s ease-in-out infinite;
     }
 
-    .elysia-footer-icons a:hover,
-    .elysia-footer-icons span:hover {
-      transform: scale(1.2);
+    .elysia-footer-icons a:hover {
+      transform: scale(1.25);
     }
 
     @keyframes glowPulse {
       0% { text-shadow: 0 0 6px rgba(180,150,255,0.4); }
       100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
     }
+
+    .elysia-footer-text {
+      line-height: 1.6;
+      animation: fadeIn 2.5s ease-in-out 0.5s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
   <main>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
-    <h1>This page has been fully encrypted</h1>
+    <!-- 多行淡入文字 -->
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
@@ -124,18 +135,17 @@
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- 🌐 联系方式页脚 -->
+  <!-- 🌐 页脚 -->
   <footer>
     <div class="elysia-footer-icons">
       <a href="mailto:bestElysia+support@hotmail.com" title="Email">✉️</a>
-      <a href="@bestElysia_bot" title="Telegram">💬</a>
+      <a href="https://t.me/bestElysia_bot" title="Telegram">💬</a>
+    </div>
+    <div class="elysia-footer-text">
+      订阅使用指南 ver.3.24 · 特别鸣谢 bestElysia, CM, Raymond, bulianglin, Program-think, GMOogway
+      <br>© bestElysia 2025
     </div>
   </footer>
-
-  <footer>
-  订阅使用指南 ver.3.24 · 特别鸣谢 bestElysia, CM, Raymond, bulianglin, Program-think, GMOogway
-  <br>© bestElysia 2025
-</footer>
 
   <script>
   // === 滚动淡入效果 ===
@@ -151,7 +161,6 @@
 
     fadeElements.forEach((el, i) => {
       observer.observe(el);
-      // 为每行淡入加时间延迟
       el.style.transitionDelay = `${i * 0.15}s`;
     });
   });

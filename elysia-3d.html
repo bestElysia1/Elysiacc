@@ -1,36 +1,75 @@
-<!-- === 联系我 === -->
-<section id="contact" class="contact-card">
-  <h2>Contact Me</h2>
-  <p>如果你想与我联系，请通过以下方式：</p>
-  <ul>
-    <li>📧 Email：<a href="mailto:bestelysia@outlook.com">bestelysia@outlook.com</a></li>
-    <li>💬 Telegram：<a href="https://t.me/bestelysia" target="_blank">@bestelysia</a></li>
-  </ul>
-</section>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elysia Footer</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #f6f0ff 0%, #f0ebff 100%);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #444;
+    }
 
-<style>
-.contact-card {
-  margin: 60px auto;
-  width: 90%;
-  max-width: 420px;
-  padding: 20px 25px;
-  border-radius: 20px;
-  backdrop-filter: blur(15px) saturate(180%);
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 32px rgba(99, 93, 255, 0.2);
-  color: #5f4bb6;
-  text-align: center;
-  transition: transform 0.3s ease;
-}
-.contact-card:hover {
-  transform: scale(1.02);
-}
-.contact-card a {
-  color: #6b5be8;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-.contact-card a:hover {
-  color: #a18fff;
-}
-</style>
+    /* 🌐 页脚容器 */
+    .elysia-footer {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 24px;
+      font-size: 22px;
+      color: #bca7ff;
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 10px 20px;
+      box-shadow: 0 0 20px rgba(150,120,255,0.2);
+      user-select: none;
+      z-index: 999;
+      transition: background 0.3s ease;
+    }
+
+    .elysia-footer:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .elysia-footer span {
+      cursor: default;
+      transition: transform 0.2s ease;
+    }
+
+    .elysia-footer span:hover {
+      transform: scale(1.2);
+    }
+
+    /* ⛅ 可选标题展示 */
+    h1 {
+      font-size: 24px;
+      color: #a18aff;
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>更多内容正在开发中…</h1>
+
+  <!-- 🌐 联系方式页脚 -->
+  <div class="elysia-footer">
+    <span title="Email">✉️</span>
+    <span title="Telegram">💬</span>
+    <span title="X (Twitter)">🕊️</span>
+    <span title="Discord">💠</span>
+    <span title="Website">🌐</span>
+  </div>
+
+</body>
+</html>

@@ -18,48 +18,47 @@
     main {
       flex: 1;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 40px 20px;
+      padding: 60px 20px;
     }
 
     h1 {
       color: #6a58b5;
       font-weight: 500;
       font-size: 1.4rem;
+      margin: 12px 0;
     }
 
-    /* === 底部液态玻璃页脚 === */
-    .elysia-footer {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
+    /* === 页脚液态玻璃风格 === */
+    footer {
+      margin-top: 60px;
+      width: 100%;
       display: flex;
-      gap: 22px;
+      justify-content: center;
+      padding: 15px 0;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      border-top: 1px solid rgba(160, 130, 255, 0.2);
+      box-shadow: 0 -4px 20px rgba(180,150,255,0.15);
+    }
+
+    .elysia-footer-icons {
+      display: flex;
+      gap: 25px;
       font-size: 22px;
       color: #bca7ff;
-      backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 12px;
-      padding: 10px 22px;
-      box-shadow: 0 0 20px rgba(150,120,255,0.2);
-      user-select: none;
-      z-index: 9999;
-      transition: background 0.3s ease;
     }
 
-    .elysia-footer:hover {
-      background: rgba(255, 255, 255, 0.35);
-    }
-
-    .elysia-footer span {
+    .elysia-footer-icons span {
       cursor: default;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s ease;
     }
 
-    .elysia-footer span:hover {
+    .elysia-footer-icons span:hover {
       transform: scale(1.2);
     }
   </style>
@@ -67,17 +66,22 @@
 <body>
 
   <main>
+    <h1>订阅链接1：https://basic.bestxuyi.us/basic</h1>
+    <h1>订阅链接2：https://bestxuyi.us/onlymyrailgun</h1>
+    <h1>This page has been fully encrypted</h1>
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- 🌐 联系方式页脚 -->
-  <div class="elysia-footer">
-    <span title="Email">✉️</span>
-    <span title="Telegram">💬</span>
-    <span title="X (Twitter)">🕊️</span>
-    <span title="Discord">💠</span>
-    <span title="Website">🌐</span>
-  </div>
+  <!-- 🌐 联系方式页脚（静态展示） -->
+  <footer>
+    <div class="elysia-footer-icons">
+      <span title="Email">✉️</span>
+      <span title="Telegram">💬</span>
+      <span title="X (Twitter)">🕊️</span>
+      <span title="Discord">💠</span>
+      <span title="Website">🌐</span>
+    </div>
+  </footer>
 
 </body>
 </html>

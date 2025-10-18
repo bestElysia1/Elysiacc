@@ -1,59 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>樱花雨动态背景</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #fff4f3;
-      overflow: hidden;
-      cursor: pointer;
-    }
+<!-- === 联系我 === -->
+<section id="contact" class="contact-card">
+  <h2>Contact Me</h2>
+  <p>如果你想与我联系，请通过以下方式：</p>
+  <ul>
+    <li>📧 Email：<a href="mailto:bestelysia@outlook.com">bestelysia@outlook.com</a></li>
+    <li>💬 Telegram：<a href="https://t.me/bestelysia" target="_blank">@bestelysia</a></li>
+  </ul>
+</section>
 
-    /* 樱花样式：使用本地路径 assets/banner1.jpg 作为背景图 */
-   .sakura {
-      position: absolute;
-      width: 15px; /* 可调整樱花大小 */
-      height: 15px;
-      background-image: url('assets/banner1.jpg'); /* 替换为你的本地图片路径 */
-      background-size: cover; /* 让图片适应元素大小 */
-      background-repeat: no-repeat; /* 避免图片重复 */
-      animation: fall 8s linear infinite; /* 下落动画，8秒/次 */
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    @keyframes fall {
-      0% {
-        transform: translate(calc(Math.random() * 50px - 25px), -100%); /* 左右轻微晃动 */
-        opacity: 0;
-        animation-delay: calc(Math.random() * 5s); /* 随机延迟出现，避免同步 */
-      }
-      10% {
-        opacity: 0.8; /* 樱花最清晰的状态 */
-      }
-      100% {
-        transform: translate(calc(Math.random() * 50px - 25px), 100vh); /* 落到页面底部 */
-        opacity: 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <script>
-    const documentBody = document.body;
-    // 生成150朵樱花（数量可调整，越多越密集）
-    for (let i = 0; i < 150; i++) {
-      const sakura = document.createElement('div');
-      sakura.className ='sakura';
-      // 随机分布在页面左侧
-      sakura.style.left = `${Math.random() * window.innerWidth}px`;
-      // 随机调整动画时长（5-10秒），让下落速度有差异
-      sakura.style.animationDuration = `${5 + Math.random() * 5}s`;
-      documentBody.appendChild(sakura);
-    }
-  </script>
-</body>
-</html>
+<style>
+.contact-card {
+  margin: 60px auto;
+  width: 90%;
+  max-width: 420px;
+  padding: 20px 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px) saturate(180%);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(99, 93, 255, 0.2);
+  color: #5f4bb6;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+.contact-card:hover {
+  transform: scale(1.02);
+}
+.contact-card a {
+  color: #6b5be8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.contact-card a:hover {
+  color: #a18fff;
+}
+</style>

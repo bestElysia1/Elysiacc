@@ -1302,7 +1302,48 @@ document.addEventListener('keydown', e => {
 }, true);
 </script>
 
+<style>
+  /* 增加淡出过渡动画 */
+  .hamburger {
+    transition: opacity 0.5s ease;
+  }
+</style>
 
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  let hideTimer;
+
+  // 隐藏菜单按钮
+  function hideHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '0';
+      hamburger.style.pointerEvents = 'none';
+    }
+  }
+
+  // 显示菜单按钮
+  function showHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '1';
+      hamburger.style.pointerEvents = 'auto';
+    }
+  }
+
+  // 重置计时器（有用户操作时执行）
+  function resetHideTimer() {
+    showHamburger();
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideHamburger, 30000); // 30秒无操作后隐藏
+  }
+
+  // 监听用户交互事件
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, resetHideTimer);
+  });
+
+  // 初始化
+  resetHideTimer();
+</script>
 
 </body>
 </html>

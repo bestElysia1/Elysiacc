@@ -1221,20 +1221,20 @@ updateSong();
   animation: softPulse 3s ease-in-out infinite;
 }
 
-/* ===== 打开：dockBounceOpen ===== */
+/* === 打开 === */
 @keyframes dockBounceOpen {
   0% {
-    transform: translateX(-50%) scale(0.75);
+    transform: translateX(-50%) scale(0.72);
     opacity: 0;
   }
   45% {
-    transform: translateX(-50%) scale(1.1);
+    transform: translateX(-50%) scale(1.12);
     opacity: 1;
   }
-  65% {
-    transform: translateX(-50%) scale(0.93);
+  70% {
+    transform: translateX(-50%) scale(0.96);
   }
-  85% {
+  88% {
     transform: translateX(-50%) scale(1.04);
   }
   100% {
@@ -1242,23 +1242,25 @@ updateSong();
   }
 }
 
-/* ===== 关闭：dockBounceClose ===== */
+/* === 关闭 === */
 @keyframes dockBounceClose {
   0% {
     transform: translateX(-50%) scale(1);
     opacity: 1;
   }
-  25% {
-    transform: translateX(-50%) scale(1.06);
+  20% {
+    transform: translateX(-50%) scale(1.05);
   }
   45% {
-    transform: translateX(-50%) scale(0.92);
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0.9;
   }
   70% {
-    transform: translateX(-50%) scale(1.03);
+    transform: translateX(-50%) scale(1.02);
+    opacity: 0.7;
   }
   100% {
-    transform: translateX(-50%) scale(0.7);
+    transform: translateX(-50%) scale(0.65);
     opacity: 0;
   }
 }

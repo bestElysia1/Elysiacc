@@ -1220,43 +1220,18 @@ updateSong();
   box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
-
-/* === 打开 === */
+/* 中等项 */
 @keyframes dockBounceOpen {
-  0% {
-    transform: translateY(20px) scale(0.95);
-    opacity: 0;
-  }
-  50% {
-    transform: translateY(-10px) scale(1.05);
-    opacity: 1;
-  }
-  70% {
-    transform: translateY(5px) scale(0.98);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
 }
 
-/* === 关闭 === */
 @keyframes dockBounceClose {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-  30% {
-    transform: translateY(-8px) scale(1.04);
-  }
-  60% {
-    transform: translateY(12px) scale(0.93);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(20px) scale(0.85);
-    opacity: 0;
-  }
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
 }
 
 /* 发光波纹层（使用 ::after） */

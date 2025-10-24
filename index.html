@@ -217,18 +217,20 @@ main.container li:hover {
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->
-<div class="dropdown">  
-<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
-</a>
-<div class="dropdown-content">
+<div class="dropdown">
+  <a href="#" class="hamburger" aria-label="爱莉希雅">
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+  </a>
+  <div class="dropdown-content">
     <a href="elysia-3d.html">elysia</a>
     <a href="contact.html">contact</a>
   </div>
-  
+</div>
+
 <style>
+/* 汉堡按钮 */
 .hamburger {
   position: fixed;
   left: 14px;
@@ -255,14 +257,57 @@ main.container li:hover {
   box-shadow: 0 0 25px rgba(150,120,255,0.25);
   transform: scale(1.05);
 }
+
+/* 汉堡按钮内的线条 */
 .hb-line {
-  display:block;
+  display: block;
   width: 20px;
   height: 2px;
   border-radius: 2px;
   background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
   background-size: 200% auto;
   animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+}
+
+/* 下拉菜单容器 */
+.dropdown {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  z-index: 10000;
+}
+
+/* 下拉内容 */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 54px;
+  left: 0;
+  min-width: 140px;
+  background: rgba(30, 20, 60, 0.85);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(100, 80, 200, 0.25);
+  overflow: hidden;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 14px;
+  color: #f0e9ff;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.25s, color 0.25s;
+}
+
+.dropdown-content a:hover {
+  background: rgba(150,120,255,0.15);
+  color: #fff;
+}
+
+/* 悬停显示菜单 */
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 /* 流动微光 */

@@ -159,9 +159,9 @@ footer:hover {
   }
   50% {
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(156,107,255,0.9),
-                 0 0 20px rgba(156,107,255,0.6),
-                 0 0 30px rgba(156,107,255,0.3);
+    text-shadow: 0 0 10px rgba(180,140,255,0.9),
+                 0 0 20px rgba(160,120,255,0.6),
+                 0 0 30px rgba(160,120,255,0.3);
   }
   100% {
     color: #9a6ef0;
@@ -257,10 +257,10 @@ main.container li:hover {
   left: 14px;
   transform: translateX(0) scale(0.98);
   transform-origin: 0% 0%; /* 从左上角展开 */
-  width: 180px;
-  max-height: 200px;
-  padding: 12px 16px;
-  border-radius: 16px;
+  width: 240px; /* 增大宽度 */
+  max-height: 300px; /* 增大最大高度 */
+  padding: 16px 20px; /* 增大内边距 */
+  border-radius: 18px; /* 略增大圆角 */
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
@@ -280,15 +280,15 @@ main.container li:hover {
 }
 
 .nav-dropdown li {
-  margin: 6px 0;
+  margin: 8px 0; /* 增大间距 */
 }
 
 .nav-dropdown a {
   display: block;
-  padding: 8px 12px;
+  padding: 10px 14px; /* 增大padding */
   color: #f2eaff;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1rem; /* 增大字体 */
   border-radius: 8px;
   transition: background 0.2s ease;
   text-shadow: 0 0 8px rgba(160,120,255,0.3);
@@ -367,6 +367,16 @@ main.container li:hover {
 @keyframes moveBlobs { 
   0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
+}
+
+/* 媒体查询：小屏幕自适应 */
+@media (max-width: 600px) {
+  .nav-dropdown {
+    width: 90vw; /* 占满屏幕宽度 */
+    left: 5vw;
+    top: 70px; /* 调整位置避免重叠 */
+    transform-origin: 50% 0%; /* 从顶部中心展开 */
+  }
 }
 </style>
 
@@ -753,7 +763,7 @@ document.addEventListener("DOMContentLoaded", () => {
         preloadNext();
         bindEvents(); // 🔥 切换后重新绑定事件
       }, 800);
-    }).catch(err => {
+    }).then(err => {
       switching = false;
       console.warn("⚠️ 播放被阻止:", err);
     });
@@ -1187,7 +1197,7 @@ function updateSong() {
   const song = songs[currentSong];
   audio.src = song.src;
   titleEl.textContent = song.title;
-  audio.play().catch(()=>{});
+  audio.play().then(()=>{});
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
   updateMediaSession(song);
@@ -1392,7 +1402,7 @@ updateSong();
 
 .playlist-item:hover {
   background: rgba(160, 120, 255, 0.15);
-  color: #ffffff; /* 悬停时变亮 */
+  color: #ffffff; /* 悬停时变变 */
 }
 
 .playlist-item.active {

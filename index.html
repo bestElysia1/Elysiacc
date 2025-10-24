@@ -218,7 +218,6 @@ main.container li:hover {
 <body>
 <!-- 爱莉希雅入口按钮 -->
 <div class="dropdown">
-  <a href="#" class="hamburger" aria-label="爱莉希雅">
     <span class="hb-line"></span>
     <span class="hb-line"></span>
     <span class="hb-line"></span>
@@ -230,6 +229,16 @@ main.container li:hover {
 </div>
 
 <style>
+/* 变量定义 - 淡紫色调 */
+:root {
+  --accent-purple: #c7a4ff; /* 淡紫主色 */
+  --light-purple: #e6d9ff; /* 更淡紫 */
+  --glass-bg: rgba(230, 225, 255, 0.18); /* 液态玻璃背景 */
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --text-color: #6a1b9a; /* 深紫文字 */
+  --shadow-color: rgba(147, 112, 219, 0.25); /* 紫色阴影 */
+}
+
 /* 汉堡按钮 */
 .hamburger {
   position: fixed;
@@ -243,18 +252,18 @@ main.container li:hover {
   gap: 6px;
   align-items: center;
   z-index: 10001;
-  background: rgba(255,255,255,0.04);
-  border-radius: 10px;
+  background: var(--glass-bg);
+  border-radius: 12px;
   padding: 6px;
   text-decoration: none;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 6px 20px var(--shadow-color);
   transition: all 0.3s ease;
 }
 .hamburger:hover {
-  box-shadow: 0 0 25px rgba(150,120,255,0.25);
+  box-shadow: 0 0 25px var(--shadow-color);
   transform: scale(1.05);
 }
 
@@ -264,7 +273,7 @@ main.container li:hover {
   width: 20px;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  background: linear-gradient(90deg, var(--accent-purple), var(--light-purple), var(--accent-purple));
   background-size: 200% auto;
   animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
 }
@@ -284,30 +293,42 @@ main.container li:hover {
   top: 54px;
   left: 0;
   min-width: 140px;
-  background: rgba(30, 20, 60, 0.85);
-  border-radius: 10px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 25px rgba(100, 80, 200, 0.25);
+  background: var(--glass-bg);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 25px var(--shadow-color);
   overflow: hidden;
+  border: 1px solid var(--glass-border);
+  transform: translateY(36px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease;
+}
+
+.dropdown-content.open {
+  display: block;
+  opacity: 1;
+  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards;
 }
 
 .dropdown-content a {
   display: block;
   padding: 10px 14px;
-  color: #f0e9ff;
+  color: var(--text-color);
   text-decoration: none;
   font-size: 14px;
   transition: background 0.25s, color 0.25s;
 }
 
 .dropdown-content a:hover {
-  background: rgba(150,120,255,0.15);
+  background: rgba(230, 225, 255, 0.25);
   color: #fff;
 }
 
-/* 悬停显示菜单 */
-.dropdown:hover .dropdown-content {
-  display: block;
+/* Dock-like 弹出动画 */
+@keyframes dockPop {
+  0% { transform: translateY(36px) scale(0.96); filter: brightness(0.92); }
+  55% { transform: translateY(-10px) scale(1.08); filter: brightness(1.12); }
+  100% { transform: translateY(0) scale(1); filter: brightness(1); }
 }
 
 /* 流动微光 */
@@ -318,10 +339,12 @@ main.container li:hover {
 
 /* 呼吸光晕 */
 @keyframes breathe {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
-  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px var(--shadow-color); }
+  50% { opacity: 1; box-shadow: 0 0 12px var(--shadow-color); }
 }
 </style>
+
+
   <nav class="leftnav" aria-hidden="true">
    
   </nav>
@@ -1395,5 +1418,21 @@ document.addEventListener('keydown', e => {
   resetHideTimer();
 </script>
 
+  <script>
+// 点击切换下拉菜单
+document.querySelector('.hamburger').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.querySelector('.dropdown-content').classList.toggle('open');
+});
+
+// 点击外部关闭菜单
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.dropdown');
+  if (!dropdown.contains(e.target)) {
+    document.querySelector('.dropdown-content').classList.remove('open');
+  }
+});
+</script>
+  
 </body>
 </html>

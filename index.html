@@ -2,26 +2,8 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.3.24</title>
-  <meta name="description" content="Elysia 使用指南与更新说明" />
-
-  <!-- ✅ 网站图标 favicon -->
-  <link rel="icon" href="assets/banner1.jpg" type="image/png" />
-  <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
-
-  <!-- ✅ Open Graph 分享信息（微信 / 微博 / Facebook / LinkedIn） -->
-  <meta property="og:title" content="订阅使用指南 ver.3.24" />
-  <meta property="og:description" content="Elysia 使用指南与更新说明" />
-  <meta property="og:image" content="https://elysia.bestxuyi.us/assets/bannershare.png" />
-  <meta property="og:url" content="https://elysia.bestxuyi.us" />
-  <meta property="og:type" content="website" />
-
-  <!-- ✅ Twitter 分享卡片 -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="订阅使用指南 ver.3.24" />
-  <meta name="twitter:description" content="Elysia 使用指南与更新说明" />
-  <meta name="twitter:image" content="https://elysia.bestxuyi.us/assets/bannershare.png"/>
   <style>
     :root{
       --accent-start: #9a6ef0;
@@ -159,9 +141,9 @@ footer:hover {
   }
   50% {
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(180,140,255,0.9),
-                 0 0 20px rgba(160,120,255,0.6),
-                 0 0 30px rgba(160,120,255,0.3);
+    text-shadow: 0 0 10px rgba(156,107,255,0.9),
+                 0 0 20px rgba(156,107,255,0.6),
+                 0 0 30px rgba(156,107,255,0.3);
   }
   100% {
     color: #9a6ef0;
@@ -235,180 +217,11 @@ main.container li:hover {
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->
-<div class="hamburger" id="navToggle" aria-label="导航菜单">
+<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
-</div>
-
-<!-- 新增的下拉菜单 -->
-<div class="nav-dropdown" id="navDropdown">
-  <ul>
-    <li><a href="https://elysia.bestxuyi.us">Homepage</a></li>
-    <li><a href="https://elysia.bestxuyi.us/elysia-3d.html">Elysia 3D</a></li>
-  </ul>
-</div>
-
-<style>
-/* ====== 导航下拉菜单（淡紫玻璃液态风格） ====== */
-.nav-dropdown {
-  position: fixed;
-  top: 60px; /* 汉堡菜单下方 */
-  left: 14px;
-  transform: translateX(0) scale(0.98);
-  transform-origin: 0% 0%; /* 从左上角展开 */
-  width: 240px; /* 增大宽度 */
-  max-height: 300px; /* 增大最大高度 */
-  padding: 16px 20px; /* 增大内边距 */
-  border-radius: 18px; /* 略增大圆角 */
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  overflow-y: auto;
-  opacity: 0; 
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.4s ease-in-out;
-  z-index: 9999;
-  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-}
-
-.nav-dropdown ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-dropdown li {
-  margin: 8px 0; /* 增大间距 */
-}
-
-.nav-dropdown a {
-  display: block;
-  padding: 10px 14px; /* 增大padding */
-  color: #f2eaff;
-  text-decoration: none;
-  font-size: 1rem; /* 增大字体 */
-  border-radius: 8px;
-  transition: background 0.2s ease;
-  text-shadow: 0 0 8px rgba(160,120,255,0.3);
-}
-
-.nav-dropdown a:hover {
-  background: rgba(160,120,255,0.25);
-  box-shadow: 0 0 12px rgba(160,120,255,0.4);
-}
-
-/* ====== 液态背景层 ====== */
-.nav-dropdown::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
-  filter: blur(36px);
-  opacity: 0.9;
-  animation: moveBlobs 14s ease-in-out infinite;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-/* ====== 优化的 Mac OS Dock 风格动画 ====== */
-@keyframes dockBounceOpen {
-  0%   { transform: translateX(0) scale(0.9); opacity: 0; }
-  60%  { transform: translateX(0) scale(1.05); opacity: 1; }
-  80%  { transform: translateX(0) scale(0.98); }
-  100% { transform: translateX(0) scale(1); }
-}
-
-@keyframes dockBounceClose {
-  0%   { transform: translateX(0) scale(1); opacity: 1; }
-  40%  { transform: translateX(0) scale(1.02); }
-  100% { transform: translateX(0) scale(0.9); opacity: 0; }
-}
-
-/* ====== 发光波纹层 ====== */
-.nav-dropdown::after {
-  content: ""; 
-  position: absolute; 
-  inset: 0; 
-  border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
-  opacity: 0; 
-  transform: scale(0.8); 
-  pointer-events: none; 
-  transition: opacity .5s ease, transform .5s ease;
-}
-
-.nav-dropdown.show::after { 
-  opacity: 1; 
-  transform: scale(1.2); 
-}
-
-.nav-dropdown.hide::after { 
-  opacity: 0; 
-  transform: scale(0.8); 
-}
-
-/* ====== 应用动画类 ====== */
-.nav-dropdown.show {
-  opacity: 1; 
-  pointer-events: auto;
-  animation: dockBounceOpen 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; /* 调整为更平滑的 overshoot 曲线 */
-}
-
-.nav-dropdown.hide {
-  animation: dockBounceClose 0.3s ease-in-out both; /* 使用 ease-in-out 使关闭更自然 */
-}
-
-/* 小动画 */
-@keyframes moveBlobs { 
-  0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
-  50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
-}
-
-/* 媒体查询：小屏幕自适应 */
-@media (max-width: 600px) {
-  .nav-dropdown {
-    width: 90vw; /* 占满屏幕宽度 */
-    left: 5vw;
-    top: 70px; /* 调整位置避免重叠 */
-    transform-origin: 50% 0%; /* 从顶部中心展开 */
-  }
-}
-</style>
-
-<script>
-/* ====== 下拉菜单 toggle ====== */
-const navToggle = document.getElementById('navToggle');
-const navDropdown = document.getElementById('navDropdown');
-
-function openNav() {
-  navDropdown.classList.remove("hide");
-  navDropdown.classList.add("show");
-  navDropdown.setAttribute('aria-hidden', 'false');
-}
-
-function closeNav() {
-  navDropdown.classList.remove("show");
-  navDropdown.classList.add("hide");
-  navDropdown.setAttribute('aria-hidden', 'true');
-}
-
-navToggle.addEventListener("click", e => {
-  e.stopPropagation();
-  navDropdown.classList.contains("show") ? closeNav() : openNav();
-});
-
-// 点击外部关闭
-document.addEventListener("click", e => {
-  if (!navDropdown.contains(e.target) && e.target !== navToggle) {
-    if (navDropdown.classList.contains("show")) closeNav();
-  }
-});
-</script>
+</a>
 
 <style>
 .hamburger {
@@ -763,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
         preloadNext();
         bindEvents(); // 🔥 切换后重新绑定事件
       }, 800);
-    }).then(err => {
+    }).catch(err => {
       switching = false;
       console.warn("⚠️ 播放被阻止:", err);
     });
@@ -1197,7 +1010,7 @@ function updateSong() {
   const song = songs[currentSong];
   audio.src = song.src;
   titleEl.textContent = song.title;
-  audio.play().then(()=>{});
+  audio.play().catch(()=>{});
   playPauseBtn.textContent = "⏸";
   renderPlaylist();
   updateMediaSession(song);
@@ -1270,13 +1083,9 @@ function closePlaylist() {
   playlist.setAttribute('aria-hidden', 'true');
 }
 
-function togglePlaylist() {
-  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
-}
-
 titleEl.addEventListener("click", e => {
   e.stopPropagation();
-  togglePlaylist();
+  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
 });
 document.addEventListener("click", e => {
   if (!playlist.contains(e.target) && e.target !== titleEl) {
@@ -1402,7 +1211,7 @@ updateSong();
 
 .playlist-item:hover {
   background: rgba(160, 120, 255, 0.15);
-  color: #ffffff; /* 悬停时变变 */
+  color: #ffffff; /* 悬停时变亮 */
 }
 
 .playlist-item.active {

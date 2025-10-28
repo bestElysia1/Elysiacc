@@ -158,6 +158,240 @@
     <h1>More content is under development...</h1>
   </main>
 
+<div class="elysia-video-wrapper">
+  <video id="videoA" autoplay muted playsinline preload="auto"></video>
+  <video id="videoB" muted playsinline preload="auto"></video>
+</div>
+
+<style>
+.elysia-video-wrapper {
+  position: relative;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(150,120,255,0.15);
+}
+.elysia-video-wrapper video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: opacity 0.8s ease-in-out;
+  background: #000;
+}
+#videoA { opacity: 1; z-index: 2; }
+#videoB { opacity: 0; z-index: 1; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const videos = [
+    "assets/elysiatest.mp4",
+    
+  ];
+
+  const videoA = document.getElementById("videoA");
+  const videoB = document.getElementById("videoB");
+  let current = videoA;
+  let next = videoB;
+  let index = 0;
+  let nextReady = false;
+  let switching = false;
+
+  // === 预加载所有视频 ===
+  const cachePool = videos.map(src => {
+    const v = document.createElement("video");
+    v.src = src;
+    v.preload = "auto";
+    v.muted = true;
+    v.load();
+    return v;
+  });
+
+  function preloadNext() {
+    const nextIndex = (index + 1) % videos.length;
+    next.src = cachePool[nextIndex].src;
+    nextReady = false;
+    next.load();
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
+  }
+
+  function switchVideo() {
+    if (switching) return;
+    switching = true;
+
+    if (!nextReady) {
+      console.log("⏳ 等待下一段缓冲...");
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
+
+    next.currentTime = 0;
+    next.play().then(() => {
+      next.style.opacity = "1";
+      current.style.opacity = "0";
+
+      setTimeout(() => {
+        current.pause();
+        [current, next] = [next, current];
+        index = (index + 1) % videos.length;
+        switching = false;
+        preloadNext();
+        bindEvents(); // 🔥 切换后重新绑定事件
+      }, 800);
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ 播放被阻止:", err);
+    });
+  }
+
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      // 容错: 若时间卡死不触发 ended
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
+    };
+  }
+
+  // === 初始播放 ===
+  current.src = videos[index];
+  bindEvents();
+  preloadNext();
+
+  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
+});
+</script>
+
+  <div class="elysia-video-wrapper">
+  <video id="videoA" autoplay muted playsinline preload="auto"></video>
+  <video id="videoB" muted playsinline preload="auto"></video>
+</div>
+
+<style>
+.elysia-video-wrapper {
+  position: relative;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(150,120,255,0.15);
+}
+.elysia-video-wrapper video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: opacity 0.8s ease-in-out;
+  background: #000;
+}
+#videoA { opacity: 1; z-index: 2; }
+#videoB { opacity: 0; z-index: 1; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const videos = [
+    "assets/elysiatest2.mp4",
+    
+  ];
+
+  const videoA = document.getElementById("videoA");
+  const videoB = document.getElementById("videoB");
+  let current = videoA;
+  let next = videoB;
+  let index = 0;
+  let nextReady = false;
+  let switching = false;
+
+  // === 预加载所有视频 ===
+  const cachePool = videos.map(src => {
+    const v = document.createElement("video");
+    v.src = src;
+    v.preload = "auto";
+    v.muted = true;
+    v.load();
+    return v;
+  });
+
+  function preloadNext() {
+    const nextIndex = (index + 1) % videos.length;
+    next.src = cachePool[nextIndex].src;
+    nextReady = false;
+    next.load();
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
+  }
+
+  function switchVideo() {
+    if (switching) return;
+    switching = true;
+
+    if (!nextReady) {
+      console.log("⏳ 等待下一段缓冲...");
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
+
+    next.currentTime = 0;
+    next.play().then(() => {
+      next.style.opacity = "1";
+      current.style.opacity = "0";
+
+      setTimeout(() => {
+        current.pause();
+        [current, next] = [next, current];
+        index = (index + 1) % videos.length;
+        switching = false;
+        preloadNext();
+        bindEvents(); // 🔥 切换后重新绑定事件
+      }, 800);
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ 播放被阻止:", err);
+    });
+  }
+
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      // 容错: 若时间卡死不触发 ended
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
+    };
+  }
+
+  // === 初始播放 ===
+  current.src = videos[index];
+  bindEvents();
+  preloadNext();
+
+  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
+});
+</script>
+
+  
+
+
+  
   <footer>
     <div class="elysia-footer-icons">
       <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">✉️</a>

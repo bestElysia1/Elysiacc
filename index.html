@@ -217,7 +217,7 @@ main.container li:hover {
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->
-<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
+<a href="#" class="hamburger" aria-label="爱莉希雅" id="hamburger-btn">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
@@ -251,7 +251,7 @@ main.container li:hover {
   transform: scale(1.05);
 }
 .hb-line {
-  display:block;
+  display: block;
   width: 20px;
   height: 2px;
   border-radius: 2px;
@@ -271,10 +271,98 @@ main.container li:hover {
   0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
   50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
 }
+
+/* macOS-style popup window */
+.macos-popup {
+  position: fixed;
+  top: 60px; /* Position below the hamburger button */
+  left: 14px;
+  width: 200px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  z-index: 10000;
+  overflow: hidden;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: none;
+}
+
+.macos-popup.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.macos-popup ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.macos-popup li {
+  padding: 10px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.macos-popup li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.macos-popup li a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* Close on outside click */
+body.popup-open .macos-popup {
+  display: block;
+}
 </style>
-  <nav class="leftnav" aria-hidden="true">
-   
-  </nav>
+
+<nav class="leftnav" aria-hidden="true">
+  <!-- Empty nav, as per original -->
+</nav>
+
+<!-- macOS Popup Content -->
+<div class="macos-popup" id="macos-popup">
+  <ul>
+    <li><a href="elysia-3d.html">Elysia 3D</a></li>
+    <li><a href="contact.html">Contact</a></li> <!-- Assuming contact.html as the link; adjust as needed -->
+  </ul>
+</div>
+
+<script>
+// JavaScript to handle popup toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const popup = document.getElementById('macos-popup');
+
+  hamburgerBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+    popup.classList.toggle('visible');
+    document.body.classList.toggle('popup-open');
+  });
+
+  // Close popup when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!hamburgerBtn.contains(event.target) && !popup.contains(event.target)) {
+      popup.classList.remove('visible');
+      document.body.classList.remove('popup-open');
+    }
+  });
+});
+</script>
+
 
   <main class="container">
     <!-- 🌌 裸眼3D Banner -->

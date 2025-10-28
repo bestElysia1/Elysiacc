@@ -218,9 +218,9 @@ main.container li:hover {
 <body>
 <!-- 爱莉希雅入口按钮 -->
 <a href="#" class="hamburger" aria-label="爱莉希雅" id="hamburger-btn">
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
+  <span class="hb-line hb-top"></span>
+  <span class="hb-line hb-middle"></span>
+  <span class="hb-line hb-bottom"></span>
 </a>
 
 <style>
@@ -245,6 +245,7 @@ main.container li:hover {
   border: 1px solid rgba(255,255,255,0.06);
   box-shadow: 0 6px 20px rgba(150,120,255,0.12);
   transition: all 0.3s ease;
+  will-change: transform, box-shadow;
 }
 .hamburger:hover {
   box-shadow: 0 0 25px rgba(150,120,255,0.25);
@@ -257,19 +258,28 @@ main.container li:hover {
   border-radius: 2px;
   background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
   background-size: 200% auto;
-  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+  animation: glowFlow 3s linear infinite;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  will-change: transform, opacity, background-position;
 }
 
+/* Optimized: Removed breathe animation for better performance; rely on glowFlow only */
 /* 流动微光 */
 @keyframes glowFlow {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
 
-/* 呼吸光晕 */
-@keyframes breathe {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
-  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+/* Hamburger to X transformation */
+.hamburger.open .hb-top {
+  transform: translateY(8px) rotate(45deg);
+}
+.hamburger.open .hb-middle {
+  opacity: 0;
+  transform: scale(0);
+}
+.hamburger.open .hb-bottom {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* macOS-style popup window */
@@ -286,16 +296,17 @@ main.container li:hover {
   border: 1px solid rgba(255, 255, 255, 0.5);
   z-index: 10000;
   overflow: hidden;
-  transform: translateY(-20px);
+  transform: translateY(-20px) scale(0.95);
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
   display: none;
+  will-change: transform, opacity;
 }
 
 .macos-popup.visible {
   display: block;
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .macos-popup ul {
@@ -349,6 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   hamburgerBtn.addEventListener('click', function(event) {
     event.preventDefault();
+    hamburgerBtn.classList.toggle('open');
     popup.classList.toggle('visible');
     document.body.classList.toggle('popup-open');
   });
@@ -356,12 +368,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Close popup when clicking outside
   document.addEventListener('click', function(event) {
     if (!hamburgerBtn.contains(event.target) && !popup.contains(event.target)) {
+      hamburgerBtn.classList.remove('open');
       popup.classList.remove('visible');
       document.body.classList.remove('popup-open');
     }
   });
 });
 </script>
+
 
 
   <main class="container">

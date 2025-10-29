@@ -217,11 +217,13 @@ main.container li:hover {
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->
-<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
+<button class="hamburger" aria-label="爱莉希雅" id="navTrigger">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
-</a>
+</button>
+
+<div class="nav-popup" id="navPopup" aria-hidden="true"></div>
 
 <style>
 .hamburger {
@@ -272,6 +274,133 @@ main.container li:hover {
   50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
 }
 </style>
+
+<style>
+/* ====== 导航弹出菜单（与播放列表风格一致） ====== */
+.nav-popup {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.98);
+  transform-origin: 50% 100%;
+  width: 260px;
+  max-height: 260px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  overflow-y: auto;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  z-index: 9998;
+  will-change: transform, opacity;
+}
+
+.nav-item {
+  padding: 6px 10px;
+  color: #cdbaff;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: block;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff;
+}
+
+/* 中等项 */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* 发光波纹层（使用 ::after） */
+.nav-popup::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.nav-popup.show::after { opacity: 1; transform: scale(1.35); }
+.nav-popup.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 应用动画类 */
+.nav-popup.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.nav-popup.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* 小动画 */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === 轻柔飘浮动画（Elysia 风格） === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.nav-popup {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+</style>
+
+<script>
+// 导航弹出菜单逻辑
+document.addEventListener('DOMContentLoaded', () => {
+  const navTrigger = document.getElementById('navTrigger');
+  const navPopup = document.getElementById('navPopup');
+
+  // 渲染导航列表
+  navPopup.innerHTML = `
+    <a href="elysia-3d.html" class="nav-item" target="_blank" rel="noopener noreferrer">Elysia</a>
+    <a href="mailto:contact@elysia.com" class="nav-item" target="_blank" rel="noopener noreferrer">Contact</a>
+  `; // 注意：替换contact的mailto为实际邮箱
+
+  function openNav() {
+    navPopup.classList.remove("hide");
+    navPopup.classList.add("show");
+    navPopup.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeNav() {
+    navPopup.classList.remove("show");
+    navPopup.classList.add("hide");
+    navPopup.setAttribute('aria-hidden', 'true');
+  }
+
+  navTrigger.addEventListener("click", e => {
+    e.preventDefault();
+    navPopup.classList.contains("show") ? closeNav() : openNav();
+  });
+
+  document.addEventListener("click", e => {
+    if (!navPopup.contains(e.target) && e.target !== navTrigger) {
+      if (navPopup.classList.contains("show")) closeNav();
+    }
+  });
+});
+</script>
+
   <nav class="leftnav" aria-hidden="true">
    
   </nav>

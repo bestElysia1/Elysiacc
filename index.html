@@ -309,13 +309,13 @@ main.container li:hover {
 </style>
 
 <style>
-/* ====== 导航弹出菜单（与播放列表风格一致） ====== */
+/* ====== 导航弹出菜单（与播放列表风格一致，弹出位置调整到hamburger下方） ====== */
 .nav-popup {
   position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.98);
-  transform-origin: 50% 100%;
+  top: 70px;
+  left: 14px;
+  transform: scale(0.98);
+  transform-origin: 0 0; /* top left */
   width: 260px;
   max-height: 260px;
   padding: 10px 14px;
@@ -348,18 +348,18 @@ main.container li:hover {
   color: #ffffff;
 }
 
-/* 中等项 */
+/* 中等项动画（增强流畅度：调整贝塞尔曲线使弹出更丝滑） */
 @keyframes dockBounceOpen {
-  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
-  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
-  75%  { transform: translateX(-50%) scale(0.97); }
-  100% { transform: translateX(-50%) scale(1); }
+  0%   { transform: scale(0.75); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  80%  { transform: scale(0.98); }
+  100% { transform: scale(1); }
 }
 
 @keyframes dockBounceClose {
-  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  35%  { transform: translateX(-50%) scale(1.04); }
-  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(1.02); }
+  100% { transform: scale(0.7); opacity: 0; }
 }
 
 /* 发光波纹层（使用 ::after） */
@@ -371,15 +371,15 @@ main.container li:hover {
 .nav-popup.show::after { opacity: 1; transform: scale(1.35); }
 .nav-popup.hide::after { opacity: 0; transform: scale(0.6); }
 
-/* 应用动画类 */
+/* 应用动画类（使用更平滑的贝塞尔曲线） */
 .nav-popup.show {
   opacity: 1; pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
-  transform-origin: 50% 100%;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  transform-origin: 0 0;
 }
 .nav-popup.hide {
   animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 50% 100%;
+  transform-origin: 0 0;
 }
 
 /* 小动画 */
@@ -388,8 +388,8 @@ main.container li:hover {
 
 /* === 轻柔飘浮动画（Elysia 风格） === */
 @keyframes elysiaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 .nav-popup {
@@ -405,8 +405,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 渲染导航列表
   navPopup.innerHTML = `
-    <a href="elysia-3d.html" class="nav-item" target="_blank" rel="noopener noreferrer">Elysia</a>
-    <a href="mailto:contact@elysia.com" class="nav-item" target="_blank" rel="noopener noreferrer">Contact</a>
+    <a href="elysia-3d.html" class="nav-item" target="_blank" rel="noopener noreferrer">elysia</a>
+    <a href="mailto:contact@elysia.com" class="nav-item" target="_blank" rel="noopener noreferrer">contact</a>
   `; // 注意：替换contact的mailto为实际邮箱
 
   function openNav() {
@@ -1387,17 +1387,17 @@ updateSong();
   box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
-/* 中等项 */
+/* 中等项动画（增强流畅度：调整贝塞尔曲线使弹出更丝滑） */
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
-  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
-  75%  { transform: translateX(-50%) scale(0.97); }
+  60%  { transform: translateX(-50%) scale(1.05); opacity: 1; }
+  80%  { transform: translateX(-50%) scale(0.98); }
   100% { transform: translateX(-50%) scale(1); }
 }
 
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  35%  { transform: translateX(-50%) scale(1.04); }
+  40%  { transform: translateX(-50%) scale(1.02); }
   100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
 }
 
@@ -1410,10 +1410,10 @@ updateSong();
 .elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
-/* 应用动画类 */
+/* 应用动画类（使用更平滑的贝塞尔曲线） */
 .elysia-playlist.show {
   opacity: 1; pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.2, 0.9, 0.3, 1) both;
   transform-origin: 50% 100%;
 }
 .elysia-playlist.hide {

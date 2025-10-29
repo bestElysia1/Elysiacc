@@ -1,43 +1,10 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>订阅使用指南 ver.3.24</title>
-    <meta name="description" content="订阅使用指南 ver.3.24" />
-    <meta name="keywords" content="I AM " />
-    <meta name="author" content="Elysia" />
-
-    <!-- 🌿 网站图标 -->
-    <link rel="icon" type="image/jpg" href="assets/banner.jpg" />
-    <link rel="apple-touch-icon" href="assets/banner.jpg" />
-
-    <!-- 🌍 Open Graph / WhatsApp / Facebook / Telegram -->
-    <meta property="og:title" content="elysiabestxuyi.us — 订阅使用指南 ver.3.24" />
-    <meta property="og:description" content="I AM." />
-    <meta property="og:image" content="https://elysiabestxuyi.us/assets/banner.jpg" />
-    <meta property="og:url" content="https://elysiabestxuyi.us/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="elysiabestxuyi.us" />
-
-    <!-- 🐦 Twitter 分享 -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="elysiabestxuyi.us — 订阅使用指南 ver.3.24" />
-    <meta name="twitter:description" content="I AM ." />
-    <meta name="twitter:image" content="https://elysiabestxuyi.us/assets/banner.jpg" />
-
-    <!-- 📱 移动端设置 -->
-    <meta name="theme-color" content="#1b5e20" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="elysiabestxuyi.us" />
-
-    <!-- 🧭 SEO 规范化 -->
-    <link rel="canonical" href="https://elysiabestxuyi.us/" />
-
-    <!-- ✨ 字体和样式 -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" /  
-    <style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>订阅使用指南 ver.3.24</title>
+  <style>
     :root{
       --accent-start: #9a6ef0;
       --accent-end: #7b3fe4;
@@ -250,13 +217,11 @@ main.container li:hover {
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->
-<button class="hamburger" aria-label="爱莉希雅" id="navTrigger">
+<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
-</button>
-
-<div class="nav-popup" id="navPopup" aria-hidden="true"></div>
+</a>
 
 <style>
 .hamburger {
@@ -307,133 +272,6 @@ main.container li:hover {
   50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
 }
 </style>
-
-<style>
-/* ====== 导航弹出菜单（与播放列表风格一致，弹出位置调整到hamburger下方） ====== */
-.nav-popup {
-  position: fixed;
-  top: 70px;
-  left: 14px;
-  transform: scale(0.98);
-  transform-origin: 0 0; /* top left */
-  width: 260px;
-  max-height: 260px;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: rgba(255,240,255,0.25);
-  border: 1px solid rgba(255,210,255,0.35);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  overflow-y: auto;
-  opacity: 0; pointer-events: none;
-  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
-  z-index: 9998;
-  will-change: transform, opacity;
-}
-
-.nav-item {
-  padding: 6px 10px;
-  color: #cdbaff;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  display: block;
-  text-decoration: none;
-}
-
-.nav-item:hover {
-  background: rgba(160, 120, 255, 0.15);
-  color: #ffffff;
-}
-
-/* 中等项动画（增强流畅度：调整贝塞尔曲线使弹出更丝滑） */
-@keyframes dockBounceOpen {
-  0%   { transform: scale(0.75); opacity: 0; }
-  60%  { transform: scale(1.05); opacity: 1; }
-  80%  { transform: scale(0.98); }
-  100% { transform: scale(1); }
-}
-
-@keyframes dockBounceClose {
-  0%   { transform: scale(1); opacity: 1; }
-  40%  { transform: scale(1.02); }
-  100% { transform: scale(0.7); opacity: 0; }
-}
-
-/* 发光波纹层（使用 ::after） */
-.nav-popup::after {
-  content: ""; position: absolute; inset: 0; border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
-  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
-}
-.nav-popup.show::after { opacity: 1; transform: scale(1.35); }
-.nav-popup.hide::after { opacity: 0; transform: scale(0.6); }
-
-/* 应用动画类（使用更平滑的贝塞尔曲线） */
-.nav-popup.show {
-  opacity: 1; pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.2, 0.9, 0.3, 1) both;
-  transform-origin: 0 0;
-}
-.nav-popup.hide {
-  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 0 0;
-}
-
-/* 小动画 */
-@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
-@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
-
-/* === 轻柔飘浮动画（Elysia 风格） === */
-@keyframes elysiaFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.nav-popup {
-  animation: elysiaFloat 6s ease-in-out infinite;
-}
-</style>
-
-<script>
-// 导航弹出菜单逻辑
-document.addEventListener('DOMContentLoaded', () => {
-  const navTrigger = document.getElementById('navTrigger');
-  const navPopup = document.getElementById('navPopup');
-
-  // 渲染导航列表
-  navPopup.innerHTML = `
-    <a href="elysia-3d.html" class="nav-item" target="_blank" rel="noopener noreferrer">elysia</a>
-    <a href="mailto:contact@elysia.com" class="nav-item" target="_blank" rel="noopener noreferrer">contact</a>
-  `; // 注意：替换contact的mailto为实际邮箱
-
-  function openNav() {
-    navPopup.classList.remove("hide");
-    navPopup.classList.add("show");
-    navPopup.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeNav() {
-    navPopup.classList.remove("show");
-    navPopup.classList.add("hide");
-    navPopup.setAttribute('aria-hidden', 'true');
-  }
-
-  navTrigger.addEventListener("click", e => {
-    e.preventDefault();
-    navPopup.classList.contains("show") ? closeNav() : openNav();
-  });
-
-  document.addEventListener("click", e => {
-    if (!navPopup.contains(e.target) && e.target !== navTrigger) {
-      if (navPopup.classList.contains("show")) closeNav();
-    }
-  });
-});
-</script>
-
   <nav class="leftnav" aria-hidden="true">
    
   </nav>
@@ -1387,17 +1225,17 @@ updateSong();
   box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
-/* 中等项动画（增强流畅度：调整贝塞尔曲线使弹出更丝滑） */
+/* 中等项 */
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
-  60%  { transform: translateX(-50%) scale(1.05); opacity: 1; }
-  80%  { transform: translateX(-50%) scale(0.98); }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
   100% { transform: translateX(-50%) scale(1); }
 }
 
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  40%  { transform: translateX(-50%) scale(1.02); }
+  35%  { transform: translateX(-50%) scale(1.04); }
   100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
 }
 
@@ -1410,10 +1248,10 @@ updateSong();
 .elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
-/* 应用动画类（使用更平滑的贝塞尔曲线） */
+/* 应用动画类 */
 .elysia-playlist.show {
   opacity: 1; pointer-events: auto;
-  animation: dockBounceOpen 0.58s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
   transform-origin: 50% 100%;
 }
 .elysia-playlist.hide {

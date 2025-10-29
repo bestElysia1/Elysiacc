@@ -147,11 +147,53 @@
         opacity: 0;
       }
     }
+
+    /* === Banner 样式 === */
+    .banner-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .banner-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      animation: float 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes breathe {
+      0% {
+        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(180, 150, 255, 0.7);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
+      }
+    }
   </style>
 </head>
 <body>
 
   <main>
+    <div class="banner-container">
+      <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">
+    </div>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>

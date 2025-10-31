@@ -326,24 +326,48 @@ document.addEventListener('keydown', e => {
   }
 }, true);
 
-// 检测开发者工具是否打开
-let checkStatus;
-const element = new Image();
-Object.defineProperty(element, 'id', {
-  get: function () {
-    checkStatus = 'on';
-  }
-});
+// 改进的开发者工具检测：使用更可靠的调试器检测和轮询
+function detectDevTools() {
+  const threshold = 160; // 根据浏览器调整阈值（Chrome dev tools 通常会改变窗口大小）
+  const check = () => {
+    if (
+      window.outerWidth - window.innerWidth > threshold ||
+      window.outerHeight - window.innerHeight > threshold ||
+      (window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) ||
+      /./.toString().length > 100 // 检测函数字符串化是否被修改（表示被调试）
+    ) {
+      window.location.href = 'https://404.com';
+    }
+  };
 
-setInterval(() => {
-  checkStatus = 'off';
-  console.log(element);
-  console.clear();
-  if (checkStatus === 'on') {
-    window.location.href = 'https://404.com';
-  }
-}, 1000);
+  // 初始检查
+  check();
+
+  // 轮询检查
+  setInterval(check, 500);
+
+  // 使用 console 陷阱检测
+  let checkStatus;
+  const element = new Image();
+  Object.defineProperty(element, 'id', {
+    get: function () {
+      checkStatus = 'on';
+    }
+  });
+
+  setInterval(() => {
+    checkStatus = 'off';
+    console.log(element);
+    console.clear();
+    if (checkStatus === 'on') {
+      window.location.href = 'https://404.com';
+    }
+  }, 1000);
+}
+
+detectDevTools();
 </script>
+
 
 
 </body>

@@ -326,6 +326,9 @@ document.addEventListener('keydown', e => {
   }
 }, true);
 
+</script>
+
+<script>
 (function() {
   // ========== 配置 ==========
   const config = {
@@ -355,17 +358,19 @@ document.addEventListener('keydown', e => {
     if (typeof config.onDetect === 'function') {
       try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
     }
-    // 改为强制跳转到404页面
     forceRedirect();
   }
 
   // ========== 新增：强制跳转函数 ==========
   function forceRedirect() {
     try {
-      // 防止无限循环或多次跳转
-      if (window.location.pathname === config.redirectUrl.replace(/^\//, '')) return;
+      // 防止历史记录堆栈，替换当前URL并跳转
+      history.replaceState(null, '', config.redirectUrl);
       window.location.href = config.redirectUrl;
-    } catch (e) { /* ignore errors */ }
+    } catch (e) {
+      // 备用简单跳转
+      window.location.href = config.redirectUrl;
+    }
   }
 
   // ========== 1) 控制台 getter 检测（最常见） ==========
@@ -382,8 +387,7 @@ document.addEventListener('keydown', e => {
       setInterval(() => {
         try {
           console.log(bait);
-          // 清理输出避免控制台被污损（可选）
-          console.clear();
+          // 移除 console.clear() 以减少可疑行为，避免被反检测
         } catch (e) {}
       }, config.checkInterval);
     } catch (e) { /* ignore */ }
@@ -408,8 +412,6 @@ document.addEventListener('keydown', e => {
       try {
         const t0 = performance.now();
         // 当 DevTools 打开并处于某些暂停状态时，debugger 会造成明显时间延迟
-        // 注意：现代浏览器对 debugger 的行为可能不同，这只是 heuristic
-        // 使用 try/catch 避免在某些 CSP 下触发异常
         try { debugger; } catch (_) {}
         const diff = performance.now() - t0;
         if (diff > config.timeThreshold) {
@@ -419,6 +421,31 @@ document.addEventListener('keydown', e => {
     }, config.checkInterval * 2);
   })();
 
+  // ========== 优化：添加更多检测方法 ==========
+  // 4) RegExp toString 检测（DevTools 会修改 RegExp.prototype.toString）
+  (function regExpCheck() {
+    try {
+      const reg = /./;
+      if (reg.toString() !== '/./') {
+        markDetected('regexp-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 5) Function toString 检测（类似）
+  (function funcToStringCheck() {
+    try {
+      const func = function() {};
+      if (func.toString.toString().includes('[native code]') === false) {
+        markDetected('func-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 初始调用额外检测
+  regExpCheck();
+  funcToStringCheck();
+
   // ========== 辅助：暴露状态与手动触发 ==========
   window.__DevToolsDetect = {
     isDetected: () => detected,
@@ -426,8 +453,7 @@ document.addEventListener('keydown', e => {
     reset: () => { detected = false; lastDetectInfo = null; }
   };
 
-  // 初始 log（研究用）
-  console.info('[DevToolsDetect] initialized (research/demo mode).');
+  // 移除初始 console.info 以减少足迹
 })();
 </script>
 

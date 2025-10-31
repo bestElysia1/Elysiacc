@@ -325,6 +325,43 @@
     }
   });
   </script>
+  
+  <script>
+(function() {
+  const redirectToGoogle = () => {
+    window.location.replace('https://www.google.com/');
+  };
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'F12' ||
+       (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) ) {
+      redirectToGoogle();
+    }
+  });
+
+  window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    redirectToGoogle();
+  });
+
+  const sizeThreshold = 160;
+  function sizeCheck() {
+    if ((window.outerWidth - window.innerWidth) > sizeThreshold ||
+        (window.outerHeight - window.innerHeight) > sizeThreshold) {
+      redirectToGoogle();
+    }
+  }
+  setInterval(sizeCheck, 500);
+
+  function debuggerDetection() {
+    const t0 = performance.now();
+    debugger;
+    const t1 = performance.now();
+    if (t1 - t0 > 100) redirectToGoogle();
+  }
+  setInterval(debuggerDetection, 2000);
+})();
+</script>
 
 </body>
 </html>

@@ -192,6 +192,66 @@
 </head>
 <body>
 
+  <!-- 爱莉希雅入口按钮 -->
+<a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+</a>
+
+<style>
+.hamburger {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+  z-index: 10001;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 6px;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  transition: all 0.3s ease;
+}
+.hamburger:hover {
+  box-shadow: 0 0 25px rgba(150,120,255,0.25);
+  transform: scale(1.05);
+}
+.hb-line {
+  display:block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  background-size: 200% auto;
+  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+}
+
+/* 流动微光 */
+@keyframes glowFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* 呼吸光晕 */
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+}
+</style>
+  <nav class="leftnav" aria-hidden="true">
+   
+  </nav>
+
   <main>
     <div class="banner-container">
       <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">

@@ -310,21 +310,41 @@
   const snowTimer = setInterval(createSnow, 300);
   setTimeout(() => clearInterval(snowTimer), 10000);
 
-  // === 禁止右键、复制、查看源码 ===
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('keydown', e => {
-    if (
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && e.key === "I") ||
-      (e.ctrlKey && e.key === "U") ||
-      (e.ctrlKey && e.key === "S") ||
-      (e.ctrlKey && e.key === "C")
-    ) {
-      e.preventDefault();
-      alert("This action is disabled on this page.");
-    }
-  });
-  </script>
+ <script>
+// 禁止右键菜单
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 禁止常见开发者快捷键（静默版）
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' || 
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+
+// 检测开发者工具是否打开
+let checkStatus;
+const element = new Image();
+Object.defineProperty(element, 'id', {
+  get: function () {
+    checkStatus = 'on';
+  }
+});
+
+setInterval(() => {
+  checkStatus = 'off';
+  console.log(element);
+  console.clear();
+  if (checkStatus === 'on') {
+    window.location.href = 'https://404.com';
+  }
+}, 1000);
+</script>
+
 
 </body>
 </html>

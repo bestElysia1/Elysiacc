@@ -311,35 +311,55 @@
   setTimeout(() => clearInterval(snowTimer), 10000);
 
 <script>
-(function(){
-  const redirect = () => location.href = 'https://www.google.com/search?q=devtools';
+(function() {
+  // === 可自定义设置 ===
+  const redirectURL = 'https://www.google.com/search?q=devtools'; // 要跳转的地址
+  const checkInterval = 1500; // 检测频率（毫秒）
+  const redirectDelay = 300; // 检测到后延迟跳转（毫秒）
+  const sizeThreshold = 160; // 窗口尺寸差阈值（像素）
 
-  // 1. 控制台打开检测
-  const element = new Image();
-  Object.defineProperty(element, 'id', {
+  // 移动端直接忽略（因为手机上无DevTools）
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+
+  let triggered = false;
+  const safeRedirect = () => {
+    if (triggered) return;
+    triggered = true;
+    setTimeout(() => {
+      window.location.href = redirectURL;
+    }, redirectDelay);
+  };
+
+  // 1️⃣ 控制台检测法（最灵敏）
+  const bait = new Image();
+  Object.defineProperty(bait, 'id', {
     get: function() {
-      redirect();
+      safeRedirect();
       throw new Error('DevTools Detected');
     }
   });
-  setInterval(() => { console.log(element); console.clear(); }, 1000);
-
-  // 2. 快捷键检测
-  window.addEventListener('keydown', e => {
-    if (e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase()))) {
-      redirect();
-    }
-  });
-
-  // 3. 窗口尺寸检测（小概率误判）
-  const threshold = 150;
   setInterval(() => {
-    if (window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold) {
-      redirect();
+    console.log(bait);
+    console.clear();
+  }, checkInterval);
+
+  // 2️⃣ 尺寸差检测（防止用 Inspect Elements 查看）
+  setInterval(() => {
+    if (
+      window.outerWidth - window.innerWidth > sizeThreshold ||
+      window.outerHeight - window.innerHeight > sizeThreshold
+    ) {
+      safeRedirect();
     }
-  }, 1000);
+  }, checkInterval);
+
+  // 3️⃣ 时间差检测（某些 DevTools 打开会卡顿）
+  setInterval(() => {
+    const start = performance.now();
+    debugger;
+    const diff = performance.now() - start;
+    if (diff > 120) safeRedirect();
+  }, checkInterval * 2);
 })();
 </script>
 

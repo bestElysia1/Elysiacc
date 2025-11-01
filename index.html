@@ -217,108 +217,50 @@ main.container li:hover {
 
 
   </style>
-<!--  Crisp 初始化 -->
 <script type="text/javascript">
+  // Crisp 初始化
   window.$crisp = [];
   window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
-  (function () {
+
+  (function() {
     var d = document;
     var s = d.createElement("script");
     s.src = "https://client.crisp.chat/l.js";
     s.async = 1;
     d.getElementsByTagName("head")[0].appendChild(s);
   })();
-</script>
 
-<!--  淡紫液态玻璃按钮样式 -->
-<style>
-  .crisp-glass-button {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    backdrop-filter: blur(14px);
-    background: rgba(180, 160, 255, 0.18);
-    box-shadow: 0 4px 25px rgba(140, 90, 255, 0.3),
-                inset 0 1px 2px rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(200, 170, 255, 0.35);
-    cursor: pointer;
-    transition: all 0.35s ease;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-  }
-
-  .crisp-glass-button.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.9);
-  }
-
-  .crisp-glass-button:hover {
-    transform: scale(1.08);
-    background: rgba(200, 180, 255, 0.25);
-    box-shadow: 0 0 35px rgba(160, 120, 255, 0.5),
-                inset 0 1px 2px rgba(255, 255, 255, 0.6);
-  }
-
-  .crisp-glass-button svg {
-    width: 32px;
-    height: 32px;
-    fill: #ffffff;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-    filter: drop-shadow(0 0 4px rgba(180, 150, 255, 0.8));
-  }
-
-  .crisp-glass-button:hover svg {
-    opacity: 1;
-    filter: drop-shadow(0 0 8px rgba(190, 160, 255, 1));
-  }
-</style>
-
-<!--  按钮本体 -->
-<div class="crisp-glass-button" id="crispGlassButton" onclick="openCrispChat()">
-  <svg viewBox="0 0 24 24">
-    <path d="M20 2H4a2 2 0 0 0-2 2v20l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 9h12v2H6V9zm8 4H6v-2h8v2z"/>
-  </svg>
-</div>
-
-<!-- 🧠 按钮控制 + 自动隐藏逻辑 -->
-<script>
-  // 隐藏 Crisp 默认浮窗
-  window.$crisp.push(["do", "chat:hide"]);
-
-  // 点击打开 Crisp
-  function openCrispChat() {
-    window.$crisp.push(["do", "chat:show"]);
-    window.$crisp.push(["do", "chat:open"]);
-  }
-
-  //  自动隐藏逻辑
-  const crispBtn = document.getElementById("crispGlassButton");
+  // 🫖 自动隐藏逻辑
   let idleTimer;
-  const idleTime = 10000; // 10 秒无操作后隐藏
+  const idleTime = 10000; // 30秒无操作后隐藏
 
   function resetIdleTimer() {
     clearTimeout(idleTimer);
-    crispBtn.classList.remove("hidden");
-    idleTimer = setTimeout(() => {
-      crispBtn.classList.add("hidden");
-    }, idleTime);
+    showCrisp();
+    idleTimer = setTimeout(hideCrisp, idleTime);
   }
 
-  // 监听用户活动
-  ["mousemove", "keydown", "scroll", "click", "touchstart"].forEach(evt => {
+  function hideCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:hide"]);
+    }
+  }
+
+  function showCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:show"]);
+    }
+  }
+
+  // 监听用户活动（滚动、点击、键盘）
+  ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
     document.addEventListener(evt, resetIdleTimer, { passive: true });
   });
 
+  // 初始化计时器
   window.addEventListener("load", resetIdleTimer);
 </script>
+
 
   
 </head>

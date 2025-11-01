@@ -31,7 +31,7 @@
   position: relative;
   ...
 }
-    header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    er{display:flex;align-items:center;justify-content:space-between;gap:20px}
     .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
     .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
     .music{margin-left:auto}
@@ -132,7 +132,7 @@ footer:hover {
     @media (max-width:900px){
       .container{padding:0 18px}
       .leftnav{display:none}
-      header{flex-direction:column;align-items:flex-start}
+      er{flex-direction:column;align-items:flex-start}
       .music{margin-left:0;margin-top:8px}
     }
 /*  Elysia Breathing Glow Fade-In Effect */
@@ -217,6 +217,51 @@ main.container li:hover {
 
 
   </style>
+<script type="text/javascript">
+  // Crisp 初始化
+  window.$crisp = [];
+  window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
+
+  (function() {
+    var d = document;
+    var s = d.createElement("script");
+    s.src = "https://client.crisp.chat/l.js";
+    s.async = 1;
+    d.getElementsByTagName("head")[0].appendChild(s);
+  })();
+
+  // 🫖 自动隐藏逻辑
+  let idleTimer;
+  const idleTime = 10000; // 30秒无操作后隐藏
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    showCrisp();
+    idleTimer = setTimeout(hideCrisp, idleTime);
+  }
+
+  function hideCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:hide"]);
+    }
+  }
+
+  function showCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:show"]);
+    }
+  }
+
+  // 监听用户活动（滚动、点击、键盘）
+  ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // 初始化计时器
+  window.addEventListener("load", resetIdleTimer);
+</script>
+
+  
 </head>
 <body>
 <!-- 爱莉希雅入口按钮 -->

@@ -312,6 +312,8 @@
   </script>
 
   <script>
+// 禁止右键菜单
+  document.addEventListener('contextmenu', e => e.preventDefault());
     // 禁止
   document.addEventListener('keydown', e => {
     if (

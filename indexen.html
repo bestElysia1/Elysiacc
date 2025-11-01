@@ -913,9 +913,9 @@ document.querySelectorAll('a[href]').forEach(a => {
 </script>
 
 <script>
-// Disable Right-Click Menu
+// 禁止右键菜单
 document.addEventListener('contextmenu', e => e.preventDefault());
-// Disable Common Developer Shortcuts (Silent Version)
+// 禁止常见开发者快捷键（静默版）
 document.addEventListener('keydown', e => {
   if (
     e.key === 'F12' || 
@@ -926,6 +926,135 @@ document.addEventListener('keydown', e => {
     e.stopPropagation();
   }
 }, true);
+</script>
+
+<script>
+(function() {
+  // ========== 配置 ==========
+  const config = {
+    checkInterval: 1200,          // 检测频率(ms)
+    sizeThreshold: 160,           // outer - inner 超过这个值视为 DevTools docked (px)
+    timeThreshold: 120,           // debugger 导致的时间差阈值(ms)
+    onDetect: (detail) => {       // 检测回调（可替换为上报接口）
+      console.warn('[DevToolsDetect]', detail);
+      // 示例：如果想上报，可在这里 fetch('/log', {method:'POST', body: JSON.stringify(detail)})
+    },
+    ignoreMobile: true,           // 是否忽略移动设备
+    redirectUrl: '/404.html'      // 强制跳转的404页面URL（可自定义）
+  };
+
+  // ========== 预检：移动端跳过 ==========
+  if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+
+  // ========== 状态 ==========
+  let detected = false;
+  let lastDetectInfo = null;
+
+  // 内部安全重入保护
+  function markDetected(reason, meta = {}) {
+    if (detected) return;
+    detected = true;
+    lastDetectInfo = { reason, meta, time: new Date().toISOString(), ua: navigator.userAgent };
+    if (typeof config.onDetect === 'function') {
+      try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
+    }
+    forceRedirect();
+  }
+
+  // ========== 新增：强制跳转函数 ==========
+  function forceRedirect() {
+    try {
+      // 防止历史记录堆栈，替换当前URL并跳转
+      history.replaceState(null, '', config.redirectUrl);
+      window.location.href = config.redirectUrl;
+    } catch (e) {
+      // 备用简单跳转
+      window.location.href = config.redirectUrl;
+    }
+  }
+
+  // ========== 1) 控制台 getter 检测（最常见） ==========
+  (function consoleBait() {
+    try {
+      const bait = new Image();
+      Object.defineProperty(bait, 'id', {
+        get: function() {
+          markDetected('console-getter');
+          return '';
+        }
+      });
+      // 周期向 console 输出 bait（控制台展开时会触发 getter）
+      setInterval(() => {
+        try {
+          console.log(bait);
+          // 移除 console.clear() 以减少可疑行为，避免被反检测
+        } catch (e) {}
+      }, config.checkInterval);
+    } catch (e) { /* ignore */ }
+  })();
+
+  // ========== 2) 窗口尺寸差检测（dock 模式） ==========
+  (function sizeCheck() {
+    setInterval(() => {
+      try {
+        const wdiff = Math.abs(window.outerWidth - window.innerWidth);
+        const hdiff = Math.abs(window.outerHeight - window.innerHeight);
+        if (wdiff > config.sizeThreshold || hdiff > config.sizeThreshold) {
+          markDetected('size-diff', { wdiff, hdiff, outerWidth: window.outerWidth, innerWidth: window.innerWidth, outerHeight: window.outerHeight, innerHeight: window.innerHeight });
+        }
+      } catch (e) {}
+    }, config.checkInterval);
+  })();
+
+  // ========== 3) 时间差（debugger）检测 ==========
+  (function debugTimeCheck() {
+    setInterval(() => {
+      try {
+        const t0 = performance.now();
+        // 当 DevTools 打开并处于某些暂停状态时，debugger 会造成明显时间延迟
+        try { debugger; } catch (_) {}
+        const diff = performance.now() - t0;
+        if (diff > config.timeThreshold) {
+          markDetected('debugger-time', { diff });
+        }
+      } catch (e) {}
+    }, config.checkInterval * 2);
+  })();
+
+  // ========== 优化：添加更多检测方法 ==========
+  // 4) RegExp toString 检测（DevTools 会修改 RegExp.prototype.toString）
+  (function regExpCheck() {
+    try {
+      const reg = /./;
+      if (reg.toString() !== '/./') {
+        markDetected('regexp-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 5) Function toString 检测（类似）
+  (function funcToStringCheck() {
+    try {
+      const func = function() {};
+      if (func.toString.toString().includes('[native code]') === false) {
+        markDetected('func-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 初始调用额外检测
+  regExpCheck();
+  funcToStringCheck();
+
+  // ========== 辅助：暴露状态与手动触发 ==========
+  window.__DevToolsDetect = {
+    isDetected: () => detected,
+    lastInfo: () => lastDetectInfo,
+    reset: () => { detected = false; lastDetectInfo = null; }
+  };
+
+  // 移除初始 console.info 以减少足迹
+})();
 </script>
 
 <style>

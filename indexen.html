@@ -303,6 +303,11 @@ main.container li:hover {
   pointer-events: auto;
   animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
 }
+.dropdown-menu.closing {
+  animation: dockClose 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 关闭动画 */
+  display: block; /* 保持可见直到动画结束 */
+  pointer-events: none; /* 防止交互 */
+}
 .dropdown-menu li {
   margin: 5px 0;
 }
@@ -320,26 +325,47 @@ main.container li:hover {
 
 /* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
 @keyframes dockPop {
-  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
-  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); } /* 轻微向下反弹，保留小规模 */
-  100% { transform: translateY(0) scale(1); filter: brightness(1); }
+  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); opacity: 0; }
+  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); opacity: 1; } /* 轻微向下反弹，保留小规模 */
+  100% { transform: translateY(0) scale(1); filter: brightness(1); opacity: 1; }
+}
+
+/* 新增关闭动画 keyframes（反向dockPop） */
+@keyframes dockClose {
+  0% { transform: translateY(0) scale(1); filter: brightness(1); opacity: 1; }
+  55% { transform: translateY(-2px) scale(1.02); filter: brightness(1.12); opacity: 1; } /* 轻微向上反弹 */
+  100% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); opacity: 0; }
 }
 </style>
 
 <!-- JavaScript脚本：处理点击事件（移除active toggle） -->
 <script>
-document.getElementById('hamburger-menu').addEventListener('click', function() {
-  // Toggle 菜单显示
-  var menu = document.getElementById('dropdown');
-  menu.classList.toggle('show');
+const hamburger = document.getElementById('hamburger-menu');
+const menu = document.getElementById('dropdown');
+
+function closeMenu() {
+  if (menu.classList.contains('show')) {
+    menu.classList.add('closing');
+    menu.addEventListener('animationend', function handler() {
+      menu.classList.remove('show', 'closing');
+      menu.removeEventListener('animationend', handler);
+    });
+  }
+}
+
+hamburger.addEventListener('click', function() {
+  if (menu.classList.contains('show')) {
+    closeMenu();
+  } else {
+    menu.classList.remove('closing');
+    menu.classList.add('show');
+  }
 });
 
 // 可选：点击菜单外关闭（增强体验）
 document.addEventListener('click', function(event) {
-  var hamburger = document.getElementById('hamburger-menu');
-  var menu = document.getElementById('dropdown');
   if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
-    menu.classList.remove('show');
+    closeMenu();
   }
 });
 </script>

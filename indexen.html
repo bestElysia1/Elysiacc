@@ -219,13 +219,22 @@ main.container li:hover {
   </style>
 </head>
 <body>
-<!-- Elysia Entry Button -->
-<a href="elysia-3d.html" class="hamburger" aria-label="Elysia">
+<!-- 爱莉希雅入口按钮 -->
+<!-- HTML部分：汉堡按钮和下拉菜单 -->
+<div class="hamburger" id="hamburger-menu" aria-label="菜单">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
-</a>
+</div>
 
+<!-- 下拉菜单（初始隐藏） -->
+<ul class="dropdown-menu" id="dropdown">
+  <li><a href="index.html">Home</a></li>
+  <li><a href="elysia-3d.html">Elysia</a></li>
+  <li><a href="indexen.html">EN</a></li>
+</ul>
+
+<!-- CSS样式（保持原有，并调整下拉菜单动画） -->
 <style>
 .hamburger {
   position: fixed;
@@ -248,21 +257,85 @@ main.container li:hover {
   border: 1px solid rgba(255,255,255,0.06);
   box-shadow: 0 6px 20px rgba(150,120,255,0.12);
   transition: all 0.3s ease;
+  cursor: pointer; /* 添加指针样式，表示可点击 */
 }
 .hamburger:hover {
   box-shadow: 0 0 25px rgba(150,120,255,0.25);
   transform: scale(1.05);
 }
 .hb-line {
-  display:block;
+  display: block;
   width: 20px;
   height: 2px;
   border-radius: 2px;
   background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
   background-size: 200% auto;
   animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+  transition: all 0.3s ease; /* 为动画添加过渡 */
 }
 
+/* 下拉菜单样式（增强macOS弹出效果） */
+.dropdown-menu {
+  position: fixed;
+  left: 14px;
+  top: 60px; /* 汉堡按钮下方位置 */
+  width: 200px; /* 菜单宽度，可调整 */
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+  z-index: 10000;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  display: none; /* 初始隐藏 */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95); /* 初始状态：向上位移 + 轻微缩小 */
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* ease-out-back for bounce弹出 */
+  transform-origin: top left; /* 从左上角弹出 */
+}
+.dropdown-menu.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1); /* 弹出到正常大小 */
+}
+.dropdown-menu li {
+  margin: 5px 0;
+}
+.dropdown-menu a {
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  text-decoration: none;
+  display: block;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+.dropdown-menu a:hover {
+  background: rgba(255,255,255,0.2);
+}
+</style>
+
+<!-- JavaScript脚本：处理点击事件（移除active toggle） -->
+<script>
+document.getElementById('hamburger-menu').addEventListener('click', function() {
+  // Toggle 菜单显示
+  var menu = document.getElementById('dropdown');
+  menu.classList.toggle('show');
+});
+
+// 可选：点击菜单外关闭（增强体验）
+document.addEventListener('click', function(event) {
+  var hamburger = document.getElementById('hamburger-menu');
+  var menu = document.getElementById('dropdown');
+  if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+    menu.classList.remove('show');
+  }
+});
+</script>
+
+<style>
 /* Flowing Glow */
 @keyframes glowFlow {
   0% { background-position: 0% center; }

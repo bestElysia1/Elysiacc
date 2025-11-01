@@ -221,6 +221,7 @@ main.container li:hover {
 <body>
 <!-- 爱莉希雅入口按钮 -->
 <a href="elysia-3d.html" class="hamburger" aria-label="爱莉希雅">
+<a href="indexen.html" class="hamburger" aria-label="EN">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
@@ -626,7 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </section>
 
     <footer>
-  订阅使用指南 ver.3.24  <button id="langToggle" class="lang-button">EN / 中文</button>
+  订阅使用指南 ver.3.24
   <br>© bestElysia 2025
 </footer>
 
@@ -1480,49 +1481,6 @@ document.addEventListener('keydown', e => {
 
   // 初始化
   resetHideTimer();
-</script>
-
- <style>
-.lang-button {
-  background: linear-gradient(90deg, #c8a6ff, #b48dff); /* 淡紫渐变 */
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(176, 128, 255, 0.25);
-  float: right; /* 让按钮靠右 */
-  margin-right: 10px; /* 离右边留点距离 */
-}
-
-.lang-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(176, 128, 255, 0.35);
-  animation: glowPulse 1.5s infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(176,128,255,0.3); }
-  50% { box-shadow: 0 0 20px rgba(176,128,255,0.6); }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('langToggle');
-  const isEnglish = window.location.pathname.includes('indexen.html'); // 假设英文页面为 indexen.html
-  btn.textContent = isEnglish ? '中文' : 'EN';
-
-  btn.addEventListener('click', () => {
-    if (isEnglish) {
-      window.location.href = 'index.html'; // 中文页面 (假设为 index_zh.html，根据实际文件名调整)
-    } else {
-      window.location.href = 'indexen.html'; // 英文页面
-    }
-  });
-});
 </script>
 
 

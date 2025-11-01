@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subscription Guide ver.3.24</title>
+    <!-- ✅ Website Favicon -->
+  <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
+  <style>
+    :root{
+      --accent-start: #9a6ef0;
+      --accent-end: #7b3fe4;
+      --link: #8f66f0;
+      --bg: #ffffff;
+      --maxw: 980px;
+    }
+    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333;}
+    body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  letter-spacing: 0.3px;
+  line-height: 1.85;
+}
+    .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
+    .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
+    .banner img{width:100%;height:auto;display:block}
+    .banner img{width:100%;height:auto;display:block}
+
+/* 🌈 Naked Eye 3D Banner Effect */
+.banner-3d {
+  position: relative;
+  ...
+}
+    header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+    .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
+    .music{margin-left:auto}
+    iframe{border-radius:6px;border:0}
+    /* countdown */
+   /* 🌌 Elysia — Liquid Purple-Pink Glass Countdown */
+.countdown {
+  position: relative;
+  margin: 22px 0;
+  padding: 20px 28px;
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 4px 18px rgba(160,120,255,0.3);
+  animation: countdownFloat 8s ease-in-out infinite;
+}
+
+/* 💫 Liquid Glow Background */
+.countdown::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
+    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
+    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+  filter: blur(40px);
+  animation: blobMove 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 🕒 Countdown Numbers and Title */
+.countdown div {
+  color: rgba(240,230,255,0.9);
+  font-size: 0.96rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(180,140,255,0.6);
+}
+.countdown .nums {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #d9caff;
+  text-shadow:
+    0 0 10px rgba(180,140,255,0.8),
+    0 0 20px rgba(160,120,255,0.4);
+}
+
+/* ✨ Subtle Breathing Float */
+@keyframes countdownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 🌊 Background Liquid Movement */
+@keyframes blobMove {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(6%, -4%) scale(1.05); }
+  50% { transform: translate(-5%, 5%) scale(1.02); }
+  75% { transform: translate(3%, -3%) scale(1.07); }
+  100% { transform: translate(0,0) scale(1); }
+}
+    .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
+    /* content */
+    section{margin-top:28px}
+    h2{font-size:1.02rem;margin:8px 0 14px 0;padding-left:10px;border-left:4px solid rgba(123,63,228,0.12);color:var(--accent-end);background:linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));padding:8px;border-radius:6px}
+    p, ul, li{color:#4a3f6d;line-height:1.8;font-size:0.95rem}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
+    footer {
+  margin: 36px 0 0 0;
+  padding-top: 12px;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid rgba(156,107,255,0.2);
+  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
+  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
+  transition: all 0.4s ease;
+}
+footer:hover {
+  text-shadow: 0 0 6px rgba(156,107,255,0.6);
+  color: #bca9ff;
+}
+
+    /* layout */
+    .leftnav{position:fixed;left:12px;top:120px;width:160px}
+    .leftnav ul{list-style:none;padding:0;margin:0}
+    .leftnav li{margin:8px 0;color:var(--link);font-size:0.9rem}
+    /* responsive */
+    @media (max-width:900px){
+      .container{padding:0 18px}
+      .leftnav{display:none}
+      header{flex-direction:column;align-items:flex-start}
+      .music{margin-left:0;margin-top:8px}
+    }
+/*  Elysia Breathing Glow Fade-In Effect */
+@keyframes glowPulse {
+  0% {
+    color: #9a6ef0;
+    text-shadow: 0 0 4px rgba(156,107,255,0.4),
+                 0 0 8px rgba(156,107,255,0.2);
+  }
+  50% {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(156,107,255,0.9),
+                 0 0 20px rgba(156,107,255,0.6),
+                 0 0 30px rgba(156,107,255,0.3);
+  }
+  100% {
+    color: #9a6ef0;
+    text-shadow: 0 0 4px rgba(156,107,255,0.4),
+                 0 0 8px rgba(156,107,255,0.2);
+  }
+}
+
+/*  Elysia Title Gradient Flow + Glow Combination */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+h2 {
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  transition: all 0.6s ease;
+}
+
+h2:hover {
+  animation: gradientFlow 3s linear infinite, glowPulse 1.8s ease-in-out infinite;
+}
+
+/* Let paragraphs, lists, links have subtle breathing glow */
+a:hover, p:hover, li:hover {
+  animation: glowPulse 1.8s ease-in-out infinite;
+  transition: all 0.4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section {
+  animation: fadeInUp 0.8s ease both;
+}
+/*  Global Body Light Purple Optimization (Elysia Style) */
+p, ul, li {
+  color: #7a66c7 !important; /* Soft light purple */
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+/*  Paragraph hover slight brightening */
+p:hover, li:hover {
+  color: #9a6ef0 !important;
+  text-shadow: 0 0 6px rgba(156,107,255,0.3);
+  transition: all 0.3s ease;
+}
+/*  Force body text to show light purple */
+main.container p,
+main.container ul,
+main.container li {
+  color: #7a66c7 !important;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+/*  Mouse hover subtle glow */
+main.container p:hover,
+main.container li:hover {
+  color: #9a6ef0 !important;
+  text-shadow: 0 0 6px rgba(156,107,255,0.4);
+  transition: all 0.3s ease;
+}
+
+
+  </style>
+</head>
+<body>
+<!-- Elysia Entry Button -->
+<a href="elysia-3d.html" class="hamburger" aria-label="Elysia">
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+</a>
+
+<style>
+.hamburger {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+  z-index: 10001;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 6px;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  transition: all 0.3s ease;
+}
+.hamburger:hover {
+  box-shadow: 0 0 25px rgba(150,120,255,0.25);
+  transform: scale(1.05);
+}
+.hb-line {
+  display:block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  background-size: 200% auto;
+  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+}
+
+/* Flowing Glow */
+@keyframes glowFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Breathing Halo */
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+}
+</style>
+  <nav class="leftnav" aria-hidden="true">
+   
+  </nav>
+
+  <main class="container">
+    <!-- 🌌 Naked Eye 3D Banner -->
+<div class="banner-3d" id="banner3d">
+  <div class="banner-layer">
+    <img src="assets/banner.jpg" alt="Banner">
+  </div>
+  <div class="banner-glow"></div>
+</div>
+
+    <header>
+
+
+</div>
+
+      
+    </header>
+
+    <div class="countdown" id="countdown" aria-live="polite">
+      <div style="font-size:0.95rem;color:#666;margin-bottom:6px">Countdown</div>
+      <div class="nums" id="countdownNums">— Days — : — : —</div>
+    </div>
+
+    <section>
+      <p><strong>WeiYun</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines</p>
+      <p><strong>Milkshake</strong> Same as above</p>
+      <p><strong>IEPL IPLC</strong> Premium Dedicated Lines</p>
+      <p><strong>IEPL prem.</strong> Gaming Dedicated</p>
+      <p><strong>Pure</strong> Native IP Dual ISP</p>
+      <p><strong>Shenzhen-Hong Kong</strong> Backup Lines</p>
+      <p><strong>Limited</strong> Backup Lines</p>
+      <p><strong>Tunnel</strong> Backup Lines</p>
+      <p><strong>Direct</strong> Usable Both Domestically and Internationally</p>
+      <p><strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use</p>
+    </section>
+
+    <section>
+      <h2>Subscription Link</h2>
+      <p>Please send "Subscription" to the email to obtain</p>
+
+    </section>
+
+    <section>
+      <h2>Notifications</h2>
+      <ul>
+        <li>Three-Network Optimization Completed ~ 2025-09-16</li>
+        <li>ChatGPT is not available in Hong Kong. To use ChatGPT, please use Singapore or Japan or other nodes to avoid unavailability and degradation ~ 2025-09-16 (Auto-Switch Completed)</li>
+        <li>Due to upgrades in provincial firewalls in some provinces, mobile lines need special optimization. If unavailable, contact me for individual tuning ~ 2025-09-19</li>
+        <li>Mobile in some provinces is blocked, switch to Telecom. Mobile network temporarily unavailable ~ 2025-09-30 (Fixed)</li>
+        <li>Germany Frankfurt CN2 GIA Dedicated Line will be online on October 20 ~ 2025-10-10</li>
+        <li>Server maintenance expected from November 1-7, does not affect normal use. Update subscription on November 8 ~ 2025-10-30</li>
+
+      </ul>
+    </section>
+
+    <section>
+      <h2>Usage Rules</h2>
+      <p>Copy the subscription link to the software and sync to use</p>
+    </section>
+
+    <section>
+      <h2>Mobile Devices</h2>
+      <ul>
+        <li><strong>Android:</strong> V2rayNG, FIClash, Nekobox, Sing-box for Android, Clash Meta for Android .etc</li>
+        <li><strong>iOS (including iPadOS/tvOS):</strong> ShadowRocket (Little Rocket), Surge, Loon, Stash, Quantumult .etc</li>
+        <li><strong>Harmony OS NEXT:</strong> Same as Android, but not recommended</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Computers</h2>
+      <ul>
+        <li><strong>Windows:</strong> V2rayN, Clash Party, Clash Verge, FIClash .etc</li>
+        <li><strong>macOS:</strong> Surge, Shadowrocket, Clash Verge Rev, GUI for SingBox, Clash Party .etc</li>
+        <li><strong>Linux:</strong> V2rayN, Singbox for Linux .etc</li>
+        <li><strong>FreeBSD/Unix:</strong> Mihomo (Bare Core), Sing-box .etc</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Routers</h2>
+      <ul>
+        <li><strong>ASUS Hardware Router:</strong> MerlinClash2 (Merlin), FancySS</li>
+        <li><strong>Xiaomi Hardware Router:</strong> ShellCrash</li>
+        <li><strong>OpenWrt Software Router:</strong> OpenClash, PassWall, Nikki</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Rule Set</h2>
+      <p><strong>Shadowsrocket:</strong></p>
+      <p>Open Little Rocket - Configuration - Top Right - "+" Paste this link into URL</p>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+      <p>Use this configuration, then on the same page open - Module - Top Right "+" Import the three links for Direct, Proxy, Reject into modules respectively</p>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
+
+      <p>After setup - Little Rocket - Home - Global Routing - Change to - Configuration, restart Little Rocket. This way, no need to toggle Little Rocket on/off. Domestic apps/websites default direct, foreign apps/websites default proxy (except bank apps)</p>
+
+    </section>
+
+    <section>
+      <h2>Shadowrocket Advanced</h2>
+      <p><strong>Shadowrocket Ultimate Advanced Play:</strong></p>
+      <p>If you have specific websites needing proxy or direct, open Little Rocket - Configuration - Module, you can see direct, proxy, reject, three modules. Open the proxy module, you can see proxy_list. For example, if yhdm.one needs proxy, add under rule:</p>
+      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
+DOMAIN-SUFFIX,yinhuadm.one,PROXY
+DOMAIN-SUFFIX,anime1.me,PROXY
+DOMAIN-SUFFIX,elysia.bestxuyi.us,PROXY
+DOMAIN-SUFFIX,mp3juice.co,PROXY
+DOMAIN-SUFFIX,openai.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,chatgpt.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,googleapis.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,gemini.googleapis.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,bard.google.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,gemini.google.com,WeiYun｜Singapore01-❄️10Gbps
+DOMAIN-SUFFIX,x.ai,WeiYun｜Singapore01-❄️10Gbps</pre>
+      <p>Then save. Note: When adding in bulk, ensure each rule is on one line and copy-paste together</p>
+      <p>Others like specific websites going direct (open direct module...) same logic~</p>
+    
+    </section>
+
+    <section>
+      <h2>Shadowrocket Load Balancing</h2>
+      <p>Open Little Rocket - Home - Global Routing - Enable Fallback; Group - Simple Mode - Enable; Group - Edit - Select the nodes you want to use - Done</p>
+      <p>Must include WeiYun Hong Kong & Singapore & Japan nodes</p>
+      <p>Aims to ensure always available & auto-switch available</p>
+    
+    </section>
+
+    <section>
+      <h2>V2rayN-Windows Basics</h2>
+      <p><strong>V2rayN Usage</strong></p>
+      <p>Open V2rayN - Top Tab - Subscription Group - Subscription Group Settings - Add - Fill Alias Elysia (any) - Paste subscription link into Optional URL - Confirm - Click Subscription Group - Update Current Subscription (via Proxy) - Select any node - Right Click - Set as Active Profile - Bottom System Proxy - Auto Configure System Proxy - Top Tab - Settings - Restart as Administrator</p>
+      <p><strong>V2rayN Diversion</strong></p>
+      <p>Open V2rayN - Top Tab - Settings - Routing Settings - Double Click V3 Bypass Mainland - Add Rule - Alias: Elysia (any) - outboundTag: WeiYun｜Singapore02-❄️10Gbps - Paste below rules in Domain:</p>
+      <pre>domain:openai.com,
+domain:chat.openai.com,
+domain:api.openai.com,
+domain:cdn.openai.com,
+domain:x.ai,
+domain:gemini.google.com,
+domain:bard.google.com,
+domain:makersuite.google.com,
+domain:claude.ai,
+domain:gemini.google.com,
+domain:perplexity.ai,
+domain:poe.com,
+domain:huggingface.co,
+domain:chatgpt.com</pre>
+      <p>Others unchanged, click Confirm - Tab - Settings - Restart as Administrator. This sets up - auto-switch to Singapore node when using ChatGPT etc AI, without affecting current node</p>
+      <p>Others like adding diversion nodes or modifying AI nodes same logic~</p>
+
+
+      <p>Others like clash verge, sing-box .etc omitted</p>
+
+    </section>
+
+    
+    <section>
+      <h2>Tutorial for Building Your Own VPS Nodes</h2>
+      <ul>
+        <li><strong>Common Tools:</strong> Final shell, Putty, CMD, XUI&3X-UI</li>
+        <li><strong>Final shell:</strong> Buy 1 VPS (system version ubuntu22 or above) Open final shell, create a new ssh connection, enter host IP address, port, username, key to login to this VPS, then copy bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) this link to VPS and follow prompts step by step, import generated nodes to V2rayN to use</li>
+        <li><strong>Putty:</strong> Open putty, enter host IP and port to login, subsequent steps same as above</li>
+        <li><strong>CMD:</strong> windows+R run CMD, then copy command ssh root@yourIP -p port (root is username, yourIP replace with your purchased host IP address, -P followed by VPS provided port) login, subsequent steps same as above</li>
+        <li><strong>Recommendation:</strong> After building nodes, pair with front proxy or use traffic forwarding service to make your VPS nodes very stable and accelerated, avoid unavailability etc</li>
+      </ul>
+    </section>
+
+
+
+    <section>
+  <h2>Speed Test Links</h2>
+  <ul>
+    <li><a href="https://www.speedtest.net/">Speedtest</a></li>
+    <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
+    <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li> 
+  </ul>
+    </section>
+              
+
+    
+    <section>
+  <h2>Some Software Links</h2>
+  <ul>
+    <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
+    <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
+    <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
+    <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
+    <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
+    <li><a href="https://nssurge.com/">Surge</a></li>
+    <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
+    <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
+    
+  </ul>
+    </section>
+
+<div class="elysia-video-wrapper">
+  <video id="videoA" autoplay muted playsinline preload="auto"></video>
+  <video id="videoB" muted playsinline preload="auto"></video>
+</div>
+
+<style>
+.elysia-video-wrapper {
+  position: relative;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(150,120,255,0.15);
+}
+.elysia-video-wrapper video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: opacity 0.8s ease-in-out;
+  background: #000;
+}
+#videoA { opacity: 1; z-index: 2; }
+#videoB { opacity: 0; z-index: 1; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const videos = [
+    "assets/elysiatest.mp4",
+    "assets/elysiatest2.mp4",
+    "assets/elysiatest3.mp4",
+    "assets/elysiatest4.mp4",
+    "assets/elysiatest5.mp4",
+    "assets/elysiatest6.mp4",
+    "assets/elysiatest7.mp4",
+    "assets/elysiatest8.mp4",
+    "assets/elysiatest9.mp4.MOV",
+    "assets/elysiatest10.mp4.MOV",
+    "assets/elysiatest11.mp4.MOV",
+    "assets/elysiatest12.mov",
+    "assets/elysiatest13.MOV",
+    "assets/elysiatest14.mov",
+    "assets/elysiatest15.mov",
+    "assets/elysiatest16.mov",
+    "assets/elysiatest17.mov"
+    
+  ];
+
+  const videoA = document.getElementById("videoA");
+  const videoB = document.getElementById("videoB");
+  let current = videoA;
+  let next = videoB;
+  let index = 0;
+  let nextReady = false;
+  let switching = false;
+
+  // === Preload All Videos ===
+  const cachePool = videos.map(src => {
+    const v = document.createElement("video");
+    v.src = src;
+    v.preload = "auto";
+    v.muted = true;
+    v.load();
+    return v;
+  });
+
+  function preloadNext() {
+    const nextIndex = (index + 1) % videos.length;
+    next.src = cachePool[nextIndex].src;
+    nextReady = false;
+    next.load();
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
+  }
+
+  function switchVideo() {
+    if (switching) return;
+    switching = true;
+
+    if (!nextReady) {
+      console.log("⏳ Waiting for next buffer...");
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
+
+    next.currentTime = 0;
+    next.play().then(() => {
+      next.style.opacity = "1";
+      current.style.opacity = "0";
+
+      setTimeout(() => {
+        current.pause();
+        [current, next] = [next, current];
+        index = (index + 1) % videos.length;
+        switching = false;
+        preloadNext();
+        bindEvents(); // 🔥 Rebind events after switch
+      }, 800);
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ Playback blocked:", err);
+    });
+  }
+
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      // Fallback: If time stuck not triggering ended
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
+    };
+  }
+
+  // === Initial Playback ===
+  current.src = videos[index];
+  bindEvents();
+  preloadNext();
+
+  current.play().catch(err => console.log("⚠️ Autoplay blocked:", err));
+});
+</script>
+
+  <h2>Some Useful & Interesting Websites</h2>
+  <ul>
+    <li><a href="https://www.nodeseek.com/post-183694-1">Common VPS Scripts</a></li>
+    <li><a href="https://downloads.khinsider.com/">Music Download Site 1 Used Here</a></li>
+    <li><a href="https://mp3juice.co/">Music Download Site 2 Used Here</a></li>
+    <li><a href="https://wallhaven.cc/index.php">Useful PC Wallpapers</a></li>
+    <li><a href="https://hstock.org/en">Purchase Site for Apple ID etc Resources</a></li>
+    <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
+  </ul>
+    </section>
+
+     <section>
+      <h2>Eternal Elysia</h2>
+      <p>Congratulations, you have fully mastered common VPN techniques</p>
+
+    </section>
+
+    <footer>
+  Subscription Guide ver.3.24 
+  <br>© bestElysia 2025
+</footer>
+
+  </main>
+
+  <script>
+    // Countdown to 2025-12-31 23:59:59 (UTC+8)
+    const target = new Date('2025-12-31T23:59:59+08:00').getTime();
+    const el = document.getElementById('countdownNums');
+    function updateCount() {
+      const now = Date.now();
+      let diff = target - now;
+      if (diff < 0) diff = 0;
+      const days = Math.floor(diff / (24*60*60*1000));
+      diff -= days * 24*60*60*1000;
+      const hrs = Math.floor(diff / (60*60*1000));
+      diff -= hrs * 60*60*1000;
+      const mins = Math.floor(diff / (60*1000));
+      diff -= mins * 60*1000;
+      const secs = Math.floor(diff / 1000);
+      el.textContent = `${days} Days ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
+    }
+    updateCount(); setInterval(updateCount, 1000);
+  </script>
+
+<!--  Style -->
+<style>
+.music-player-floating {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 6px 12px;
+  box-shadow: 0 0 15px rgba(156,107,255,0.5);
+  transition: all 0.3s ease;
+}
+.music-player-floating:hover {
+  box-shadow: 0 0 22px rgba(156,107,255,0.8);
+  background: rgba(255, 255, 255, 0.35);
+}
+.music-player-floating audio {
+  width: 260px;
+  height: 32px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+  accent-color: #9c6bff;
+}
+@media (max-width: 600px) {
+  .music-player-floating audio {
+    width: 200px;
+  }
+}
+  /*  Elysia Floating Animation */
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+.music-player-floating {
+  animation: floaty 5s ease-in-out infinite;
+}
+</style>
+
+<style>
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;  /*  Further back layer */
+  background: transparent;  /* Remove light background */
+  pointer-events: none;  /* Prevent intercepting mouse clicks */
+}
+</style>
+
+
+<script>
+// 🌌 Naked Eye 3D + Breathing Float Banner
+const banner3d = document.getElementById("banner3d");
+const bannerLayer = banner3d?.querySelector(".banner-layer");
+const bannerGlow = banner3d?.querySelector(".banner-glow");
+
+// 🌈 Desktop: Mouse 3D Parallax
+if (window.matchMedia("(pointer:fine)").matches && banner3d) {
+  banner3d.addEventListener("mousemove", e => {
+    const rect = banner3d.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotY = ((x / rect.width) - 0.5) * 16;
+    const rotX = ((y / rect.height) - 0.5) * -12;
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+    bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
+  });
+
+  banner3d.addEventListener("mouseleave", () => {
+    bannerLayer.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
+  });
+}
+
+// 📱 Mobile: Scroll Parallax (Fake 3D)
+if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
+  window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    const rotX = Math.min(scrollY / 30, 10);
+    const rotY = Math.sin(scrollY / 180) * 8;
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+  });
+}
+</script>
+
+<style>
+/* 🌬️ Banner Breathing Float Animation */
+@keyframes bannerFloaty {
+  0%, 100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  50% {
+    transform: translateY(-6px);
+    filter: brightness(1.05);
+  }
+}
+
+/* 🌈 Naked Eye 3D Banner Container */
+.banner-3d {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 28px auto;
+  perspective: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
+  animation: bannerFloaty 8s ease-in-out infinite; /* 🫧 Breathing Float */
+}
+
+.banner-3d .banner-layer {
+  transition: transform 0.25s ease-out;
+  transform-origin: center;
+}
+
+.banner-3d img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* ✨ Light Shadow Highlight Layer */
+.banner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: background-position 0.2s ease-out;
+}
+</style>
+
+<!-- === Elysia Player (Invincible Version) === -->
+<div class="elysia-player">
+  <div class="elysia-controls">
+    <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+    <button id="nextBtn" aria-label="Next">⏭</button>
+  </div>
+  <span id="songTitle" class="clickable" role="button" tabindex="0">Loading...</span>
+</div>
+
+<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+
+<script>
+/* ===== 🎵 Song List ===== */
+const songs = [
+  { 
+    title: "My Soul, Your Beats!", 
+    src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", 
+    cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" 
+  },
+  { 
+    title: "My Most Precious Treasure", 
+    src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", 
+    cover: "assets/Key anime piano medley.jpg" 
+  },
+  { 
+    title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", 
+    src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", 
+    cover: "assets/Shiteki.jpg" 
+  },
+  { 
+    title: "Last regrets, foretting me", 
+    src: "assets/Last regrets,foretting me.mp3", 
+    cover: "assets/Last regrets, foretting me.jpg" 
+  },
+  { 
+    title: "Megumeru Gensoukyoku", 
+    src: "assets/Megumeru Gensoukyoku.mp3", 
+    cover: "assets/Megumeru Gensoukyoku.jpg" 
+  },
+  { 
+    title: "Call of Silence", 
+    src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3", 
+    cover: "assets/Call of Silence.jpg" 
+  },
+  { 
+    title: "Only my Railgun OP1 fripSide", 
+    src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", 
+    cover: "assets/Level5.jpg" 
+  },
+  { 
+    title: "Aoi Tori - The iDOLM", 
+    src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", 
+    cover: "assets/Aoi Tori - The iDOLM.jpg" 
+  },
+  { 
+    title: "鬼滅之刃 OPLiSA - 紅蓮華", 
+    src: "assets/Gurenge - Demon Slayer OP [Piano].mp3", 
+    cover: "assets/Shinobu Kocho.jpg" 
+  },
+  { 
+    title: "Flower Dance - DJ Okawari", 
+    src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", 
+    cover: "assets/Flower Dance - DJ Okawari.jpg" 
+  },
+  { 
+    title: "theme of SSS -Piano Arrange ", 
+    src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", 
+    cover: "assets/theme of SSS.jpg" 
+  },
+  { 
+    title: "My Soul, Your Beats! Classic", 
+    src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", 
+    cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" 
+  },
+  { 
+    title: "Pachelbel's Canon", 
+    src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Heroism endures in nothingness", 
+    src: "assets/英雄主义-在虚无中永存.mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "诀别书", 
+    src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "Key anime piano medley", 
+    src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", 
+    cover: "assets/Key anime piano medley.jpg" 
+  },
+  { 
+    title: "Crying for Rain", 
+    src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "GIRLS BAND CRY", 
+    src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", 
+    cover: "assets/GIRLS BAND CRY.jpg" 
+  },
+  { 
+    title: "Hikari no Senritsu", 
+    src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "LEVEL5 -judgelight", 
+    src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Flower Dance Super Trick Version", 
+    src: "assets/Flower Dance Super Trick Version (mp3cut.net).mp3", 
+    cover: "assets/Flower Dance - DJ Okawari.jpg" 
+  },
+  { 
+    title: "Departures - Guilty Crown ED1", 
+    src: "assets/Departures - Guilty Crown ED1 [Piano].mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "Majo no Tabitabi", 
+    src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", 
+    cover: "assets/Majo no Tabitabi.jpg" 
+  },
+  { 
+    title: "My Dearest ", 
+    src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", 
+    cover: "assets/Mydearest.jpg" 
+  },
+  { 
+    title: "Ninelie Kabaneri", 
+    src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", 
+    cover: "assets/ninelie.jpg" 
+  },
+  { 
+    title: "One Last Kiss", 
+    src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", 
+    cover: "assets/one last kiss.jpg" 
+  },
+  { 
+    title: "secret base", 
+    src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", 
+    cover: "assets/secret base.jpg" 
+  },
+  { 
+    title: "Blue Bird 2022 ver.", 
+    src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "Hikaru Nara - Your Lie in Apri", 
+    src: "assets/Hikaru Nara - Your Lie in April OP1 [Piano].mp3", 
+    cover: "assets/Elysia11.jpg"
+  },
+  { 
+    title: "AKIBA POP the Future - Pianeet", 
+    src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "SWORD ART ONLINE", 
+    src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", 
+    cover: "assets/SWORD ART ONLINE.jpg" 
+  },
+  { 
+    title: "反方向的钟", 
+    src: "assets/反方向的钟.mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "给我一首歌的时间", 
+    src: "assets/给我一首歌的时间 piano ver-.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "晴天", 
+    src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", 
+    cover: "assets/banner1.jpg" 
+  },
+  { 
+    title: "溯", 
+    src: "assets/su.mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "潮汐", 
+    src: "assets/Natural.mp3", 
+    cover: "assets/Elysia11.jpg" 
+  },
+  { 
+    title: "游京", 
+    src: "assets/游京 东雪莲.mp3", 
+    cover: "assets/游京 东雪莲.jpg" 
+  }
+];
+
+let currentSong = 0;
+const audio = new Audio(songs[currentSong].src);
+audio.preload = "auto";
+
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("songTitle");
+const player = document.querySelector(".elysia-player");
+const playlist = document.getElementById("playlist");
+
+/* ======== Playlist Rendering ======== */
+function renderPlaylist() {
+  playlist.innerHTML = songs.map((s, i) => `
+    <div class="playlist-item ${i === currentSong ? 'active' : ''}" data-index="${i}">
+      ${s.title}
+    </div>`).join("");
+}
+
+/* ======== Update Playing Song ======== */
+function updateSong() {
+  const song = songs[currentSong];
+  audio.src = song.src;
+  titleEl.textContent = song.title;
+  audio.play().catch(()=>{});
+  playPauseBtn.textContent = "⏸";
+  renderPlaylist();
+  updateMediaSession(song);
+}
+
+/* ======== Control Buttons ======== */
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  currentSong = (currentSong + 1) % songs.length;
+  updateSong();
+});
+
+audio.addEventListener("ended", () => nextBtn.click());
+audio.addEventListener("play", () => player.classList.add("playing"));
+audio.addEventListener("pause", () => player.classList.remove("playing"));
+
+/* ======== 🎧 Media Session API (Dynamic Island + Lock Screen Cover) ======== */
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: "Elysia Player",
+      album: "Piano Collection",
+      artwork: [
+        { src: song.cover, sizes: "96x96", type: "image/jpeg" },
+        { src: song.cover, sizes: "128x128", type: "image/jpeg" },
+        { src: song.cover, sizes: "192x192", type: "image/jpeg" },
+        { src: song.cover, sizes: "256x256", type: "image/jpeg" },
+        { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+      ]
+    });
+    navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+  } catch(e) {
+    console.warn("MediaSession update failed:", e);
+  }
+}
+
+audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
+audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
+audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
+
+/* ======== Playlist Click ======== */
+playlist.addEventListener("click", e => {
+  const item = e.target.closest(".playlist-item");
+  if (item) {
+    currentSong = parseInt(item.dataset.index);
+    updateSong();
+  }
+});
+
+/* ======== Open/Close Playlist ======== */
+function openPlaylist() {
+  playlist.classList.remove("hide");
+  playlist.classList.add("show");
+  playlist.setAttribute('aria-hidden', 'false');
+}
+function closePlaylist() {
+  playlist.classList.remove("show");
+  playlist.classList.add("hide");
+  playlist.setAttribute('aria-hidden', 'true');
+}
+
+titleEl.addEventListener("click", e => {
+  e.stopPropagation();
+  playlist.classList.contains("show") ? closePlaylist() : openPlaylist();
+});
+document.addEventListener("click", e => {
+  if (!playlist.contains(e.target) && e.target !== titleEl) {
+    if (playlist.classList.contains("show")) closePlaylist();
+  }
+});
+
+/* ======== Auto Hide Player ======== */
+let inactivityTimer;
+function hidePlayer() {
+  player.style.opacity = '0';
+  player.style.transform = 'translate(-50%, 40px)';
+  player.style.pointerEvents = 'none';
+  if (playlist.classList.contains("show")) closePlaylist();
+}
+function showPlayer() {
+  player.style.opacity = '1';
+  player.style.transform = 'translate(-50%, 0)';
+  player.style.pointerEvents = 'auto';
+  resetTimer();
+}
+function resetTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(hidePlayer, 30000);
+}
+['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+  window.addEventListener(evt, showPlayer)
+);
+resetTimer();
+
+renderPlaylist();
+updateSong();
+</script>
+
+<style>
+/* ====== Base: Liquid Glass Player ====== */
+.elysia-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px;
+  border-radius: 16px;
+  z-index: 9999;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: transform, opacity;
+}
+.elysia-player::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+  
+/* Control Buttons */
+.elysia-controls { display:flex; gap:10px; }
+.elysia-controls button {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer; transition: all .25s ease; backdrop-filter: blur(6px);
+}
+.elysia-controls button:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(160,120,255,0.4); }
+
+/* Song Name */
+#songTitle {
+  color: #f2eaff; font-weight:600; width:200px; font-size:0.95rem;
+  text-shadow:0 0 10px rgba(160,120,255,0.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+  will-change: transform;
+}
+
+/* ===== Playlist (Improved) ===== */
+/* Key: transform-origin set to bottom center, so scaling looks like retracting to player position */
+.elysia-playlist {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.98);
+  transform-origin: 50% 100%;
+  width: 260px;
+  max-height: 260px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  overflow-y: auto;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  z-index: 9998;
+  will-change: transform, opacity;
+}
+
+/* Song Name Text Color Adjusted to Light Purple Tone */
+.playlist-item {
+  padding: 6px 10px;
+  color: #cdbaff; /* Brighter light purple text */
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.playlist-item:hover {
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff; /* Brighten on hover */
+}
+
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
+}
+/* Medium Item */
+@keyframes dockBounceOpen {
+  0%   { transform: translateX(-50%) scale(0.75); opacity: 0; }
+  55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  75%  { transform: translateX(-50%) scale(0.97); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes dockBounceClose {
+  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
+  35%  { transform: translateX(-50%) scale(1.04); }
+  100% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+}
+
+/* Glow Ripple Layer (Using ::after) */
+.elysia-playlist::after {
+  content: ""; position: absolute; inset: 0; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; transform: scale(0.8); pointer-events: none; transition: opacity .6s ease, transform .6s ease;
+}
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* Apply Animation Classes */
+.elysia-playlist.show {
+  opacity: 1; pointer-events: auto;
+  animation: dockBounceOpen 0.58s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.48s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* Small Animations */
+@keyframes moveBlobs { 0%,100%{transform:translate3d(0,0,0) scale(1.03);} 50%{transform:translate3d(4%,-3%,0) scale(1.05);} }
+@keyframes softPulse { 0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} }
+
+/* === Soft Floating Animation (Elysia Style) === */
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.elysia-player {
+  animation: elysiaFloat 6s ease-in-out infinite;
+}
+
+
+/* Accessibility and Fine-Tuning */
+.elysia-playlist { scrollbar-width: thin; }
+.elysia-playlist .playlist-item { outline: none; }
+
+/* If stronger "retract" visual needed, change dockBounceClose last frame scale value (smaller for more thorough retract) */
+</style>
+
+
+<script>
+document.querySelectorAll('a[href]').forEach(a => {
+  if (!a.target) a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener noreferrer');
+});
+  
+</script>
+
+<script>
+// Disable Right-Click Menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+// Disable Common Developer Shortcuts (Silent Version)
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' || 
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+</script>
+
+<style>
+  /* Add Fade-Out Transition Animation */
+  .hamburger {
+    transition: opacity 0.5s ease;
+  }
+</style>
+
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  let hideTimer;
+
+  // Hide Menu Button
+  function hideHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '0';
+      hamburger.style.pointerEvents = 'none';
+    }
+  }
+
+  // Show Menu Button
+  function showHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '1';
+      hamburger.style.pointerEvents = 'auto';
+    }
+  }
+
+  // Reset Timer (Execute on User Interaction)
+  function resetHideTimer() {
+    showHamburger();
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideHamburger, 30000); // Hide after 30 seconds of inactivity
+  }
+
+  // Listen for User Interaction Events
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, resetHideTimer);
+  });
+
+  // Initialize
+  resetHideTimer();
+</script>
+
+</body>
+</html>

@@ -207,7 +207,7 @@
   <li><a href="indexen.html">EN</a></li>
 </ul>
 
-<!-- CSS样式（整合效果best的macOS动画） -->
+<!-- CSS样式（整合效果best的macOS动画，保留原弹出尺寸） -->
 <style>
 .hamburger {
   position: fixed;
@@ -247,7 +247,7 @@
   transition: all 0.3s ease; /* 为动画添加过渡 */
 }
 
-/* 下拉菜单样式（整合效果best：macOS Dock弹出动画） */
+/* 下拉菜单样式（整合效果best：macOS Dock弹出动画，保留原尺寸） */
 .dropdown-menu {
   position: fixed;
   left: 14px;
@@ -266,7 +266,7 @@
   display: none; /* 初始隐藏 */
   opacity: 0;
   pointer-events: none;
-  transform: translateY(36px) scale(0.96); /* 初始状态：向下位移 + 缩小 */
+  transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
   transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
   transform-origin: top left; /* 从左上角弹出 */
 }
@@ -291,10 +291,10 @@
   background: rgba(255,255,255,0.2);
 }
 
-/* 效果best的核心动画 keyframes */
+/* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
 @keyframes dockPop {
-  0% { transform: translateY(36px) scale(.96); filter: brightness(.92); }
-  55% { transform: translateY(-10px) scale(1.08); filter: brightness(1.12); }
+  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
+  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); } /* 轻微向下反弹，保留小规模 */
   100% { transform: translateY(0) scale(1); filter: brightness(1); }
 }
 </style>

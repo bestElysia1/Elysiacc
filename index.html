@@ -626,7 +626,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </section>
 
     <footer>
-  订阅使用指南 ver.3.24 
+  订阅使用指南 ver.3.24  <button id="langToggle" class="lang-button">EN / 中文</button>
   <br>© bestElysia 2025
 </footer>
 
@@ -1481,6 +1481,43 @@ document.addEventListener('keydown', e => {
   // 初始化
   resetHideTimer();
 </script>
+
+  <style>
+.lang-button {
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(123,63,228,0.2);
+}
+
+.lang-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(123,63,228,0.3);
+  animation: glowPulse 1.5s infinite;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('langToggle');
+  const isEnglish = window.location.pathname.includes('indexen.html'); // 假设英文页面为 indexen.html
+  btn.textContent = isEnglish ? '中文' : 'EN';
+
+  btn.addEventListener('click', () => {
+    if (isEnglish) {
+      window.location.href = 'index.html'; // 中文页面 (假设为 index_zh.html，根据实际文件名调整)
+    } else {
+      window.location.href = 'indexen.html'; // 英文页面
+    }
+  });
+});
+</script>
+
 
 </body>
 </html>

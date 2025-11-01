@@ -192,7 +192,7 @@
 </head>
 <body>
 
- <!-- 爱莉希雅入口按钮 -->
+<!-- 爱莉希雅入口按钮 -->
 <!-- HTML部分：汉堡按钮和下拉菜单 -->
 <div class="hamburger" id="hamburger-menu" aria-label="菜单">
   <span class="hb-line"></span>
@@ -207,7 +207,7 @@
   <li><a href="indexen.html">EN</a></li>
 </ul>
 
-<!-- CSS样式（保持原有，并调整下拉菜单动画） -->
+<!-- CSS样式（整合效果best的macOS动画） -->
 <style>
 .hamburger {
   position: fixed;
@@ -247,7 +247,7 @@
   transition: all 0.3s ease; /* 为动画添加过渡 */
 }
 
-/* 下拉菜单样式（增强macOS弹出效果） */
+/* 下拉菜单样式（整合效果best：macOS Dock弹出动画） */
 .dropdown-menu {
   position: fixed;
   left: 14px;
@@ -265,14 +265,16 @@
   box-shadow: 0 6px 20px rgba(150,120,255,0.12);
   display: none; /* 初始隐藏 */
   opacity: 0;
-  transform: translateY(-10px) scale(0.95); /* 初始状态：向上位移 + 轻微缩小 */
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* ease-out-back for bounce弹出 */
+  pointer-events: none;
+  transform: translateY(36px) scale(0.96); /* 初始状态：向下位移 + 缩小 */
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
   transform-origin: top left; /* 从左上角弹出 */
 }
 .dropdown-menu.show {
   display: block;
   opacity: 1;
-  transform: translateY(0) scale(1); /* 弹出到正常大小 */
+  pointer-events: auto;
+  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
 }
 .dropdown-menu li {
   margin: 5px 0;
@@ -287,6 +289,13 @@
 }
 .dropdown-menu a:hover {
   background: rgba(255,255,255,0.2);
+}
+
+/* 效果best的核心动画 keyframes */
+@keyframes dockPop {
+  0% { transform: translateY(36px) scale(.96); filter: brightness(.92); }
+  55% { transform: translateY(-10px) scale(1.08); filter: brightness(1.12); }
+  100% { transform: translateY(0) scale(1); filter: brightness(1); }
 }
 </style>
 

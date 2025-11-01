@@ -1482,9 +1482,9 @@ document.addEventListener('keydown', e => {
   resetHideTimer();
 </script>
 
-  <style>
+ <style>
 .lang-button {
-  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(90deg, #c8a6ff, #b48dff); /* 淡紫渐变 */
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1492,13 +1492,20 @@ document.addEventListener('keydown', e => {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(123,63,228,0.2);
+  box-shadow: 0 2px 8px rgba(176, 128, 255, 0.25);
+  float: right; /* 让按钮靠右 */
+  margin-right: 10px; /* 离右边留点距离 */
 }
 
 .lang-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(123,63,228,0.3);
+  box-shadow: 0 4px 12px rgba(176, 128, 255, 0.35);
   animation: glowPulse 1.5s infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(176,128,255,0.3); }
+  50% { box-shadow: 0 0 20px rgba(176,128,255,0.6); }
 }
 </style>
 

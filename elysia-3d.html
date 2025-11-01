@@ -414,7 +414,7 @@ document.addEventListener('click', function(event) {
     // ========== 配置 ==========
     const config = {
       checkInterval: 1200,          // 检测频率(ms)
-      sizeThreshold: 160,           // outer - inner 超过这个值视为 DevTools docked (px)
+      sizeThreshold: 300,           // outer - inner 超过这个值视为 DevTools docked (px)
       timeThreshold: 120,           // debugger 导致的时间差阈值(ms)
       onDetect: (detail) => {       // 检测回调（可替换为上报接口）
         console.warn('[DevToolsDetect]', detail);

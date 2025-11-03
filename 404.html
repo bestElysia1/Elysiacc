@@ -15,7 +15,8 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      overflow: hidden; /* 改为 hidden 以防止滚动 */
+      position: relative;
     }
 
     main {
@@ -26,15 +27,21 @@
       align-items: center;
       text-align: center;
       padding: 60px 20px;
+      position: relative;
+      z-index: 1; /* 确保文本在图像上方 */
     }
 
     img {
-      max-width: 300px;
-      height: auto;
-      margin-bottom: 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* 铺满全屏，保持比例 */
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 1s ease-out, transform 1s ease-out;
+      z-index: 0; /* 图像在背景层 */
     }
 
     h1 {
@@ -54,9 +61,9 @@
   </style>
 </head>
 <body>
+  <img src="assets/bendan.jpg" alt="笨蛋插图" />
   <main>
-    <img src="assets/bendan.jpg" alt="笨蛋插图" />
-    <h1>404 - 页面未找到。笨蛋，你想干什么！</h1>
+    <h1>笨蛋你想干什么</h1>
   </main>
   <script>
     window.addEventListener('load', function() {

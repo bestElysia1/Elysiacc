@@ -1,1 +1,45 @@
 笨蛋你想干什么！
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elysia Secret Page</title>
+  <link rel="icon" href="assets/bendan.jpg" type="image/jpg" />
+  <link rel="apple-touch-icon" href="assets/bendan.jpg" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f0ff 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    h1 {
+      color: #6a58b5;
+      font-weight: 500;
+      font-size: 1.4rem;
+      margin: 12px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    h1.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }

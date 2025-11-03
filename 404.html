@@ -28,6 +28,15 @@
       padding: 60px 20px;
     }
 
+    img {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
     h1 {
       color: #6a58b5;
       font-weight: 500;
@@ -38,7 +47,7 @@
       transition: opacity 1s ease-out, transform 1s ease-out;
     }
 
-    h1.visible {
+    .visible {
       opacity: 1;
       transform: translateY(0);
     }
@@ -46,10 +55,12 @@
 </head>
 <body>
   <main>
-    <h1>笨蛋你想干什么！</h1>
+    <img src="assets/bendan.jpg" alt="笨蛋插图" />
+    <h1>404 - 页面未找到。笨蛋，你想干什么！</h1>
   </main>
   <script>
     window.addEventListener('load', function() {
+      document.querySelector('img').classList.add('visible');
       document.querySelector('h1').classList.add('visible');
     });
   </script>

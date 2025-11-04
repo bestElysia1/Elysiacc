@@ -5,50 +5,31 @@
     <style>
        
         @keyframes glowFlow {
-            0% { background-position: -100% center; }  
-            100% { background-position: 100% center; }  
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
-     
+      
         @keyframes breathe {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
             50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
         }
 
        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-2px); }  
-        }
-
-        
         img {
             width: 100%;
             height: auto;
             background: linear-gradient(90deg, 
                 transparent 0%, 
-                transparent 45%, 
-                rgba(255,255,255,0.6) 50%,  
-                rgba(160,130,255,0.4) 51%,  
-                transparent 55%,
+                rgba(160,130,255,0.3) 30%, 
+                rgba(160,130,255,0.1) 50%, 
                 transparent 100%
-            );  
-            background-size: 200% 100%;  
+            );
+            background-size: 200% 100%;
             animation: 
-                glowFlow 1.5s linear infinite,  
+                glowFlow 2s linear infinite,
                 breathe 3s ease-in-out infinite;
             border-radius: 8px;
             display: block;
-            transition: all 0.3s ease; 
-        }
-
-       
-        img:hover {
-            transform: scale(1.05) translateY(-5px); 
-            box-shadow: 0 0 20px rgba(160,130,255,0.6);  
-            animation: 
-                glowFlow 0.8s linear infinite,  
-                breathe 1.5s ease-in-out infinite;  
-            /* img:hover { animation: float 1s ease-in-out infinite; } */
         }
     </style>

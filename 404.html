@@ -1,3 +1,35 @@
 笨蛋你想干什么！
 
 <img src="assets/bendan.jpg" alt="bendan" style="width:100%; height:auto;" />
+
+    <style>
+        /* 流动微光 */
+        @keyframes glowFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* 呼吸光晕 */
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
+            50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+        }
+
+        /* 应用到图片 */
+        img {
+            width: 100%;
+            height: auto;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(160,130,255,0.3) 30%, 
+                rgba(160,130,255,0.1) 50%, 
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: 
+                glowFlow 2s linear infinite,
+                breathe 3s ease-in-out infinite;
+            border-radius: 8px;
+            display: block;
+        }
+    </style>

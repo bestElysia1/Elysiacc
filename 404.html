@@ -3,53 +3,52 @@
 <img src="assets/bendan.jpg" alt="bendan" style="width:100%; height:auto;" />
 
     <style>
-        /* 流动微光：细光线从左到右划过 */
+       
         @keyframes glowFlow {
-            0% { background-position: -100% center; }  /* 从左侧外开始 */
-            100% { background-position: 100% center; }  /* 到右侧外结束 */
+            0% { background-position: -100% center; }  
+            100% { background-position: 100% center; }  
         }
 
-        /* 呼吸光晕 */
+     
         @keyframes breathe {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
             50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
         }
 
-        /* 悬浮效果 */
+       
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-2px); }  /* 轻微上下浮动，但默认不启用 */
+            50% { transform: translateY(-2px); }  
         }
 
-        /* 应用到图片 */
+        
         img {
             width: 100%;
             height: auto;
             background: linear-gradient(90deg, 
                 transparent 0%, 
                 transparent 45%, 
-                rgba(255,255,255,0.6) 50%,  /* 细白光线核心 */
-                rgba(160,130,255,0.4) 51%,  /* 紫色光晕 */
+                rgba(255,255,255,0.6) 50%,  
+                rgba(160,130,255,0.4) 51%,  
                 transparent 55%,
                 transparent 100%
-            );  /* 窄光线渐变，只占约5%宽度 */
-            background-size: 200% 100%;  /* 拉伸以便移动 */
+            );  
+            background-size: 200% 100%;  
             animation: 
-                glowFlow 1.5s linear infinite,  /* 细光线快速划过，1.5s一循环 */
+                glowFlow 1.5s linear infinite,  
                 breathe 3s ease-in-out infinite;
             border-radius: 8px;
             display: block;
-            transition: all 0.3s ease;  /* 悬浮平滑过渡 */
-            cursor: pointer;  /* 鼠标变小手 */
+            transition: all 0.3s ease; 
         }
 
-        /* 悬浮时效果 */
+       
         img:hover {
-            transform: scale(1.05) translateY(-5px);  /* 放大 + 上浮 */
-            box-shadow: 0 0 20px rgba(160,130,255,0.6);  /* 阴影加深 */
+            transform: scale(1.05) translateY(-5px); 
+            box-shadow: 0 0 20px rgba(160,130,255,0.6);  
             animation: 
-                glowFlow 0.8s linear infinite,  /* 光线加速 */
-                breathe 1.5s ease-in-out infinite;  /* 呼吸加快 */
-            /* 可选：加浮动动画 img:hover { animation: float 1s ease-in-out infinite; } */
+                glowFlow 0.8s linear infinite,  
+                breathe 1.5s ease-in-out infinite;  
+            /* img:hover { animation: float 1s ease-in-out infinite; } */
         }
     </style>

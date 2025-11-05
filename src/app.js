@@ -1,7 +1,6 @@
 import chineseHtml from './index.html';
 import englishHtml from './en.html';
 import threeDHtml from './elysia-3d.html';
-import './style.css';  // 如果有CSS，导入；否则删行
 
 document.addEventListener('DOMContentLoaded', () => {
   let htmlToUse = chineseHtml;  // 默认中文

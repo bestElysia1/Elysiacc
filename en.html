@@ -215,22 +215,15 @@ main.container li:hover {
   transition: all 0.3s ease;
 }
 
-/* 打字机效果专用样式 */
+/* 打字机效果专用样式 - 移除光标 */
 .typewriter {
-  border-right: 2px solid var(--accent-end); /* 光标效果 */
   white-space: nowrap; /* 防止换行 */
   overflow: hidden; /* 隐藏未显示部分 */
-  animation: blink 1s infinite; /* 光标闪烁 */
-  display: inline-block; /* 确保光标只在文本旁 */
+  display: inline-block; /* 确保只在文本旁 */
 }
-@keyframes blink {
-  0%, 50% { border-color: var(--accent-end); }
-  51%, 100% { border-color: transparent; }
-}
-/* 打字完成后停止闪烁 */
+/* 打字完成后无特殊类 */
 .typewriter.done {
-  border-right: none;
-  animation: none;
+  /* 无光标相关 */
 }
 
   </style>
@@ -280,7 +273,7 @@ main.container li:hover {
 
   
 </head>
-<body>
+<body style="opacity: 0; transition: opacity 1s ease-in-out;">
 <!-- 爱莉希雅入口按钮 -->
 <!-- HTML部分：汉堡按钮和下拉菜单 -->
 <div class="hamburger" id="hamburger-menu" aria-label="菜单">
@@ -466,95 +459,97 @@ document.addEventListener('click', function(event) {
       
     </header>
 
-    <div class="countdown" id="countdown" aria-live="polite">
+    <div class="countdown" id="countdown" aria-live="polite" style="opacity: 0; transition: opacity 0.5s ease-in-out;">
       <div style="font-size:0.95rem;color:#666;margin-bottom:6px">Countdown</div>
       <div class="nums" id="countdownNums">— Days — : — : —</div>
     </div>
 
-    <section>
-      <p id="introText1" class="typewriter"><strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines</p>
-      <p id="introText2" class="typewriter"><strong>Milkshake</strong> Same as above</p>
-      <p id="introText3" class="typewriter"><strong>IEPL IPLC</strong> Premium Dedicated Lines</p>
-      <p id="introText4" class="typewriter"><strong>IEPL prem.</strong> Gaming Dedicated</p>
-      <p id="introText5" class="typewriter"><strong>Pure</strong> Native IP Dual ISP</p>
-      <p id="introText6" class="typewriter"><strong>Shenzhen-Hong Kong</strong> Backup Lines</p>
-      <p id="introText7" class="typewriter"><strong>Limited</strong> Backup Lines</p>
-      <p id="introText8" class="typewriter"><strong>Tunnel</strong> Backup Lines</p>
-      <p id="introText9" class="typewriter"><strong>Direct</strong> Usable Both Domestically and Internationally</p>
-      <p id="introText10" class="typewriter"><strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use</p>
+    <section id="introSection" style="opacity: 0;">
+      <p id="introText1" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText2" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText3" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText4" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText5" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText6" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText7" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText8" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText9" class="typewriter" style="font-size: 0;"></p>
+      <p id="introText10" class="typewriter" style="font-size: 0;"></p>
     </section>
 
-    <section>
-      <h2>Subscription Link</h2>
-      <p>Please send "Subscription" to the email to obtain</p>
+    <!-- 其他所有 section 初始隐藏 -->
+    <section id="otherSections" style="opacity: 0; transition: opacity 1s ease-in-out;">
+      <section>
+        <h2 style="font-size: 0;">Subscription Link</h2>
+        <p style="font-size: 0;">Please send "Subscription" to the email to obtain</p>
 
-    </section>
+      </section>
 
-    <section>
-      <h2>Notifications</h2>
-      <ul>
-        <li>Three-Network Optimization Completed ~ 2025-09-16</li>
-        <li>ChatGPT is not available in Hong Kong. To use ChatGPT, please use Singapore or Japan or other nodes to avoid unavailability and degradation ~ 2025-09-16 (Auto-Switch Completed)</li>
-        <li>Due to upgrades in provincial firewalls in some provinces, mobile lines need special optimization. If unavailable, contact me for individual tuning ~ 2025-09-19</li>
-        <li>Mobile in some provinces is blocked, switch to Telecom. Mobile network temporarily unavailable ~ 2025-09-30 (Fixed)</li>
-        <li>Germany Frankfurt CN2 GIA Dedicated Line will be online on October 20 ~ 2025-10-10</li>
-        <li>Server maintenance expected from November 1-7, does not affect normal use. Update subscription on November 8 ~ 2025-10-30</li>
+      <section>
+        <h2 style="font-size: 0;">Notifications</h2>
+        <ul>
+          <li style="font-size: 0;">Three-Network Optimization Completed ~ 2025-09-16</li>
+          <li style="font-size: 0;">ChatGPT is not available in Hong Kong. To use ChatGPT, please use Singapore or Japan or other nodes to avoid unavailability and degradation ~ 2025-09-16 (Auto-Switch Completed)</li>
+          <li style="font-size: 0;">Due to upgrades in provincial firewalls in some provinces, mobile lines need special optimization. If unavailable, contact me for individual tuning ~ 2025-09-19</li>
+          <li style="font-size: 0;">Mobile in some provinces is blocked, switch to Telecom. Mobile network temporarily unavailable ~ 2025-09-30 (Fixed)</li>
+          <li style="font-size: 0;">Germany Frankfurt CN2 GIA Dedicated Line will be online on October 20 ~ 2025-10-10</li>
+          <li style="font-size: 0;">Server maintenance expected from November 1-7, does not affect normal use. Update subscription on November 8 ~ 2025-10-30</li>
 
-      </ul>
-    </section>
+        </ul>
+      </section>
 
-    <section>
-      <h2>Usage Rules</h2>
-      <p>Copy the subscription link to the software and sync to use</p>
-    </section>
+      <section>
+        <h2 style="font-size: 0;">Usage Rules</h2>
+        <p style="font-size: 0;">Copy the subscription link to the software and sync to use</p>
+      </section>
 
-    <section>
-      <h2>Mobile Devices</h2>
-      <ul>
-        <li><strong>Android:</strong> V2rayNG, FIClash, Nekobox, Sing-box for Android, Clash Meta for Android .etc</li>
-        <li><strong>iOS (including iPadOS/tvOS):</strong> ShadowRocket (Little Rocket), Surge, Loon, Stash, Quantumult .etc</li>
-        <li><strong>Harmony OS NEXT:</strong> Same as Android, but not recommended</li>
-      </ul>
-    </section>
+      <section>
+        <h2 style="font-size: 0;">Mobile Devices</h2>
+        <ul>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Android:</strong> V2rayNG, FIClash, Nekobox, Sing-box for Android, Clash Meta for Android .etc</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">iOS (including iPadOS/tvOS):</strong> ShadowRocket (Little Rocket), Surge, Loon, Stash, Quantumult .etc</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Harmony OS NEXT:</strong> Same as Android, but not recommended</li>
+        </ul>
+      </section>
 
-    <section>
-      <h2>Computers</h2>
-      <ul>
-        <li><strong>Windows:</strong> V2rayN, Clash Party, Clash Verge, FIClash .etc</li>
-        <li><strong>macOS:</strong> Surge, Shadowrocket, Clash Verge Rev, GUI for SingBox, Clash Party .etc</li>
-        <li><strong>Linux:</strong> V2rayN, Singbox for Linux .etc</li>
-        <li><strong>FreeBSD/Unix:</strong> Mihomo (Bare Core), Sing-box .etc</li>
-      </ul>
-    </section>
+      <section>
+        <h2 style="font-size: 0;">Computers</h2>
+        <ul>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Windows:</strong> V2rayN, Clash Party, Clash Verge, FIClash .etc</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">macOS:</strong> Surge, Shadowrocket, Clash Verge Rev, GUI for SingBox, Clash Party .etc</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Linux:</strong> V2rayN, Singbox for Linux .etc</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">FreeBSD/Unix:</strong> Mihomo (Bare Core), Sing-box .etc</li>
+        </ul>
+      </section>
 
-    <section>
-      <h2>Routers</h2>
-      <ul>
-        <li><strong>ASUS Hardware Router:</strong> MerlinClash2 (Merlin), FancySS</li>
-        <li><strong>Xiaomi Hardware Router:</strong> ShellCrash</li>
-        <li><strong>OpenWrt Software Router:</strong> OpenClash, PassWall, Nikki</li>
-      </ul>
-    </section>
+      <section>
+        <h2 style="font-size: 0;">Routers</h2>
+        <ul>
+          <li style="font-size: 0;"><strong style="font-size: 0;">ASUS Hardware Router:</strong> MerlinClash2 (Merlin), FancySS</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Xiaomi Hardware Router:</strong> ShellCrash</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">OpenWrt Software Router:</strong> OpenClash, PassWall, Nikki</li>
+        </ul>
+      </section>
 
-    <section>
-      <h2>Rule Set</h2>
-      <p><strong>Shadowsrocket:</strong></p>
-      <p>Open Little Rocket - Configuration - Top Right - "+" Paste this link into URL</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
-      <p>Use this configuration, then on the same page open - Module - Top Right "+" Import the three links for Direct, Proxy, Reject into modules respectively</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+      <section>
+        <h2 style="font-size: 0;">Rule Set</h2>
+        <p style="font-size: 0;"><strong style="font-size: 0;">Shadowsrocket:</strong></p>
+        <p style="font-size: 0;">Open Little Rocket - Configuration - Top Right - "+" Paste this link into URL</p>
+        <pre style="font-size: 0;">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+        <p style="font-size: 0;">Use this configuration, then on the same page open - Module - Top Right "+" Import the three links for Direct, Proxy, Reject into modules respectively</p>
+        <pre style="font-size: 0;">https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
 
-      <p>After setup - Little Rocket - Home - Global Routing - Change to - Configuration, restart Little Rocket. This way, no need to toggle Little Rocket on/off. Domestic apps/websites default direct, foreign apps/websites default proxy (except bank apps)</p>
+        <p style="font-size: 0;">After setup - Little Rocket - Home - Global Routing - Change to - Configuration, restart Little Rocket. This way, no need to toggle Little Rocket on/off. Domestic apps/websites default direct, foreign apps/websites default proxy (except bank apps)</p>
 
-    </section>
+      </section>
 
-    <section>
-      <h2>Shadowrocket Advanced</h2>
-      <p><strong>Shadowrocket Ultimate Advanced Play:</strong></p>
-      <p>If you have specific websites needing proxy or direct, open Little Rocket - Configuration - Module, you can see direct, proxy, reject, three modules. Open the proxy module, you can see proxy_list. For example, if yhdm.one needs proxy, add under rule:</p>
-      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
+      <section>
+        <h2 style="font-size: 0;">Shadowrocket Advanced</h2>
+        <p style="font-size: 0;"><strong style="font-size: 0;">Shadowrocket Ultimate Advanced Play:</strong></p>
+        <p style="font-size: 0;">If you have specific websites needing proxy or direct, open Little Rocket - Configuration - Module, you can see direct, proxy, reject, three modules. Open the proxy module, you can see proxy_list. For example, if yhdm.one needs proxy, add under rule:</p>
+        <pre style="font-size: 0;">DOMAIN-SUFFIX,yhdm.one,PROXY
 DOMAIN-SUFFIX,yinhuadm.one,PROXY
 DOMAIN-SUFFIX,anime1.me,PROXY
 DOMAIN-SUFFIX,elysia.bestxuyi.us,PROXY
@@ -566,26 +561,26 @@ DOMAIN-SUFFIX,gemini.googleapis.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,bard.google.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.google.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,x.ai,Onlycloud｜Singapore01-❄️10Gbps</pre>
-      <p>Then save. Note: When adding in bulk, ensure each rule is on one line and copy-paste together</p>
-      <p>Others like specific websites going direct (open direct module...) same logic~</p>
-    
-    </section>
+        <p style="font-size: 0;">Then save. Note: When adding in bulk, ensure each rule is on one line and copy-paste together</p>
+        <p style="font-size: 0;">Others like specific websites going direct (open direct module...) same logic~</p>
+      
+      </section>
 
-    <section>
-      <h2>Shadowrocket Load Balancing</h2>
-      <p>Open Little Rocket - Home - Global Routing - Enable Fallback; Group - Simple Mode - Enable; Group - Edit - Select the nodes you want to use - Done</p>
-      <p>Must include Onlycloud Hong Kong & Singapore & Japan nodes</p>
-      <p>Aims to ensure always available & auto-switch available</p>
-    
-    </section>
+      <section>
+        <h2 style="font-size: 0;">Shadowrocket Load Balancing</h2>
+        <p style="font-size: 0;">Open Little Rocket - Home - Global Routing - Enable Fallback; Group - Simple Mode - Enable; Group - Edit - Select the nodes you want to use - Done</p>
+        <p style="font-size: 0;">Must include Onlycloud Hong Kong & Singapore & Japan nodes</p>
+        <p style="font-size: 0;">Aims to ensure always available & auto-switch available</p>
+      
+      </section>
 
-    <section>
-      <h2>V2rayN-Windows Basics</h2>
-      <p><strong>V2rayN Usage</strong></p>
-      <p>Open V2rayN - Top Tab - Subscription Group - Subscription Group Settings - Add - Fill Alias Elysia (any) - Paste subscription link into Optional URL - Confirm - Click Subscription Group - Update Current Subscription (via Proxy) - Select any node - Right Click - Set as Active Profile - Bottom System Proxy - Auto Configure System Proxy - Top Tab - Settings - Restart as Administrator</p>
-      <p><strong>V2rayN Diversion</strong></p>
-      <p>Open V2rayN - Top Tab - Settings - Routing Settings - Double Click V3 Bypass Mainland - Add Rule - Alias: Elysia (any) - outboundTag: Onlycloud｜Singapore02-❄️10Gbps - Paste below rules in Domain:</p>
-      <pre>domain:openai.com,
+      <section>
+        <h2 style="font-size: 0;">V2rayN-Windows Basics</h2>
+        <p style="font-size: 0;"><strong style="font-size: 0;">V2rayN Usage</strong></p>
+        <p style="font-size: 0;">Open V2rayN - Top Tab - Subscription Group - Subscription Group Settings - Add - Fill Alias Elysia (any) - Paste subscription link into Optional URL - Confirm - Click Subscription Group - Update Current Subscription (via Proxy) - Select any node - Right Click - Set as Active Profile - Bottom System Proxy - Auto Configure System Proxy - Top Tab - Settings - Restart as Administrator</p>
+        <p style="font-size: 0;"><strong style="font-size: 0;">V2rayN Diversion</strong></p>
+        <p style="font-size: 0;">Open V2rayN - Top Tab - Settings - Routing Settings - Double Click V3 Bypass Mainland - Add Rule - Alias: Elysia (any) - outboundTag: Onlycloud｜Singapore02-❄️10Gbps - Paste below rules in Domain:</p>
+        <pre style="font-size: 0;">domain:openai.com,
 domain:chat.openai.com,
 domain:api.openai.com,
 domain:cdn.openai.com,
@@ -599,55 +594,55 @@ domain:perplexity.ai,
 domain:poe.com,
 domain:huggingface.co,
 domain:chatgpt.com</pre>
-      <p>Others unchanged, click Confirm - Tab - Settings - Restart as Administrator. This sets up - auto-switch to Singapore node when using ChatGPT etc AI, without affecting current node</p>
-      <p>Others like adding diversion nodes or modifying AI nodes same logic~</p>
+        <p style="font-size: 0;">Others unchanged, click Confirm - Tab - Settings - Restart as Administrator. This sets up - auto-switch to Singapore node when using ChatGPT etc AI, without affecting current node</p>
+        <p style="font-size: 0;">Others like adding diversion nodes or modifying AI nodes same logic~</p>
 
 
-      <p>Others like clash verge, sing-box .etc omitted</p>
+        <p style="font-size: 0;">Others like clash verge, sing-box .etc omitted</p>
 
-    </section>
+      </section>
 
-    
-    <section>
-      <h2>Tutorial for Building Your Own VPS Nodes</h2>
-      <ul>
-        <li><strong>Common Tools:</strong> Final shell, Putty, CMD, XUI&3X-UI</li>
-        <li><strong>Final shell:</strong> Buy 1 VPS (system version ubuntu22 or above) Open final shell, create a new ssh connection, enter host IP address, port, username, key to login to this VPS, then copy bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) this link to VPS and follow prompts step by step, import generated nodes to V2rayN to use</li>
-        <li><strong>Putty:</strong> Open putty, enter host IP and port to login, subsequent steps same as above</li>
-        <li><strong>CMD:</strong> windows+R run CMD, then copy command ssh root@yourIP -p port (root is username, yourIP replace with your purchased host IP address, -P followed by VPS provided port) login, subsequent steps same as above</li>
-        <li><strong>Recommendation:</strong> After building nodes, pair with front proxy or use traffic forwarding service to make your VPS nodes very stable and accelerated, avoid unavailability etc</li>
-      </ul>
-    </section>
+      
+      <section>
+        <h2 style="font-size: 0;">Tutorial for Building Your Own VPS Nodes</h2>
+        <ul>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Common Tools:</strong> Final shell, Putty, CMD, XUI&3X-UI</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Final shell:</strong> Buy 1 VPS (system version ubuntu22 or above) Open final shell, create a new ssh connection, enter host IP address, port, username, key to login to this VPS, then copy bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) this link to VPS and follow prompts step by step, import generated nodes to V2rayN to use</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Putty:</strong> Open putty, enter host IP and port to login, subsequent steps same as above</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">CMD:</strong> windows+R run CMD, then copy command ssh root@yourIP -p port (root is username, yourIP replace with your purchased host IP address, -P followed by VPS provided port) login, subsequent steps same as above</li>
+          <li style="font-size: 0;"><strong style="font-size: 0;">Recommendation:</strong> After building nodes, pair with front proxy or use traffic forwarding service to make your VPS nodes very stable and accelerated, avoid unavailability etc</li>
+        </ul>
+      </section>
 
 
 
-    <section>
-  <h2>Speed Test Links</h2>
+      <section>
+  <h2 style="font-size: 0;">Speed Test Links</h2>
   <ul>
-    <li><a href="https://www.speedtest.net/">Speedtest</a></li>
-    <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
-    <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li> 
+    <li style="font-size: 0;"><a href="https://www.speedtest.net/" style="font-size: 0;">Speedtest</a></li>
+    <li style="font-size: 0;"><a href="https://fiber.google.com/speedtest/" style="font-size: 0;">Google Speedtest</a></li>
+    <li style="font-size: 0;"><a href="http://puspfc.speedtestcustom.com/" style="font-size: 0;">Custom Speedtest</a></li> 
   </ul>
     </section>
               
 
-    
-    <section>
-  <h2>Some Software Links</h2>
+      
+      <section>
+  <h2 style="font-size: 0;">Some Software Links</h2>
   <ul>
-    <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
-    <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
-    <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
-    <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
-    <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
-    <li><a href="https://nssurge.com/">Surge</a></li>
-    <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
-    <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
+    <li style="font-size: 0;"><a href="https://github.com/2dust/v2rayN" style="font-size: 0;">V2rayN</a></li>
+    <li style="font-size: 0;"><a href="https://github.com/mihomo-party-org/clash-party/" style="font-size: 0;">Clash-party</a></li>
+    <li style="font-size: 0;"><a href="https://github.com/chen08209/FlClash/" style="font-size: 0;">FlClash</a></li>
+    <li style="font-size: 0;"><a href="https://github.com/clash-verge-rev/clash-verge-rev/" style="font-size: 0;">Clash-verge-rev</a></li>
+    <li style="font-size: 0;"><a href="https://www.shadowrocket.vip/" style="font-size: 0;">Shadowrocket</a></li>
+    <li style="font-size: 0;"><a href="https://nssurge.com/" style="font-size: 0;">Surge</a></li>
+    <li style="font-size: 0;"><a href="https://www.hostbuf.com/t/988.html" style="font-size: 0;">Final Shell</a></li>
+    <li style="font-size: 0;"><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" style="font-size: 0;">Putty</a></li>
     
   </ul>
     </section>
 
-<div class="elysia-video-wrapper">
+<div class="elysia-video-wrapper" style="opacity: 0; transition: opacity 0.5s ease-in-out;">
   <video id="videoA" autoplay muted playsinline preload="auto"></video>
   <video id="videoB" muted playsinline preload="auto"></video>
 </div>
@@ -778,24 +773,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-  <h2>Some Useful & Interesting Websites</h2>
+  <h2 style="font-size: 0;">Some Useful & Interesting Websites</h2>
   <ul>
-    <li><a href="https://www.nodeseek.com/post-183694-1">Common VPS Scripts</a></li>
-    <li><a href="https://downloads.khinsider.com/">Music Download Site 1 Used Here</a></li>
-    <li><a href="https://mp3juice.co/">Music Download Site 2 Used Here</a></li>
-    <li><a href="https://wallhaven.cc/index.php">Useful PC Wallpapers</a></li>
-    <li><a href="https://hstock.org/en">Purchase Site for Apple ID etc Resources</a></li>
-    <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
+    <li style="font-size: 0;"><a href="https://www.nodeseek.com/post-183694-1" style="font-size: 0;">Common VPS Scripts</a></li>
+    <li style="font-size: 0;"><a href="https://downloads.khinsider.com/" style="font-size: 0;">Music Download Site 1 Used Here</a></li>
+    <li style="font-size: 0;"><a href="https://mp3juice.co/" style="font-size: 0;">Music Download Site 2 Used Here</a></li>
+    <li style="font-size: 0;"><a href="https://wallhaven.cc/index.php" style="font-size: 0;">Useful PC Wallpapers</a></li>
+    <li style="font-size: 0;"><a href="https://hstock.org/en" style="font-size: 0;">Purchase Site for Apple ID etc Resources</a></li>
+    <li style="font-size: 0;"><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way" style="font-size: 0;">How-To-Ask-Questions</a></li>
   </ul>
     </section>
 
      <section>
-      <h2>Eternal Elysia</h2>
-      <p>Congratulations, you have fully mastered common VPN techniques</p>
+      <h2 style="font-size: 0;">Eternal Elysia</h2>
+      <p style="font-size: 0;">Congratulations, you have fully mastered common VPN techniques</p>
 
     </section>
 
-    <footer>
+    <footer style="opacity: 0; transition: opacity 0.5s ease-in-out;">
   Subscription Guide ver.3.24 
   <br>© bestElysia 2025
 </footer>
@@ -803,18 +798,19 @@ document.addEventListener("DOMContentLoaded", () => {
   </main>
 
   <script>
-    // 打字机效果函数
+    // 修改后的打字机函数 - 无光标，修复strong显示
     function typeWriter(text, element, speed = 100, callback = null) {
       let i = 0;
       element.innerHTML = ''; // 清空初始内容
+      element.style.fontSize = '0.95rem'; // 恢复字体大小
 
       function type() {
         if (i < text.length) {
-          element.innerHTML += text.charAt(i); // 追加一个字符
+          element.innerHTML += text.charAt(i); // 使用innerHTML解析HTML（但由于预处理strong，已无标签问题）
           i++;
           setTimeout(type, speed); // 延时调用下一次
         } else {
-          element.classList.add('done'); // 打字完成后停止光标
+          element.classList.add('done'); // 标记完成（无光标效果）
           if (callback) callback(); // 执行回调
         }
       }
@@ -839,19 +835,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     updateCount(); setInterval(updateCount, 1000);
 
-    // 启动打字机效果：逐个段落打出介绍文本
+    // 启动打字机效果：逐个段落打出介绍文本 - 预插入strong修复bug
     window.addEventListener('load', () => {
+      // 先显示banner和countdown
+      document.body.style.opacity = '1';
+      document.getElementById('countdown').style.opacity = '1';
+
+      const boldTexts = [
+        'Onlycloud',
+        'Milkshake',
+        'IEPL IPLC',
+        'IEPL prem.',
+        'Pure',
+        'Shenzhen-Hong Kong',
+        'Limited',
+        'Tunnel',
+        'Direct',
+        'Government-Enterprise Dedicated Lines'
+      ];
+
       const texts = [
-        '<strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines',
-        '<strong>Milkshake</strong> Same as above',
-        '<strong>IEPL IPLC</strong> Premium Dedicated Lines',
-        '<strong>IEPL prem.</strong> Gaming Dedicated',
-        '<strong>Pure</strong> Native IP Dual ISP',
-        '<strong>Shenzhen-Hong Kong</strong> Backup Lines',
-        '<strong>Limited</strong> Backup Lines',
-        '<strong>Tunnel</strong> Backup Lines',
-        '<strong>Direct</strong> Usable Both Domestically and Internationally',
-        '<strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use'
+        ' Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines',
+        ' Same as above',
+        ' Premium Dedicated Lines',
+        ' Gaming Dedicated',
+        ' Native IP Dual ISP',
+        ' Backup Lines',
+        ' Backup Lines',
+        ' Backup Lines',
+        ' Usable Both Domestically and Internationally',
+        ' Due to Regional Restrictions, Generally Do Not Use'
       ];
 
       const elements = [
@@ -870,10 +883,20 @@ document.addEventListener("DOMContentLoaded", () => {
       let currentIndex = 0;
       function startNextText() {
         if (currentIndex < texts.length) {
+          // 预插入 <strong> 标签，修复显示bug
+          elements[currentIndex].innerHTML = `<strong>${boldTexts[currentIndex]}</strong>`;
+          // 然后打字剩余文本
           typeWriter(texts[currentIndex], elements[currentIndex], 80, () => {
+            currentIndex++;
             setTimeout(startNextText, 300); // 每个段落后延迟0.3秒
           });
-          currentIndex++;
+        } else {
+          // 所有intro完成后，显示整个剩余页面（打字效果应用到intro，整个页渐现）
+          document.getElementById('introSection').style.opacity = '1';
+          document.getElementById('otherSections').style.opacity = '1';
+          document.querySelector('.elysia-video-wrapper').style.opacity = '1';
+          document.querySelector('footer').style.opacity = '1';
+          // 可选：为其他文本元素也应用打字（这里简化渐现，如需全打字可扩展）
         }
       }
 

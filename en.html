@@ -631,8 +631,8 @@ domain:chatgpt.com</pre>
     </section>
 
 <div class="elysia-video-wrapper">
-  <video id="videoA" autoplay muted playsinline preload="auto"></video>
-  <video id="videoB" muted playsinline preload="auto"></video>
+  <video id="videoA" autoplay muted playsinline preload="metadata"></video>
+  <video id="videoB" muted playsinline preload="metadata"></video>
 </div>
 
 <style>
@@ -686,52 +686,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const videoA = document.getElementById("videoA");
   const videoB = document.getElementById("videoB");
+  const wrapper = document.querySelector(".elysia-video-wrapper");
   let current = videoA;
   let next = videoB;
   let index = 0;
   let nextReady = false;
   let switching = false;
+  let isPlaying = false; // Track play state for resume
+  let isVisible = false; // Track viewport visibility
+  let isPageVisible = true; // Track page visibility
 
-  // === Preload All Videos ===
-  const cachePool = videos.map(src => {
-    const v = document.createElement("video");
-    v.src = src;
-    v.preload = "auto";
-    v.muted = true;
-    v.load();
-    return v;
-  });
-
+  // === Preload Next ===
   function preloadNext() {
     const nextIndex = (index + 1) % videos.length;
-    next.src = cachePool[nextIndex].src;
-    nextReady = false;
+    next.src = videos[nextIndex];
+    next.preload = "metadata"; // Lazy preload
     next.load();
     next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
   }
 
+  // === Switch Video ===
   function switchVideo() {
-    if (switching) return;
+    if (switching || !isVisible || !isPageVisible) return;
     switching = true;
 
     if (!nextReady) {
-      console.log("⏳ Waiting for next buffer...");
       setTimeout(() => { switching = false; switchVideo(); }, 300);
       return;
     }
 
     next.currentTime = 0;
     next.play().then(() => {
+      isPlaying = true;
       next.style.opacity = "1";
       current.style.opacity = "0";
-
       setTimeout(() => {
         current.pause();
         [current, next] = [next, current];
         index = (index + 1) % videos.length;
         switching = false;
         preloadNext();
-        bindEvents(); // 🔥 Rebind events after switch
+        bindEvents();
       }, 800);
     }).catch(err => {
       switching = false;
@@ -739,25 +734,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // === Bind Events to Current Video ===
   function bindEvents() {
     current.onended = switchVideo;
     current.ontimeupdate = () => {
       if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
         preloadNext();
       }
-      // Fallback: If time stuck not triggering ended
       if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
         switchVideo();
       }
     };
   }
 
-  // === Initial Playback ===
-  current.src = videos[index];
-  bindEvents();
-  preloadNext();
+  // === Start Playback if Visible ===
+  function startPlayback() {
+    if (isVisible && isPageVisible && !isPlaying) {
+      current.play().then(() => {
+        isPlaying = true;
+      }).catch(err => console.log("⚠️ Autoplay blocked:", err));
+    }
+  }
 
-  current.play().catch(err => console.log("⚠️ Autoplay blocked:", err));
+  // === Pause Playback ===
+  function pausePlayback() {
+    if (isPlaying) {
+      current.pause();
+      isPlaying = false;
+    }
+  }
+
+  // === Intersection Observer for Viewport Visibility ===
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        if (!current.src) { // Lazy load first video
+          current.src = videos[0];
+          current.load();
+          current.addEventListener('loadedmetadata', () => {
+            bindEvents();
+            preloadNext();
+            startPlayback();
+          }, { once: true });
+        } else {
+          startPlayback();
+        }
+      } else {
+        pausePlayback();
+      }
+    });
+  }, { threshold: 0.25 }); // Start when 25% visible
+
+  observer.observe(wrapper);
+
+  // === Page Visibility Change ===
+  document.addEventListener("visibilitychange", () => {
+    isPageVisible = !document.hidden;
+    if (isPageVisible) {
+      startPlayback();
+    } else {
+      pausePlayback();
+    }
+  });
 });
 </script>
 

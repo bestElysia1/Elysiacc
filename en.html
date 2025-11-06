@@ -215,6 +215,23 @@ main.container li:hover {
   transition: all 0.3s ease;
 }
 
+/* 打字机效果专用样式 */
+.typewriter {
+  border-right: 2px solid var(--accent-end); /* 光标效果 */
+  white-space: nowrap; /* 防止换行 */
+  overflow: hidden; /* 隐藏未显示部分 */
+  animation: blink 1s infinite; /* 光标闪烁 */
+  display: inline-block; /* 确保光标只在文本旁 */
+}
+@keyframes blink {
+  0%, 50% { border-color: var(--accent-end); }
+  51%, 100% { border-color: transparent; }
+}
+/* 打字完成后停止闪烁 */
+.typewriter.done {
+  border-right: none;
+  animation: none;
+}
 
   </style>
 <script type="text/javascript">
@@ -455,16 +472,16 @@ document.addEventListener('click', function(event) {
     </div>
 
     <section>
-      <p><strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines</p>
-      <p><strong>Milkshake</strong> Same as above</p>
-      <p><strong>IEPL IPLC</strong> Premium Dedicated Lines</p>
-      <p><strong>IEPL prem.</strong> Gaming Dedicated</p>
-      <p><strong>Pure</strong> Native IP Dual ISP</p>
-      <p><strong>Shenzhen-Hong Kong</strong> Backup Lines</p>
-      <p><strong>Limited</strong> Backup Lines</p>
-      <p><strong>Tunnel</strong> Backup Lines</p>
-      <p><strong>Direct</strong> Usable Both Domestically and Internationally</p>
-      <p><strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use</p>
+      <p id="introText1" class="typewriter"><strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines</p>
+      <p id="introText2" class="typewriter"><strong>Milkshake</strong> Same as above</p>
+      <p id="introText3" class="typewriter"><strong>IEPL IPLC</strong> Premium Dedicated Lines</p>
+      <p id="introText4" class="typewriter"><strong>IEPL prem.</strong> Gaming Dedicated</p>
+      <p id="introText5" class="typewriter"><strong>Pure</strong> Native IP Dual ISP</p>
+      <p id="introText6" class="typewriter"><strong>Shenzhen-Hong Kong</strong> Backup Lines</p>
+      <p id="introText7" class="typewriter"><strong>Limited</strong> Backup Lines</p>
+      <p id="introText8" class="typewriter"><strong>Tunnel</strong> Backup Lines</p>
+      <p id="introText9" class="typewriter"><strong>Direct</strong> Usable Both Domestically and Internationally</p>
+      <p id="introText10" class="typewriter"><strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use</p>
     </section>
 
     <section>
@@ -786,6 +803,24 @@ document.addEventListener("DOMContentLoaded", () => {
   </main>
 
   <script>
+    // 打字机效果函数
+    function typeWriter(text, element, speed = 100, callback = null) {
+      let i = 0;
+      element.innerHTML = ''; // 清空初始内容
+
+      function type() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i); // 追加一个字符
+          i++;
+          setTimeout(type, speed); // 延时调用下一次
+        } else {
+          element.classList.add('done'); // 打字完成后停止光标
+          if (callback) callback(); // 执行回调
+        }
+      }
+      type(); // 开始打字
+    }
+
     // Countdown to 2025-12-31 23:59:59 (UTC+8)
     const target = new Date('2025-12-31T23:59:59+08:00').getTime();
     const el = document.getElementById('countdownNums');
@@ -803,6 +838,48 @@ document.addEventListener("DOMContentLoaded", () => {
       el.textContent = `${days} Days ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
     }
     updateCount(); setInterval(updateCount, 1000);
+
+    // 启动打字机效果：逐个段落打出介绍文本
+    window.addEventListener('load', () => {
+      const texts = [
+        '<strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines',
+        '<strong>Milkshake</strong> Same as above',
+        '<strong>IEPL IPLC</strong> Premium Dedicated Lines',
+        '<strong>IEPL prem.</strong> Gaming Dedicated',
+        '<strong>Pure</strong> Native IP Dual ISP',
+        '<strong>Shenzhen-Hong Kong</strong> Backup Lines',
+        '<strong>Limited</strong> Backup Lines',
+        '<strong>Tunnel</strong> Backup Lines',
+        '<strong>Direct</strong> Usable Both Domestically and Internationally',
+        '<strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use'
+      ];
+
+      const elements = [
+        document.getElementById('introText1'),
+        document.getElementById('introText2'),
+        document.getElementById('introText3'),
+        document.getElementById('introText4'),
+        document.getElementById('introText5'),
+        document.getElementById('introText6'),
+        document.getElementById('introText7'),
+        document.getElementById('introText8'),
+        document.getElementById('introText9'),
+        document.getElementById('introText10')
+      ];
+
+      let currentIndex = 0;
+      function startNextText() {
+        if (currentIndex < texts.length) {
+          typeWriter(texts[currentIndex], elements[currentIndex], 80, () => {
+            setTimeout(startNextText, 300); // 每个段落后延迟0.3秒
+          });
+          currentIndex++;
+        }
+      }
+
+      // 页面加载后延迟启动
+      setTimeout(startNextText, 1500);
+    });
   </script>
 
 <!--  Style -->

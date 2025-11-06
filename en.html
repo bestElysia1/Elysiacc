@@ -797,6 +797,22 @@ document.addEventListener("DOMContentLoaded", () => {
       pausePlayback();
     }
   });
+
+  // 新增：修复视频封面黑屏bug，使用第一个视频的第一帧作为临时封面
+  const canvas = document.createElement('canvas');
+  const tempVideo = document.createElement('video');
+  tempVideo.src = videos[0]; // 使用第一个视频
+  tempVideo.muted = true;
+  tempVideo.addEventListener('loadeddata', () => {
+    canvas.width = tempVideo.videoWidth;
+    canvas.height = tempVideo.videoHeight;
+    canvas.getContext('2d').drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+    const posterUrl = canvas.toDataURL('image/png');
+    videoA.poster = posterUrl;
+    videoB.poster = posterUrl; // 为两个视频元素设置相同的poster
+    tempVideo.remove(); // 清理临时视频
+  });
+  tempVideo.load(); // 加载临时视频以捕获帧
 });
 </script>
 

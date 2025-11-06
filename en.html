@@ -630,11 +630,6 @@ domain:chatgpt.com</pre>
   </ul>
     </section>
 
-<div class="elysia-video-wrapper">
-  <video id="videoA" autoplay muted playsinline preload="metadata"></video>
-  <video id="videoB" muted playsinline preload="metadata"></video>
-</div>
-
 <style>
 .elysia-video-wrapper {
   position: relative;
@@ -695,6 +690,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false; // Track play state for resume
   let isVisible = false; // Track viewport visibility
   let isPageVisible = true; // Track page visibility
+  let lastTime = 0;
+  let stuckTimer = null;
 
   // === Preload Next ===
   function preloadNext() {
@@ -752,6 +749,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isVisible && isPageVisible && !isPlaying) {
       current.play().then(() => {
         isPlaying = true;
+        startStuckDetection();
       }).catch(err => console.log("⚠️ Autoplay blocked:", err));
     }
   }
@@ -761,6 +759,28 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isPlaying) {
       current.pause();
       isPlaying = false;
+      stopStuckDetection();
+    }
+  }
+
+  // === Stuck Detection ===
+  function startStuckDetection() {
+    lastTime = current.currentTime;
+    stuckTimer = setInterval(() => {
+      if (isPlaying && current.currentTime === lastTime && current.currentTime > 0) {
+        console.log("Video stuck detected, attempting to recover...");
+        current.load();
+        current.play().catch(err => console.error("Recovery play failed:", err));
+      } else {
+        lastTime = current.currentTime;
+      }
+    }, 3000); // Check every 3 seconds
+  }
+
+  function stopStuckDetection() {
+    if (stuckTimer) {
+      clearInterval(stuckTimer);
+      stuckTimer = null;
     }
   }
 

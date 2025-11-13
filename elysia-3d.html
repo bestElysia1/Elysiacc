@@ -583,5 +583,44 @@ document.addEventListener('click', function(event) {
 })();
 </script>
 
+<!-- 本地樱花视频特效（超小体积） -->
+<video id="sakura-video" autoplay muted loop playsinline></video>
+
+<script>
+// === 本地樱花视频播放 ===
+const video = document.getElementById('sakura-video');
+
+// 使用你本地的 MP4 文件
+video.src = 'assets/sakura.mp4'; // ← 你的转码后文件
+
+// 自动播放（静音 + playsinline 解决 iOS 问题）
+video.play().catch(() => {
+  console.log('自动播放被阻止（正常），用户交互后可播放');
+});
+</script>
+
+<style>
+/* === 樱花视频层 === */
+#sakura-video {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 997;
+  opacity: 0.88;
+  mix-blend-mode: screen;
+  transform: scale(1.15);
+}
+
+/* 手机优化 */
+@media (max-width: 768px) {
+  #sakura-video {
+    opacity: 0.7;
+    transform: scale(1.25);
+  }
+}
+</style>
+
 </body>
 </html>

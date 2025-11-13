@@ -165,7 +165,7 @@
       max-width: 100%;
       height: auto;
       border-radius: 10px;
-      animation: float 3s ease-in-out infinite;
+      animation: float 3s ease-in-out infinite; /* 已移除 breathe */
     }
 
     @keyframes float {
@@ -180,17 +180,7 @@
       }
     }
 
-    @keyframes breathe {
-      0% {
-        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(180, 150, 255, 0.7);
-      }
-      100% {
-        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
-      }
-    }
+    /* 已删除 @keyframes breathe（白光呼吸） */
   </style>
   
 <script type="text/javascript">
@@ -206,7 +196,7 @@
     d.getElementsByTagName("head")[0].appendChild(s);
   })();
 
-  // 🫖 自动隐藏逻辑
+  // 自动隐藏逻辑
   let idleTimer;
   const idleTime = 5000; // 30秒无操作后隐藏
 
@@ -374,6 +364,7 @@ document.addEventListener('click', function(event) {
   100% { background-position: 200% center; }
 }
 
+/* 已移除 @keyframes breathe（白光呼吸） */
 </style>
   <nav class="leftnav" aria-hidden="true">
    
@@ -400,7 +391,7 @@ document.addEventListener('click', function(event) {
 
   <footer>
     <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">✉️</a>
+      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">Email</a>
       <a href="https://t.me/bestElysia_bot" title="Telegram">
         <img src="assets/tele1.jpg" alt="Telegram" class="tele-icon">
       </a>
@@ -433,7 +424,7 @@ document.addEventListener('click', function(event) {
   function createSnow() {
     const snow = document.createElement("div");
     snow.classList.add("sakura");
-    snow.textContent = "❄️";
+    snow.textContent = "Snowflake";
     snow.style.left = Math.random() * 100 + "vw";
     snow.style.fontSize = Math.random() * 12 + 12 + "px";
     snow.style.opacity = 0.8 + Math.random() * 0.2;
@@ -591,9 +582,6 @@ document.addEventListener('click', function(event) {
   // 移除初始 console.info 以减少足迹
 })();
 </script>
-
-
-
 
 </body>
 </html>

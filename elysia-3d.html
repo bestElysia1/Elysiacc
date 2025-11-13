@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elysia Secret Page</title>
-
-  <!-- 修复：只保留 razee 作为图标 -->
-  <link rel="icon" href="assets/razee.PNG" type="image/png" />
+  <link rel="icon" href="assets/bestbanner.png" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/bestbanner.png" />
+   <link rel="icon" href="assets/razee.PNG" type="image/png" />
   <link rel="apple-touch-icon" href="assets/razee.PNG" />
-
+ 
   <style>
     body {
       margin: 0;
@@ -46,44 +46,7 @@
       transform: translateY(0);
     }
 
-    /* === 统一尺寸 + 居中对齐的图片容器 === */
-    .banner-container {
-      width: 100%;
-      max-width: 500px;           /* 控制最大宽度 */
-      margin: 0 auto 30px;        /* 居中 + 下间距 */
-      text-align: center;
-    }
-
-    .banner-img {
-      width: 100% !important;     /* 强制宽度一致 */
-      height: auto;
-      max-height: 300px;          /* 防止过高 */
-      object-fit: contain;        /* 保持比例，不裁剪 */
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      padding: 12px;
-      box-sizing: border-box;
-      animation: float 3s ease-in-out infinite; /* 仅漂浮 */
-      box-shadow: 0 0 15px rgba(180,150,255,0.3); /* 固定光晕 */
-      display: block;
-      margin: 0 auto;
-    }
-
-    .banner-caption {
-      margin: 12px 0 0;
-      color: #9d7cff;
-      font-size: 1rem;
-      font-weight: 500;
-      text-shadow: 0 0 8px rgba(180,150,255,0.3);
-    }
-
-    /* 仅保留漂浮动画 */
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    /* === 页脚 === */
+    /* === 液态玻璃风格页脚 === */
     footer {
       width: 100%;
       padding: 18px 0 20px 0;
@@ -130,6 +93,7 @@
       100% { text-shadow: 0 0 16px rgba(180,150,255,0.8); }
     }
 
+    /* === Telegram 与 邮箱图标统一风格 === */
     .tele-icon {
       width: 40px;
       height: 40px;
@@ -137,6 +101,7 @@
       object-fit: cover;
       box-shadow: 0 0 10px rgba(180,150,255,0.4);
       transition: transform 0.25s ease, box-shadow 0.3s ease;
+      vertical-align: middle;
     }
 
     .tele-icon:hover {
@@ -163,7 +128,7 @@
       box-shadow: 0 0 20px rgba(180,150,255,0.8);
     }
 
-    /* === 雪花 === */
+    /* === 雪花样式 === */
     .sakura {
       position: fixed;
       top: -10px;
@@ -174,172 +139,274 @@
     }
 
     @keyframes fall {
-      0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
-      50% { transform: translateX(20px) translateY(55vh) rotate(360deg); opacity: 1; }
-      100% { transform: translateX(-20px) translateY(110vh) rotate(720deg); opacity: 0; }
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: translateX(20px) translateY(55vh) rotate(360deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(-20px) translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
     }
 
-    /* === 汉堡菜单 === */
-    .hamburger {
-      position: fixed;
-      left: 14px;
-      top: 14px;
-      width: 44px;
-      height: 44px;
-      display: inline-flex;
-      flex-direction: column;
+    /* === Banner 样式 === */
+    .banner-container {
+      width: 100%;
+      display: flex;
       justify-content: center;
-      gap: 6px;
-      align-items: center;
-      z-index: 10001;
-      background: rgba(255,255,255,0.04);
+      margin-bottom: 40px;
+    }
+
+    .banner-img {
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
-      padding: 6px;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-      transition: all 0.3s ease;
-      cursor: pointer;
+      animation: float 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
     }
 
-    .hamburger:hover {
-      box-shadow: 0 0 25px rgba(150,120,255,0.25);
-      transform: scale(1.05);
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0);
+      }
     }
 
-    .hb-line {
-      display: block;
-      width: 20px;
-      height: 2px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-      background-size: 200% auto;
-      animation: glowFlow 3s linear infinite;
-      transition: all 0.3s ease;
-    }
-
-    @keyframes glowFlow {
-      0% { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
-
-    .dropdown-menu {
-      position: fixed;
-      left: 14px;
-      top: 60px;
-      width: 200px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px;
-      list-style: none;
-      margin: 0;
-      z-index: 10000;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-      display: none;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-10px) scale(0.95);
-      transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease;
-      transform-origin: top left;
-    }
-
-    .dropdown-menu.show {
-      display: block;
-      opacity: 1;
-      pointer-events: auto;
-      animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards;
-    }
-
-    .dropdown-menu li { margin: 5px 0; }
-    .dropdown-menu a {
-      color: #cdbaff;
-      text-decoration: none;
-      display: block;
-      padding: 8px;
-      border-radius: 5px;
-      transition: background 0.2s;
-    }
-    .dropdown-menu a:hover { background: rgba(255,255,255,0.2); }
-
-    @keyframes dockPop {
-      0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
-      55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); }
-      100% { transform: translateY(0) scale(1); filter: brightness(1); }
+    @keyframes breathe {
+      0% {
+        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(180, 150, 255, 0.7);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(180, 150, 255, 0.3);
+      }
     }
   </style>
+  
+<script type="text/javascript">
+  // Crisp 初始化
+  window.$crisp = [];
+  window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
 
-  <!-- Crisp 客服 -->
-  <script type="text/javascript">
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
-    (function() {
-      var d = document;
-      var s = d.createElement("script");
-      s.src = "https://client.crisp.chat/l.js";
-      s.async = 1;
-      d.getElementsByTagName("head")[0].appendChild(s);
-    })();
+  (function() {
+    var d = document;
+    var s = d.createElement("script");
+    s.src = "https://client.crisp.chat/l.js";
+    s.async = 1;
+    d.getElementsByTagName("head")[0].appendChild(s);
+  })();
 
-    let idleTimer;
-    const idleTime = 5000;
-    function resetIdleTimer() {
-      clearTimeout(idleTimer);
-      showCrisp();
-      idleTimer = setTimeout(hideCrisp, idleTime);
+  // 🫖 自动隐藏逻辑
+  let idleTimer;
+  const idleTime = 5000; // 30秒无操作后隐藏
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    showCrisp();
+    idleTimer = setTimeout(hideCrisp, idleTime);
+  }
+
+  function hideCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:hide"]);
     }
-    function hideCrisp() { if (window.$crisp) window.$crisp.push(["do", "chat:hide"]); }
-    function showCrisp() { if (window.$crisp) window.$crisp.push(["do", "chat:show"]); }
-    ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt =>
-      document.addEventListener(evt, resetIdleTimer, { passive: true })
-    );
-    window.addEventListener("load", resetIdleTimer);
-  </script>
-</head>
+  }
 
+  function showCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:show"]);
+    }
+  }
+
+  // 监听用户活动（滚动、点击、键盘）
+  ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // 初始化计时器
+  window.addEventListener("load", resetIdleTimer);
+</script>
+
+
+  
+</head>
 <body>
 
-  <!-- 汉堡菜单 -->
-  <div class="hamburger" id="hamburger-menu" aria-label="菜单">
-    <span class="hb-line"></span>
-    <span class="hb-line"></span>
-    <span class="hb-line"></span>
-  </div>
+<!-- 爱莉希雅入口按钮 -->
+<!-- HTML部分：汉堡按钮和下拉菜单 -->
+<div class="hamburger" id="hamburger-menu" aria-label="菜单">
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+</div>
 
-  <ul class="dropdown-menu" id="dropdown">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="elysia-3d.html">Elysia</a></li>
-    <li><a href="en.html">EN</a></li>
-  </ul>
+<!-- 下拉菜单（初始隐藏） -->
+<ul class="dropdown-menu" id="dropdown">
+  <li><a href="index.html">Home</a></li>
+  <li><a href="elysia-3d.html">Elysia</a></li>
+  <li><a href="en.html">EN</a></li>
+</ul>
 
-  <nav class="leftnav" aria-hidden="true"></nav>
+<!-- CSS样式（整合效果best的macOS动画，保留原弹出尺寸） -->
+<style>
+.hamburger {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+  z-index: 10001;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 6px;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  transition: all 0.3s ease;
+  cursor: pointer; /* 添加指针样式，表示可点击 */
+}
+.hamburger:hover {
+  box-shadow: 0 0 25px rgba(150,120,255,0.25);
+  transform: scale(1.05);
+}
+.hb-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  background-size: 200% auto;
+  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+  transition: all 0.3s ease; /* 为动画添加过渡 */
+}
 
-  <!-- 主内容：两张图宽度一致、对齐 -->
+/* 下拉菜单样式（整合效果best：macOS Dock弹出动画，保留原尺寸） */
+.dropdown-menu {
+  position: fixed;
+  left: 14px;
+  top: 60px; /* 汉堡按钮下方位置 */
+  width: 200px; /* 菜单宽度，可调整 */
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+  z-index: 10000;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  display: none; /* 初始隐藏 */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
+  transform-origin: top left; /* 从左上角弹出 */
+}
+.dropdown-menu.show {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
+}
+.dropdown-menu li {
+  margin: 5px 0;
+}
+.dropdown-menu a {
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  text-decoration: none;
+  display: block;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+.dropdown-menu a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
+@keyframes dockPop {
+  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
+  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); } /* 轻微向下反弹，保留小规模 */
+  100% { transform: translateY(0) scale(1); filter: brightness(1); }
+}
+</style>
+
+<!-- JavaScript脚本：处理点击事件（移除active toggle） -->
+<script>
+document.getElementById('hamburger-menu').addEventListener('click', function() {
+  // Toggle 菜单显示
+  var menu = document.getElementById('dropdown');
+  menu.classList.toggle('show');
+});
+
+// 可选：点击菜单外关闭（增强体验）
+document.addEventListener('click', function(event) {
+  var hamburger = document.getElementById('hamburger-menu');
+  var menu = document.getElementById('dropdown');
+  if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+    menu.classList.remove('show');
+  }
+});
+</script>
+
+<style>
+/* 流动微光 */
+@keyframes glowFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* 呼吸光晕 */
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+}
+</style>
+  <nav class="leftnav" aria-hidden="true">
+   
+  </nav>
+
   <main>
-    <!-- 第一张图 -->
     <div class="banner-container">
       <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">
     </div>
-
-    <!-- 第二张图：宽度完全一致 -->
-    <div class="banner-container">
-      <img src="assets/razee.PNG" alt="Razee" class="banner-img">
-      <p class="banner-caption">Razee</p>
-    </div>
-
+    
+<!-- 替换你原来的 razee 图片区块 -->
+<div class="banner-container" style="margin-top: 30px;">
+  <img src="assets/razee.PNG" alt="Razee" class="banner-img" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+  <p style="margin: 10px 0 0; color: #9d7cff; font-size: 1rem; font-weight: 500;">
+    Razee
+  </p>
+</div>
+    
+    
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
     <h1>More content is under development...</h1>
   </main>
 
-  <!-- 页脚 -->
   <footer>
     <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">Email</a>
+      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">✉️</a>
       <a href="https://t.me/bestElysia_bot" title="Telegram">
         <img src="assets/tele1.jpg" alt="Telegram" class="tele-icon">
       </a>
@@ -350,78 +417,189 @@
     </div>
   </footer>
 
-  <!-- 脚本 -->
   <script>
-    // 滚动淡入
-    document.addEventListener("DOMContentLoaded", () => {
-      const fadeElements = document.querySelectorAll("h1");
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add("visible");
-        });
-      }, { threshold: 0.2 });
-      fadeElements.forEach((el, i) => {
-        observer.observe(el);
-        el.style.transitionDelay = `${i * 0.15}s`;
+  // === 滚动淡入效果 ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const fadeElements = document.querySelectorAll("h1");
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
       });
+    }, { threshold: 0.2 });
+
+    fadeElements.forEach((el, i) => {
+      observer.observe(el);
+      el.style.transitionDelay = `${i * 0.15}s`;
     });
+  });
 
-    // 雪花
-    function createSnow() {
-      const snow = document.createElement("div");
-      snow.classList.add("sakura");
-      snow.textContent = "Snowflake";
-      snow.style.left = Math.random() * 100 + "vw";
-      snow.style.fontSize = Math.random() * 12 + 12 + "px";
-      snow.style.opacity = 0.8 + Math.random() * 0.2;
-      snow.style.animationDuration = 8 + Math.random() * 5 + "s";
-      snow.style.transform = `rotate(${Math.random() * 360}deg)`;
-      document.body.appendChild(snow);
-      setTimeout(() => snow.remove(), 12000);
-    }
-    const snowTimer = setInterval(createSnow, 300);
-    setTimeout(() => clearInterval(snowTimer), 10000);
+  // === 雪花飘落（持续10秒） ===
+  function createSnow() {
+    const snow = document.createElement("div");
+    snow.classList.add("sakura");
+    snow.textContent = "❄️";
+    snow.style.left = Math.random() * 100 + "vw";
+    snow.style.fontSize = Math.random() * 12 + 12 + "px";
+    snow.style.opacity = 0.8 + Math.random() * 0.2;
+    snow.style.animationDuration = 8 + Math.random() * 5 + "s";
+    snow.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(snow);
+    setTimeout(() => snow.remove(), 12000);
+  }
 
-    // 汉堡菜单
-    document.getElementById('hamburger-menu').addEventListener('click', function() {
-      document.getElementById('dropdown').classList.toggle('show');
-    });
-    document.addEventListener('click', function(event) {
-      const hamburger = document.getElementById('hamburger-menu');
-      const menu = document.getElementById('dropdown');
-      if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
-        menu.classList.remove('show');
-      }
-    });
-
-    // 防右键、F12
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (e.key === 'F12' || 
-          (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-          (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, true);
-
-    // 反调试
-    (function() {
-      const config = { checkInterval: 1200, sizeThreshold: 160, timeThreshold: 120, ignoreMobile: true, redirectUrl: '/404.html' };
-      if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
-      let detected = false;
-      function markDetected() { if (!detected) { detected = true; forceRedirect(); } }
-      function forceRedirect() {
-        try { history.replaceState(null, '', config.redirectUrl); window.location.href = config.redirectUrl; }
-        catch { window.location.href = config.redirectUrl; }
-      }
-      (function(){try{const b=new Image();Object.defineProperty(b,'id',{get:()=>markDetected()});setInterval(()=>console.log(b),config.checkInterval);}catch{}})();
-      (function(){setInterval(()=>{const w=Math.abs(window.outerWidth-window.innerWidth);const h=Math.abs(window.outerHeight-window.innerHeight);if(w>config.sizeThreshold||h>config.sizeThreshold)markDetected();},config.checkInterval);})();
-      (function(){setInterval(()=>{const t=performance.now();try{debugger;}catch{}if(performance.now()-t>config.timeThreshold)markDetected();},config.checkInterval*2);})();
-      (function(){try{if((/./).toString()!=='/./')markDetected();}catch{}})();
-      (function(){try{if((function(){}).toString().includes('[native code]')===false)markDetected();}catch{}})();
-    })();
+  const snowTimer = setInterval(createSnow, 300);
+  setTimeout(() => clearInterval(snowTimer), 10000);
   </script>
+
+  <script>
+// 禁止右键菜单
+  document.addEventListener('contextmenu', e => e.preventDefault());
+    // 禁止
+  document.addEventListener('keydown', e => {
+    if (
+      e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+      (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+  </script>
+
+  <script>
+(function() {
+  // ========== 配置 ==========
+  const config = {
+    checkInterval: 1200,          // 检测频率(ms)
+    sizeThreshold: 160,           // outer - inner 超过这个值视为 DevTools docked (px)
+    timeThreshold: 120,           // debugger 导致的时间差阈值(ms)
+    onDetect: (detail) => {       // 检测回调（可替换为上报接口）
+      console.warn('[DevToolsDetect]', detail);
+      // 示例：如果想上报，可在这里 fetch('/log', {method:'POST', body: JSON.stringify(detail)})
+    },
+    ignoreMobile: true,           // 是否忽略移动设备
+    redirectUrl: '/404.html'      // 强制跳转的404页面URL（可自定义）
+  };
+
+  // ========== 预检：移动端跳过 ==========
+  if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+
+  // ========== 状态 ==========
+  let detected = false;
+  let lastDetectInfo = null;
+
+  // 内部安全重入保护
+  function markDetected(reason, meta = {}) {
+    if (detected) return;
+    detected = true;
+    lastDetectInfo = { reason, meta, time: new Date().toISOString(), ua: navigator.userAgent };
+    if (typeof config.onDetect === 'function') {
+      try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
+    }
+    forceRedirect();
+  }
+
+  // ========== 新增：强制跳转函数 ==========
+  function forceRedirect() {
+    try {
+      // 防止历史记录堆栈，替换当前URL并跳转
+      history.replaceState(null, '', config.redirectUrl);
+      window.location.href = config.redirectUrl;
+    } catch (e) {
+      // 备用简单跳转
+      window.location.href = config.redirectUrl;
+    }
+  }
+
+  // ========== 1) 控制台 getter 检测（最常见） ==========
+  (function consoleBait() {
+    try {
+      const bait = new Image();
+      Object.defineProperty(bait, 'id', {
+        get: function() {
+          markDetected('console-getter');
+          return '';
+        }
+      });
+      // 周期向 console 输出 bait（控制台展开时会触发 getter）
+      setInterval(() => {
+        try {
+          console.log(bait);
+          // 移除 console.clear() 以减少可疑行为，避免被反检测
+        } catch (e) {}
+      }, config.checkInterval);
+    } catch (e) { /* ignore */ }
+  })();
+
+  // ========== 2) 窗口尺寸差检测（dock 模式） ==========
+  (function sizeCheck() {
+    setInterval(() => {
+      try {
+        const wdiff = Math.abs(window.outerWidth - window.innerWidth);
+        const hdiff = Math.abs(window.outerHeight - window.innerHeight);
+        if (wdiff > config.sizeThreshold || hdiff > config.sizeThreshold) {
+          markDetected('size-diff', { wdiff, hdiff, outerWidth: window.outerWidth, innerWidth: window.innerWidth, outerHeight: window.outerHeight, innerHeight: window.innerHeight });
+        }
+      } catch (e) {}
+    }, config.checkInterval);
+  })();
+
+  // ========== 3) 时间差（debugger）检测 ==========
+  (function debugTimeCheck() {
+    setInterval(() => {
+      try {
+        const t0 = performance.now();
+        // 当 DevTools 打开并处于某些暂停状态时，debugger 会造成明显时间延迟
+        try { debugger; } catch (_) {}
+        const diff = performance.now() - t0;
+        if (diff > config.timeThreshold) {
+          markDetected('debugger-time', { diff });
+        }
+      } catch (e) {}
+    }, config.checkInterval * 2);
+  })();
+
+  // ========== 优化：添加更多检测方法 ==========
+  // 4) RegExp toString 检测（DevTools 会修改 RegExp.prototype.toString）
+  (function regExpCheck() {
+    try {
+      const reg = /./;
+      if (reg.toString() !== '/./') {
+        markDetected('regexp-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 5) Function toString 检测（类似）
+  (function funcToStringCheck() {
+    try {
+      const func = function() {};
+      if (func.toString.toString().includes('[native code]') === false) {
+        markDetected('func-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 初始调用额外检测
+  regExpCheck();
+  funcToStringCheck();
+
+  // ========== 辅助：暴露状态与手动触发 ==========
+  window.__DevToolsDetect = {
+    isDetected: () => detected,
+    lastInfo: () => lastDetectInfo,
+    reset: () => { detected = false; lastDetectInfo = null; }
+  };
+
+  // 移除初始 console.info 以减少足迹
+})();
+</script>
+
+
+
 
 </body>
 </html>

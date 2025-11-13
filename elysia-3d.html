@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elysia Secret Page</title>
 
-  <!-- 修复：只保留 razee 作为 favicon -->
+  <!-- 修复：只保留 razee 作为图标 -->
   <link rel="icon" href="assets/razee.PNG" type="image/png" />
   <link rel="apple-touch-icon" href="assets/razee.PNG" />
 
@@ -46,33 +46,27 @@
       transform: translateY(0);
     }
 
-    /* === 统一尺寸图片网格 === */
-    .banner-grid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
+    /* === 统一尺寸 + 居中对齐的图片容器 === */
+    .banner-container {
       width: 100%;
-      max-width: 500px;
-      margin: 0 auto 40px;
-      padding: 0 20px;
-    }
-
-    .banner-item {
-      width: 100%;
+      max-width: 500px;           /* 控制最大宽度 */
+      margin: 0 auto 30px;        /* 居中 + 下间距 */
       text-align: center;
     }
 
     .banner-img {
-      width: 100% !important;
-      height: 200px !important;
-      object-fit: contain;
+      width: 100% !important;     /* 强制宽度一致 */
+      height: auto;
+      max-height: 300px;          /* 防止过高 */
+      object-fit: contain;        /* 保持比例，不裁剪 */
       border-radius: 12px;
       background: rgba(255,255,255,0.1);
       padding: 12px;
       box-sizing: border-box;
-      animation: float 3s ease-in-out infinite; /* 仅漂浮，无呼吸 */
+      animation: float 3s ease-in-out infinite; /* 仅漂浮 */
       box-shadow: 0 0 15px rgba(180,150,255,0.3); /* 固定光晕 */
+      display: block;
+      margin: 0 auto;
     }
 
     .banner-caption {
@@ -83,7 +77,7 @@
       text-shadow: 0 0 8px rgba(180,150,255,0.3);
     }
 
-    /* 漂浮动画（保留） */
+    /* 仅保留漂浮动画 */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
@@ -221,18 +215,13 @@
       border-radius: 2px;
       background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
       background-size: 200% auto;
-      animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+      animation: glowFlow 3s linear infinite;
       transition: all 0.3s ease;
     }
 
     @keyframes glowFlow {
       0% { background-position: 0% center; }
       100% { background-position: 200% center; }
-    }
-
-    @keyframes breathe {
-      0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
-      50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
     }
 
     .dropdown-menu {
@@ -328,16 +317,17 @@
 
   <nav class="leftnav" aria-hidden="true"></nav>
 
-  <!-- 主内容：两张图尺寸统一 + 无呼吸光效 -->
+  <!-- 主内容：两张图宽度一致、对齐 -->
   <main>
-    <div class="banner-grid">
-      <div class="banner-item">
-        <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">
-      </div>
-      <div class="banner-item">
-        <img src="assets/razee.PNG" alt="Razee" class="banner-img">
-        <p class="banner-caption">Razee</p>
-      </div>
+    <!-- 第一张图 -->
+    <div class="banner-container">
+      <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">
+    </div>
+
+    <!-- 第二张图：宽度完全一致 -->
+    <div class="banner-container">
+      <img src="assets/razee.PNG" alt="Razee" class="banner-img">
+      <p class="banner-caption">Razee</p>
     </div>
 
     <h1>This page has been fully encrypted</h1>
@@ -349,7 +339,7 @@
   <!-- 页脚 -->
   <footer>
     <div class="elysia-footer-icons">
-      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">✉️</a>
+      <a href="mailto:bestElysia+support@hotmail.com" title="Email" class="email-icon">Email</a>
       <a href="https://t.me/bestElysia_bot" title="Telegram">
         <img src="assets/tele1.jpg" alt="Telegram" class="tele-icon">
       </a>
@@ -360,7 +350,7 @@
     </div>
   </footer>
 
-  <!-- 脚本：滚动淡入 + 雪花 + 菜单 + 防调试 -->
+  <!-- 脚本 -->
   <script>
     // 滚动淡入
     document.addEventListener("DOMContentLoaded", () => {
@@ -376,11 +366,11 @@
       });
     });
 
-    // 雪花飘落
+    // 雪花
     function createSnow() {
       const snow = document.createElement("div");
       snow.classList.add("sakura");
-      snow.textContent = "❄️";
+      snow.textContent = "Snowflake";
       snow.style.left = Math.random() * 100 + "vw";
       snow.style.fontSize = Math.random() * 12 + 12 + "px";
       snow.style.opacity = 0.8 + Math.random() * 0.2;
@@ -404,7 +394,7 @@
       }
     });
 
-    // 禁止右键、F12、快捷键
+    // 防右键、F12
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if (e.key === 'F12' || 
@@ -415,7 +405,7 @@
       }
     }, true);
 
-    // 反调试检测
+    // 反调试
     (function() {
       const config = { checkInterval: 1200, sizeThreshold: 160, timeThreshold: 120, ignoreMobile: true, redirectUrl: '/404.html' };
       if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;

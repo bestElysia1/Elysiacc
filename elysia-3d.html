@@ -165,7 +165,7 @@
       max-width: 100%;
       height: auto;
       border-radius: 10px;
-      animation: float 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
+      animation: float 3s ease-in-out infinite;
     }
 
     @keyframes float {
@@ -374,11 +374,6 @@ document.addEventListener('click', function(event) {
   100% { background-position: 200% center; }
 }
 
-/* 呼吸光晕 */
-@keyframes breathe {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
-  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
-}
 </style>
   <nav class="leftnav" aria-hidden="true">
    

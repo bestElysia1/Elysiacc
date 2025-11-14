@@ -1226,5 +1226,61 @@ document.addEventListener('keydown', e => {
   resetHideTimer();
 </script>
 
+<!-- 本地樱花视频特效（15 秒后自动消失） -->
+<video id="sakura-video" autoplay muted loop playsinline></video>
+
+<script>
+// === 樱花视频播放 15 秒后淡出消失 ===
+const video = document.getElementById('sakura-video');
+video.src = 'assets/saruka.mp4';
+
+// 自动播放
+video.play().catch(() => {
+  console.log('自动播放被阻止，等待用户点击');
+});
+
+// 用户点击 → 强制播放
+document.body.addEventListener('click', () => video.play(), { once: true });
+
+// 15 秒后开始淡出（1 秒淡出动画）
+setTimeout(() => {
+  video.style.transition = 'opacity 1s ease-out';
+  video.style.opacity = '0';
+  console.log('樱花视频 15 秒后开始淡出');
+  
+  // 16 秒后完全停止
+  setTimeout(() => {
+    video.pause();
+    video.remove(); // 可选：彻底移除 DOM
+    console.log('樱花视频已消失');
+  }, 1000);
+}, 15000);
+</script>
+
+<style>
+/* === 樱花视频层（15 秒后消失）=== */
+#sakura-video {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 997;
+  opacity: 1.0;
+  mix-blend-mode: screen;
+  transform: scale(1.15);
+  transition: opacity 1s ease-out; /* 淡出动画 */
+}
+
+/* 手机优化 */
+@media (max-width: 768px) {
+  #sakura-video {
+    opacity: 0.7;
+    transform: scale(1.25);
+  }
+}
+</style>
+
+
 </body>
 </html>

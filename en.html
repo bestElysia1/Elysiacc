@@ -15,13 +15,11 @@
       --bg: #ffffff;
       --maxw: 980px;
     }
-    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333; -webkit-overflow-scrolling: touch; touch-action: pan-y;}
+    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333;}
     body {
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
   letter-spacing: 0.3px;
   line-height: 1.85;
-  -webkit-text-size-adjust: 100%;
-  text-rendering: optimizeLegibility;
 }
     .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
     .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
@@ -64,7 +62,7 @@
   background:
     radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
     radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.�22), transparent 20%);
+    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
   filter: blur(40px);
   animation: blobMove 14s ease-in-out infinite;
   mix-blend-mode: screen;
@@ -106,41 +104,10 @@
     /* content */
     section{margin-top:28px}
     h2{font-size:1.02rem;margin:8px 0 14px 0;padding-left:10px;border-left:4px solid rgba(123,63,228,0.12);color:var(--accent-end);background:linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));padding:8px;border-radius:6px}
-    
-    /* 🔧 修复 iOS 文字右边不对齐 */
-    p, ul, li {
-      color: #7a66c7 !important;
-      line-height: 1.8;
-      font-size: 0.95rem;
-      margin: 0 0 0.9rem 0;
-      padding-right: 2px; /* 防止 iOS 文字被裁剪 */
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      hyphens: auto;
-    }
-    ul {
-      padding-left: 1.4em;
-      margin-left: 0;
-    }
-    li {
-      margin-bottom: 0.4rem;
-    }
-
+    p, ul, li{color:#4a3f6d;line-height:1.8;font-size:0.95rem}
     a{color:var(--link);text-decoration:none}
     a:hover{text-decoration:underline}
-    pre{
-      background:#faf6ff;
-      border:1px solid rgba(123,63,228,0.06);
-      padding:10px;
-      border-radius:8px;
-      overflow:auto;
-      color:#5b4aa1;
-      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.88rem;
-      line-height: 1.5;
-      white-space: pre;
-      word-wrap: normal;
-    }
+    pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
     footer {
   margin: 36px 0 0 0;
   padding-top: 12px;
@@ -372,7 +339,7 @@ main.container li:hover {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
-  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease;
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
   transform-origin: top left; /* 从左上角弹出 */
 }
 .dropdown-menu.show {
@@ -765,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 800);
     }).catch(err => {
       switching = false;
-      console.warn("Playback blocked:", err);
+      console.warn("⚠️ Playback blocked:", err);
     });
   }
 
@@ -788,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
       current.play().then(() => {
         isPlaying = true;
         startStuckDetection();
-      }).catch(err => console.log("Autoplay blocked:", err));
+      }).catch(err => console.log("⚠️ Autoplay blocked:", err));
     }
   }
 
@@ -975,12 +942,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <script>
-// Naked Eye 3D + Breathing Float Banner
+// 🌌 Naked Eye 3D + Breathing Float Banner
 const banner3d = document.getElementById("banner3d");
 const bannerLayer = banner3d?.querySelector(".banner-layer");
 const bannerGlow = banner3d?.querySelector(".banner-glow");
 
-// Desktop: Mouse 3D Parallax
+// 🌈 Desktop: Mouse 3D Parallax
 if (window.matchMedia("(pointer:fine)").matches && banner3d) {
   banner3d.addEventListener("mousemove", e => {
     const rect = banner3d.getBoundingClientRect();
@@ -998,7 +965,7 @@ if (window.matchMedia("(pointer:fine)").matches && banner3d) {
   });
 }
 
-// Mobile: Scroll Parallax (Fake 3D)
+// 📱 Mobile: Scroll Parallax (Fake 3D)
 if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
   window.addEventListener("scroll", () => {
     const scrollY = window.scrollY;
@@ -1010,7 +977,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 </script>
 
 <style>
-/* Banner Breathing Float Animation */
+/* 🌬️ Banner Breathing Float Animation */
 @keyframes bannerFloaty {
   0%, 100% {
     transform: translateY(0);
@@ -1022,7 +989,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
   }
 }
 
-/* Naked Eye 3D Banner Container */
+/* 🌈 Naked Eye 3D Banner Container */
 .banner-3d {
   position: relative;
   width: 100%;
@@ -1033,7 +1000,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
   overflow: hidden;
   transform-style: preserve-3d;
   box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
-  animation: bannerFloaty 8s ease-in-out infinite; /* Breathing Float */
+  animation: bannerFloaty 8s ease-in-out infinite; /* 🫧 Breathing Float */
 }
 
 .banner-3d .banner-layer {
@@ -1047,7 +1014,7 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
   border-radius: 16px;
 }
 
-/* Light Shadow Highlight Layer */
+/* ✨ Light Shadow Highlight Layer */
 .banner-glow {
   position: absolute;
   top: 0;
@@ -1258,7 +1225,6 @@ document.addEventListener('keydown', e => {
   // Initialize
   resetHideTimer();
 </script>
-
 
 </body>
 </html>

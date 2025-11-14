@@ -45,6 +45,7 @@
       opacity: 1;
       transform: translateY(0);
     }
+    
 
     /* === 液态玻璃风格页脚 === */
     footer {
@@ -227,7 +228,40 @@
   window.addEventListener("load", resetIdleTimer);
 </script>
 
+  
+  <style>
+/* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
+@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+  /* 针对 iOS 高清屏（iPhone/iPad） */
+  .container p,
+  .container ul,
+  .container li,
+  .container h2,
+  .container .subtitle,
+  .container .countdown div {
+    word-break: break-word !important;     /* 长单词强制断行 */
+    overflow-wrap: anywhere !important;    /* 现代标准换行 */
+    hyphens: auto !important;              /* 自动添加连字符（可选） */
+    text-align: justify !important;        /* 两端对齐，提升排版美观 */
+    line-height: 1.85 !important;          /* 保持行高一致 */
+  }
 
+  /* 特别处理通知列表（避免项目符号偏移） */
+  .container ul li {
+    padding-left: 0.3em;
+    text-indent: -0.3em;
+  }
+  .container ul li::marker {
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 确保段落首行缩进统一（可选：更像出版物） */
+  .container p:not(:empty) {
+    text-indent: 0;
+  }
+}
+</style>
   
 </head>
 <body>

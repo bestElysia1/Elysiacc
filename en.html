@@ -263,56 +263,67 @@ main.container li:hover {
 
   <style>
 /* ==== iOS 文字排版修复：智能两端对齐（不拉伸短行）==== */
+/* ==== iOS 智能排版：行距统一 + 仅换行行两端对齐 ==== */
 @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
   .container p,
   .container h2,
   .container .subtitle,
   .container .countdown div {
-    /* 基础换行与断词 */
+    /* 基础换行 */
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
     hyphens: auto !important;
-    line-height: 1.85 !important;
 
-    /* 关键：整体左对齐 + 仅非最后行两端对齐 */
-    text-align: left !important;           /* 默认左对齐 */
-    text-align-last: justify !important;   /* 只有“非最后行”才两端对齐 */
+    /* 行高严格统一 */
+    line-height: 1.85 !important;
+    margin: 0 0 1.2em 0 !important;         /* 段落间距固定 */
+    padding: 0 !important;
+
+    /* 智能两端对齐：仅非最后行 */
+    text-align: left !important;
+    text-align-last: justify !important;
+
+    /* 关键：避免伪元素撑高行高 */
+    position: relative;
   }
 
-  /* 强制触发“非最后行”机制：插入一个占位的 inline-block */
+  /* 伪元素不占高度，不影响行距 */
   .container p::after,
   .container h2::after,
   .container .subtitle::after {
     content: "";
-    display: inline-block;
+    display: block;
     width: 100%;
     height: 0;
+    visibility: hidden;
     line-height: 0;
+    font-size: 0;
   }
 
-  /* ========= 列表项目符号对齐 ========= */
+  /* 强制所有行内元素垂直居中对齐 */
+  .container p *,
+  .container h2 *,
+  .container .subtitle * {
+    vertical-align: baseline !important;
+    line-height: inherit !important;
+  }
+
+  /* 列表处理（防止符号影响行高） */
   .container ul {
+    margin: 0.6em 0;
     padding-left: 1.2em;
-    list-style-position: outside;
   }
   .container ul li {
     text-align: left !important;
     text-align-last: justify !important;
+    margin-bottom: 0.4em;
   }
   .container ul li::after {
     content: "";
-    display: inline-block;
+    display: block;
     width: 100%;
     height: 0;
-  }
-  .container ul li::marker {
-    unicode-bidi: isolate;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* 段落首行缩进（可选） */
-  .container p:not(:empty) {
-    text-indent: 0 !important; /* 你原意：不缩进 */
+    visibility: hidden;
   }
 }
 

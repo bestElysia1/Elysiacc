@@ -180,7 +180,7 @@
       }
     }
 
-    /* 已删除 @keyframes breathe（白光呼吸） */
+   
   </style>
   
 <script type="text/javascript">
@@ -198,7 +198,7 @@
 
   // 自动隐藏逻辑
   let idleTimer;
-  const idleTime = 5000; // 30秒无操作后隐藏
+  const idleTime = 10000; // 30秒无操作后隐藏
 
   function resetIdleTimer() {
     clearTimeout(idleTimer);
@@ -420,22 +420,6 @@ document.addEventListener('click', function(event) {
     });
   });
 
-  // === 雪花飘落（持续10秒） ===
-  function createSnow() {
-    const snow = document.createElement("div");
-    snow.classList.add("sakura");
-    snow.textContent = "❄️";
-    snow.style.left = Math.random() * 100 + "vw";
-    snow.style.fontSize = Math.random() * 12 + 12 + "px";
-    snow.style.opacity = 0.8 + Math.random() * 0.2;
-    snow.style.animationDuration = 8 + Math.random() * 5 + "s";
-    snow.style.transform = `rotate(${Math.random() * 360}deg)`;
-    document.body.appendChild(snow);
-    setTimeout(() => snow.remove(), 12000);
-  }
-
-  const snowTimer = setInterval(createSnow, 300);
-  setTimeout(() => clearInterval(snowTimer), 10000);
   </script>
 
   <script>
@@ -609,7 +593,7 @@ video.play().catch(() => {
   pointer-events: none;
   z-index: 997;
   opacity: 1.0;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   transform: scale(1.15);
 }
 

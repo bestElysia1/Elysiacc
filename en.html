@@ -412,5 +412,24 @@ domain:chatgpt.com</pre>
   resetHideTimer();
 </script>
 
+<style>
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1a;
+      --text: #d4c0ff;
+      --text-hover: #e6d4ff;
+      --code-bg: #2a1f3d;
+      --code-border: rgba(156,107,255,0.2);
+      --card-bg: rgba(30,20,50,0.6);
+      --border: rgba(156,107,255,0.3);
+    }
+    body, .container, footer { background: var(--bg) !important; color: var(--text) !important; }
+    p, ul, li, .countdown div { color: var(--text) !important; }
+    .countdown { background: var(--card-bg); border: 1px solid var(--border); }
+    pre { background: var(--code-bg); border-color: var(--code-border); color: #e6d4ff; }
+    .dropdown-menu { background: rgba(30,20,50,0.7); }
+  }
+</style>
+
 </body>
 </html>

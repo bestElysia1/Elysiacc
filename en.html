@@ -1,412 +1,543 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Subscription Guide ver.3.24</title>
-  <!-- Favicon -->
+    <!-- ✅ Website Favicon -->
   <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
   <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
-
   <style>
-    /* === 变量定义 === */
-    :root {
+    :root{
       --accent-start: #9a6ef0;
       --accent-end: #7b3fe4;
       --link: #8f66f0;
       --bg: #ffffff;
       --maxw: 980px;
     }
+    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333; -webkit-overflow-scrolling: touch; touch-action: pan-y;}
+    body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  letter-spacing: 0.3px;
+  line-height: 1.85;
+}
+    .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
+    .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
+    .banner img{width:100%;height:auto;display:block}
+    .banner img{width:100%;height:auto;display:block}
 
-    /* === 全局基础（修复 iOS 左右滑动 + 排版）=== */
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial, sans-serif;
-      color: #333;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      line-height: 1.85;
-      letter-spacing: 0.3px;
-    }
+/* 🌈 Naked Eye 3D Banner Effect */
+.banner-3d {
+  position: relative;
+  ...
+}
+    er{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+    .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
+    .music{margin-left:auto}
+    iframe{border-radius:6px;border:0}
+    /* countdown */
+   /* 🌌 Elysia — Liquid Purple-Pink Glass Countdown */
+.countdown {
+  position: relative;
+  margin: 22px 0;
+  padding: 20px 28px;
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 4px 18px rgba(160,120,255,0.3);
+  animation: countdownFloat 8s ease-in-out infinite;
+}
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
+/* 💫 Liquid Glow Background */
+.countdown::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
+    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
+    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+  filter: blur(40px);
+  animation: blobMove 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
 
-    /* === 容器 === */
-    .container {
-      max-width: var(--maxw);
-      margin: 28px auto;
-      padding: 0 48px;
-    }
+/* 🕒 Countdown Numbers and Title */
+.countdown div {
+  color: rgba(240,230,255,0.9);
+  font-size: 0.96rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(180,140,255,0.6);
+}
+.countdown .nums {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #d9caff;
+  text-shadow:
+    0 0 10px rgba(180,140,255,0.8),
+    0 0 20px rgba(160,120,255,0.4);
+}
 
-    /* === Banner === */
-    .banner {
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 18px;
-    }
-    .banner img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+/* ✨ Subtle Breathing Float */
+@keyframes countdownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
 
-    /* === 专业排版增强 === */
-    section + section { margin-top: 2.2em; }
-    h2 {
-      margin: 1.8em 0 0.9em;
-      padding-left: 10px;
-      border-left: 4px solid rgba(123,63,228,0.12);
-      font-weight: 600;
-      font-size: 1.02rem;
-      color: var(--accent-end);
-    }
-    p, li {
-      margin-bottom: 1em;
-      line-height: 1.85;
-      font-size: 0.95rem;
-    }
-    pre {
-      margin: 1.2em 0;
-      padding: 1em;
-      overflow-x: auto;
-      background: #faf6ff;
-      border: 1px solid rgba(123,63,228,0.06);
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-
-    /* === 3D Banner === */
-    .banner-3d {
-      position: relative;
-      width: 100%;
-      max-width: 980px;
-      margin: 0 auto 28px;
-      perspective: 1000px;
-      border-radius: 16px;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
-      animation: bannerFloaty 8s ease-in-out infinite;
-    }
-    .banner-3d .banner-layer {
-      transition: transform 0.25s ease-out;
-    }
-    .banner-3d img {
-      width: 100%;
-      display: block;
-      border-radius: 16px;
-    }
-    .banner-glow {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
-      mix-blend-mode: overlay;
-      pointer-events: none;
-      opacity: 0.5;
-    }
-    @keyframes bannerFloaty {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-
-    /* === Countdown === */
-    .countdown {
-      position: relative;
-      margin: 22px 0;
-      padding: 20px 28px;
-      border-radius: 18px;
-      overflow: hidden;
-      backdrop-filter: blur(14px) saturate(160%);
-      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 18px rgba(160,120,255,0.3);
-      animation: countdownFloat 8s ease-in-out infinite;
-    }
-    .countdown::before {
-      content: "";
-      position: absolute;
-      inset: -25%;
-      background:
-        radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
-        radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-        radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-      filter: blur(40px);
-      animation: blobMove 14s ease-in-out infinite;
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
-    .countdown .nums {
-      font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 1px;
-      color: #d9caff;
-      text-shadow: 0 0 10px rgba(180,140,255,0.8), 0 0 20px rgba(160,120,255,0.4);
-    }
-    @keyframes countdownFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-    @keyframes blobMove { 0% { transform: translate(0,0) scale(1); } 25% { transform: translate(6%, -4%) scale(1.05); } 50% { transform: translate(-5%, 5%) scale(1.02); } 75% { transform: translate(3%, -3%) scale(1.07); } 100% { transform: translate(0,0) scale(1); } }
-
-    /* === 页脚 === */
+/* 🌊 Background Liquid Movement */
+@keyframes blobMove {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(6%, -4%) scale(1.05); }
+  50% { transform: translate(-5%, 5%) scale(1.02); }
+  75% { transform: translate(3%, -3%) scale(1.07); }
+  100% { transform: translate(0,0) scale(1); }
+}
+    .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
+    /* content */
+    section{margin-top:28px}
+    h2{font-size:1.02rem;margin:8px 0 14px 0;padding-left:10px;border-left:4px solid rgba(123,63,228,0.12);color:var(--accent-end);background:linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));padding:8px;border-radius:6px}
+    p, ul, li{color:#4a3f6d;line-height:1.8;font-size:0.95rem}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
     footer {
-      margin: 36px 0 0 0;
-      padding-top: 12px;
-      color: #999;
-      font-size: 0.85rem;
-      text-align: center;
-      border-top: 1px solid rgba(156,107,255,0.2);
-      background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
-      box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
-      transition: all 0.4s ease;
-    }
-    footer:hover {
-      text-shadow: 0 0 6px rgba(156,107,255,0.6);
-      color: #bca9ff;
-    }
+  margin: 36px 0 0 0;
+  padding-top: 12px;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid rgba(156,107,255,0.2);
+  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
+  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
+  transition: all 0.4s ease;
+}
+footer:hover {
+  text-shadow: 0 0 6px rgba(156,107,255,0.6);
+  color: #bca9ff;
+}
 
-    /* === 汉堡菜单 === */
-    .hamburger {
-      position: fixed;
-      left: 14px;
-      top: 14px;
-      width: 44px;
-      height: 44px;
-      display: inline-flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      align-items: center;
-      z-index: 10001;
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
-      padding: 6px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-      transition: all 0.3s ease;
-      cursor: pointer;
+    /* layout */
+    .leftnav{position:fixed;left:12px;top:120px;width:160px}
+    .leftnav ul{list-style:none;padding:0;margin:0}
+    .leftnav li{margin:8px 0;color:var(--link);font-size:0.9rem}
+    /* responsive */
+    @media (max-width:900px){
+      .container{padding:0 18px}
+      .leftnav{display:none}
+      er{flex-direction:column;align-items:flex-start}
+      .music{margin-left:0;margin-top:8px}
     }
-    .hamburger:hover { box-shadow: 0 0 25px rgba(150,120,255,0.25); transform: scale(1.05); }
-    .hb-line {
-      display: block;
-      width: 20px;
-      height: 2px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-      background-size: 200% auto;
-      animation: glowFlow 3s linear infinite;
-      transition: all 0.3s ease;
-    }
-    .dropdown-menu {
-      position: fixed;
-      left: 14px;
-      top: 60px;
-      width: 200px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px;
-      list-style: none;
-      margin: 0;
-      z-index: 10000;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-      display: none;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-10px) scale(0.95);
-      transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease;
-      transform-origin: top left;
-    }
-    .dropdown-menu.show { display: block; opacity: 1; pointer-events: auto; animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; }
-    .dropdown-menu.closing { animation: dockClose 0.62s cubic-bezier(.22,.9,.36,1) forwards; display: block; pointer-events: none; }
-    .dropdown-menu li { margin: 5px 0; }
-    .dropdown-menu a {
-      color: #cdbaff;
-      text-decoration: none;
-      display: block;
-      padding: 8px;
-      border-radius: 5px;
-      transition: background 0.2s;
-    }
-    .dropdown-menu a:hover { background: rgba(255,255,255,0.2); }
-    @keyframes dockPop { 0% { transform: translateY(-10px) scale(0.95); opacity: 0; } 55% { transform: translateY(2px) scale(1.02); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
-    @keyframes dockClose { 0% { transform: translateY(0) scale(1); opacity: 1; } 55% { transform: translateY(-2px) scale(1.02); opacity: 1; } 100% { transform: translateY(-10px) scale(0.95); opacity: 0; } }
-    @keyframes glowFlow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+/*  Elysia Breathing Glow Fade-In Effect */
+@keyframes glowPulse {
+  0% {
+    color: #9a6ef0;
+    text-shadow: 0 0 4px rgba(156,107,255,0.4),
+                 0 0 8px rgba(156,107,255,0.2);
+  }
+  50% {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(156,107,255,0.9),
+                 0 0 20px rgba(156,107,255,0.6),
+                 0 0 30px rgba(156,107,255,0.3);
+  }
+  100% {
+    color: #9a6ef0;
+    text-shadow: 0 0 4px rgba(156,107,255,0.4),
+                 0 0 8px rgba(156,107,255,0.2);
+  }
+}
 
-    /* === 樱花视频（15 秒后淡出）=== */
-    #sakura-video {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      z-index: 997;
-      opacity: 1.0;
-      mix-blend-mode: screen;
-      transform: scale(1.15);
-      transition: opacity 1s ease-out;
-      background: #000;
-    }
-    @media (max-width: 768px) {
-      #sakura-video { opacity: 0.7; transform: scale(1.25); }
-      .container { padding: 0 24px; }
-    }
+/*  Elysia Title Gradient Flow + Glow Combination */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+h2 {
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  transition: all 0.6s ease;
+}
+
+h2:hover {
+  animation: gradientFlow 3s linear infinite, glowPulse 1.8s ease-in-out infinite;
+}
+
+/* Let paragraphs, lists, links have subtle breathing glow */
+a:hover, p:hover, li:hover {
+  animation: glowPulse 1.8s ease-in-out infinite;
+  transition: all 0.4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section {
+  animation: fadeInUp 0.8s ease both;
+}
+/*  Global Body Light Purple Optimization (Elysia Style) */
+p, ul, li {
+  color: #7a66c7 !important; /* Soft light purple */
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+/*  Paragraph hover slight brightening */
+p:hover, li:hover {
+  color: #9a6ef0 !important;
+  text-shadow: 0 0 6px rgba(156,107,255,0.3);
+  transition: all 0.3s ease;
+}
+/*  Force body text to show light purple */
+main.container p,
+main.container ul,
+main.container li {
+  color: #7a66c7 !important;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+/*  Mouse hover subtle glow */
+main.container p:hover,
+main.container li:hover {
+  color: #9a6ef0 !important;
+  text-shadow: 0 0 6px rgba(156,107,255,0.4);
+  transition: all 0.3s ease;
+}
+
+
   </style>
+<script type="text/javascript">
+  // Crisp 初始化
+  window.$crisp = [];
+  window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
 
-  <!-- Crisp 客服 -->
-  <script type="text/javascript">
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
-    (function() {
-      var d = document;
-      var s = d.createElement("script");
-      s.src = "https://client.crisp.chat/l.js";
-      s.async = 1;
-      d.getElementsByTagName("head")[0].appendChild(s);
-    })();
-    let idleTimer;
-    const idleTime = 5000;
-    function resetIdleTimer() {
-      clearTimeout(idleTimer);
-      showCrisp();
-      idleTimer = setTimeout(hideCrisp, idleTime);
+  (function() {
+    var d = document;
+    var s = d.createElement("script");
+    s.src = "https://client.crisp.chat/l.js";
+    s.async = 1;
+    d.getElementsByTagName("head")[0].appendChild(s);
+  })();
+
+  // 🫖 自动隐藏逻辑
+  let idleTimer;
+  const idleTime = 5000; // 30秒无操作后隐藏
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    showCrisp();
+    idleTimer = setTimeout(hideCrisp, idleTime);
+  }
+
+  function hideCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:hide"]);
     }
-    function hideCrisp() { if (window.$crisp) window.$crisp.push(["do", "chat:hide"]); }
-    function showCrisp() { if (window.$crisp) window.$crisp.push(["do", "chat:show"]); }
-    ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt =>
-      document.addEventListener(evt, resetIdleTimer, { passive: true })
-    );
-    window.addEventListener("load", resetIdleTimer);
-  </script>
+  }
+
+  function showCrisp() {
+    if (window.$crisp) {
+      window.$crisp.push(["do", "chat:show"]);
+    }
+  }
+
+  // 监听用户活动（滚动、点击、键盘）
+  ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // 初始化计时器
+  window.addEventListener("load", resetIdleTimer);
+</script>
+
+  
 </head>
 <body>
+<!-- 爱莉希雅入口按钮 -->
+<!-- HTML部分：汉堡按钮和下拉菜单 -->
+<div class="hamburger" id="hamburger-menu" aria-label="菜单">
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+</div>
 
-  <!-- 汉堡菜单 -->
-  <div class="hamburger" id="hamburger-menu" aria-label="菜单">
-    <span class="hb-line"></span>
-    <span class="hb-line"></span>
-    <span class="hb-line"></span>
-  </div>
+<!-- 下拉菜单（初始隐藏） -->
+<ul class="dropdown-menu" id="dropdown">
+  <li><a href="index.html">Home</a></li>
+  <li><a href="elysia-3d.html">Elysia</a></li>
+  <li><a href="en.html">EN</a></li>
+</ul>
 
-  <ul class="dropdown-menu" id="dropdown">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="elysia-3d.html">Elysia</a></li>
-    <li><a href="en.html">EN</a></li>
-  </ul>
+<!-- CSS样式（整合效果best的macOS动画，保留原弹出尺寸） -->
+<style>
+.hamburger {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+  z-index: 10001;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 6px;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  transition: all 0.3s ease;
+  cursor: pointer; /* 添加指针样式，表示可点击 */
+}
+.hamburger:hover {
+  box-shadow: 0 0 25px rgba(150,120,255,0.25);
+  transform: scale(1.05);
+}
+.hb-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  background-size: 200% auto;
+  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
+  transition: all 0.3s ease; /* 为动画添加过渡 */
+}
 
-  <nav class="leftnav" aria-hidden="true"></nav>
+/* 下拉菜单样式（整合效果best：macOS Dock弹出动画，保留原尺寸） */
+.dropdown-menu {
+  position: fixed;
+  left: 14px;
+  top: 60px; /* 汉堡按钮下方位置 */
+  width: 200px; /* 菜单宽度，可调整 */
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+  z-index: 10000;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
+  display: none; /* 初始隐藏 */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
+  transform-origin: top left; /* 从左上角弹出 */
+}
+.dropdown-menu.show {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
+}
+.dropdown-menu.closing {
+  animation: dockClose 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 关闭动画 */
+  display: block; /* 保持可见直到动画结束 */
+  pointer-events: none; /* 防止交互 */
+}
+.dropdown-menu li {
+  margin: 5px 0;
+}
+.dropdown-menu a {
+  color: #cdbaff; /* 更亮的淡紫色文字 */
+  text-decoration: none;
+  display: block;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+.dropdown-menu a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
+@keyframes dockPop {
+  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); opacity: 0; }
+  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); opacity: 1; } /* 轻微向下反弹，保留小规模 */
+  100% { transform: translateY(0) scale(1); filter: brightness(1); opacity: 1; }
+}
+
+/* 新增关闭动画 keyframes（反向dockPop） */
+@keyframes dockClose {
+  0% { transform: translateY(0) scale(1); filter: brightness(1); opacity: 1; }
+  55% { transform: translateY(-2px) scale(1.02); filter: brightness(1.12); opacity: 1; } /* 轻微向上反弹 */
+  100% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); opacity: 0; }
+}
+</style>
+
+<!-- JavaScript脚本：处理点击事件（移除active toggle） -->
+<script>
+const hamburger = document.getElementById('hamburger-menu');
+const menu = document.getElementById('dropdown');
+
+function closeMenu() {
+  if (menu.classList.contains('show')) {
+    menu.classList.add('closing');
+    menu.addEventListener('animationend', function handler() {
+      menu.classList.remove('show', 'closing');
+      menu.removeEventListener('animationend', handler);
+    });
+  }
+}
+
+hamburger.addEventListener('click', function() {
+  if (menu.classList.contains('show')) {
+    closeMenu();
+  } else {
+    menu.classList.remove('closing');
+    menu.classList.add('show');
+  }
+});
+
+// 可选：点击菜单外关闭（增强体验）
+document.addEventListener('click', function(event) {
+  if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+    closeMenu();
+  }
+});
+</script>
+
+<style>
+/* Flowing Glow */
+@keyframes glowFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Breathing Halo */
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
+}
+</style>
+  <nav class="leftnav" aria-hidden="true">
+   
+  </nav>
 
   <main class="container">
-    <!-- 3D Banner -->
-    <div class="banner-3d" id="banner3d">
-      <div class="banner-layer">
-        <img src="assets/banner.jpg" alt="Banner">
-      </div>
-      <div class="banner-glow"></div>
-    </div>
+    <!-- 🌌 Naked Eye 3D Banner -->
+<div class="banner-3d" id="banner3d">
+  <div class="banner-layer">
+    <img src="assets/banner.jpg" alt="Banner">
+  </div>
+  <div class="banner-glow"></div>
+</div>
 
-    <!-- Countdown -->
+    <header>
+
+
+</div>
+
+      
+    </header>
+
     <div class="countdown" id="countdown" aria-live="polite">
       <div style="font-size:0.95rem;color:#666;margin-bottom:6px">Countdown</div>
       <div class="nums" id="countdownNums">— Days — : — : —</div>
     </div>
 
-    <!-- 节点说明 -->
     <section>
-      <h2>节点说明</h2>
-      <p><strong>Onlycloud</strong>：Disney+、YouTube、Netflix 流媒体全解锁，无限速度，优质专线</p>
-      <p><strong>Milkshake</strong>：同上</p>
-      <p><strong>IEPL IPLC</strong>：优质专线</p>
-      <p><strong>IEPL prem.</strong>：游戏专用</p>
-      <p><strong>Pure</strong>：原生 IP 双 ISP</p>
-      <p><strong>Shenzhen-Hong Kong</strong>：备用线路</p>
-      <p><strong>Limited</strong>：备用线路</p>
-      <p><strong>Tunnel</strong>：备用线路</p>
-      <p><strong>Direct</strong>：国内外均可用</p>
-      <p><strong>Government-Enterprise Dedicated Lines</strong>：因区域限制，一般不使用</p>
+      <p><strong>Onlycloud</strong> Disney+, YouTube, Netflix Streaming, ChatGPT .etc Fully Unlocked, Unlimited Speed, Premium Dedicated Lines</p>
+      <p><strong>Milkshake</strong> Same as above</p>
+      <p><strong>IEPL IPLC</strong> Premium Dedicated Lines</p>
+      <p><strong>IEPL prem.</strong> Gaming Dedicated</p>
+      <p><strong>Pure</strong> Native IP Dual ISP</p>
+      <p><strong>Shenzhen-Hong Kong</strong> Backup Lines</p>
+      <p><strong>Limited</strong> Backup Lines</p>
+      <p><strong>Tunnel</strong> Backup Lines</p>
+      <p><strong>Direct</strong> Usable Both Domestically and Internationally</p>
+      <p><strong>Government-Enterprise Dedicated Lines</strong> Due to Regional Restrictions, Generally Do Not Use</p>
     </section>
 
-    <!-- 订阅链接 -->
     <section>
-      <h2>订阅链接</h2>
-      <p>请邮件发送「订阅」获取</p>
+      <h2>Subscription Link</h2>
+      <p>Please send "Subscription" to the email to obtain</p>
+
     </section>
 
-    <!-- 通知 -->
     <section>
-      <h2>通知</h2>
+      <h2>Notifications</h2>
       <ul>
-        <li>三网优化完成 ~ 2025-09-16</li>
-        <li>ChatGPT 在香港不可用，使用新加坡/日本等节点避免降级 ~ 2025-09-16（已自动切换）</li>
-        <li>部分省份省级防火墙升级，移动线路需特殊优化，不可使用请联系我单独调优 ~ 2025-09-19</li>
-        <li>部分省份移动被墙，切换电信。移动网络暂时不可用 ~ 2025-09-30（已修复）</li>
-        <li>德国法兰克福 CN2 GIA 专线将于 10 月 20 日上线 ~ 2025-10-10</li>
-        <li>11 月 1-7 日服务器维护，不影响正常使用。11 月 8 日更新订阅 ~ 2025-10-30</li>
+        <li>Three-Network Optimization Completed ~ 2025-09-16</li>
+        <li>ChatGPT is not available in Hong Kong. To use ChatGPT, please use Singapore or Japan or other nodes to avoid unavailability and degradation ~ 2025-09-16 (Auto-Switch Completed)</li>
+        <li>Due to upgrades in provincial firewalls in some provinces, mobile lines need special optimization. If unavailable, contact me for individual tuning ~ 2025-09-19</li>
+        <li>Mobile in some provinces is blocked, switch to Telecom. Mobile network temporarily unavailable ~ 2025-09-30 (Fixed)</li>
+        <li>Germany Frankfurt CN2 GIA Dedicated Line will be online on October 20 ~ 2025-10-10</li>
+        <li>Server maintenance expected from November 1-7, does not affect normal use. Update subscription on November 8 ~ 2025-10-30</li>
+
       </ul>
     </section>
 
-    <!-- 使用规则 -->
     <section>
-      <h2>使用规则</h2>
-      <p>复制订阅链接到软件中同步即可使用</p>
+      <h2>Usage Rules</h2>
+      <p>Copy the subscription link to the software and sync to use</p>
     </section>
 
-    <!-- 移动设备 -->
     <section>
-      <h2>移动设备</h2>
+      <h2>Mobile Devices</h2>
       <ul>
-        <li><strong>Android：</strong> V2rayNG、FIClash、Nekobox、Sing-box for Android、Clash Meta for Android 等</li>
-        <li><strong>iOS（含 iPadOS/tvOS）：</strong> ShadowRocket（小火箭）、Surge、Loon、Stash、Quantumult 等</li>
-        <li><strong>Harmony OS NEXT：</strong> 同 Android，但不推荐</li>
+        <li><strong>Android:</strong> V2rayNG, FIClash, Nekobox, Sing-box for Android, Clash Meta for Android .etc</li>
+        <li><strong>iOS (including iPadOS/tvOS):</strong> ShadowRocket (Little Rocket), Surge, Loon, Stash, Quantumult .etc</li>
+        <li><strong>Harmony OS NEXT:</strong> Same as Android, but not recommended</li>
       </ul>
     </section>
 
-    <!-- 电脑 -->
     <section>
-      <h2>电脑</h2>
+      <h2>Computers</h2>
       <ul>
-        <li><strong>Windows：</strong> V2rayN、Clash Party、Clash Verge、FIClash 等</li>
-        <li><strong>macOS：</strong> Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party 等</li>
-        <li><strong>Linux：</strong> V2rayN、Singbox for Linux 等</li>
-        <li><strong>FreeBSD/Unix：</strong> Mihomo（裸核心）、Sing-box 等</li>
+        <li><strong>Windows:</strong> V2rayN, Clash Party, Clash Verge, FIClash .etc</li>
+        <li><strong>macOS:</strong> Surge, Shadowrocket, Clash Verge Rev, GUI for SingBox, Clash Party .etc</li>
+        <li><strong>Linux:</strong> V2rayN, Singbox for Linux .etc</li>
+        <li><strong>FreeBSD/Unix:</strong> Mihomo (Bare Core), Sing-box .etc</li>
       </ul>
     </section>
 
-    <!-- 路由器 -->
     <section>
-      <h2>路由器</h2>
+      <h2>Routers</h2>
       <ul>
-        <li><strong>华硕硬件路由：</strong> MerlinClash2（梅林）、FancySS</li>
-        <li><strong>小米硬件路由：</strong> ShellCrash</li>
-        <li><strong>OpenWrt 软件路由：</strong> OpenClash、PassWall、Nikki</li>
+        <li><strong>ASUS Hardware Router:</strong> MerlinClash2 (Merlin), FancySS</li>
+        <li><strong>Xiaomi Hardware Router:</strong> ShellCrash</li>
+        <li><strong>OpenWrt Software Router:</strong> OpenClash, PassWall, Nikki</li>
       </ul>
     </section>
 
-    <!-- Shadowrocket 规则 -->
     <section>
-      <h2>Shadowrocket 规则集</h2>
-      <p><strong>Shadowsrocket：</strong></p>
-      <p>打开小火箭 - 配置 - 右上角 - "+" 将此链接粘贴到 URL 中</p>
-      <pre><code>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</code></pre>
-      <p>使用此配置，然后在同一页面打开 - 模块 - 右上角 "+" 分别导入 Direct、Proxy、Reject 三个链接到模块中</p>
-      <pre><code>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+      <h2>Rule Set</h2>
+      <p><strong>Shadowsrocket:</strong></p>
+      <p>Open Little Rocket - Configuration - Top Right - "+" Paste this link into URL</p>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+      <p>Use this configuration, then on the same page open - Module - Top Right "+" Import the three links for Direct, Proxy, Reject into modules respectively</p>
+      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
-https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</code></pre>
-      <p>设置完成后 - 小火箭 - 首页 - 全局路由 - 改为 - 配置，重启小火箭。这样无需开关小火箭，国内应用/网站默认直连，国外应用/网站默认代理（银行类除外）</p>
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
+
+      <p>After setup - Little Rocket - Home - Global Routing - Change to - Configuration, restart Little Rocket. This way, no need to toggle Little Rocket on/off. Domestic apps/websites default direct, foreign apps/websites default proxy (except bank apps)</p>
+
     </section>
 
-    <!-- Shadowrocket 高级 -->
     <section>
-      <h2>Shadowrocket 高级玩法</h2>
-      <p><strong>Shadowrocket 终极高级玩法：</strong></p>
-      <p>如有特定网站需走代理或直连，打开小火箭 - 配置 - 模块，可看到 direct、proxy、reject 三个模块。打开 proxy 模块，可看到 proxy_list。例如 yhdm.one 需走代理，在 rule 下添加：</p>
-      <pre><code>DOMAIN-SUFFIX,yhdm.one,PROXY
+      <h2>Shadowrocket Advanced</h2>
+      <p><strong>Shadowrocket Ultimate Advanced Play:</strong></p>
+      <p>If you have specific websites needing proxy or direct, open Little Rocket - Configuration - Module, you can see direct, proxy, reject, three modules. Open the proxy module, you can see proxy_list. For example, if yhdm.one needs proxy, add under rule:</p>
+      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
 DOMAIN-SUFFIX,yinhuadm.one,PROXY
 DOMAIN-SUFFIX,anime1.me,PROXY
 DOMAIN-SUFFIX,elysia.bestxuyi.us,PROXY
@@ -417,27 +548,27 @@ DOMAIN-SUFFIX,googleapis.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.googleapis.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,bard.google.com,Onlycloud｜Singapore01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.google.com,Onlycloud｜Singapore01-❄️10Gbps
-DOMAIN-SUFFIX,x.ai,Onlycloud｜Singapore01-❄️10Gbps</code></pre>
-      <p>然后保存。注意：批量添加时，确保每条规则一行，一起复制粘贴</p>
-      <p>其他如特定网站走直连（打开 direct 模块...）同理~</p>
+DOMAIN-SUFFIX,x.ai,Onlycloud｜Singapore01-❄️10Gbps</pre>
+      <p>Then save. Note: When adding in bulk, ensure each rule is on one line and copy-paste together</p>
+      <p>Others like specific websites going direct (open direct module...) same logic~</p>
+    
     </section>
 
-    <!-- Shadowrocket 负载均衡 -->
     <section>
-      <h2>Shadowrocket 负载均衡</h2>
-      <p>打开小火箭 - 首页 - 全局路由 - 启用 Fallback；分组 - 简单模式 - 启用；分组 - 编辑 - 勾选要使用的节点 - 完成</p>
-      <p>必须包含 Onlycloud 香港 & 新加坡 & 日本节点</p>
-      <p>目的是保证永远可用 & 自动切换可用节点</p>
+      <h2>Shadowrocket Load Balancing</h2>
+      <p>Open Little Rocket - Home - Global Routing - Enable Fallback; Group - Simple Mode - Enable; Group - Edit - Select the nodes you want to use - Done</p>
+      <p>Must include Onlycloud Hong Kong & Singapore & Japan nodes</p>
+      <p>Aims to ensure always available & auto-switch available</p>
+    
     </section>
 
-    <!-- V2rayN 基础 -->
     <section>
-      <h2>V2rayN-Windows 基础</h2>
-      <p><strong>V2rayN 使用</strong></p>
-      <p>打开 V2rayN - 顶部标签 - 订阅组 - 订阅组设置 - 添加 - 填写别名 Elysia（随意） - 将订阅链接粘贴到可选 URL - 确认 - 点击订阅组 - 更新当前订阅（通过代理） - 选择任意节点 - 右键 - 设为活动配置文件 - 底部系统代理 - 自动配置系统代理 - 顶部标签 - 设置 - 以管理员身份重新启动</p>
-      <p><strong>V2rayN 分流</strong></p>
-      <p>打开 V2rayN - 顶部标签 - 设置 - 路由设置 - 双击 V3 绕过大陆 - 添加规则 - 别名：Elysia（随意） - outboundTag: Onlycloud｜Singapore02-❄️10Gbps - 在 Domain 粘贴以下规则：</p>
-      <pre><code>domain:openai.com,
+      <h2>V2rayN-Windows Basics</h2>
+      <p><strong>V2rayN Usage</strong></p>
+      <p>Open V2rayN - Top Tab - Subscription Group - Subscription Group Settings - Add - Fill Alias Elysia (any) - Paste subscription link into Optional URL - Confirm - Click Subscription Group - Update Current Subscription (via Proxy) - Select any node - Right Click - Set as Active Profile - Bottom System Proxy - Auto Configure System Proxy - Top Tab - Settings - Restart as Administrator</p>
+      <p><strong>V2rayN Diversion</strong></p>
+      <p>Open V2rayN - Top Tab - Settings - Routing Settings - Double Click V3 Bypass Mainland - Add Rule - Alias: Elysia (any) - outboundTag: Onlycloud｜Singapore02-❄️10Gbps - Paste below rules in Domain:</p>
+      <pre>domain:openai.com,
 domain:chat.openai.com,
 domain:api.openai.com,
 domain:cdn.openai.com,
@@ -450,203 +581,651 @@ domain:gemini.google.com,
 domain:perplexity.ai,
 domain:poe.com,
 domain:huggingface.co,
-domain:chatgpt.com</code></pre>
-      <p>其他不变，点击确认 - 标签 - 设置 - 以管理员身份重新启动。这样设置 - 使用 ChatGPT 等 AI 时自动切换到新加坡节点，不影响当前节点</p>
-      <p>其他如添加分流节点或修改 AI 节点同理~</p>
-      <p>其他如 clash verge、sing-box 等略</p>
+domain:chatgpt.com</pre>
+      <p>Others unchanged, click Confirm - Tab - Settings - Restart as Administrator. This sets up - auto-switch to Singapore node when using ChatGPT etc AI, without affecting current node</p>
+      <p>Others like adding diversion nodes or modifying AI nodes same logic~</p>
+
+
+      <p>Others like clash verge, sing-box .etc omitted</p>
+
     </section>
 
-    <!-- 自建节点教程 -->
+    
     <section>
-      <h2>自建 VPS 节点教程</h2>
+      <h2>Tutorial for Building Your Own VPS Nodes</h2>
       <ul>
-        <li><strong>常用工具：</strong> Final shell、Putty、CMD、XUI&3X-UI</li>
-        <li><strong>Final shell：</strong> 购买 1 台 VPS（系统版本 ubuntu22 及以上）打开 final shell，新建 ssh 连接，输入主机 IP 地址、端口、用户名、密钥登录这台 VPS，然后复制 <code>bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</code> 这条链接到 VPS，按提示一步步操作，导入生成的节点到 V2rayN 即可使用</li>
-        <li><strong>Putty：</strong> 打开 putty，输入主机 IP 和端口登录，后续步骤同上</li>
-        <li><strong>CMD：</strong> windows+R 运行 CMD，然后复制命令 <code>ssh root@yourIP -p port</code>（root 为用户名，yourIP 替换为你购买的主机 IP 地址，-P 后跟 VPS 提供的端口）登录，后续步骤同上</li>
-        <li><strong>推荐：</strong> 搭建节点后，搭配前置代理或使用流量转发服务，可让你的 VPS 节点非常稳定和加速，避免不可用等问题</li>
+        <li><strong>Common Tools:</strong> Final shell, Putty, CMD, XUI&3X-UI</li>
+        <li><strong>Final shell:</strong> Buy 1 VPS (system version ubuntu22 or above) Open final shell, create a new ssh connection, enter host IP address, port, username, key to login to this VPS, then copy bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) this link to VPS and follow prompts step by step, import generated nodes to V2rayN to use</li>
+        <li><strong>Putty:</strong> Open putty, enter host IP and port to login, subsequent steps same as above</li>
+        <li><strong>CMD:</strong> windows+R run CMD, then copy command ssh root@yourIP -p port (root is username, yourIP replace with your purchased host IP address, -P followed by VPS provided port) login, subsequent steps same as above</li>
+        <li><strong>Recommendation:</strong> After building nodes, pair with front proxy or use traffic forwarding service to make your VPS nodes very stable and accelerated, avoid unavailability etc</li>
       </ul>
     </section>
 
-    <!-- 测速链接 -->
+
+
     <section>
-      <h2>测速链接</h2>
-      <ul>
-        <li><a href="https://www.speedtest.net/">Speedtest</a></li>
-        <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
-        <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li>
-      </ul>
+  <h2>Speed Test Links</h2>
+  <ul>
+    <li><a href="https://www.speedtest.net/">Speedtest</a></li>
+    <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
+    <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li> 
+  </ul>
+    </section>
+              
+
+    
+    <section>
+  <h2>Some Software Links</h2>
+  <ul>
+    <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
+    <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
+    <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
+    <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
+    <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
+    <li><a href="https://nssurge.com/">Surge</a></li>
+    <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
+    <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
+    
+  </ul>
     </section>
 
-    <!-- 软件链接 -->
-    <section>
-      <h2>部分软件链接</h2>
-      <ul>
-        <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
-        <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
-        <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
-        <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
-        <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
-        <li><a href="https://nssurge.com/">Surge</a></li>
-        <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
-        <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
-      </ul>
+<div class="elysia-video-wrapper">
+  <video id="videoA" autoplay muted playsinline preload="metadata"></video>
+  <video id="videoB" muted playsinline preload="metadata"></video>
+</div>
+
+<style>
+.elysia-video-wrapper {
+  position: relative;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(150,120,255,0.15);
+}
+.elysia-video-wrapper video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: opacity 0.8s ease-in-out;
+  background: #000;
+}
+#videoA { opacity: 1; z-index: 2; }
+#videoB { opacity: 0; z-index: 1; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const videos = [
+    "assets/elysiatest.mp4",
+    "assets/elysiatest2.mp4",
+    "assets/elysiatest3.mp4",
+    "assets/elysiatest4.mp4",
+    "assets/elysiatest5.mp4",
+    "assets/elysiatest6.mp4",
+    "assets/elysiatest7.mp4",
+    "assets/elysiatest8.mp4",
+    "assets/elysiatest9.mp4.MOV",
+    "assets/elysiatest10.mp4.MOV",
+    "assets/elysiatest11.mp4.MOV",
+    "assets/elysiatest12.mov",
+    "assets/elysiatest13.MOV",
+    "assets/elysiatest14.mov",
+    "assets/elysiatest15.mov",
+    "assets/elysiatest16.mov",
+    "assets/elysiatest17.mov"
+    
+  ];
+
+  const videoA = document.getElementById("videoA");
+  const videoB = document.getElementById("videoB");
+  const wrapper = document.querySelector(".elysia-video-wrapper");
+  let current = videoA;
+  let next = videoB;
+  let index = 0;
+  let nextReady = false;
+  let switching = false;
+  let isPlaying = false; // Track play state for resume
+  let isVisible = false; // Track viewport visibility
+  let isPageVisible = true; // Track page visibility
+  let lastTime = 0;
+  let stuckTimer = null;
+
+  // === Preload Next ===
+  function preloadNext() {
+    const nextIndex = (index + 1) % videos.length;
+    next.src = videos[nextIndex];
+    next.preload = "metadata"; // Lazy preload
+    next.load();
+    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
+  }
+
+  // === Switch Video ===
+  function switchVideo() {
+    if (switching || !isVisible || !isPageVisible) return;
+    switching = true;
+
+    if (!nextReady) {
+      setTimeout(() => { switching = false; switchVideo(); }, 300);
+      return;
+    }
+
+    next.currentTime = 0;
+    next.play().then(() => {
+      isPlaying = true;
+      next.style.opacity = "1";
+      current.style.opacity = "0";
+      setTimeout(() => {
+        current.pause();
+        [current, next] = [next, current];
+        index = (index + 1) % videos.length;
+        switching = false;
+        preloadNext();
+        bindEvents();
+      }, 800);
+    }).catch(err => {
+      switching = false;
+      console.warn("⚠️ Playback blocked:", err);
+    });
+  }
+
+  // === Bind Events to Current Video ===
+  function bindEvents() {
+    current.onended = switchVideo;
+    current.ontimeupdate = () => {
+      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
+        preloadNext();
+      }
+      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
+        switchVideo();
+      }
+    };
+  }
+
+  // === Start Playback if Visible ===
+  function startPlayback() {
+    if (isVisible && isPageVisible && !isPlaying) {
+      current.play().then(() => {
+        isPlaying = true;
+        startStuckDetection();
+      }).catch(err => console.log("⚠️ Autoplay blocked:", err));
+    }
+  }
+
+  // === Pause Playback ===
+  function pausePlayback() {
+    if (isPlaying) {
+      current.pause();
+      isPlaying = false;
+      stopStuckDetection();
+    }
+  }
+
+  // === Stuck Detection ===
+  function startStuckDetection() {
+    lastTime = current.currentTime;
+    stuckTimer = setInterval(() => {
+      if (isPlaying && current.currentTime === lastTime && current.currentTime > 0) {
+        console.log("Video stuck detected, attempting to recover...");
+        current.load();
+        current.play().catch(err => console.error("Recovery play failed:", err));
+      } else {
+        lastTime = current.currentTime;
+      }
+    }, 3000); // Check every 3 seconds
+  }
+
+  function stopStuckDetection() {
+    if (stuckTimer) {
+      clearInterval(stuckTimer);
+      stuckTimer = null;
+    }
+  }
+
+  // === Intersection Observer for Viewport Visibility ===
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        if (!current.src) { // Lazy load first video
+          current.src = videos[0];
+          current.load();
+          current.addEventListener('loadedmetadata', () => {
+            bindEvents();
+            preloadNext();
+            startPlayback();
+          }, { once: true });
+        } else {
+          startPlayback();
+        }
+      } else {
+        pausePlayback();
+      }
+    });
+  }, { threshold: 0.25 }); // Start when 25% visible
+
+  observer.observe(wrapper);
+
+  // === Page Visibility Change ===
+  document.addEventListener("visibilitychange", () => {
+    isPageVisible = !document.hidden;
+    if (isPageVisible) {
+      startPlayback();
+    } else {
+      pausePlayback();
+    }
+  });
+
+  // 新增：修复视频封面黑屏bug，使用第一个视频的第一帧作为临时封面
+  const canvas = document.createElement('canvas');
+  const tempVideo = document.createElement('video');
+  tempVideo.src = videos[0]; // 使用第一个视频
+  tempVideo.muted = true;
+  tempVideo.addEventListener('loadeddata', () => {
+    canvas.width = tempVideo.videoWidth;
+    canvas.height = tempVideo.videoHeight;
+    canvas.getContext('2d').drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+    const posterUrl = canvas.toDataURL('image/png');
+    videoA.poster = posterUrl;
+    videoB.poster = posterUrl; // 为两个视频元素设置相同的poster
+    tempVideo.remove(); // 清理临时视频
+  });
+  tempVideo.load(); // 加载临时视频以捕获帧
+});
+</script>
+
+  <h2>Some Useful & Interesting Websites</h2>
+  <ul>
+    <li><a href="https://www.nodeseek.com/post-183694-1">Common VPS Scripts</a></li>
+    <li><a href="https://downloads.khinsider.com/">Music Download Site 1 Used Here</a></li>
+    <li><a href="https://mp3juice.co/">Music Download Site 2 Used Here</a></li>
+    <li><a href="https://wallhaven.cc/index.php">Useful PC Wallpapers</a></li>
+    <li><a href="https://hstock.org/en">Purchase Site for Apple ID etc Resources</a></li>
+    <li><a href="https://www.naifeistation.com/i/2EEaDt">Link to purchase resources such as chatGpt Plus, Super Grok, YouTube, and Netflix memberships</a></li>
+    <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
+  </ul>
     </section>
 
-    <!-- Elysia 视频 -->
-    <div class="elysia-video-wrapper">
-      <video id="videoA" autoplay muted playsinline preload="metadata"></video>
-      <video id="videoB" muted playsinline preload="metadata"></video>
-    </div>
+     <section>
+      <h2>Eternal Elysia</h2>
+      <p>Congratulations, you have fully mastered common VPN techniques</p>
 
-    <!-- 有用网站 -->
-    <section>
-      <h2>部分有用 & 有趣网站</h2>
-      <ul>
-        <li><a href="https://www.nodeseek.com/post-183694-1">常用 VPS 脚本</a></li>
-        <li><a href="https://downloads.khinsider.com/">此处使用的音乐下载站 1</a></li>
-        <li><a href="https://mp3juice.co/">此处使用的音乐下载站 2</a></li>
-        <li><a href="https://wallhaven.cc/index.php">实用电脑壁纸</a></li>
-        <li><a href="https://hstock.org/en">购买 Apple ID 等资源站点</a></li>
-        <li><a href="https://www.naifeistation.com/i/2EEaDt">购买 chatGpt Plus、Super Grok、YouTube、Netflix 会员等资源链接</a></li>
-        <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
-      </ul>
     </section>
 
-    <!-- 永恒爱莉希雅 -->
-    <section>
-      <h2>永恒爱莉希雅</h2>
-      <p>恭喜你，已完全掌握常用 VPN 技术</p>
-    </section>
-
-    <!-- 页脚 -->
     <footer>
-      Subscription Guide ver.3.24 
-      <br>© bestElysia 2025
-    </footer>
+  Subscription Guide ver.3.24 
+  <br>© bestElysia 2025
+</footer>
+
   </main>
 
-  <!-- 樱花视频（15 秒后淡出） -->
-  <video id="sakura-video" autoplay muted loop playsinline preload="auto"></video>
-
   <script>
-  // === 樱花视频播放 15 秒后淡出消失 ===
-  const video = document.getElementById('sakura-video');
-  video.src = 'assets/saruka.mp4';
+    // Countdown to 2025-12-31 23:59:59 (UTC+8)
+    const target = new Date('2025-12-31T23:59:59+08:00').getTime();
+    const el = document.getElementById('countdownNums');
+    function updateCount() {
+      const now = Date.now();
+      let diff = target - now;
+      if (diff < 0) diff = 0;
+      const days = Math.floor(diff / (24*60*60*1000));
+      diff -= days * 24*60*60*1000;
+      const hrs = Math.floor(diff / (60*60*1000));
+      diff -= hrs * 60*60*1000;
+      const mins = Math.floor(diff / (60*1000));
+      diff -= mins * 60*1000;
+      const secs = Math.floor(diff / 1000);
+      el.textContent = `${days} Days ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
+    }
+    updateCount(); setInterval(updateCount, 1000);
+  </script>
 
-  video.play().catch(() => {
-    console.log('自动播放被阻止，等待用户点击');
+<!--  Style -->
+<style>
+.music-player-floating {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 6px 12px;
+  box-shadow: 0 0 15px rgba(156,107,255,0.5);
+  transition: all 0.3s ease;
+}
+.music-player-floating:hover {
+  box-shadow: 0 0 22px rgba(156,107,255,0.8);
+  background: rgba(255, 255, 255, 0.35);
+}
+.music-player-floating audio {
+  width: 260px;
+  height: 32px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b388ff, #9c6bff);
+  accent-color: #9c6bff;
+}
+@media (max-width: 600px) {
+  .music-player-floating audio {
+    width: 200px;
+  }
+}
+  /*  Elysia Floating Animation */
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+.music-player-floating {
+  animation: floaty 5s ease-in-out infinite;
+}
+</style>
+
+<style>
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;  /*  Further back layer */
+  background: transparent;  /* Remove light background */
+  pointer-events: none;  /* Prevent intercepting mouse clicks */
+}
+</style>
+
+
+<script>
+// 🌌 Naked Eye 3D + Breathing Float Banner
+const banner3d = document.getElementById("banner3d");
+const bannerLayer = banner3d?.querySelector(".banner-layer");
+const bannerGlow = banner3d?.querySelector(".banner-glow");
+
+// 🌈 Desktop: Mouse 3D Parallax
+if (window.matchMedia("(pointer:fine)").matches && banner3d) {
+  banner3d.addEventListener("mousemove", e => {
+    const rect = banner3d.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotY = ((x / rect.width) - 0.5) * 16;
+    const rotX = ((y / rect.height) - 0.5) * -12;
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+    bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
   });
 
-  document.body.addEventListener('click', () => video.play(), { once: true });
+  banner3d.addEventListener("mouseleave", () => {
+    bannerLayer.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
+  });
+}
 
-  setTimeout(() => {
-    video.style.transition = 'opacity 1s ease-out';
-    video.style.opacity = '0';
-    setTimeout(() => video.pause(), 1000);
-  }, 15000);
-  </script>
+// 📱 Mobile: Scroll Parallax (Fake 3D)
+if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
+  window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    const rotX = Math.min(scrollY / 30, 10);
+    const rotY = Math.sin(scrollY / 180) * 8;
+    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+  });
+}
+</script>
 
-  <!-- 3D Banner 交互 -->
-  <script>
-  const banner3d = document.getElementById("banner3d");
-  const bannerLayer = banner3d?.querySelector(".banner-layer");
-  const bannerGlow = banner3d?.querySelector(".banner-glow");
-
-  if (window.matchMedia("(pointer:fine)").matches && banner3d) {
-    banner3d.addEventListener("mousemove", e => {
-      const rect = banner3d.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const rotY = ((x / rect.width) - 0.5) * 16;
-      const rotX = ((y / rect.height) - 0.5) * -12;
-      bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
-      bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
-    });
-    banner3d.addEventListener("mouseleave", () => {
-      bannerLayer.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
-      bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
-    });
+<style>
+/* 🌬️ Banner Breathing Float Animation */
+@keyframes bannerFloaty {
+  0%, 100% {
+    transform: translateY(0);
+    filter: brightness(1);
   }
-  </script>
-
-  <!-- 倒计时 -->
-  <script>
-  const target = new Date('2025-12-31T23:59:59+08:00').getTime();
-  const el = document.getElementById('countdownNums');
-  function updateCount() {
-    const now = Date.now();
-    let diff = target - now;
-    if (diff < 0) diff = 0;
-    const days = Math.floor(diff / (24*60*60*1000));
-    diff -= days * 24*60*60*1000;
-    const hrs = Math.floor(diff / (60*60*1000));
-    diff -= hrs * 60*60*1000;
-    const mins = Math.floor(diff / (60*1000));
-    diff -= mins * 60*1000;
-    const secs = Math.floor(diff / 1000);
-    el.textContent = `${days} Days ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
+  50% {
+    transform: translateY(-6px);
+    filter: brightness(1.05);
   }
-  updateCount(); setInterval(updateCount, 1000);
-  </script>
+}
 
-  <!-- 汉堡菜单 -->
-  <script>
-  const hamburger = document.getElementById('hamburger-menu');
-  const menu = document.getElementById('dropdown');
+/* 🌈 Naked Eye 3D Banner Container */
+.banner-3d {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 28px auto;
+  perspective: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
+  animation: bannerFloaty 8s ease-in-out infinite; /* 🫧 Breathing Float */
+}
 
-  function closeMenu() {
-    if (menu.classList.contains('show')) {
-      menu.classList.add('closing');
-      menu.addEventListener('animationend', function handler() {
-        menu.classList.remove('show', 'closing');
-        menu.removeEventListener('animationend', handler);
+.banner-3d .banner-layer {
+  transition: transform 0.25s ease-out;
+  transform-origin: center;
+}
+
+.banner-3d img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* ✨ Light Shadow Highlight Layer */
+.banner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: background-position 0.2s ease-out;
+}
+</style>
+
+
+<script>
+document.querySelectorAll('a[href]').forEach(a => {
+  if (!a.target) a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener noreferrer');
+});
+  
+</script>
+
+<script>
+// 禁止右键菜单
+document.addEventListener('contextmenu', e => e.preventDefault());
+// 禁止常见开发者快捷键（静默版）
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' || 
+    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+</script>
+
+<script>
+(function() {
+  // ========== 配置 ==========
+  const config = {
+    checkInterval: 1200,          // 检测频率(ms)
+    sizeThreshold: 160,           // outer - inner 超过这个值视为 DevTools docked (px)
+    timeThreshold: 120,           // debugger 导致的时间差阈值(ms)
+    onDetect: (detail) => {       // 检测回调（可替换为上报接口）
+      console.warn('[DevToolsDetect]', detail);
+      // 示例：如果想上报，可在这里 fetch('/log', {method:'POST', body: JSON.stringify(detail)})
+    },
+    ignoreMobile: true,           // 是否忽略移动设备
+    redirectUrl: '/404.html'      // 强制跳转的404页面URL（可自定义）
+  };
+
+  // ========== 预检：移动端跳过 ==========
+  if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+
+  // ========== 状态 ==========
+  let detected = false;
+  let lastDetectInfo = null;
+
+  // 内部安全重入保护
+  function markDetected(reason, meta = {}) {
+    if (detected) return;
+    detected = true;
+    lastDetectInfo = { reason, meta, time: new Date().toISOString(), ua: navigator.userAgent };
+    if (typeof config.onDetect === 'function') {
+      try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
+    }
+    forceRedirect();
+  }
+
+  // ========== 新增：强制跳转函数 ==========
+  function forceRedirect() {
+    try {
+      // 防止历史记录堆栈，替换当前URL并跳转
+      history.replaceState(null, '', config.redirectUrl);
+      window.location.href = config.redirectUrl;
+    } catch (e) {
+      // 备用简单跳转
+      window.location.href = config.redirectUrl;
+    }
+  }
+
+  // ========== 1) 控制台 getter 检测（最常见） ==========
+  (function consoleBait() {
+    try {
+      const bait = new Image();
+      Object.defineProperty(bait, 'id', {
+        get: function() {
+          markDetected('console-getter');
+          return '';
+        }
       });
+      // 周期向 console 输出 bait（控制台展开时会触发 getter）
+      setInterval(() => {
+        try {
+          console.log(bait);
+          // 移除 console.clear() 以减少可疑行为，避免被反检测
+        } catch (e) {}
+      }, config.checkInterval);
+    } catch (e) { /* ignore */ }
+  })();
+
+  // ========== 2) 窗口尺寸差检测（dock 模式） ==========
+  (function sizeCheck() {
+    setInterval(() => {
+      try {
+        const wdiff = Math.abs(window.outerWidth - window.innerWidth);
+        const hdiff = Math.abs(window.outerHeight - window.innerHeight);
+        if (wdiff > config.sizeThreshold || hdiff > config.sizeThreshold) {
+          markDetected('size-diff', { wdiff, hdiff, outerWidth: window.outerWidth, innerWidth: window.innerWidth, outerHeight: window.outerHeight, innerHeight: window.innerHeight });
+        }
+      } catch (e) {}
+    }, config.checkInterval);
+  })();
+
+  // ========== 3) 时间差（debugger）检测 ==========
+  (function debugTimeCheck() {
+    setInterval(() => {
+      try {
+        const t0 = performance.now();
+        // 当 DevTools 打开并处于某些暂停状态时，debugger 会造成明显时间延迟
+        try { debugger; } catch (_) {}
+        const diff = performance.now() - t0;
+        if (diff > config.timeThreshold) {
+          markDetected('debugger-time', { diff });
+        }
+      } catch (e) {}
+    }, config.checkInterval * 2);
+  })();
+
+  // ========== 优化：添加更多检测方法 ==========
+  // 4) RegExp toString 检测（DevTools 会修改 RegExp.prototype.toString）
+  (function regExpCheck() {
+    try {
+      const reg = /./;
+      if (reg.toString() !== '/./') {
+        markDetected('regexp-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 5) Function toString 检测（类似）
+  (function funcToStringCheck() {
+    try {
+      const func = function() {};
+      if (func.toString.toString().includes('[native code]') === false) {
+        markDetected('func-tostring');
+      }
+    } catch (e) {}
+  })();
+
+  // 初始调用额外检测
+  regExpCheck();
+  funcToStringCheck();
+
+  // ========== 辅助：暴露状态与手动触发 ==========
+  window.__DevToolsDetect = {
+    isDetected: () => detected,
+    lastInfo: () => lastDetectInfo,
+    reset: () => { detected = false; lastDetectInfo = null; }
+  };
+
+  // 移除初始 console.info 以减少足迹
+})();
+</script>
+
+<style>
+  /* Add Fade-Out Transition Animation */
+  .hamburger {
+    transition: opacity 0.5s ease;
+  }
+</style>
+
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  let hideTimer;
+
+  // Hide Menu Button
+  function hideHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '0';
+      hamburger.style.pointerEvents = 'none';
     }
   }
 
-  hamburger.addEventListener('click', function() {
-    if (menu.classList.contains('show')) {
-      closeMenu();
-    } else {
-      menu.classList.remove('closing');
-      menu.classList.add('show');
+  // Show Menu Button
+  function showHamburger() {
+    if (hamburger) {
+      hamburger.style.opacity = '1';
+      hamburger.style.pointerEvents = 'auto';
     }
+  }
+
+  // Reset Timer (Execute on User Interaction)
+  function resetHideTimer() {
+    showHamburger();
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideHamburger, 30000); // Hide after 30 seconds of inactivity
+  }
+
+  // Listen for User Interaction Events
+  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, resetHideTimer);
   });
 
-  document.addEventListener('click', function(event) {
-    if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
-      closeMenu();
-    }
-  });
-  </script>
+  // Initialize
+  resetHideTimer();
+</script>
 
-  <!-- 安全防护 -->
-  <script>
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('keydown', e => {
-    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
-
-  (function() {
-    const config = { checkInterval: 1200, sizeThreshold: 160, timeThreshold: 120, ignoreMobile: true, redirectUrl: '/404.html' };
-    if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
-    let detected = false;
-    function markDetected() { if (!detected) { detected = true; forceRedirect(); } }
-    function forceRedirect() {
-      try { history.replaceState(null, '', config.redirectUrl); window.location.href = config.redirectUrl; }
-      catch { window.location.href = config.redirectUrl; }
-    }
-    (function(){try{const b=new Image();Object.defineProperty(b,'id',{get:()=>markDetected()});setInterval(()=>console.log(b),config.checkInterval);}catch{}})();
-    (function(){setInterval(()=>{const w=Math.abs(window.outerWidth-window.innerWidth);const h=Math.abs(window.outerHeight-window.innerHeight);if(w>config.sizeThreshold||h>config.sizeThreshold)markDetected();},config.checkInterval);})();
-    (function(){setInterval(()=>{const t=performance.now();try{debugger;}catch{}if(performance.now()-t>config.timeThreshold)markDetected();},config.checkInterval*2);})();
-    (function(){try{if((/./).toString()!=='/./')markDetected();}catch{}})();
-    (function(){try{if((function(){}).toString().includes('[native code]')===false)markDetected();}catch{}})();
-  })();
-  </script>
 
 </body>
 </html>

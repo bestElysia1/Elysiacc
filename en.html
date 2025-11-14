@@ -272,27 +272,47 @@ main.container li:hover {
   .container .subtitle,
   .container .countdown div {
     word-break: break-word !important;     /* 长单词强制断行 */
-    overflow-wrap: anywhere !important;    /* 现代标准换行 */
-    hyphens: auto !important;              /* 自动添加连字符（可选） */
-    text-align: justify !important;        /* 两端对齐，提升排版美观 */
-    line-height: 1.85 !important;          /* 保持行高一致 */
+    overflow-wrap: anywhere !important;    /* 现代标准：任意位置换行 */
+    hyphens: auto !important;              /* 自动连字符（英文有效） */
+    text-align: justify !important;        /* 两端对齐 */
+    text-align-last: left !important;      /* 关键：最后一行左对齐，防止错位 */
+    line-height: 1.85 !important;          /* 行高舒适 */
   }
 
-  /* 特别处理通知列表（避免项目符号偏移） */
+  /* 强制非最后行也两端对齐（兼容性更强） */
+  .container p::after,
+  .container h2::after,
+  .container .subtitle::after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    height: 0;
+  }
+
+  /* 特别处理通知列表：项目符号对齐 */
+  .container ul {
+    padding-left: 1.2em;                   /* 留出符号空间 */
+    list-style-position: outside;
+  }
   .container ul li {
-    padding-left: 0.3em;
-    text-indent: -0.3em;
+    padding-left: 0;
+    text-indent: 0;
+    position: relative;
   }
   .container ul li::marker {
     unicode-bidi: isolate;
     font-variant-numeric: tabular-nums;
   }
 
-  /* 确保段落首行缩进统一（可选：更像出版物） */
+  /* 段落首行缩进控制（0 = 无缩进，你原意如此） */
   .container p:not(:empty) {
-    text-indent: 0;
+    text-indent: 0 !important;
   }
+
+  /* 可选：如果你想加中文出版物式首行缩进 2em，改成下面这行 */
+  /* .container p:not(:first-of-type):not(:empty) { text-indent: 2em !important; } */
 }
+
 </style>
   
 </head>

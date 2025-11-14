@@ -261,8 +261,8 @@ main.container li:hover {
   window.addEventListener("load", resetIdleTimer);
 </script>
 
-  <style>
-/* ==== iOS 文字排版：智能两端对齐 + 强制换行（不拉间距） ==== */
+<style>
+/* ==== iOS 文字排版终极修复：智能对齐 + 零拉伸 ==== */
 @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
   .container p,
   .container ul,
@@ -270,44 +270,46 @@ main.container li:hover {
   .container h2,
   .container .subtitle,
   .container .countdown div {
-    /* 1. 强制换行 */
-    word-break: break-word !important;     /* 长单词断行 */
-    overflow-wrap: anywhere !important;    /* 现代标准 */
-    hyphens: auto !important;              /* 自动连字符（可选） */
-
-    /* 2. 智能两端对齐 */
-    text-align: justify !important;        /* 正常行两端对齐 */
-    text-align-last: left !important;      /* 最后一行左对齐（关键！） */
-
-    /* 3. 禁止拉大间距 */
-    text-justify: inter-word !important;   /* 优先调节单词间距 */
-    letter-spacing: normal !important;     /* 字符间距不变 */
-    word-spacing: normal !important;       /* 单词间距不变 */
-
-    /* 4. 行高统一（可删） */
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    hyphens: auto !important;
+    text-align: justify !important;
+    text-align-last: left !important;
+    letter-spacing: 0 !important;
+    word-spacing: 0 !important;
+    text-justify: inter-word !important;
     line-height: 1.85 !important;
   }
 
-  /* 5. 列表符号位置修正（不影响内容间距） */
+  /* 单行段落强制左对齐 */
+  .container p {
+    max-height: calc(1.85em * 1.6);
+    overflow: hidden;
+  }
+  .container p:not(:has(br)):not(:has(span)):not(:has(a)):not(:has(strong)):not(:has(em)):not(:has(code)) {
+    text-align: left !important;
+    text-align-last: auto !important;
+  }
+
+  /* 列表符号 */
   .container ul li {
     padding-left: 0.3em !important;
     text-indent: -0.3em !important;
-    margin-top: inherit !important;
-    margin-bottom: inherit !important;
+    margin: inherit !important;
   }
   .container ul li::marker {
     unicode-bidi: isolate;
     font-variant-numeric: tabular-nums;
   }
 
-  /* 6. 段落首行缩进（可选） */
-  .container p:not(:empty) {
-    text-indent: 0 !important;
-    margin-top: inherit !important;
-    margin-bottom: inherit !important;
+  /* 特例：手动标记的单行段落 */
+  .container p.no-justify {
+    text-align: left !important;
+    text-align-last: auto !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
   }
 }
-
 </style>
   
 </head>

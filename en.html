@@ -262,24 +262,24 @@ main.container li:hover {
 </script>
 
   <style>
-/* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
+/* ==== iOS 文字排版修复：智能两端对齐（不拉伸短行）==== */
 @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  /* 针对 iOS 高清屏（iPhone/iPad） */
   .container p,
-  .container ul,
-  .container li,
   .container h2,
   .container .subtitle,
   .container .countdown div {
-    word-break: break-word !important;     /* 长单词强制断行 */
-    overflow-wrap: anywhere !important;    /* 现代标准：任意位置换行 */
-    hyphens: auto !important;              /* 自动连字符（英文有效） */
-    text-align: justify !important;        /* 两端对齐 */
-    text-align-last: left !important;      /* 关键：最后一行左对齐，防止错位 */
-    line-height: 1.85 !important;          /* 行高舒适 */
+    /* 基础换行与断词 */
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    hyphens: auto !important;
+    line-height: 1.85 !important;
+
+    /* 关键：整体左对齐 + 仅非最后行两端对齐 */
+    text-align: left !important;           /* 默认左对齐 */
+    text-align-last: justify !important;   /* 只有“非最后行”才两端对齐 */
   }
 
-  /* 强制非最后行也两端对齐（兼容性更强） */
+  /* 强制触发“非最后行”机制：插入一个占位的 inline-block */
   .container p::after,
   .container h2::after,
   .container .subtitle::after {
@@ -287,30 +287,33 @@ main.container li:hover {
     display: inline-block;
     width: 100%;
     height: 0;
+    line-height: 0;
   }
 
-  /* 特别处理通知列表：项目符号对齐 */
+  /* ========= 列表项目符号对齐 ========= */
   .container ul {
-    padding-left: 1.2em;                   /* 留出符号空间 */
+    padding-left: 1.2em;
     list-style-position: outside;
   }
   .container ul li {
-    padding-left: 0;
-    text-indent: 0;
-    position: relative;
+    text-align: left !important;
+    text-align-last: justify !important;
+  }
+  .container ul li::after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    height: 0;
   }
   .container ul li::marker {
     unicode-bidi: isolate;
     font-variant-numeric: tabular-nums;
   }
 
-  /* 段落首行缩进控制（0 = 无缩进，你原意如此） */
+  /* 段落首行缩进（可选） */
   .container p:not(:empty) {
-    text-indent: 0 !important;
+    text-indent: 0 !important; /* 你原意：不缩进 */
   }
-
-  /* 可选：如果你想加中文出版物式首行缩进 2em，改成下面这行 */
-  /* .container p:not(:first-of-type):not(:empty) { text-indent: 2em !important; } */
 }
 
 </style>

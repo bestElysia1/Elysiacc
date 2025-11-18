@@ -1,22 +1,65 @@
-笨蛋你想干什么！
-
-<img src="assets/bendan.jpg" alt="bendan" style="width:100%; height:auto;" />
-
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404</title>
     <style>
-       
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #content {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        /* 销毁动画：模拟Telegram的燃烧效果（渐变橙红 + 淡出 + 缩小） */
+        .destroy {
+            animation: burn 2s forwards; /* 动画持续2秒 */
+        }
+
+        @keyframes burn {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+                filter: brightness(1.5) hue-rotate(30deg); /* 橙红火焰色 */
+                box-shadow: 0 0 20px orange;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+                filter: brightness(0);
+            }
+        }
+
+        /* 用户提供的图片CSS动画 */
         @keyframes glowFlow {
             0% { background-position: 0% center; }
             100% { background-position: 200% center; }
         }
 
-      
         @keyframes breathe {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
             50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
         }
 
-       
-        img {
+        #bendan-img {
             width: 100%;
             height: auto;
             background: linear-gradient(90deg, 
@@ -31,5 +74,57 @@
                 breathe 3s ease-in-out infinite;
             border-radius: 8px;
             display: block;
+            margin: 20px auto;
+        }
+
+        #countdown {
+            font-size: 24px;
+            color: red;
+            margin-top: 10px;
+            display: none; /* 初始隐藏 */
         }
     </style>
+</head>
+<body>
+    <div id="content">
+        <h1>笨蛋你想干什么！</h1>
+        <img id="bendan-img" src="assets/bendan.jpg" alt="bendan">
+        <div id="countdown"></div>
+        <!-- 这里可以放其他内容 -->
+    </div>
+
+    <script>
+        // 页面加载后启动计时器
+        window.onload = function() {
+            var totalTime = 20; // 总自毁时间20秒
+            var countdownElement = document.getElementById('countdown');
+            var content = document.getElementById('content');
+
+            // 启动倒计时interval
+            var remaining = totalTime;
+            var interval = setInterval(function() {
+                remaining--;
+                if (remaining <= 10 && remaining > 0) {
+                    countdownElement.style.display = 'block';
+                    countdownElement.textContent = '剩余 ' + remaining + ' 秒...';
+                } else if (remaining <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+            // 20秒后触发销毁
+            setTimeout(function() {
+                if (content) {
+                    // 添加动画类
+                    content.classList.add('destroy');
+                    // 动画结束后移除内容（2秒动画时间）
+                    setTimeout(function() {
+                        content.remove(); // 或 content.style.display = 'none';
+                    }, 2000);
+                }
+                clearInterval(interval); // 停止interval
+            }, totalTime * 1000);
+        };
+    </script>
+</body>
+</html>

@@ -18,13 +18,13 @@
 
         #content {
             text-align: center;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            position: relative;
+            position: absolute;
+            top: 20px; /* 顶部放置 */
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1;
+            width: 100%;
+            max-width: 600px;
         }
 
         /* 粒子动画容器 */
@@ -77,13 +77,17 @@
             color: red;
             margin-top: 10px;
             display: none; /* 初始隐藏 */
-            position: relative;
+            position: absolute;
+            bottom: 20px; /* 倒计时放到页面底部 */
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1;
         }
 
         h1 {
-            position: relative;
-            z-index: 1;
+            margin: 0;
+            color: white; /* 白色以在图片上方可见，根据图片调整 */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 添加阴影提升可见度 */
         }
     </style>
 </head>
@@ -91,9 +95,8 @@
     <img id="bendan-img" src="assets/bendan.jpg" alt="bendan">
     <div id="content">
         <h1>笨蛋你想干什么！</h1>
-        <div id="countdown"></div>
-        <!-- 这里可以放其他内容 -->
     </div>
+    <div id="countdown"></div>
     <canvas id="particle-canvas"></canvas>
 
     <script>
@@ -108,40 +111,55 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            // 粒子系统参数
+            // 改进粒子系统：更细腻逼真，像Telegram燃烧（增加数量、多类型粒子、alpha渐变、模糊、随机速度）
             var particles = [];
-            var particleCount = 200; // 粒子数量
+            var particleCount = 500; // 增加粒子数量
             function createParticles() {
                 for (var i = 0; i < particleCount; i++) {
+                    var type = Math.random() > 0.7 ? 'smoke' : 'fire'; // 70%火花，30%烟雾
+                    var color;
+                    if (type === 'fire') {
+                        color = 'rgba(' + Math.floor(255 - Math.random() * 50) + ', ' + Math.floor(100 + Math.random() * 155) + ', 0, '; // 橙红火
+                    } else {
+                        color = 'rgba(100, 100, 100, '; // 灰色烟雾
+                    }
                     particles.push({
-                        x: Math.random() * canvas.width,
+                        x: Math.random() * canvas.width, // 全屏随机，但模拟从中心爆发
                         y: Math.random() * canvas.height,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: (Math.random() - 0.5) * 4 - 2, // 向上飘
-                        size: Math.random() * 5 + 1,
-                        color: 'rgba(255, ' + Math.floor(Math.random() * 100 + 155) + ', 0, ' + (Math.random() * 0.5 + 0.5) + ')', // 橙红火焰色
-                        life: Math.random() * 2 + 1 // 寿命秒
+                        vx: (Math.random() - 0.5) * 6, // 更随机速度
+                        vy: (Math.random() - 0.5) * 6 - 3, // 更向上飘，增加随机
+                        size: Math.random() * 4 + 1, // 小粒子
+                        alpha: 1, // 初始不透明
+                        color: color,
+                        life: Math.random() * 3 + 2, // 更长寿命
+                        type: type
                     });
                 }
             }
 
             function drawParticles() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'lighter'; // 叠加模式使火焰更亮
                 particles.forEach(function(p, index) {
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
+                    ctx.fillStyle = p.color + (p.alpha) + ')';
+                    ctx.shadowBlur = 10; // 添加模糊，提升逼真
+                    ctx.shadowColor = p.type === 'fire' ? 'orange' : 'gray';
                     ctx.fill();
 
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.size *= 0.95; // 缩小
-                    p.life -= 0.016; // 约60fps
+                    p.vy -= 0.05; // 轻微减速，模拟上升
+                    p.size *= 0.98; // 缓慢缩小
+                    p.alpha -= 0.01; // 渐变淡出
+                    p.life -= 0.016;
 
-                    if (p.life <= 0 || p.size < 0.1) {
+                    if (p.life <= 0 || p.alpha <= 0 || p.size < 0.1) {
                         particles.splice(index, 1);
                     }
                 });
+                ctx.globalCompositeOperation = 'source-over'; // 重置
 
                 if (particles.length > 0) {
                     requestAnimationFrame(drawParticles);
@@ -154,7 +172,7 @@
             var remaining = totalTime;
             var interval = setInterval(function() {
                 remaining--;
-                if (remaining <= 10 && remaining > 0) {
+                if (remaining <= 5 && remaining > 0) { // 改为从5s开始显示
                     countdownElement.style.display = 'block';
                     countdownElement.textContent = '剩余 ' + remaining + ' 秒...';
                 } else if (remaining <= 0) {
@@ -168,10 +186,11 @@
                     // 隐藏内容和图片
                     content.style.display = 'none';
                     img.style.display = 'none';
+                    countdownElement.style.display = 'none';
 
                     // 启动粒子燃烧动画
                     canvas.style.display = 'block';
-                    createParticles(); // 从随机位置生成粒子，模拟燃烧散开
+                    createParticles();
                     drawParticles();
                 }
                 clearInterval(interval); // 停止interval

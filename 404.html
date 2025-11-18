@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404</title>
+    <title>自毁网页示例</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            overflow: hidden; /* 防止滚动 */
         }
 
         #content {
@@ -22,33 +23,23 @@
             background-color: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* 销毁动画：模拟Telegram的燃烧效果（渐变橙红 + 淡出 + 缩小） */
-        .destroy {
-            animation: burn 2s forwards; /* 动画持续2秒 */
+        /* 粒子动画容器 */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            display: none; /* 初始隐藏 */
+            pointer-events: none; /* 不影响交互 */
         }
 
-        @keyframes burn {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-                filter: brightness(1);
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.8;
-                filter: brightness(1.5) hue-rotate(30deg); /* 橙红火焰色 */
-                box-shadow: 0 0 20px orange;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-                filter: brightness(0);
-            }
-        }
-
-        /* 用户提供的图片CSS动画 */
+        /* 用户提供的图片CSS动画 - 调整为全屏显示 */
         @keyframes glowFlow {
             0% { background-position: 0% center; }
             100% { background-position: 200% center; }
@@ -60,8 +51,12 @@
         }
 
         #bendan-img {
-            width: 100%;
-            height: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* 全屏覆盖，保持比例 */
             background: linear-gradient(90deg, 
                 transparent 0%, 
                 rgba(160,130,255,0.3) 30%, 
@@ -72,9 +67,9 @@
             animation: 
                 glowFlow 2s linear infinite,
                 breathe 3s ease-in-out infinite;
-            border-radius: 8px;
+            border-radius: 0; /* 移除圆角以全屏 */
             display: block;
-            margin: 20px auto;
+            z-index: 0; /* 图片在背景层 */
         }
 
         #countdown {
@@ -82,16 +77,24 @@
             color: red;
             margin-top: 10px;
             display: none; /* 初始隐藏 */
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
+    <img id="bendan-img" src="assets/bendan.jpg" alt="bendan">
     <div id="content">
         <h1>笨蛋你想干什么！</h1>
-        <img id="bendan-img" src="assets/bendan.jpg" alt="bendan">
         <div id="countdown"></div>
         <!-- 这里可以放其他内容 -->
     </div>
+    <canvas id="particle-canvas"></canvas>
 
     <script>
         // 页面加载后启动计时器
@@ -99,6 +102,53 @@
             var totalTime = 20; // 总自毁时间20秒
             var countdownElement = document.getElementById('countdown');
             var content = document.getElementById('content');
+            var img = document.getElementById('bendan-img');
+            var canvas = document.getElementById('particle-canvas');
+            var ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // 粒子系统参数
+            var particles = [];
+            var particleCount = 200; // 粒子数量
+            function createParticles() {
+                for (var i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4 - 2, // 向上飘
+                        size: Math.random() * 5 + 1,
+                        color: 'rgba(255, ' + Math.floor(Math.random() * 100 + 155) + ', 0, ' + (Math.random() * 0.5 + 0.5) + ')', // 橙红火焰色
+                        life: Math.random() * 2 + 1 // 寿命秒
+                    });
+                }
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(function(p, index) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.size *= 0.95; // 缩小
+                    p.life -= 0.016; // 约60fps
+
+                    if (p.life <= 0 || p.size < 0.1) {
+                        particles.splice(index, 1);
+                    }
+                });
+
+                if (particles.length > 0) {
+                    requestAnimationFrame(drawParticles);
+                } else {
+                    canvas.style.display = 'none';
+                }
+            }
 
             // 启动倒计时interval
             var remaining = totalTime;
@@ -114,16 +164,24 @@
 
             // 20秒后触发销毁
             setTimeout(function() {
-                if (content) {
-                    // 添加动画类
-                    content.classList.add('destroy');
-                    // 动画结束后移除内容（2秒动画时间）
-                    setTimeout(function() {
-                        content.remove(); // 或 content.style.display = 'none';
-                    }, 2000);
+                if (content && img) {
+                    // 隐藏内容和图片
+                    content.style.display = 'none';
+                    img.style.display = 'none';
+
+                    // 启动粒子燃烧动画
+                    canvas.style.display = 'block';
+                    createParticles(); // 从随机位置生成粒子，模拟燃烧散开
+                    drawParticles();
                 }
                 clearInterval(interval); // 停止interval
             }, totalTime * 1000);
+
+            // 窗口调整时更新canvas大小
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
         };
     </script>
 </body>

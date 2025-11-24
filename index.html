@@ -1181,30 +1181,97 @@ audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
 
 /* ======== 🎧 Media Session API（灵动岛 + 锁屏封面） ======== */
+/* ======== 🎧 Media Session API（灵动岛 + 锁屏封面 + 控制修复） ======== */
 function updateMediaSession(song) {
   if (!("mediaSession" in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: "Elysia Player",
-      album: "Piano Collection",
-      artwork: [
-        { src: song.cover, sizes: "96x96", type: "image/jpeg" },
-        { src: song.cover, sizes: "128x128", type: "image/jpeg" },
-        { src: song.cover, sizes: "192x192", type: "image/jpeg" },
-        { src: song.cover, sizes: "256x256", type: "image/jpeg" },
-        { src: song.cover, sizes: "512x512", type: "image/jpeg" }
-      ]
-    });
-    navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
-  } catch(e) {
-    console.warn("MediaSession update failed:", e);
+
+  // 1. 设置元数据（封面、标题）
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: song.title,
+    artist: "Elysia Player",
+    album: "Piano Collection",
+    artwork: [
+      { src: song.cover, sizes: "96x96", type: "image/jpeg" },
+      { src: song.cover, sizes: "128x128", type: "image/jpeg" },
+      { src: song.cover, sizes: "192x192", type: "image/jpeg" },
+      { src: song.cover, sizes: "256x256", type: "image/jpeg" },
+      { src: song.cover, sizes: "512x512", type: "image/jpeg" }
+    ]
+  });
+
+  // 2. 绑定动作处理器（这部分是你缺失的关键代码）
+  const actions = [
+    ['play', () => { audio.play(); playPauseBtn.textContent = "⏸"; }],
+    ['pause', () => { audio.pause(); playPauseBtn.textContent = "▶"; }],
+    ['previoustrack', () => { 
+        currentSong = (currentSong - 1 + songs.length) % songs.length; 
+        updateSong(); 
+    }],
+    ['nexttrack', () => { 
+        currentSong = (currentSong + 1) % songs.length; 
+        updateSong(); 
+    }],
+    ['seekto', (details) => {
+        if (details.fastSeek && 'fastSeek' in audio) {
+          audio.fastSeek(details.seekTime);
+          return;
+        }
+        audio.currentTime = details.seekTime;
+        updatePositionState(); // 拖动后立即更新状态
+    }],
+  ];
+
+  for (const [action, handler] of actions) {
+    try {
+      navigator.mediaSession.setActionHandler(action, handler);
+    } catch (error) {
+      console.log(`The media session action "${action}" is not supported yet.`);
+    }
   }
 }
 
-audio.addEventListener("play", () => updateMediaSession(songs[currentSong]));
-audio.addEventListener("pause", () => updateMediaSession(songs[currentSong]));
-audio.addEventListener("ended", () => updateMediaSession(songs[currentSong]));
+// 3. 更新播放进度状态（修复锁屏进度条无法拖动和显示时间不对的问题）
+function updatePositionState() {
+  if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime
+    });
+  }
+}
+
+// 监听音频事件以同步状态
+audio.addEventListener("play", () => {
+  player.classList.add("playing");
+  navigator.mediaSession.playbackState = "playing";
+  updatePositionState();
+});
+
+audio.addEventListener("pause", () => {
+  player.classList.remove("playing");
+  navigator.mediaSession.playbackState = "paused";
+  updatePositionState();
+});
+
+// 当歌曲加载完毕获取到时长时，更新锁屏的总时长显示
+audio.addEventListener('loadedmetadata', updatePositionState);
+
+// 偶尔更新进度防止不同步（可选，不必每秒都更）
+audio.addEventListener('timeupdate', () => {
+   // 每隔几秒或在特定节点同步一次即可，过于频繁可能消耗性能，
+   // 但对于 iOS 进度条平滑移动，主要依赖 loadedmetadata 和 seekto 的正确响应
+});
+
+audio.addEventListener("ended", () => {
+    // 自动切歌
+    nextBtn.click();
+    updateMediaSession(songs[currentSong]); // 确保下一首元数据刷新
+});
+
+// 初始化第一首歌的元数据
+updateMediaSession(songs[currentSong]);
+
 
 /* ======== 播放列表点击 ======== */
 playlist.addEventListener("click", e => {

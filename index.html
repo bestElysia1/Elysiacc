@@ -1177,7 +1177,6 @@ nextBtn.addEventListener("click", () => {
   updateSong();
 });
 
-audio.addEventListener("ended", () => nextBtn.click());
 audio.addEventListener("play", () => player.classList.add("playing"));
 audio.addEventListener("pause", () => player.classList.remove("playing"));
 

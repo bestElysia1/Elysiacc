@@ -4,11 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elysia Secret Page</title>
+  
   <link rel="icon" href="assets/bestbanner.png" type="image/png" />
   <link rel="apple-touch-icon" href="assets/bestbanner.png" />
-   <link rel="icon" href="assets/razee.PNG" type="image/png" />
+  <link rel="icon" href="assets/razee.PNG" type="image/png" />
   <link rel="apple-touch-icon" href="assets/razee.PNG" />
  
+  <link rel="stylesheet" href="hamburger.css">
+
   <style>
     body {
       margin: 0;
@@ -129,31 +132,6 @@
       box-shadow: 0 0 20px rgba(180,150,255,0.8);
     }
 
-    /* === 雪花样式 === */
-    .sakura {
-      position: fixed;
-      top: -10px;
-      z-index: 999;
-      user-select: none;
-      pointer-events: none;
-      animation: fall linear forwards;
-    }
-
-    @keyframes fall {
-      0% {
-        transform: translateX(0) translateY(0) rotate(0deg);
-        opacity: 1;
-      }
-      50% {
-        transform: translateX(20px) translateY(55vh) rotate(360deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateX(-20px) translateY(110vh) rotate(720deg);
-        opacity: 0;
-      }
-    }
-
     /* === Banner 样式 === */
     .banner-container {
       width: 100%;
@@ -166,256 +144,113 @@
       max-width: 100%;
       height: auto;
       border-radius: 10px;
-      animation: float 3s ease-in-out infinite; /* 已移除 breathe */
+      animation: float 3s ease-in-out infinite;
     }
 
     @keyframes float {
-      0% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-      100% {
-        transform: translateY(0);
-      }
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
     }
 
-   
+    /* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
+    @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+      .container p,
+      .container ul,
+      .container li,
+      .container h2,
+      .container .subtitle,
+      .container .countdown div {
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        hyphens: auto !important;
+        text-align: justify !important;
+        line-height: 1.85 !important;
+      }
+      .container ul li {
+        padding-left: 0.3em;
+        text-indent: -0.3em;
+      }
+      .container ul li::marker {
+        unicode-bidi: isolate;
+        font-variant-numeric: tabular-nums;
+      }
+      .container p:not(:empty) {
+        text-indent: 0;
+      }
+    }
   </style>
   
-<script type="text/javascript">
-  // Crisp 初始化
-  window.$crisp = [];
-  window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
+  <script type="text/javascript">
+    // Crisp 初始化
+    window.$crisp = [];
+    window.CRISP_WEBSITE_ID = "f93484dd-433f-47f2-a23c-efda76003699";
 
-  (function() {
-    var d = document;
-    var s = d.createElement("script");
-    s.src = "https://client.crisp.chat/l.js";
-    s.async = 1;
-    d.getElementsByTagName("head")[0].appendChild(s);
-  })();
+    (function() {
+      var d = document;
+      var s = d.createElement("script");
+      s.src = "https://client.crisp.chat/l.js";
+      s.async = 1;
+      d.getElementsByTagName("head")[0].appendChild(s);
+    })();
 
-  // 自动隐藏逻辑
-  let idleTimer;
-  const idleTime = 10000; // 30秒无操作后隐藏
+    // 自动隐藏逻辑
+    let idleTimer;
+    const idleTime = 10000; // 30秒无操作后隐藏 (注释说30秒但代码写的是10000即10秒，按代码为准)
 
-  function resetIdleTimer() {
-    clearTimeout(idleTimer);
-    showCrisp();
-    idleTimer = setTimeout(hideCrisp, idleTime);
-  }
-
-  function hideCrisp() {
-    if (window.$crisp) {
-      window.$crisp.push(["do", "chat:hide"]);
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      showCrisp();
+      idleTimer = setTimeout(hideCrisp, idleTime);
     }
-  }
 
-  function showCrisp() {
-    if (window.$crisp) {
-      window.$crisp.push(["do", "chat:show"]);
+    function hideCrisp() {
+      if (window.$crisp) {
+        window.$crisp.push(["do", "chat:hide"]);
+      }
     }
-  }
 
-  // 监听用户活动（滚动、点击、键盘）
-  ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
-    document.addEventListener(evt, resetIdleTimer, { passive: true });
-  });
+    function showCrisp() {
+      if (window.$crisp) {
+        window.$crisp.push(["do", "chat:show"]);
+      }
+    }
 
-  // 初始化计时器
-  window.addEventListener("load", resetIdleTimer);
-</script>
+    // 监听用户活动
+    ["scroll", "mousemove", "keydown", "click", "touchstart"].forEach(evt => {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
 
-  
-  <style>
-/* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
-@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  /* 针对 iOS 高清屏（iPhone/iPad） */
-  .container p,
-  .container ul,
-  .container li,
-  .container h2,
-  .container .subtitle,
-  .container .countdown div {
-    word-break: break-word !important;     /* 长单词强制断行 */
-    overflow-wrap: anywhere !important;    /* 现代标准换行 */
-    hyphens: auto !important;              /* 自动添加连字符（可选） */
-    text-align: justify !important;        /* 两端对齐，提升排版美观 */
-    line-height: 1.85 !important;          /* 保持行高一致 */
-  }
-
-  /* 特别处理通知列表（避免项目符号偏移） */
-  .container ul li {
-    padding-left: 0.3em;
-    text-indent: -0.3em;
-  }
-  .container ul li::marker {
-    unicode-bidi: isolate;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* 确保段落首行缩进统一（可选：更像出版物） */
-  .container p:not(:empty) {
-    text-indent: 0;
-  }
-}
-</style>
+    window.addEventListener("load", resetIdleTimer);
+  </script>
   
 </head>
 <body>
 
-<!-- 爱莉希雅入口按钮 -->
-<!-- HTML部分：汉堡按钮和下拉菜单 -->
 <div class="hamburger" id="hamburger-menu" aria-label="菜单">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
 </div>
 
-<!-- 下拉菜单（初始隐藏） -->
 <ul class="dropdown-menu" id="dropdown">
   <li><a href="index.html">Home</a></li>
   <li><a href="elysia-3d.html">Elysia</a></li>
   <li><a href="en.html">EN</a></li>
 </ul>
 
-<!-- CSS样式（整合效果best的macOS动画，保留原弹出尺寸） -->
-<style>
-.hamburger {
-  position: fixed;
-  left: 14px;
-  top: 14px;
-  width: 44px;
-  height: 44px;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  align-items: center;
-  z-index: 10001;
-  background: rgba(255,255,255,0.04);
-  border-radius: 10px;
-  padding: 6px;
-  text-decoration: none;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-  transition: all 0.3s ease;
-  cursor: pointer; /* 添加指针样式，表示可点击 */
-}
-.hamburger:hover {
-  box-shadow: 0 0 25px rgba(150,120,255,0.25);
-  transform: scale(1.05);
-}
-.hb-line {
-  display: block;
-  width: 20px;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-  background-size: 200% auto;
-  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
-  transition: all 0.3s ease; /* 为动画添加过渡 */
-}
-
-/* 下拉菜单样式（整合效果best：macOS Dock弹出动画，保留原尺寸） */
-.dropdown-menu {
-  position: fixed;
-  left: 14px;
-  top: 60px; /* 汉堡按钮下方位置 */
-  width: 200px; /* 菜单宽度，可调整 */
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px;
-  list-style: none;
-  margin: 0;
-  z-index: 10000;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-  display: none; /* 初始隐藏 */
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
-  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
-  transform-origin: top left; /* 从左上角弹出 */
-}
-.dropdown-menu.show {
-  display: block;
-  opacity: 1;
-  pointer-events: auto;
-  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
-}
-.dropdown-menu li {
-  margin: 5px 0;
-}
-.dropdown-menu a {
-  color: #cdbaff; /* 更亮的淡紫色文字 */
-  text-decoration: none;
-  display: block;
-  padding: 8px;
-  border-radius: 5px;
-  transition: background 0.2s;
-}
-.dropdown-menu a:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-/* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
-@keyframes dockPop {
-  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
-  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); } /* 轻微向下反弹，保留小规模 */
-  100% { transform: translateY(0) scale(1); filter: brightness(1); }
-}
-</style>
-
-<!-- JavaScript脚本：处理点击事件（移除active toggle） -->
-<script>
-document.getElementById('hamburger-menu').addEventListener('click', function() {
-  // Toggle 菜单显示
-  var menu = document.getElementById('dropdown');
-  menu.classList.toggle('show');
-});
-
-// 可选：点击菜单外关闭（增强体验）
-document.addEventListener('click', function(event) {
-  var hamburger = document.getElementById('hamburger-menu');
-  var menu = document.getElementById('dropdown');
-  if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
-    menu.classList.remove('show');
-  }
-});
-</script>
-
-<style>
-/* 流动微光 */
-@keyframes glowFlow {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-/* 已移除 @keyframes breathe（白光呼吸） */
-</style>
-  <nav class="leftnav" aria-hidden="true">
-   
-  </nav>
+  <nav class="leftnav" aria-hidden="true"></nav>
 
   <main>
     <div class="banner-container">
       <img src="assets/bestbanner.png" alt="Best Banner" class="banner-img">
     </div>
     
-<!-- 替换你原来的 razee 图片区块 -->
-<div class="banner-container" style="margin-top: 30px;">
-  <img src="assets/razee.PNG" alt="Razee" class="banner-img" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
-  <p style="margin: 10px 0 0; color: #9d7cff; font-size: 1rem; font-weight: 500;">
-  </p>
-</div>
-    
+    <div class="banner-container" style="margin-top: 30px;">
+      <img src="assets/razee.PNG" alt="Razee" class="banner-img" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+      <p style="margin: 10px 0 0; color: #9d7cff; font-size: 1rem; font-weight: 500;">
+      </p>
+    </div>
     
     <h1>This page has been fully encrypted</h1>
     <h1>This page has been fully encrypted</h1>
@@ -426,11 +261,11 @@ document.addEventListener('click', function(event) {
   <footer>
     <div class="elysia-footer-icons">
       <a href="#" 
-   onclick="navigator.clipboard.writeText('bestElysia+support@hotmail.com'); alert('邮箱已复制！去你的网页邮箱粘贴发送吧~'); return false;" 
-   class="email-icon" 
-   title="复制邮箱地址">
-  💌
-</a>
+         onclick="navigator.clipboard.writeText('bestElysia+support@hotmail.com'); alert('邮箱已复制！去你的网页邮箱粘贴发送吧~'); return false;" 
+         class="email-icon" 
+         title="复制邮箱地址">
+        💌
+      </a>
       <a href="https://t.me/bestElysia_bot" title="Telegram">
         <img src="assets/tele1.jpg" alt="Telegram" class="tele-icon">
       </a>
@@ -458,13 +293,12 @@ document.addEventListener('click', function(event) {
       el.style.transitionDelay = `${i * 0.15}s`;
     });
   });
-
   </script>
 
   <script>
-// 禁止右键菜单
+  // 禁止右键菜单
   document.addEventListener('contextmenu', e => e.preventDefault());
-    // 禁止
+  // 禁止调试快捷键
   document.addEventListener('keydown', e => {
     if (
       e.key === 'F12' || 
@@ -478,172 +312,148 @@ document.addEventListener('click', function(event) {
   </script>
 
   <script>
-(function() {
-  // ========== 配置 ==========
-  const config = {
-    checkInterval: 1200,          // 检测频率(ms)
-    sizeThreshold: 160,           // outer - inner 超过这个值视为 DevTools docked (px)
-    timeThreshold: 120,           // debugger 导致的时间差阈值(ms)
-    onDetect: (detail) => {       // 检测回调（可替换为上报接口）
-      console.warn('[DevToolsDetect]', detail);
-      // 示例：如果想上报，可在这里 fetch('/log', {method:'POST', body: JSON.stringify(detail)})
-    },
-    ignoreMobile: true,           // 是否忽略移动设备
-    redirectUrl: '/404.html'      // 强制跳转的404页面URL（可自定义）
-  };
+  // === DevTools 检测与防护脚本 ===
+  (function() {
+    const config = {
+      checkInterval: 1200,
+      sizeThreshold: 160,
+      timeThreshold: 120,
+      onDetect: (detail) => {
+        console.warn('[DevToolsDetect]', detail);
+      },
+      ignoreMobile: true,
+      redirectUrl: '/404.html' 
+    };
 
-  // ========== 预检：移动端跳过 ==========
-  if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+    if (config.ignoreMobile && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
 
-  // ========== 状态 ==========
-  let detected = false;
-  let lastDetectInfo = null;
+    let detected = false;
+    let lastDetectInfo = null;
 
-  // 内部安全重入保护
-  function markDetected(reason, meta = {}) {
-    if (detected) return;
-    detected = true;
-    lastDetectInfo = { reason, meta, time: new Date().toISOString(), ua: navigator.userAgent };
-    if (typeof config.onDetect === 'function') {
-      try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
+    function markDetected(reason, meta = {}) {
+      if (detected) return;
+      detected = true;
+      lastDetectInfo = { reason, meta, time: new Date().toISOString(), ua: navigator.userAgent };
+      if (typeof config.onDetect === 'function') {
+        try { config.onDetect(lastDetectInfo); } catch (e) { console.error(e); }
+      }
+      forceRedirect();
     }
-    forceRedirect();
-  }
 
-  // ========== 新增：强制跳转函数 ==========
-  function forceRedirect() {
-    try {
-      // 防止历史记录堆栈，替换当前URL并跳转
-      history.replaceState(null, '', config.redirectUrl);
-      window.location.href = config.redirectUrl;
-    } catch (e) {
-      // 备用简单跳转
-      window.location.href = config.redirectUrl;
+    function forceRedirect() {
+      try {
+        history.replaceState(null, '', config.redirectUrl);
+        window.location.href = config.redirectUrl;
+      } catch (e) {
+        window.location.href = config.redirectUrl;
+      }
     }
-  }
 
-  // ========== 1) 控制台 getter 检测（最常见） ==========
-  (function consoleBait() {
-    try {
-      const bait = new Image();
-      Object.defineProperty(bait, 'id', {
-        get: function() {
-          markDetected('console-getter');
-          return '';
-        }
-      });
-      // 周期向 console 输出 bait（控制台展开时会触发 getter）
+    // 1) Console getter 检测
+    (function consoleBait() {
+      try {
+        const bait = new Image();
+        Object.defineProperty(bait, 'id', {
+          get: function() {
+            markDetected('console-getter');
+            return '';
+          }
+        });
+        setInterval(() => {
+          try {
+            console.log(bait);
+          } catch (e) {}
+        }, config.checkInterval);
+      } catch (e) {}
+    })();
+
+    // 2) 窗口尺寸检测
+    (function sizeCheck() {
       setInterval(() => {
         try {
-          console.log(bait);
-          // 移除 console.clear() 以减少可疑行为，避免被反检测
+          const wdiff = Math.abs(window.outerWidth - window.innerWidth);
+          const hdiff = Math.abs(window.outerHeight - window.innerHeight);
+          if (wdiff > config.sizeThreshold || hdiff > config.sizeThreshold) {
+            markDetected('size-diff', { wdiff, hdiff });
+          }
         } catch (e) {}
       }, config.checkInterval);
-    } catch (e) { /* ignore */ }
-  })();
+    })();
 
-  // ========== 2) 窗口尺寸差检测（dock 模式） ==========
-  (function sizeCheck() {
-    setInterval(() => {
+    // 3) Debugger 时间差检测
+    (function debugTimeCheck() {
+      setInterval(() => {
+        try {
+          const t0 = performance.now();
+          try { debugger; } catch (_) {}
+          const diff = performance.now() - t0;
+          if (diff > config.timeThreshold) {
+            markDetected('debugger-time', { diff });
+          }
+        } catch (e) {}
+      }, config.checkInterval * 2);
+    })();
+
+    // 4) RegExp toString 检测
+    (function regExpCheck() {
       try {
-        const wdiff = Math.abs(window.outerWidth - window.innerWidth);
-        const hdiff = Math.abs(window.outerHeight - window.innerHeight);
-        if (wdiff > config.sizeThreshold || hdiff > config.sizeThreshold) {
-          markDetected('size-diff', { wdiff, hdiff, outerWidth: window.outerWidth, innerWidth: window.innerWidth, outerHeight: window.outerHeight, innerHeight: window.innerHeight });
+        const reg = /./;
+        if (reg.toString() !== '/./') {
+          markDetected('regexp-tostring');
         }
       } catch (e) {}
-    }, config.checkInterval);
-  })();
+    })();
 
-  // ========== 3) 时间差（debugger）检测 ==========
-  (function debugTimeCheck() {
-    setInterval(() => {
+    // 5) Function toString 检测
+    (function funcToStringCheck() {
       try {
-        const t0 = performance.now();
-        // 当 DevTools 打开并处于某些暂停状态时，debugger 会造成明显时间延迟
-        try { debugger; } catch (_) {}
-        const diff = performance.now() - t0;
-        if (diff > config.timeThreshold) {
-          markDetected('debugger-time', { diff });
+        const func = function() {};
+        if (func.toString.toString().includes('[native code]') === false) {
+          markDetected('func-tostring');
         }
       } catch (e) {}
-    }, config.checkInterval * 2);
+    })();
+
+    regExpCheck();
+    funcToStringCheck();
   })();
+  </script>
 
-  // ========== 优化：添加更多检测方法 ==========
-  // 4) RegExp toString 检测（DevTools 会修改 RegExp.prototype.toString）
-  (function regExpCheck() {
-    try {
-      const reg = /./;
-      if (reg.toString() !== '/./') {
-        markDetected('regexp-tostring');
-      }
-    } catch (e) {}
-  })();
+  <video id="sakura-video" autoplay muted loop playsinline></video>
 
-  // 5) Function toString 检测（类似）
-  (function funcToStringCheck() {
-    try {
-      const func = function() {};
-      if (func.toString.toString().includes('[native code]') === false) {
-        markDetected('func-tostring');
-      }
-    } catch (e) {}
-  })();
+  <script>
+  // === 本地樱花视频播放 ===
+  const video = document.getElementById('sakura-video');
+  video.src = 'assets/saruka.mp4'; 
+  video.play().catch(() => {
+    console.log('自动播放被阻止（正常），用户交互后可播放');
+  });
+  </script>
 
-  // 初始调用额外检测
-  regExpCheck();
-  funcToStringCheck();
-
-  // ========== 辅助：暴露状态与手动触发 ==========
-  window.__DevToolsDetect = {
-    isDetected: () => detected,
-    lastInfo: () => lastDetectInfo,
-    reset: () => { detected = false; lastDetectInfo = null; }
-  };
-
-  // 移除初始 console.info 以减少足迹
-})();
-</script>
-
-<!-- 本地樱花视频特效（超小体积） -->
-<video id="sakura-video" autoplay muted loop playsinline></video>
-
-<script>
-// === 本地樱花视频播放 ===
-const video = document.getElementById('sakura-video');
-
-// 使用你本地的 MP4 文件
-video.src = 'assets/saruka.mp4'; // ← 你的转码后文件
-
-// 自动播放（静音 + playsinline 解决 iOS 问题）
-video.play().catch(() => {
-  console.log('自动播放被阻止（正常），用户交互后可播放');
-});
-</script>
-
-<style>
-/* === 樱花视频层 === */
-#sakura-video {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  z-index: 997;
-  opacity: 1.0;
-  mix-blend-mode: screen;
-  transform: scale(1.15);
-}
-
-/* 手机优化 */
-@media (max-width: 768px) {
+  <style>
+  /* === 樱花视频层 === */
   #sakura-video {
-    opacity: 0.7;
-    transform: scale(1.25);
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 997;
+    opacity: 1.0;
+    mix-blend-mode: screen;
+    transform: scale(1.15);
   }
-}
-</style>
+
+  /* 手机优化 */
+  @media (max-width: 768px) {
+    #sakura-video {
+      opacity: 0.7;
+      transform: scale(1.25);
+    }
+  }
+  </style>
+
+  <script src="hamburger.js" defer></script>
 
 </body>
 </html>

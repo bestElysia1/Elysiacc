@@ -1,31 +1,31 @@
-/* hamburger.js */
+/* hamburger.js - Logic for Elysia Navigation */
 
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById('hamburger-menu');
   const menu = document.getElementById('dropdown');
   
-  // 30秒无操作后自动隐藏按钮
-  const AUTO_HIDE_DELAY = 30000;
+  // 30秒无操作自动隐藏按钮
   let hideTimer;
+  const AUTO_HIDE_DELAY = 30000;
 
   // ============================
-  // 1. 核心开关逻辑
+  // 1. 菜单开关逻辑
   // ============================
   function toggleMenu() {
     if (!menu) return;
-    
-    // 切换 show 类
-    const isShowing = menu.classList.toggle('show');
-    
-    // 如果打开了菜单，给按钮一个微小的缩放反馈，增加交互实感
-    if (isShowing && hamburger) {
-      hamburger.style.transform = "scale(0.9)";
-      setTimeout(() => {
-        // 清除内联样式，恢复 CSS 定义的 hover/default 状态
-        hamburger.style.transform = ""; 
-      }, 200);
-      
-      resetHideTimer(); // 打开菜单时重置计时器
+
+    // 切换 .show 类
+    const isOpening = !menu.classList.contains('show');
+    menu.classList.toggle('show');
+
+    if (isOpening) {
+      // 打开时，给按钮一个微小的缩放反馈
+      if (hamburger) {
+        hamburger.style.transform = "scale(0.95)";
+        setTimeout(() => { hamburger.style.transform = ""; }, 200);
+      }
+      // 菜单打开时，重置并暂停自动隐藏
+      showHamburger();
     }
   }
 
@@ -34,22 +34,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // 2. 事件绑定
+  // 2. 事件监听
   // ============================
   
   // 按钮点击
   if (hamburger) {
     hamburger.addEventListener('click', (e) => {
-      e.stopPropagation(); // 防止冒泡触发 document 点击
+      e.stopPropagation(); // 阻止冒泡
       toggleMenu();
     });
   }
 
-  // 点击空白处关闭
+  // 点击外部关闭
   document.addEventListener('click', (e) => {
     // 只有当菜单显示时才检测
     if (menu && menu.classList.contains('show')) {
-      // 如果点击目标既不是菜单内部，也不是汉堡按钮
+      // 点击目标既不是菜单内部，也不是按钮本身
       if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
         closeMenu();
       }
@@ -57,25 +57,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ============================
-  // 3. 自动隐藏按钮 (沉浸模式)
+  // 3. 按钮自动隐藏逻辑 (沉浸模式)
   // ============================
   function hideHamburger() {
-    // 如果菜单正开着，绝对不隐藏按钮
+    // ⚠️ 关键优化：如果菜单是打开的，绝对不要隐藏按钮
     if (menu && menu.classList.contains('show')) return;
     
-    if (hamburger) hamburger.classList.add('fade-out');
+    if (hamburger) {
+      hamburger.classList.add('fade-out');
+    }
   }
 
   function showHamburger() {
-    if (hamburger) hamburger.classList.remove('fade-out');
-    
-    // 重置倒计时
+    if (hamburger) {
+      hamburger.classList.remove('fade-out');
+    }
+    // 重置计时器
     clearTimeout(hideTimer);
     hideTimer = setTimeout(hideHamburger, AUTO_HIDE_DELAY);
   }
 
-  // 监听用户活动，唤醒按钮
-  ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+  // 监听所有用户交互，重置计时器
+  const events = ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'];
+  events.forEach(evt => {
     window.addEventListener(evt, showHamburger);
   });
 

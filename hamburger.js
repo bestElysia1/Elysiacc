@@ -14,18 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleMenu() {
     if (!menu) return;
 
-    // 切换 .show 类
+    // 切换 .show 类触发 CSS 动画
     const isOpening = !menu.classList.contains('show');
-    menu.classList.toggle('show');
-
+    
     if (isOpening) {
+      menu.classList.add('show');
       // 打开时，给按钮一个微小的缩放反馈
       if (hamburger) {
-        hamburger.style.transform = "scale(0.95)";
+        hamburger.style.transform = "scale(0.92)";
         setTimeout(() => { hamburger.style.transform = ""; }, 200);
       }
       // 菜单打开时，重置并暂停自动隐藏
       showHamburger();
+    } else {
+      menu.classList.remove('show');
     }
   }
 
@@ -60,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. 按钮自动隐藏逻辑 (沉浸模式)
   // ============================
   function hideHamburger() {
-    // ⚠️ 关键优化：如果菜单是打开的，绝对不要隐藏按钮
+    // 如果菜单是打开的，绝对不要隐藏按钮
     if (menu && menu.classList.contains('show')) return;
     
     if (hamburger) {

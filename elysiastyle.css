@@ -1,0 +1,353 @@
+/* elysiastyle.css - Core Layout & Visual Effects */
+
+:root {
+  --accent-start: #9a6ef0;
+  --accent-end: #7b3fe4;
+  --link: #8f66f0;
+  --bg: #ffffff;
+  --maxw: 980px;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial, sans-serif;
+  color: #333;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  letter-spacing: 0.3px;
+  line-height: 1.85;
+}
+
+.container {
+  max-width: var(--maxw);
+  margin: 28px auto;
+  padding: 0 48px;
+}
+
+.banner {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #888;
+  margin-top: 6px;
+  font-size: 0.92rem;
+}
+
+.music {
+  margin-left: auto;
+}
+
+iframe {
+  border-radius: 6px;
+  border: 0;
+}
+
+/* =========================================
+   🌌 Elysia — 液态紫粉玻璃倒计时
+   ========================================= */
+.countdown {
+  position: relative;
+  margin: 22px 0;
+  padding: 20px 28px;
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 4px 18px rgba(160,120,255,0.3);
+  animation: countdownFloat 8s ease-in-out infinite;
+}
+
+/* 💫 液态流光背景 */
+.countdown::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
+    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
+    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+  filter: blur(40px);
+  animation: blobMove 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 🕒 倒计时数字与标题 */
+.countdown div {
+  color: rgba(240,230,255,0.9);
+  font-size: 0.96rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(180,140,255,0.6);
+}
+
+.countdown .nums {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #d9caff;
+  text-shadow:
+    0 0 10px rgba(180,140,255,0.8),
+    0 0 20px rgba(160,120,255,0.4);
+}
+
+/* ✨ 轻微呼吸漂浮 */
+@keyframes countdownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 🌊 背景液态移动 */
+@keyframes blobMove {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(6%, -4%) scale(1.05); }
+  50% { transform: translate(-5%, 5%) scale(1.02); }
+  75% { transform: translate(3%, -3%) scale(1.07); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+/* =========================================
+   内容排版
+   ========================================= */
+section {
+  margin-top: 28px;
+  animation: fadeInUp 0.8s ease both;
+}
+
+h2 {
+  font-size: 1.02rem;
+  margin: 8px 0 14px 0;
+  padding-left: 10px;
+  border-left: 4px solid rgba(123,63,228,0.12);
+  color: var(--accent-end);
+  background: linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));
+  padding: 8px;
+  border-radius: 6px;
+  /* 标题渐变 */
+  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  transition: all 0.6s ease;
+}
+
+h2:hover {
+  animation: gradientFlow 3s linear infinite;
+}
+
+/* 全局正文淡紫色优化 */
+p, ul, li {
+  color: #7a66c7 !important;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+a:hover { text-decoration: underline; }
+
+/* 鼠标悬停轻微变色 */
+main.container p:hover,
+main.container li:hover {
+  color: #9a6ef0 !important;
+  transition: all 0.3s ease;
+}
+
+pre {
+  background: #faf6ff;
+  border: 1px solid rgba(123,63,228,0.06);
+  padding: 10px;
+  border-radius: 8px;
+  overflow: auto;
+  color: #5b4aa1;
+}
+
+footer {
+  margin: 36px 0 0 0;
+  padding-top: 12px;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid rgba(156,107,255,0.2);
+  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
+  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
+  transition: all 0.4s ease;
+}
+
+footer:hover {
+  text-shadow: 0 0 6px rgba(156,107,255,0.6);
+  color: #bca9ff;
+}
+
+/* =========================================
+   布局与响应式
+   ========================================= */
+.leftnav {
+  position: fixed;
+  left: 12px;
+  top: 120px;
+  width: 160px;
+}
+.leftnav ul { list-style: none; padding: 0; margin: 0; }
+.leftnav li { margin: 8px 0; color: var(--link); font-size: 0.9rem; }
+
+@media (max-width: 900px) {
+  .container { padding: 0 18px; }
+  .leftnav { display: none; }
+  header { flex-direction: column; align-items: flex-start; }
+  .music { margin-left: 0; margin-top: 8px; }
+}
+
+/* 动画关键帧 */
+@keyframes glowPulse {
+  0%, 100% { color: #9a6ef0; text-shadow: 0 0 4px rgba(156,107,255,0.4); }
+  50% { color: #ffffff; text-shadow: 0 0 10px rgba(156,107,255,0.9); }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   🌈 裸眼3D Banner
+   ========================================= */
+.banner-3d {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 28px auto;
+  perspective: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
+  animation: bannerFloaty 8s ease-in-out infinite;
+}
+
+.banner-3d .banner-layer {
+  transition: transform 0.25s ease-out;
+  transform-origin: center;
+}
+
+.banner-3d img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+.banner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: background-position 0.2s ease-out;
+}
+
+@keyframes bannerFloaty {
+  0%, 100% { transform: translateY(0); filter: brightness(1); }
+  50% { transform: translateY(-6px); filter: brightness(1.05); }
+}
+
+/* =========================================
+   📺 视频容器
+   ========================================= */
+.elysia-video-wrapper {
+  position: relative;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(150,120,255,0.15);
+}
+
+.elysia-video-wrapper video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: opacity 0.8s ease-in-out;
+  background: #000;
+}
+#videoA { opacity: 1; z-index: 2; }
+#videoB { opacity: 0; z-index: 1; }
+
+/* 星空背景容器 */
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* =========================================
+   📱 iOS 排版修复
+   ========================================= */
+@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+  .container p, .container ul, .container li, .container h2, .container .subtitle, .container .countdown div {
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    hyphens: auto !important;
+    text-align: justify !important;
+    line-height: 1.85 !important;
+  }
+  .container ul li { padding-left: 0.3em; text-indent: -0.3em; }
+  .container ul li::marker { unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+  .container p:not(:empty) { text-indent: 0; }
+}

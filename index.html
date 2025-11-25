@@ -4,9 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.3.24</title>
-    <!-- ✅ 网站商标 favicon -->
   <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
   <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
+  
+  <link rel="stylesheet" href="hamburger.css">
+  
   <style>
     :root{
       --accent-start: #9a6ef0;
@@ -17,89 +19,83 @@
     }
     html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333; -webkit-overflow-scrolling: touch; touch-action: pan-y;}
     body {
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
-  letter-spacing: 0.3px;
-  line-height: 1.85;
-}
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
+      letter-spacing: 0.3px;
+      line-height: 1.85;
+    }
     .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
     .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
     .banner img{width:100%;height:auto;display:block}
-    .banner img{width:100%;height:auto;display:block}
 
-/* 🌈 裸眼3D Banner 效果 */
-.banner-3d {
-  position: relative;
-  ...
-}
     header{display:flex;align-items:center;justify-content:space-between;gap:20px}
     .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
     .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
     .music{margin-left:auto}
     iframe{border-radius:6px;border:0}
-    /* countdown */
-   /* 🌌 Elysia — 液态紫粉玻璃倒计时 */
-.countdown {
-  position: relative;
-  margin: 22px 0;
-  padding: 20px 28px;
-  border-radius: 18px;
-  overflow: hidden;
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    0 4px 18px rgba(160,120,255,0.3);
-  animation: countdownFloat 8s ease-in-out infinite;
-}
+    
+    /* 🌌 Elysia — 液态紫粉玻璃倒计时 */
+    .countdown {
+      position: relative;
+      margin: 22px 0;
+      padding: 20px 28px;
+      border-radius: 18px;
+      overflow: hidden;
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        0 4px 18px rgba(160,120,255,0.3);
+      animation: countdownFloat 8s ease-in-out infinite;
+    }
 
-/* 💫 液态流光背景 */
-.countdown::before {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  background:
-    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
-    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-  filter: blur(40px);
-  animation: blobMove 14s ease-in-out infinite;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
+    /* 💫 液态流光背景 */
+    .countdown::before {
+      content: "";
+      position: absolute;
+      inset: -25%;
+      background:
+        radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
+        radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
+        radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+      filter: blur(40px);
+      animation: blobMove 14s ease-in-out infinite;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
 
-/* 🕒 倒计时数字与标题 */
-.countdown div {
-  color: rgba(240,230,255,0.9);
-  font-size: 0.96rem;
-  margin-bottom: 8px;
-  text-shadow: 0 0 10px rgba(180,140,255,0.6);
-}
-.countdown .nums {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  color: #d9caff;
-  text-shadow:
-    0 0 10px rgba(180,140,255,0.8),
-    0 0 20px rgba(160,120,255,0.4);
-}
+    /* 🕒 倒计时数字与标题 */
+    .countdown div {
+      color: rgba(240,230,255,0.9);
+      font-size: 0.96rem;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(180,140,255,0.6);
+    }
+    .countdown .nums {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: #d9caff;
+      text-shadow:
+        0 0 10px rgba(180,140,255,0.8),
+        0 0 20px rgba(160,120,255,0.4);
+    }
 
-/* ✨ 轻微呼吸漂浮 */
-@keyframes countdownFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
+    /* ✨ 轻微呼吸漂浮 */
+    @keyframes countdownFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
 
-/* 🌊 背景液态移动 */
-@keyframes blobMove {
-  0% { transform: translate(0,0) scale(1); }
-  25% { transform: translate(6%, -4%) scale(1.05); }
-  50% { transform: translate(-5%, 5%) scale(1.02); }
-  75% { transform: translate(3%, -3%) scale(1.07); }
-  100% { transform: translate(0,0) scale(1); }
-}
+    /* 🌊 背景液态移动 */
+    @keyframes blobMove {
+      0% { transform: translate(0,0) scale(1); }
+      25% { transform: translate(6%, -4%) scale(1.05); }
+      50% { transform: translate(-5%, 5%) scale(1.02); }
+      75% { transform: translate(3%, -3%) scale(1.07); }
+      100% { transform: translate(0,0) scale(1); }
+    }
     .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
     /* content */
     section{margin-top:28px}
@@ -109,20 +105,20 @@
     a:hover{text-decoration:underline}
     pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
     footer {
-  margin: 36px 0 0 0;
-  padding-top: 12px;
-  color: #999;
-  font-size: 0.85rem;
-  text-align: center;
-  border-top: 1px solid rgba(156,107,255,0.2);
-  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
-  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
-  transition: all 0.4s ease;
-}
-footer:hover {
-  text-shadow: 0 0 6px rgba(156,107,255,0.6);
-  color: #bca9ff;
-}
+      margin: 36px 0 0 0;
+      padding-top: 12px;
+      color: #999;
+      font-size: 0.85rem;
+      text-align: center;
+      border-top: 1px solid rgba(156,107,255,0.2);
+      background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
+      box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
+      transition: all 0.4s ease;
+    }
+    footer:hover {
+      text-shadow: 0 0 6px rgba(156,107,255,0.6);
+      color: #bca9ff;
+    }
 
     /* layout */
     .leftnav{position:fixed;left:12px;top:120px;width:160px}
@@ -135,116 +131,75 @@ footer:hover {
       header{flex-direction:column;align-items:flex-start}
       .music{margin-left:0;margin-top:8px}
     }
-/*  Elysia 呼吸发光渐亮效果 */
-@keyframes glowPulse {
-  0% {
-    color: #9a6ef0;
-    text-shadow: 0 0 4px rgba(156,107,255,0.4),
-                 0 0 8px rgba(156,107,255,0.2);
-  }
-  50% {
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(156,107,255,0.9),
-                 0 0 20px rgba(156,107,255,0.6),
-                 0 0 30px rgba(156,107,255,0.3);
-  }
-  100% {
-    color: #9a6ef0;
-    text-shadow: 0 0 4px rgba(156,107,255,0.4),
-                 0 0 8px rgba(156,107,255,0.2);
-  }
-}
+    
+    /* Elysia 标题渐变流动 + 发光组合 */
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
 
-/*  Elysia 标题渐变流动 + 发光组合 */
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
+    h2 {
+      background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      transition: all 0.6s ease;
+    }
 
-h2 {
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  transition: all 0.6s ease;
-}
+    h2:hover {
+      animation: gradientFlow 3s linear infinite;
+    }
 
-h2:hover {
-  animation: gradientFlow 3s linear infinite, glowPulse 1.8s ease-in-out infinite;
-}
+    /* 全局正文淡紫色优化（Elysia 风格） */
+    p, ul, li {
+      color: #7a66c7 !important; /* 柔和淡紫色 */
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
 
-/*  全局正文淡紫色优化（Elysia 风格） */
-p, ul, li {
-  color: #7a66c7 !important; /* 柔和淡紫色 */
-  line-height: 1.8;
-  font-size: 0.95rem;
-}
+    /* 鼠标悬停轻微变色 */
+    main.container p:hover,
+    main.container li:hover {
+      color: #9a6ef0 !important;
+      transition: all 0.3s ease;
+    }
 
-/*  强制让正文显示淡紫色 */
-main.container p,
-main.container ul,
-main.container li {
-  color: #7a66c7 !important;
-  line-height: 1.8;
-  font-size: 0.95rem;
-}
-
-/*  鼠标悬停轻微发光 */
-main.container p:hover,
-main.container li:hover {
-  color: #9a6ef0 !important;
-  text-shadow: 0 0 6px rgba(156,107,255,0.4);
-  transition: all 0.3s ease;
-}
-
-
+    /* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
+    @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+      .container p,
+      .container ul,
+      .container li,
+      .container h2,
+      .container .subtitle,
+      .container .countdown div {
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        hyphens: auto !important;
+        text-align: justify !important;
+        line-height: 1.85 !important;
+      }
+      .container ul li {
+        padding-left: 0.3em;
+        text-indent: -0.3em;
+      }
+      .container ul li::marker {
+        unicode-bidi: isolate;
+        font-variant-numeric: tabular-nums;
+      }
+      .container p:not(:empty) {
+        text-indent: 0;
+      }
+    }
   </style>
-  
-  <style>
-/* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
-@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  /* 针对 iOS 高清屏（iPhone/iPad） */
-  .container p,
-  .container ul,
-  .container li,
-  .container h2,
-  .container .subtitle,
-  .container .countdown div {
-    word-break: break-word !important;     /* 长单词强制断行 */
-    overflow-wrap: anywhere !important;    /* 现代标准换行 */
-    hyphens: auto !important;              /* 自动添加连字符（可选） */
-    text-align: justify !important;        /* 两端对齐，提升排版美观 */
-    line-height: 1.85 !important;          /* 保持行高一致 */
-  }
-
-  /* 特别处理通知列表（避免项目符号偏移） */
-  .container ul li {
-    padding-left: 0.3em;
-    text-indent: -0.3em;
-  }
-  .container ul li::marker {
-    unicode-bidi: isolate;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* 确保段落首行缩进统一（可选：更像出版物） */
-  .container p:not(:empty) {
-    text-indent: 0;
-  }
-}
-</style>
-  
 </head>
 <body>
-<!-- 爱莉希雅入口按钮 -->
-<!-- HTML部分：汉堡按钮和下拉菜单 -->
+
 <div class="hamburger" id="hamburger-menu" aria-label="菜单">
   <span class="hb-line"></span>
   <span class="hb-line"></span>
   <span class="hb-line"></span>
 </div>
 
-<!-- 下拉菜单（初始隐藏） -->
 <ul class="dropdown-menu" id="dropdown">
   <li><a href="index.html">Home</a></li>
   <li><a href="elysia-3d.html">Elysia</a></li>
@@ -252,149 +207,20 @@ main.container li:hover {
   <li><a href="speedtest.html">IP Test</a></li>
 </ul>
 
-<!-- CSS样式（整合效果best的macOS动画，保留原弹出尺寸） -->
-<style>
-.hamburger {
-  position: fixed;
-  left: 14px;
-  top: 14px;
-  width: 44px;
-  height: 44px;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  align-items: center;
-  z-index: 10001;
-  background: rgba(255,255,255,0.04);
-  border-radius: 10px;
-  padding: 6px;
-  text-decoration: none;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-  transition: all 0.3s ease;
-  cursor: pointer; /* 添加指针样式，表示可点击 */
-}
-.hamburger:hover {
-  box-shadow: 0 0 25px rgba(150,120,255,0.25);
-  transform: scale(1.05);
-}
-.hb-line {
-  display: block;
-  width: 20px;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-  background-size: 200% auto;
-  animation: glowFlow 3s linear infinite, breathe 3s ease-in-out infinite;
-  transition: all 0.3s ease; /* 为动画添加过渡 */
-}
-
-/* 下拉菜单样式（整合效果best：macOS Dock弹出动画，保留原尺寸） */
-.dropdown-menu {
-  position: fixed;
-  left: 14px;
-  top: 80px; /* 汉堡按钮下方位置 */
-  width: 210px; /* 菜单宽度，可调整 */
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px;
-  list-style: none;
-  margin: 0;
-  z-index: 10000;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 20px rgba(150,120,255,0.12);
-  display: none; /* 初始隐藏 */
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-10px) scale(0.95); /* 保留原初始状态：从上方轻微位移 + 缩小 */
-  transition: transform 0.6s cubic-bezier(.22,1,.36,1), opacity .36s ease; /* 平滑过渡 */
-  transform-origin: top left; /* 从左上角弹出 */
-}
-.dropdown-menu.show {
-  display: block;
-  opacity: 1;
-  pointer-events: auto;
-  animation: dockPop 0.62s cubic-bezier(.22,.9,.36,1) forwards; /* 应用效果best动画 */
-}
-.dropdown-menu li {
-  margin: 5px 0;
-}
-.dropdown-menu a {
-  color: #cdbaff; /* 更亮的淡紫色文字 */
-  text-decoration: none;
-  display: block;
-  padding: 8px;
-  border-radius: 5px;
-  transition: background 0.2s;
-}
-.dropdown-menu a:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-/* 效果best的核心动画 keyframes（调整数值以匹配原尺寸） */
-@keyframes dockPop {
-  0% { transform: translateY(-10px) scale(0.95); filter: brightness(.92); }
-  55% { transform: translateY(2px) scale(1.02); filter: brightness(1.12); } /* 轻微向下反弹，保留小规模 */
-  100% { transform: translateY(0) scale(1); filter: brightness(1); }
-}
-</style>
-
-<!-- JavaScript脚本：处理点击事件（移除active toggle） -->
-<script>
-document.getElementById('hamburger-menu').addEventListener('click', function() {
-  // Toggle 菜单显示
-  var menu = document.getElementById('dropdown');
-  menu.classList.toggle('show');
-});
-
-// 可选：点击菜单外关闭（增强体验）
-document.addEventListener('click', function(event) {
-  var hamburger = document.getElementById('hamburger-menu');
-  var menu = document.getElementById('dropdown');
-  if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
-    menu.classList.remove('show');
-  }
-});
-</script>
-
-<style>
-/* 流动微光 */
-@keyframes glowFlow {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-/* 呼吸光晕 */
-@keyframes breathe {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(160,130,255,0.4); }
-  50% { opacity: 1; box-shadow: 0 0 12px rgba(160,130,255,0.8); }
-}
-</style>
   <nav class="leftnav" aria-hidden="true">
    
   </nav>
 
   <main class="container">
-    <!-- 🌌 裸眼3D Banner -->
-<div class="banner-3d" id="banner3d">
-  <div class="banner-layer">
-    <img src="assets/banner.jpg" alt="Banner">
-  </div>
-  <div class="banner-glow"></div>
-</div>
+    <div class="banner-3d" id="banner3d">
+      <div class="banner-layer">
+        <img src="assets/banner.jpg" alt="Banner">
+      </div>
+      <div class="banner-glow"></div>
+    </div>
 
     <header>
-
-
-</div>
-
-      
-    </header>
+      </header>
 
     <div class="countdown" id="countdown" aria-live="polite">
       <div style="font-size:0.95rem;color:#666;margin-bottom:6px">倒计时</div>
@@ -755,7 +581,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCount(); setInterval(updateCount, 1000);
   </script>
 
-<!--  样式 -->
 <style>
 .music-player-floating {
   position: fixed;
@@ -788,7 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
     width: 200px;
   }
 }
-  /*  Elysia 浮动动画 */
+  /* Elysia 浮动动画 */
 @keyframes floaty {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -4px); }
@@ -803,7 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: -2;  /*  更靠后一层 */
+  z-index: -2;  /* 更靠后一层 */
   background: transparent;  /* 去掉浅色背景 */
   pointer-events: none;  /* 防止拦截鼠标点击 */
 }
@@ -898,7 +723,6 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 }
 </style>
 
-<!-- === Elysia 播放器（无敌版本） === -->
 <div class="elysia-player">
   <div class="elysia-controls">
     <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
@@ -1478,50 +1302,8 @@ document.querySelectorAll('a[href]').forEach(a => {
   
 </script>
 
-<style>
-  /* 增加淡出过渡动画 */
-  .hamburger {
-    transition: opacity 0.5s ease;
-  }
-</style>
-
-<script>
-  const hamburger = document.querySelector('.hamburger');
-  let hideTimer;
-
-  // 隐藏菜单按钮
-  function hideHamburger() {
-    if (hamburger) {
-      hamburger.style.opacity = '0';
-      hamburger.style.pointerEvents = 'none';
-    }
-  }
-
-  // 显示菜单按钮
-  function showHamburger() {
-    if (hamburger) {
-      hamburger.style.opacity = '1';
-      hamburger.style.pointerEvents = 'auto';
-    }
-  }
-
-  // 重置计时器（有用户操作时执行）
-  function resetHideTimer() {
-    showHamburger();
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(hideHamburger, 30000); // 30秒无操作后隐藏
-  }
-
-  // 监听用户交互事件
-  ['mousemove', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
-    window.addEventListener(evt, resetHideTimer);
-  });
-
-  // 初始化
-  resetHideTimer();
-</script>
-
 <script src="deeptools.js"></script>
+<script src="hamburger.js" defer></script>
 
 </body>
 </html>

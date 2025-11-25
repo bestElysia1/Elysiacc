@@ -1,14 +1,21 @@
-/* hamburger.css */
+/* hamburger.css - VisionOS Liquid Glass Edition */
+
+:root {
+  /* 定义超弹性弹簧曲线 (Spring Physics) */
+  --ease-elastic-out: cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  /* 更夸张的果冻回弹 */
+  --ease-jelly: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
 
 /* =========================================
-   1. iOS 16 风格汉堡按钮 (Liquid Glass)
+   1. iOS Vision/Future 风格汉堡按钮
    ========================================= */
 .hamburger {
   position: fixed;
   left: 18px;
   top: 18px;
-  width: 48px;
-  height: 48px;
+  width: 52px; /* 稍微加大一点以展示细节 */
+  height: 52px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -16,156 +23,186 @@
   align-items: center;
   z-index: 10001;
   
-  /* iOS 玻璃质感核心 */
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* --- 液态玻璃核心 --- */
+  /* 1. 渐变半透明背景 */
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.5) 0%, 
+    rgba(255, 255, 255, 0.1) 100%
+  );
   
-  border-radius: 14px; /* iOS 典型的平滑圆角 */
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  /* 2. 强力磨砂 */
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
   
-  /* 复合阴影模拟液态光感 */
+  /* 3. 形状 */
+  border-radius: 16px; 
+  
+  /* 4. 复杂的光影边框 (模拟玻璃厚度) */
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
+  border-left: 1px solid rgba(255, 255, 255, 0.6);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* 5. 投影与辉光 */
   box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    0 8px 32px 0 rgba(156, 107, 255, 0.15), /* 紫色漫射光 */
+    inset 0 0 10px rgba(255, 255, 255, 0.3); /* 内部光感 */
     
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* 果冻回弹过渡 */
+  transition: transform 0.4s var(--ease-elastic-out), opacity 0.4s ease;
+  will-change: transform, opacity;
 }
 
-/* 悬停状态：更亮，轻微放大 */
+/* 悬停：内部发光增强 */
 .hamburger:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.6) 0%, 
+    rgba(255, 255, 255, 0.2) 100%
+  );
   box-shadow: 
-    0 8px 25px rgba(156, 107, 255, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  transform: scale(1.05);
+    0 12px 40px 0 rgba(156, 107, 255, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.6);
+  transform: scale(1.08) translateY(2px);
 }
 
-/* 点击/激活状态：按压感 */
+/* 点击：按压凹陷感 */
 .hamburger:active {
-  transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0.9) translateY(0);
+  box-shadow: 0 2px 10px 0 rgba(156, 107, 255, 0.2);
 }
 
-/* 内部线条：渐变色 */
+/* 内部线条：液态金属质感 */
 .hb-line {
   display: block;
-  width: 22px;
-  height: 2.5px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #b388ff, #7b3fe4);
-  transition: transform 0.3s ease, width 0.3s ease;
+  width: 24px;
+  height: 3px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #d9caff, #9a6ef0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
 }
 
-/* 按钮自动隐藏时的淡出效果 */
+/* 自动隐藏时的状态 */
 .hamburger.fade-out {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.8);
+  transform: scale(0.6) rotate(-10deg); /* 旋转消失 */
 }
 
 /* =========================================
-   2. macOS Dock 风格下拉菜单
+   2. macOS Dock 风格下拉菜单 (Physics Edition)
    ========================================= */
 .dropdown-menu {
   position: fixed;
   left: 18px;
-  top: 82px; /* 避开按钮 */
+  top: 86px; /* 位于按钮正下方 */
   width: 220px;
   
-  /* 强力毛玻璃背景 */
-  background: rgba(250, 250, 255, 0.65);
-  backdrop-filter: blur(25px) saturate(200%);
-  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  /* --- 磨砂玻璃 --- */
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 10px;
   list-style: none;
   margin: 0;
   z-index: 10000;
   
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  /* 玻璃边框 */
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+    0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
-  /* 默认隐藏状态 */
+  /* 默认隐藏 */
   display: none;
   opacity: 0;
-  transform-origin: top left; /* 从左上角（按钮方向）弹出 */
+  
+  /* 关键：变换原点设为左上角，模拟从按钮喷出 */
+  transform-origin: 10% -10px; 
 }
 
-/* 菜单项样式 */
+/* 菜单项 */
 .dropdown-menu li {
-  margin: 4px 0;
+  margin: 6px 0;
 }
 
 .dropdown-menu a {
   display: block;
-  padding: 10px 14px;
-  border-radius: 10px;
-  color: #5b4aa1;
-  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #6a5acd;
+  font-weight: 600;
   text-decoration: none;
   font-size: 0.95rem;
   transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  background: transparent;
 }
 
-/* 菜单项 Hover：类似 macOS 菜单的高亮 */
+/* 菜单项 Hover：果冻高亮 */
 .dropdown-menu a:hover {
-  background: rgba(154, 110, 240, 0.15);
+  background: rgba(154, 110, 240, 0.12);
   color: #7b3fe4;
-  transform: translateX(4px);
+  transform: scale(1.02); /* 轻微放大 */
 }
 
 /* =========================================
-   3. 核心动画 (Dock Pop Effect)
+   3. 核心物理动画 (The Elastic Pop)
    ========================================= */
 
-/* 打开状态类 */
+/* 打开状态 */
 .dropdown-menu.is-open {
   display: block;
-  animation: dockPopOpen 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+  /* 使用 jelly 曲线：时间 0.6s */
+  animation: menuElasticEnter 0.6s var(--ease-jelly) forwards;
 }
 
-/* 关闭状态类 (用于执行退出动画) */
+/* 关闭状态 */
 .dropdown-menu.is-closing {
-  display: block; /* 保持显示直到动画结束 */
-  animation: dockPopClose 0.35s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+  display: block;
+  animation: menuElasticExit 0.35s cubic-bezier(0.5, 0, 0.7, 0.2) forwards;
   pointer-events: none;
 }
 
-/* 🟢 动画：弹出 (类似 Dock 图标弹起) */
-@keyframes dockPopOpen {
+/* 🟢 进场动画：极具弹性的“嘭” */
+@keyframes menuElasticEnter {
   0% {
     opacity: 0;
-    transform: scale(0.4) translateY(-20px) translateX(-10px);
+    transform: scale(0.2) translateY(-40px); /* 初始极小且靠上 */
     filter: blur(10px);
   }
-  60% {
-    transform: scale(1.05) translateY(2px); /* 过冲一点点，制造弹性 */
+  40% {
+    opacity: 1;
+  }
+  50% {
+    /* 第一次过冲：放大到 1.1 倍 */
+    transform: scale(1.1) translateY(4px); 
     filter: blur(0px);
   }
+  70% {
+    /* 回弹：缩小到 0.95 倍 */
+    transform: scale(0.95) translateY(-2px);
+  }
   100% {
-    opacity: 1;
+    /* 稳定 */
     transform: scale(1) translateY(0);
+    opacity: 1;
   }
 }
 
-/* 🔴 动画：收回 (快速缩小消失) */
-@keyframes dockPopClose {
+/* 🔴 退场动画：快速吸入消失 */
+@keyframes menuElasticExit {
   0% {
     opacity: 1;
     transform: scale(1) translateY(0);
-    filter: blur(0px);
+    filter: blur(0);
   }
   100% {
     opacity: 0;
-    transform: scale(0.6) translateY(-15px);
-    filter: blur(8px);
+    transform: scale(0.5) translateY(-30px); /* 向回缩 */
+    filter: blur(10px);
   }
 }

@@ -1,79 +1,167 @@
-/* hamburger.js */
+/* hamburger.css - VisionOS Style & Smooth Physics */
 
-document.addEventListener("DOMContentLoaded", () => {
-  const hamburger = document.getElementById('hamburger-menu');
-  const menu = document.getElementById('dropdown');
+:root {
+  /* iOS 风格黄金曲线：极速响应，优雅刹车 (No bounce, just fluid landing) */
+  --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================
+   1. 汉堡按钮 (Crystal Orb)
+   ========================================= */
+.hamburger {
+  position: fixed;
+  left: 18px;
+  top: 18px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  z-index: 10001;
   
-  // 自动隐藏配置
-  let hideTimer;
-  const AUTO_HIDE_TIME = 30000;
-
-  // ============================
-  // 1. 菜单开关 (Toggle)
-  // ============================
-  function toggleMenu() {
-    // 检查是否有 show 类
-    const isShow = menu.classList.contains('show');
+  /* --- 玻璃质感核心 --- */
+  /* 背景：极淡的白，主要靠模糊撑起质感 */
+  background: rgba(255, 255, 255, 0.25);
+  
+  /* 滤镜：VisionOS 同款高斯模糊+色彩增益 */
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  
+  border-radius: 14px;
+  
+  /* 边框：模拟光线扫过边缘 */
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  
+  /* 阴影：外部柔光 + 内部厚度折射 */
+  box-shadow: 
+    0 8px 20px -5px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
     
-    if (isShow) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  }
+  cursor: pointer;
+  
+  /* 变换过渡 */
+  transition: transform 0.4s var(--ease-fluid), background 0.3s ease, opacity 0.4s ease;
+  will-change: transform;
+}
 
-  function openMenu() {
-    menu.classList.add('show');
-    // 按钮本身轻微反馈
-    if(hamburger) hamburger.style.transform = "scale(0.92)";
-    setTimeout(() => { if(hamburger) hamburger.style.transform = ""; }, 150);
-    resetHideTimer();
-  }
+/* 悬停状态：更透亮，轻微上浮 */
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 12px 28px -8px rgba(156, 107, 255, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
 
-  function closeMenu() {
-    menu.classList.remove('show');
-  }
+/* 点击状态：按压反馈 */
+.hamburger:active {
+  transform: translateY(0) scale(0.92);
+  background: rgba(255, 255, 255, 0.5);
+}
 
-  // ============================
-  // 2. 点击事件绑定
-  // ============================
-  if (hamburger) {
-    hamburger.addEventListener('click', (e) => {
-      e.stopPropagation(); // 阻止冒泡
-      toggleMenu();
-    });
-  }
+/* 内部线条 */
+.hb-line {
+  width: 20px;
+  height: 2.5px;
+  background: #5b4aa1;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
 
-  // 点击外部关闭
-  document.addEventListener('click', (e) => {
-    // 如果点击的不是菜单内部，且不是汉堡按钮，且菜单是打开的
-    if (menu.classList.contains('show') && 
-        !menu.contains(e.target) && 
-        !hamburger.contains(e.target)) {
-      closeMenu();
-    }
-  });
+/* 自动隐藏 (Fade Out) */
+.hamburger.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
 
-  // ============================
-  // 3. 自动隐藏逻辑
-  // ============================
-  function hideHamburger() {
-    // 菜单打开时禁止隐藏按钮
-    if (menu.classList.contains('show')) return;
-    if (hamburger) hamburger.classList.add('fade-out');
-  }
+/* =========================================
+   2. 下拉菜单 (Liquid Panel)
+   ========================================= */
+.dropdown-menu {
+  position: fixed;
+  left: 18px;
+  top: 78px; /* 紧贴按钮下方 */
+  width: 210px;
+  
+  /* --- 玻璃质感 --- */
+  background: rgba(255, 255, 255, 0.45); /* 稍微提高一点不透明度以适配复杂背景 */
+  backdrop-filter: blur(50px) saturate(220%); /* 极致模糊 */
+  -webkit-backdrop-filter: blur(50px) saturate(220%);
+  
+  border-radius: 18px;
+  padding: 8px;
+  list-style: none;
+  margin: 0;
+  z-index: 10000;
+  
+  /* 边框与光感 */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 25px 60px -10px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8), /* 顶部强高光 */
+    inset 0 0 20px rgba(255, 255, 255, 0.15); /* 内部通透感 */
 
-  function showHamburger() {
-    if (hamburger) hamburger.classList.remove('fade-out');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(hideHamburger, AUTO_HIDE_TIME);
-  }
+  /* 初始隐形状态 */
+  opacity: 0;
+  visibility: hidden;
+  
+  /* 变形原点：左上角 (从按钮处生长出来) */
+  transform-origin: 8px 0; 
+  transform: scale(0.7) translateY(-20px);
+  
+  /* 默认只保留关闭时的快速过渡 */
+  transition: 
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0.25s;
+}
 
-  // 监听各种操作以重置计时器
-  ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
-    window.addEventListener(evt, showHamburger);
-  });
+/* 菜单项 */
+.dropdown-menu li {
+  margin: 2px 0;
+}
 
-  // 初始化
-  showHamburger();
-});
+.dropdown-menu a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: #4a3f6d;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.94rem;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* 菜单项 Hover */
+.dropdown-menu a:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: #7b3fe4;
+  /* 简单的位移，不做夸张变形，保持高级感 */
+  transform: translateX(4px); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* =========================================
+   3. 动画控制 (Animation State)
+   ========================================= */
+
+/* 打开状态 (.show) */
+.dropdown-menu.show {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  
+  /* 关键：覆盖默认 transition，应用高级物理曲线 */
+  /* duration 0.5s + fluid bezier = 丝般顺滑 */
+  transition: 
+    opacity 0.35s ease,
+    transform 0.5s var(--ease-fluid);
+}

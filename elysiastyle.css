@@ -76,7 +76,7 @@ iframe {
 }
 
 /* =========================================
-   🌌 Elysia — 液态紫粉玻璃倒计时
+   🌌 Elysia — 液态紫粉玻璃倒计时 (修复模糊版)
    ========================================= */
 .countdown {
   position: relative;
@@ -84,14 +84,25 @@ iframe {
   padding: 20px 28px;
   border-radius: 18px;
   overflow: hidden;
+  
+  /* 修复1：保留毛玻璃，但强制硬件加速 */
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
   border: 1px solid rgba(255,255,255,0.18);
+  
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.15),
     0 4px 18px rgba(160,120,255,0.3);
+    
+  /* 修复2：优化动画渲染，防止文字变糊 */
   animation: countdownFloat 8s ease-in-out infinite;
+  transform: translateZ(0); /* 开启3D加速 */
+  will-change: transform;   /* 告诉浏览器这个元素会动，请提前准备 */
+  backface-visibility: hidden; /* 修复边缘锯齿 */
+  
+  /* 建立层叠上下文，确保文字在伪元素之上 */
+  z-index: 1; 
 }
 
 /* 💫 液态流光背景 */
@@ -103,11 +114,16 @@ iframe {
     radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
     radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
     radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
+  
   filter: blur(40px);
   animation: blobMove 14s ease-in-out infinite;
   mix-blend-mode: screen;
   pointer-events: none;
+  
+  /* 修复3：关键！把模糊的光斑放到最底层，不要盖住文字 */
+  z-index: -1; 
 }
+
 
 /* 🕒 倒计时数字与标题 */
 .countdown div {

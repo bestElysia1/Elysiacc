@@ -1,4 +1,4 @@
-/* hamburger.css - Elysia Liquid Style (Final Optimized) */
+/* hamburger.css - Elysia Style with "DockPop" Rebound */
 
 /* =========================================
    1. 汉堡按钮 (Liquid Glass Button)
@@ -14,7 +14,7 @@
   justify-content: center;
   align-items: center;
   gap: 5px;
-  z-index: 10001; /* 必须比菜单高 */
+  z-index: 10001;
   
   /* 液态玻璃背景 */
   background: rgba(255, 255, 255, 0.25);
@@ -24,17 +24,14 @@
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.4);
   
-  /* 柔和光晕 */
+  /* 柔和光晕阴影 */
   box-shadow: 
     0 8px 24px rgba(150, 110, 240, 0.15), 
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
     
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  
-  /* 性能优化 */
-  will-change: transform;
-  -webkit-tap-highlight-color: transparent;
+  will-change: transform, opacity;
 }
 
 /* 悬停状态 */
@@ -52,7 +49,14 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* 内部线条装饰 */
+/* 自动隐藏 */
+.hamburger.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+/* 内部线条 */
 .hb-line {
   display: block;
   width: 22px;
@@ -65,7 +69,7 @@
 }
 
 /* =========================================
-   2. 下拉菜单 (Dropdown Menu) - 视觉同步 & 高清版
+   2. 下拉菜单 (Dropdown Menu) - 视觉同步版
    ========================================= */
 .dropdown-menu {
   position: fixed;
@@ -73,142 +77,125 @@
   top: 80px;
   width: 200px;
   
-  /* --- 背景：通透且清晰 --- */
-  /* 稍微增加不透明度以提升文字对比度 */
-  background: rgba(255, 240, 255, 0.35); 
+  /* --- 核心修改：同步 Elysia Playlist 的液态玻璃参数 --- */
   
-  /* 模糊：适当的模糊让背景杂物不干扰文字 */
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* 1. 背景：降低透明度 (从 0.65 降至 0.25)，增加淡紫色调 */
+  background: rgba(255, 240, 255, 0.25);
   
-  border: 1px solid rgba(255, 210, 255, 0.4);
+  /* 2. 模糊：降低模糊半径，增加饱和度，更通透 */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   
-  /* 阴影：增加层次感 */
+  /* 3. 边框：更轻薄的紫色边框 */
+  border: 1px solid rgba(255, 210, 255, 0.35);
+  
+  /* 4. 阴影：同步紫色光晕与内发光 */
   box-shadow: 
-    0 8px 24px rgba(160, 120, 255, 0.2), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    0 8px 24px rgba(200, 160, 255, 0.25), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  /* ------------------------------------------------- */
 
   border-radius: 16px;
-  padding: 10px;
+  padding: 10px; /* 稍微增加内边距以匹配播放列表 */
   list-style: none;
   margin: 0;
   z-index: 10000;
 
-  /* --- 滚动条隐藏 (保持美观) --- */
-  max-height: 60vh;
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-
-  /* --- 初始隐藏状态 --- */
+  /* 初始状态 */
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  transform-origin: 0% 0%; /* 从左上角展开 */
+  transform-origin: 0% 0%;
   transform: translateY(-10px) scale(0.95);
 }
 
-/* Chrome/Safari 隐藏滚动条 */
-.dropdown-menu::-webkit-scrollbar {
-  display: none;
-}
-
-/* 菜单项布局 */
+/* 菜单项容器 */
 .dropdown-menu li {
   margin: 4px 0;
 }
 
-/* =========================================
-   3. 菜单项交互 (丝滑核心优化)
-   ========================================= */
+/* 菜单链接 - 样式同步 */
 .dropdown-menu a {
   display: block;
   padding: 10px 14px;
   border-radius: 8px;
   
-  /* --- 字体清晰度修复 --- */
-  color: #5E4B95; /* 深紫罗兰色，确保在亮玻璃上可见 */
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6); /* 白色衬底，增加锐度 */
+  /* 文字颜色同步：默认使用淡紫色，而非深紫色 */
+  color: #5E4B95; 
   
   text-decoration: none;
   font-size: 0.95rem;
-  font-weight: 700; /* 加粗 */
-  
+  font-weight: 600;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  
+  /* 防止长文字换行 */
   white-space: nowrap;
   text-overflow: ellipsis;
-  
-  /* --- 丝滑动画核心 --- */
-  /* 颜色变快，物理位移变慢(带阻尼) */
-  transition: 
-    background-color 0.2s ease-out, 
-    color 0.15s ease-out,
-    text-shadow 0.2s ease,
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), /* Q弹回弹 */
-    box-shadow 0.3s ease;
-    
-  /* 硬件加速，防止掉帧 */
-  will-change: transform, background-color;
-  transform: translateZ(0); 
-  backface-visibility: hidden;
 }
 
-/* 菜单项：鼠标悬停 (Hover) */
+/* 菜单项 Hover - 样式同步 */
 .dropdown-menu a:hover {
-  /* 背景高亮 */
-  background: rgba(120, 80, 255, 0.85); 
+  /* Hover 背景：同步播放列表的高亮色 */
+  background: rgba(160, 120, 255, 0.15);
   
-  /* 文字反白 */
+  /* Hover 文字：变白 */
   color: #ffffff;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
   
-  /* 物理反馈：微量右移 + 放大 */
-  transform: translateX(6px) scale(1.02); 
-  
-  box-shadow: 0 4px 12px rgba(120, 80, 255, 0.3);
+  transform: translateX(4px);
+  /* 添加柔和的文字光晕 */
+  text-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  box-shadow: none;
 }
+
 
 /* =========================================
-   4. 列表开关动画 (DockPop)
+   3. 动画控制 (Animations) - 核心优化部分
    ========================================= */
 
-/* 显示状态 */
+/* 显示状态：应用参考的 dockPop 逻辑 */
 .dropdown-menu.show {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  /* 有重量感的回弹展开 */
-  animation: menuReboundOpen 0.6s cubic-bezier(0.22, 0.9, 0.36, 1) forwards;
+  
+  /* 使用参考代码的贝塞尔曲线，实现有重量感的回弹 */
+  animation: menuReboundOpen 0.62s cubic-bezier(0.22, 0.9, 0.36, 1) forwards;
 }
 
 /* 隐藏状态：快速收回 */
 .dropdown-menu:not(.show) {
+  /* 如果需要关闭动画，可以使用这个 */
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
   visibility: hidden;
 }
 
-/* 动画关键帧 */
+/* 核心动画：Menu Rebound (参考 dockPop) 
+   特点：0% -> 55%(过冲/变亮) -> 100%(回稳)
+*/
 @keyframes menuReboundOpen {
   0% { 
     opacity: 0; 
-    transform: translateY(-15px) scale(0.92);
+    transform: translateY(-15px) scale(0.92); /* 初始位置：偏上，稍暗 */
     filter: brightness(0.92);
   }
   55% {
     opacity: 1;
-    transform: translateY(4px) scale(1.03); /* 轻微过冲 */
-    filter: brightness(1.05);
+    transform: translateY(4px) scale(1.05); /* 过冲位置：偏下，放大，变亮 */
+    filter: brightness(1.12);
   }
   100% { 
     opacity: 1; 
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1); /* 最终位置：复原 */
     filter: brightness(1);
   }
 }
 
+/* 线条流动动画 */
 @keyframes glowFlow {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }

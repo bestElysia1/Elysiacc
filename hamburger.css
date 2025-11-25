@@ -1,4 +1,4 @@
-/* hamburger.css - Elysia Style Navigation */
+/* hamburger.css - Elysia Style with "DockPop" Rebound */
 
 /* =========================================
    1. 汉堡按钮 (Liquid Glass Button)
@@ -16,47 +16,47 @@
   gap: 5px;
   z-index: 10001;
   
-  /* 液态玻璃背景 - 参考播放器风格 */
-  background: rgba(255, 255, 255, 0.15);
+  /* 液态玻璃背景 */
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   
   /* 柔和光晕阴影 */
   box-shadow: 
     0 8px 24px rgba(150, 110, 240, 0.15), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
     
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   will-change: transform, opacity;
 }
 
-/* 悬停状态：发光增强 */
+/* 悬停状态 */
 .hamburger:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
   box-shadow: 
     0 12px 32px rgba(156, 107, 255, 0.3),
-    inset 0 0 10px rgba(255, 255, 255, 0.4);
+    inset 0 0 10px rgba(255, 255, 255, 0.5);
   transform: scale(1.05);
 }
 
-/* 点击状态：按压反馈 */
+/* 点击状态 */
 .hamburger:active {
   transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
 }
 
-/* 自动隐藏状态 (Fade Out) */
+/* 自动隐藏 */
 .hamburger.fade-out {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8);
 }
 
-/* 内部线条：渐变流光 */
+/* 内部线条 */
 .hb-line {
   display: block;
   width: 22px;
@@ -74,11 +74,11 @@
 .dropdown-menu {
   position: fixed;
   left: 18px;
-  top: 80px; /* 紧贴按钮下方 */
+  top: 80px;
   width: 200px;
   
-  /* 强力磨砂玻璃 - 统一 Elysia 风格 */
-  background: rgba(255, 250, 255, 0.55);
+  /* 强力磨砂玻璃 */
+  background: rgba(255, 250, 255, 0.65);
   backdrop-filter: blur(25px) saturate(200%);
   -webkit-backdrop-filter: blur(25px) saturate(200%);
   
@@ -88,22 +88,20 @@
   margin: 0;
   z-index: 10000;
   
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 
-    0 15px 40px rgba(120, 80, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 20px 50px rgba(120, 80, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   /* 初始隐藏状态 */
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
   
-  /* 变形原点：从左上角(按钮处)弹出 */
+  /* 变形原点：左上角 */
   transform-origin: 0% 0%;
-  transform: scale(0.8) translateY(-10px);
-  
-  /* 默认过渡 */
-  transition: all 0.3s cubic-bezier(0.3, 0, 0.7, 0.3);
+  /* 初始位置：稍微向上位移且缩小 */
+  transform: translateY(-10px) scale(0.95);
 }
 
 /* 菜单项 */
@@ -115,66 +113,64 @@
   display: block;
   padding: 10px 14px;
   border-radius: 10px;
-  color: #5b4aa1; /* 深紫色文字 */
+  color: #5b4aa1;
   text-decoration: none;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
-/* 菜单项 Hover：柔和高亮 */
+/* 菜单项 Hover */
 .dropdown-menu a:hover {
-  background: rgba(154, 110, 240, 0.15);
+  background: rgba(154, 110, 240, 0.12);
   color: #7b3fe4;
-  transform: translateX(4px); /* 轻微右移 */
-  text-shadow: 0 0 8px rgba(154, 110, 240, 0.3);
+  transform: translateX(4px);
+  text-shadow: 0 0 8px rgba(154, 110, 240, 0.2);
 }
 
 /* =========================================
-   3. 动画控制 (Animations)
+   3. 动画控制 (Animations) - 核心优化部分
    ========================================= */
 
-/* 显示状态 (.show) */
+/* 显示状态：应用参考的 dockPop 逻辑 */
 .dropdown-menu.show {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
   
-  /* 使用与播放器一致的弹性动画曲线 */
-  animation: menuPopOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  /* 使用参考代码的贝塞尔曲线，实现有重量感的回弹 */
+  animation: menuReboundOpen 0.62s cubic-bezier(0.22, 0.9, 0.36, 1) forwards;
 }
 
-/* 隐藏状态 (移除 .show 时回退到默认 transition，或使用动画) */
+/* 隐藏状态：快速收回 */
 .dropdown-menu:not(.show) {
-  animation: menuPopClose 0.3s ease forwards;
+  /* 如果需要关闭动画，可以使用这个 */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  visibility: hidden;
 }
 
-/* 弹出动画：弹性展开 */
-@keyframes menuPopOpen {
+/* 核心动画：Menu Rebound (参考 dockPop) 
+   特点：0% -> 55%(过冲/变亮) -> 100%(回稳)
+*/
+@keyframes menuReboundOpen {
   0% { 
     opacity: 0; 
-    transform: scale(0.8) translateY(-15px); 
+    transform: translateY(-15px) scale(0.92); /* 初始位置：偏上，稍暗 */
+    filter: brightness(0.92);
   }
-  60% {
-    transform: scale(1.02) translateY(2px);
+  55% {
+    opacity: 1;
+    transform: translateY(4px) scale(1.05); /* 过冲位置：偏下，放大，变亮 */
+    filter: brightness(1.12);
   }
   100% { 
     opacity: 1; 
-    transform: scale(1) translateY(0); 
-  }
-}
-
-/* 关闭动画：快速收缩 */
-@keyframes menuPopClose {
-  0% { 
-    opacity: 1; 
-    transform: scale(1) translateY(0); 
-  }
-  100% { 
-    opacity: 0; 
-    transform: scale(0.9) translateY(-10px); 
+    transform: translateY(0) scale(1); /* 最终位置：复原 */
+    filter: brightness(1);
   }
 }
 

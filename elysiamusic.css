@@ -68,19 +68,34 @@
   box-shadow: 0 0 12px rgba(160,120,255,0.4); 
 }
 
-/* 歌曲标题 */
+/* 歌曲标题 - 清晰修复版 */
 #songTitle {
+  /* 1. 保持原有颜色 */
   color: #f2eaff; 
-  font-weight:600; 
-  width:200px; 
-  font-size:0.95rem;
-  text-shadow:0 0 10px rgba(160,120,255,0.45);
+  
+  /* 2. 去除加粗 (原为600，改为400) */
+  font-weight: 600; 
+  
+  /* 3. 核心修复：去除 10px 的高斯模糊光晕 */
+  /* 改为 none，或者仅保留极轻微的 1px 投影以防背景太亮看不清 */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); 
+
+  /* 4. 布局保持不变 */
+  width: 200px; 
+  font-size: 0.95rem;
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   cursor: pointer;
-  will-change: transform;
+  
+  /* 5. 核心修复：强制开启字体抗锯齿，让笔画更锐利 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* 6. 移除 will-change，防止浏览器为了性能降低渲染分辨率 */
+  /* will-change: transform;  <-- 删掉这行 */
 }
+
 
 /* ===== 播放列表 (Dock 风格) ===== */
 .elysia-playlist {

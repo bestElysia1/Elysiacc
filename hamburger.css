@@ -1,163 +1,79 @@
-/* hamburger.css - Ultimate Liquid Glass & Smooth Physics */
+/* hamburger.js */
 
-:root {
-  /* iOS 风格的高级弹簧曲线：快速响应，微小回弹，丝般顺滑 */
-  --ease-ios-spring: cubic-bezier(0.25, 0.8, 0.25, 1);
-  /* 退出动画曲线：利落干脆 */
-  --ease-out-smooth: cubic-bezier(0.33, 1, 0.68, 1);
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const hamburger = document.getElementById('hamburger-menu');
+  const menu = document.getElementById('dropdown');
+  
+  // 自动隐藏配置
+  let hideTimer;
+  const AUTO_HIDE_TIME = 30000;
 
-/* =========================================
-   1. 汉堡按钮 (Crystal Button)
-   ========================================= */
-.hamburger {
-  position: fixed;
-  left: 18px;
-  top: 18px;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  z-index: 10001;
-  
-  /* 极透的玻璃底色 */
-  background: rgba(255, 255, 255, 0.15);
-  /* 强力磨砂与色彩增益 */
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  border-radius: 16px;
-  /* 玻璃边缘高光 */
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 
-    0 8px 32px rgba(31, 38, 135, 0.07),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  // ============================
+  // 1. 菜单开关 (Toggle)
+  // ============================
+  function toggleMenu() {
+    // 检查是否有 show 类
+    const isShow = menu.classList.contains('show');
     
-  cursor: pointer;
-  transition: transform 0.3s var(--ease-ios-spring), background 0.3s ease;
-}
+    if (isShow) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  }
 
-/* 悬停 */
-.hamburger:hover {
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 
-    0 8px 32px rgba(156, 107, 255, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
+  function openMenu() {
+    menu.classList.add('show');
+    // 按钮本身轻微反馈
+    if(hamburger) hamburger.style.transform = "scale(0.92)";
+    setTimeout(() => { if(hamburger) hamburger.style.transform = ""; }, 150);
+    resetHideTimer();
+  }
 
-/* 点击 */
-.hamburger:active {
-  transform: scale(0.94);
-}
+  function closeMenu() {
+    menu.classList.remove('show');
+  }
 
-/* 线条 */
-.hb-line {
-  width: 22px;
-  height: 2.5px;
-  background: #5b4aa1; /* 深紫色，保证在玻璃上的对比度 */
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
+  // ============================
+  // 2. 点击事件绑定
+  // ============================
+  if (hamburger) {
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation(); // 阻止冒泡
+      toggleMenu();
+    });
+  }
 
-/* 自动隐藏状态 */
-.hamburger.fade-out {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
+  // 点击外部关闭
+  document.addEventListener('click', (e) => {
+    // 如果点击的不是菜单内部，且不是汉堡按钮，且菜单是打开的
+    if (menu.classList.contains('show') && 
+        !menu.contains(e.target) && 
+        !hamburger.contains(e.target)) {
+      closeMenu();
+    }
+  });
 
-/* =========================================
-   2. 下拉菜单 (True Liquid Glass Menu)
-   ========================================= */
-.dropdown-menu {
-  position: fixed;
-  left: 18px;
-  top: 80px; /* 紧贴按钮下方 */
-  width: 200px;
-  
-  /* --- 核心：液态玻璃质感 --- */
-  /* 极低的不透明度，依赖模糊撑起质感 */
-  background: rgba(255, 255, 255, 0.3);
-  
-  /* 超高模糊 + 饱和度提升 = 通透感 */
-  backdrop-filter: blur(50px) saturate(220%);
-  -webkit-backdrop-filter: blur(50px) saturate(220%);
-  
-  border-radius: 18px;
-  padding: 8px;
-  list-style: none;
-  margin: 0;
-  z-index: 10000;
-  
-  /* 精细的光影堆叠 */
-  border: 1px solid rgba(255, 255, 255, 0.4); /* 亮边框 */
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.12), /* 柔和投影 */
-    inset 0 1px 0 rgba(255, 255, 255, 0.6), /* 顶部高光 */
-    inset 0 0 20px rgba(255, 255, 255, 0.2); /* 内部辉光 */
+  // ============================
+  // 3. 自动隐藏逻辑
+  // ============================
+  function hideHamburger() {
+    // 菜单打开时禁止隐藏按钮
+    if (menu.classList.contains('show')) return;
+    if (hamburger) hamburger.classList.add('fade-out');
+  }
 
-  /* 初始状态：完全隐藏 */
-  opacity: 0;
-  visibility: hidden;
-  
-  /* 变形原点：左上角，模拟从按钮流出 */
-  transform-origin: 0% 0%; 
-  transform: scale(0.8) translateY(-15px);
-  
-  /* 默认只设置关闭时的过渡 */
-  transition: 
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0.2s;
-}
+  function showHamburger() {
+    if (hamburger) hamburger.classList.remove('fade-out');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideHamburger, AUTO_HIDE_TIME);
+  }
 
-/* 菜单项 */
-.dropdown-menu li {
-  margin: 2px 0;
-}
+  // 监听各种操作以重置计时器
+  ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+    window.addEventListener(evt, showHamburger);
+  });
 
-.dropdown-menu a {
-  display: block;
-  padding: 10px 14px;
-  border-radius: 12px;
-  color: #5b4aa1;
-  font-weight: 500;
-  text-decoration: none;
-  font-size: 0.94rem;
-  transition: all 0.2s ease;
-}
-
-/* 菜单项 Hover：类似 iOS 列表的高亮 */
-.dropdown-menu a:hover {
-  background: rgba(255, 255, 255, 0.45); /* 半透明白 */
-  backdrop-filter: blur(10px);
-  color: #7b3fe4;
-  transform: translateX(3px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
-
-/* =========================================
-   3. 动画状态 (State Classes)
-   ========================================= */
-
-/* 打开状态：应用高级弹簧动画 */
-.dropdown-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1) translateY(0);
-  
-  /* 这里的动画曲线是关键：
-     duration: 0.5s 
-     timing-function: custom spring 
-  */
-  transition: 
-    opacity 0.3s ease,
-    transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); /* 极其丝滑的 iOS 展开感 */
-}
-
-/* 关闭状态：此时会回退到 .dropdown-menu 默认的 0.2s ease，实现快速收起 */
+  // 初始化
+  showHamburger();
+});

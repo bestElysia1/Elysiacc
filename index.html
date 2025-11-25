@@ -173,18 +173,6 @@ h2:hover {
   animation: gradientFlow 3s linear infinite, glowPulse 1.8s ease-in-out infinite;
 }
 
-/* 让段落、列表、链接也有柔和呼吸发光 */
-a:hover, p:hover, li:hover {
-  animation: glowPulse 1.8s ease-in-out infinite;
-  transition: all 0.4s ease;
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-section {
-  animation: fadeInUp 0.8s ease both;
-}
 /*  全局正文淡紫色优化（Elysia 风格） */
 p, ul, li {
   color: #7a66c7 !important; /* 柔和淡紫色 */
@@ -192,12 +180,6 @@ p, ul, li {
   font-size: 0.95rem;
 }
 
-/*  段落 hover 时轻微亮一点 */
-p:hover, li:hover {
-  color: #9a6ef0 !important;
-  text-shadow: 0 0 6px rgba(156,107,255,0.3);
-  transition: all 0.3s ease;
-}
 /*  强制让正文显示淡紫色 */
 main.container p,
 main.container ul,
@@ -314,8 +296,8 @@ main.container li:hover {
 .dropdown-menu {
   position: fixed;
   left: 14px;
-  top: 60px; /* 汉堡按钮下方位置 */
-  width: 200px; /* 菜单宽度，可调整 */
+  top: 80px; /* 汉堡按钮下方位置 */
+  width: 210px; /* 菜单宽度，可调整 */
   background: rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 10px;

@@ -1,0 +1,171 @@
+/* hamburger.css */
+
+/* =========================================
+   1. iOS 16 风格汉堡按钮 (Liquid Glass)
+   ========================================= */
+.hamburger {
+  position: fixed;
+  left: 18px;
+  top: 18px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  align-items: center;
+  z-index: 10001;
+  
+  /* iOS 玻璃质感核心 */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  border-radius: 14px; /* iOS 典型的平滑圆角 */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  
+  /* 复合阴影模拟液态光感 */
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* 果冻回弹过渡 */
+}
+
+/* 悬停状态：更亮，轻微放大 */
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 8px 25px rgba(156, 107, 255, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+/* 点击/激活状态：按压感 */
+.hamburger:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 内部线条：渐变色 */
+.hb-line {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #b388ff, #7b3fe4);
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* 按钮自动隐藏时的淡出效果 */
+.hamburger.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+/* =========================================
+   2. macOS Dock 风格下拉菜单
+   ========================================= */
+.dropdown-menu {
+  position: fixed;
+  left: 18px;
+  top: 82px; /* 避开按钮 */
+  width: 220px;
+  
+  /* 强力毛玻璃背景 */
+  background: rgba(250, 250, 255, 0.65);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  
+  border-radius: 16px;
+  padding: 10px;
+  list-style: none;
+  margin: 0;
+  z-index: 10000;
+  
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+
+  /* 默认隐藏状态 */
+  display: none;
+  opacity: 0;
+  transform-origin: top left; /* 从左上角（按钮方向）弹出 */
+}
+
+/* 菜单项样式 */
+.dropdown-menu li {
+  margin: 4px 0;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #5b4aa1;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 菜单项 Hover：类似 macOS 菜单的高亮 */
+.dropdown-menu a:hover {
+  background: rgba(154, 110, 240, 0.15);
+  color: #7b3fe4;
+  transform: translateX(4px);
+}
+
+/* =========================================
+   3. 核心动画 (Dock Pop Effect)
+   ========================================= */
+
+/* 打开状态类 */
+.dropdown-menu.is-open {
+  display: block;
+  animation: dockPopOpen 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+}
+
+/* 关闭状态类 (用于执行退出动画) */
+.dropdown-menu.is-closing {
+  display: block; /* 保持显示直到动画结束 */
+  animation: dockPopClose 0.35s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+  pointer-events: none;
+}
+
+/* 🟢 动画：弹出 (类似 Dock 图标弹起) */
+@keyframes dockPopOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) translateY(-20px) translateX(-10px);
+    filter: blur(10px);
+  }
+  60% {
+    transform: scale(1.05) translateY(2px); /* 过冲一点点，制造弹性 */
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 🔴 动画：收回 (快速缩小消失) */
+@keyframes dockPopClose {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-15px);
+    filter: blur(8px);
+  }
+}

@@ -4,194 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.3.24</title>
+  
   <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
   <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
   
+  <link rel="stylesheet" href="elysiastyle.css">
   <link rel="stylesheet" href="hamburger.css">
   <link rel="stylesheet" href="elysiamusic.css">
-  
-  <style>
-    :root{
-      --accent-start: #9a6ef0;
-      --accent-end: #7b3fe4;
-      --link: #8f66f0;
-      --bg: #ffffff;
-      --maxw: 980px;
-    }
-    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial; color:#333; -webkit-overflow-scrolling: touch; touch-action: pan-y;}
-    body {
-      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
-      letter-spacing: 0.3px;
-      line-height: 1.85;
-    }
-    .container{max-width:var(--maxw);margin:28px auto;padding:0 48px;}
-    .banner{border-radius:8px;overflow:hidden;margin-bottom:18px}
-    .banner img{width:100%;height:auto;display:block}
-
-    header{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .title h1{margin:0;font-size:1.5rem;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
-    .subtitle{color:#888;margin-top:6px;font-size:0.92rem}
-    .music{margin-left:auto}
-    iframe{border-radius:6px;border:0}
-    
-    /* 🌌 Elysia — 液态紫粉玻璃倒计时 */
-    .countdown {
-      position: relative;
-      margin: 22px 0;
-      padding: 20px 28px;
-      border-radius: 18px;
-      overflow: hidden;
-      backdrop-filter: blur(14px) saturate(160%);
-      -webkit-backdrop-filter: blur(14px) saturate(160%);
-      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.15),
-        0 4px 18px rgba(160,120,255,0.3);
-      animation: countdownFloat 8s ease-in-out infinite;
-    }
-
-    /* 💫 液态流光背景 */
-    .countdown::before {
-      content: "";
-      position: absolute;
-      inset: -25%;
-      background:
-        radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
-        radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-        radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-      filter: blur(40px);
-      animation: blobMove 14s ease-in-out infinite;
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
-
-    /* 🕒 倒计时数字与标题 */
-    .countdown div {
-      color: rgba(240,230,255,0.9);
-      font-size: 0.96rem;
-      margin-bottom: 8px;
-      text-shadow: 0 0 10px rgba(180,140,255,0.6);
-    }
-    .countdown .nums {
-      font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 1px;
-      color: #d9caff;
-      text-shadow:
-        0 0 10px rgba(180,140,255,0.8),
-        0 0 20px rgba(160,120,255,0.4);
-    }
-
-    /* ✨ 轻微呼吸漂浮 */
-    @keyframes countdownFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-    }
-
-    /* 🌊 背景液态移动 */
-    @keyframes blobMove {
-      0% { transform: translate(0,0) scale(1); }
-      25% { transform: translate(6%, -4%) scale(1.05); }
-      50% { transform: translate(-5%, 5%) scale(1.02); }
-      75% { transform: translate(3%, -3%) scale(1.07); }
-      100% { transform: translate(0,0) scale(1); }
-    }
-    .countdown .nums{font-weight:700;color:var(--accent-end);font-size:1.05rem;letter-spacing:1px}
-    /* content */
-    section{margin-top:28px}
-    h2{font-size:1.02rem;margin:8px 0 14px 0;padding-left:10px;border-left:4px solid rgba(123,63,228,0.12);color:var(--accent-end);background:linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));padding:8px;border-radius:6px}
-    p, ul, li{color:#4a3f6d;line-height:1.8;font-size:0.95rem}
-    a{color:var(--link);text-decoration:none}
-    a:hover{text-decoration:underline}
-    pre{background:#faf6ff;border:1px solid rgba(123,63,228,0.06);padding:10px;border-radius:8px;overflow:auto;color:#5b4aa1}
-    footer {
-      margin: 36px 0 0 0;
-      padding-top: 12px;
-      color: #999;
-      font-size: 0.85rem;
-      text-align: center;
-      border-top: 1px solid rgba(156,107,255,0.2);
-      background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
-      box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
-      transition: all 0.4s ease;
-    }
-    footer:hover {
-      text-shadow: 0 0 6px rgba(156,107,255,0.6);
-      color: #bca9ff;
-    }
-
-    /* layout */
-    .leftnav{position:fixed;left:12px;top:120px;width:160px}
-    .leftnav ul{list-style:none;padding:0;margin:0}
-    .leftnav li{margin:8px 0;color:var(--link);font-size:0.9rem}
-    /* responsive */
-    @media (max-width:900px){
-      .container{padding:0 18px}
-      .leftnav{display:none}
-      header{flex-direction:column;align-items:flex-start}
-      .music{margin-left:0;margin-top:8px}
-    }
-    
-    /* Elysia 标题渐变流动 + 发光组合 */
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    h2 {
-      background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-size: 200% 200%;
-      transition: all 0.6s ease;
-    }
-
-    h2:hover {
-      animation: gradientFlow 3s linear infinite;
-    }
-
-    /* 全局正文淡紫色优化（Elysia 风格） */
-    p, ul, li {
-      color: #7a66c7 !important; /* 柔和淡紫色 */
-      line-height: 1.8;
-      font-size: 0.95rem;
-    }
-
-    /* 鼠标悬停轻微变色 */
-    main.container p:hover,
-    main.container li:hover {
-      color: #9a6ef0 !important;
-      transition: all 0.3s ease;
-    }
-
-    /* ==== iOS 文字排版修复：强制换行 + 对齐优化 ==== */
-    @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-      .container p,
-      .container ul,
-      .container li,
-      .container h2,
-      .container .subtitle,
-      .container .countdown div {
-        word-break: break-word !important;
-        overflow-wrap: anywhere !important;
-        hyphens: auto !important;
-        text-align: justify !important;
-        line-height: 1.85 !important;
-      }
-      .container ul li {
-        padding-left: 0.3em;
-        text-indent: -0.3em;
-      }
-      .container ul li::marker {
-        unicode-bidi: isolate;
-        font-variant-numeric: tabular-nums;
-      }
-      .container p:not(:empty) {
-        text-indent: 0;
-      }
-    }
-  </style>
 </head>
 <body>
 
@@ -208,111 +27,105 @@
   <li><a href="speedtest.html">IP Test</a></li>
 </ul>
 
-  <nav class="leftnav" aria-hidden="true">
-   
-  </nav>
+<nav class="leftnav" aria-hidden="true"></nav>
 
-  <main class="container">
-    <div class="banner-3d" id="banner3d">
-      <div class="banner-layer">
-        <img src="assets/banner.jpg" alt="Banner">
-      </div>
-      <div class="banner-glow"></div>
+<main class="container">
+  <div class="banner-3d" id="banner3d">
+    <div class="banner-layer">
+      <img src="assets/banner.jpg" alt="Banner">
     </div>
+    <div class="banner-glow"></div>
+  </div>
 
-    <header>
-      </header>
+  <header></header>
 
-    <div class="countdown" id="countdown" aria-live="polite">
-      <div style="font-size:0.95rem;color:#666;margin-bottom:6px">倒计时</div>
-      <div class="nums" id="countdownNums">— 天 — : — : —</div>
-    </div>
+  <div class="countdown" id="countdown" aria-live="polite">
+    <div style="font-size:0.95rem;color:#666;margin-bottom:6px">倒计时</div>
+    <div class="nums" id="countdownNums">— 天 — : — : —</div>
+  </div>
 
-    <section>
-      <p><strong>唯云</strong> Disney+,YouTube,Netflix 流媒体、ChatGPT .etc全解锁，无限速，顶级专线</p>
-      <p><strong>奶昔</strong> 同上</p>
-      <p><strong>IEPL IPLC</strong> 顶级专线</p>
-      <p><strong>IEPL prem.</strong> 游戏专用</p>
-      <p><strong>纯净</strong> 原生 IP 双 ISP</p>
-      <p><strong>深港</strong> 备用线路</p>
-      <p><strong>限定</strong> 备用线路</p>
-      <p><strong>隧道</strong> 备用线路</p>
-      <p><strong>直连</strong> 国内外均可使用</p>
-      <p><strong>政企专线</strong> 由于地域限制，⼀般情况下请勿使⽤</p>
-    </section>
+  <section>
+    <p><strong>唯云</strong> Disney+,YouTube,Netflix 流媒体、ChatGPT .etc全解锁，无限速，顶级专线</p>
+    <p><strong>奶昔</strong> 同上</p>
+    <p><strong>IEPL IPLC</strong> 顶级专线</p>
+    <p><strong>IEPL prem.</strong> 游戏专用</p>
+    <p><strong>纯净</strong> 原生 IP 双 ISP</p>
+    <p><strong>深港</strong> 备用线路</p>
+    <p><strong>限定</strong> 备用线路</p>
+    <p><strong>隧道</strong> 备用线路</p>
+    <p><strong>直连</strong> 国内外均可使用</p>
+    <p><strong>政企专线</strong> 由于地域限制，⼀般情况下请勿使⽤</p>
+  </section>
 
-    <section>
-      <h2>订阅链接</h2>
-      <p>请发送 订阅 至邮箱获取</p>
+  <section>
+    <h2>订阅链接</h2>
+    <p>请发送 订阅 至邮箱获取</p>
+  </section>
 
-    </section>
+  <section>
+    <h2>通知</h2>
+    <ul>
+      <li>三网优化已完成〜 2025-09-16</li>
+      <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜 2025-09-16(已完成自动切换)</li>
+      <li>由于部分省份升级省级防火墙原因，移动线路要做特别优化，如果无法使用，请联系我给你单独调优〜 2025-09-19</li>
+      <li>部分省份移动已G，请切换电信，移动网络暂时无法使用〜 2025-09-30（已修复）</li>
+      <li>德国法兰克福 CN2 GIA 专线将于 10月 20日上线〜 2025-10-10</li>
+      <li>预计11月1-7日进行服务器维护，不影响正常使用，11月8日请更新订阅〜 2025-10-30</li>
+      <li>部分节点上游被攻击，暂停服务，请优先选择唯☁️节点〜 2025-11-24</li>
+    </ul>
+  </section>
 
-    <section>
-      <h2>通知</h2>
-      <ul>
-        <li>三网优化已完成〜 2025-09-16</li>
-        <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜 2025-09-16(已完成自动切换)</li>
-        <li>由于部分省份升级省级防火墙原因，移动线路要做特别优化，如果无法使用，请联系我给你单独调优〜 2025-09-19</li>
-        <li>部分省份移动已G，请切换电信，移动网络暂时无法使用〜 2025-09-30（已修复）</li>
-        <li>德国法兰克福 CN2 GIA 专线将于 10月 20日上线〜 2025-10-10</li>
-        <li>预计11月1-7日进行服务器维护，不影响正常使用，11月8日请更新订阅〜 2025-10-30</li>
-        <li>部分节点上游被攻击，暂停服务，请优先选择唯☁️节点〜 2025-11-24</li>
+  <section>
+    <h2>使用细则</h2>
+    <p>复制订阅链接到软件中同步后即可使用</p>
+  </section>
 
-      </ul>
-    </section>
+  <section>
+    <h2>移动端 Mobile Devices</h2>
+    <ul>
+      <li><strong>Android 安卓：</strong>V2rayNG、FIClash、Nekobox、Sing - box for Android、Clash Meta for Android .etc</li>
+      <li><strong>iOS（含 iPadOS/tvOS）：</strong>ShadowRocket（小火箭）、Surge、Loon、Stash、Quantumult .etc</li>
+      <li><strong>Harmony OS NEXT：</strong>同安卓，但不建议使用</li>
+    </ul>
+  </section>
 
-    <section>
-      <h2>使用细则</h2>
-      <p>复制订阅链接到软件中同步后即可使用</p>
-    </section>
+  <section>
+    <h2>电脑端 Computers</h2>
+    <ul>
+      <li><strong>Windows：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
+      <li><strong>macOS：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
+      <li><strong>Linux：</strong>V2rayN、Singbox for Linux .etc</li>
+      <li><strong>FreeBSD/Unix：</strong>Mihomo（裸核）、Sing - box .etc</li>
+    </ul>
+  </section>
 
-    <section>
-      <h2>移动端 Mobile Devices</h2>
-      <ul>
-        <li><strong>Android 安卓：</strong>V2rayNG、FIClash、Nekobox、Sing - box for Android、Clash Meta for Android .etc</li>
-        <li><strong>iOS（含 iPadOS/tvOS）：</strong>ShadowRocket（小火箭）、Surge、Loon、Stash、Quantumult .etc</li>
-        <li><strong>Harmony OS NEXT：</strong>同安卓，但不建议使用</li>
-      </ul>
-    </section>
+  <section>
+    <h2>路由器类 Routers</h2>
+    <ul>
+      <li><strong>华硕 硬路由：</strong>MerlinClash2（梅林）、FancySS</li>
+      <li><strong>小米 硬路由：</strong>ShellCrash</li>
+      <li><strong>OpenWrt 软路由：</strong>OpenClash、PassWall、Nikki</li>
+    </ul>
+  </section>
 
-    <section>
-      <h2>电脑端 Computers</h2>
-      <ul>
-        <li><strong>Windows：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
-        <li><strong>macOS：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
-        <li><strong>Linux：</strong>V2rayN、Singbox for Linux .etc</li>
-        <li><strong>FreeBSD/Unix：</strong>Mihomo（裸核）、Sing - box .etc</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>路由器类 Routers</h2>
-      <ul>
-        <li><strong>华硕 硬路由：</strong>MerlinClash2（梅林）、FancySS</li>
-        <li><strong>小米 硬路由：</strong>ShellCrash</li>
-        <li><strong>OpenWrt 软路由：</strong>OpenClash、PassWall、Nikki</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>规则集</h2>
-      <p><strong>Shadowsrocket:</strong></p>
-      <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
-      <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
-      <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+  <section>
+    <h2>规则集</h2>
+    <p><strong>Shadowsrocket:</strong></p>
+    <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
+    <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+    <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
+    <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
 
-      <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
+    <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
+  </section>
 
-    </section>
-
-    <section>
-      <h2>Shadowrocket 进阶</h2>
-      <p><strong>Shadowrocket 最终毕业玩法：</strong></p>
-      <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject,三个模块,打开其中 proxy 模块,你可以看到 proxy_list,例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
-      <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
+  <section>
+    <h2>Shadowrocket 进阶</h2>
+    <p><strong>Shadowrocket 最终毕业玩法：</strong></p>
+    <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject,三个模块,打开其中 proxy 模块,你可以看到 proxy_list,例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
+    <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
 DOMAIN-SUFFIX,yinhuadm.one,PROXY
 DOMAIN-SUFFIX,anime1.me,PROXY
 DOMAIN-SUFFIX,elysia.bestxuyi.us,PROXY
@@ -324,26 +137,24 @@ DOMAIN-SUFFIX,gemini.googleapis.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,bard.google.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,gemini.google.com,唯☁️｜新加坡01-❄️10Gbps
 DOMAIN-SUFFIX,x.ai,唯☁️｜新加坡01-❄️10Gbps</pre>
-      <p>然后保存即可，注意批量添加时，请确保每个规则一行一起复制粘贴进去即可</p>
-      <p>其他诸如特定网站走直连（打开其中direct模块...）等同理~</p>
-    
-    </section>
+    <p>然后保存即可，注意批量添加时，请确保每个规则一行一起复制粘贴进去即可</p>
+    <p>其他诸如特定网站走直连（打开其中direct模块...）等同理~</p>
+  </section>
 
-    <section>
-      <h2>Shadowrocket 负载均衡</h2>
-      <p>打开⼩⽕箭－⾸⻚－全局路由－启⽤回退；分组－简单模式－开启；分组－编辑－选择⾃⼰想要使⽤的节点－完成</p>
-      <p>这里务必包含 唯云香港&新加坡&日本节点 </p>
-      <p>旨在保证永远可⽤&自动切换可用</p>
-    
-    </section>
+  <section>
+    <h2>Shadowrocket 负载均衡</h2>
+    <p>打开⼩⽕箭－⾸⻚－全局路由－启⽤回退；分组－简单模式－开启；分组－编辑－选择⾃⼰想要使⽤的节点－完成</p>
+    <p>这里务必包含 唯云香港&新加坡&日本节点 </p>
+    <p>旨在保证永远可⽤&自动切换可用</p>
+  </section>
 
-    <section>
-      <h2>V2rayN-Windows 基础</h2>
-      <p><strong>V2rayN使用</strong></p>
-      <p>打开V2rayN－顶部标签栏－订阅分组－订阅分组设置－添加－填写别名Elysia(任意)－将订阅链接粘贴进 可选URL－确定－再点击订阅分组－更新当前订阅(通过代理)－选择任意节点－右键－设为活动配置文件－底部系统代理－自动配置系统代理－顶部标签栏－设置－以管理员身份重启 即可</p>
-      <p><strong>V2raN分流</strong></p>
-      <p>打开V2rayN－顶部标签栏－设置－路由设置－双击V3绕过大陆－添加规则－别名：Elysia(任意)－outboundTag: 唯☁️｜新加坡02-❄️10Gbps －在 Domain 处粘贴下面规则：</p>
-      <pre>domain:openai.com,
+  <section>
+    <h2>V2rayN-Windows 基础</h2>
+    <p><strong>V2rayN使用</strong></p>
+    <p>打开V2rayN－顶部标签栏－订阅分组－订阅分组设置－添加－填写别名Elysia(任意)－将订阅链接粘贴进 可选URL－确定－再点击订阅分组－更新当前订阅(通过代理)－选择任意节点－右键－设为活动配置文件－底部系统代理－自动配置系统代理－顶部标签栏－设置－以管理员身份重启 即可</p>
+    <p><strong>V2raN分流</strong></p>
+    <p>打开V2rayN－顶部标签栏－设置－路由设置－双击V3绕过大陆－添加规则－别名：Elysia(任意)－outboundTag: 唯☁️｜新加坡02-❄️10Gbps －在 Domain 处粘贴下面规则：</p>
+    <pre>domain:openai.com,
 domain:chat.openai.com,
 domain:api.openai.com,
 domain:cdn.openai.com,
@@ -357,330 +168,75 @@ domain:perplexity.ai,
 domain:poe.com,
 domain:huggingface.co,
 domain:chatgpt.com</pre>
-      <p>其他的不用改动，点击确定-标签栏-设置-以管理员身份重启，这样就设置好－在使用ChatGPT等AI时自动切换新加坡节点，不影响现在使用的节点</p>
-      <p>其他诸如增加分流节点或修改AI使用节点等同理~</p>
+    <p>其他的不用改动，点击确定-标签栏-设置-以管理员身份重启，这样就设置好－在使用ChatGPT等AI时自动切换新加坡节点，不影响现在使用的节点</p>
+    <p>其他诸如增加分流节点或修改AI使用节点等同理~</p>
+    <p>其他clash verge、sing - box .etc 略</p>
+  </section>
 
+  <section>
+    <h2>自建VPS节点的教程</h2>
+    <ul>
+      <li><strong>常用工具：</strong>Final shell、Putty、CMD、XUI&3X-UI</li>
+      <li><strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 这个脚本复制到VPS然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 </li>
+      <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
+      <li><strong>CMD：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
+      <li><strong>建议：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
+    </ul>
+  </section>
 
-      <p>其他clash verge、sing - box .etc 略</p>
+  <section>
+    <h2>测速链接</h2>
+    <ul>
+      <li><a href="https://www.speedtest.net/">Speedtest</a></li>
+      <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
+      <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li> 
+    </ul>
+  </section>
+            
+  <section>
+    <h2>一些软件链接</h2>
+    <ul>
+      <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
+      <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
+      <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
+      <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
+      <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
+      <li><a href="https://nssurge.com/">Surge</a></li>
+      <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
+      <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
+    </ul>
+  </section>
 
-    </section>
+  <div class="elysia-video-wrapper">
+    <video id="videoA" autoplay muted playsinline preload="auto"></video>
+    <video id="videoB" muted playsinline preload="auto"></video>
+  </div>
 
-    
-    <section>
-      <h2>自建VPS节点的教程</h2>
-      <ul>
-        <li><strong>常用工具：</strong>Final shell、Putty、CMD、XUI&3X-UI</li>
-        <li><strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 这个脚本复制到VPS然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 </li>
-        <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
-        <li><strong>CMD：</strong>windows+R 运行CMD,然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
-        <li><strong>建议：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
-      </ul>
-    </section>
+  <section>
+    <h2>一些实用&有趣的网址</h2>
+    <ul>
+      <li><a href="https://www.nodeseek.com/post-183694-1">常用VPS脚本</a></li>
+      <li><a href="https://downloads.khinsider.com/">本站使用的音乐下载地址1</a></li>
+      <li><a href="https://mp3juice.co/">本站使用的音乐下载地址2</a></li>
+      <li><a href="https://wallhaven.cc/index.php">好用的PC壁纸</a></li>
+      <li><a href="https://hstock.org/?referrer=01k9gngv">Apple ID等资源的购买网址</a></li>
+      <li><a href="https://www.naifeistation.com/i/2EEaDt">ChatGpt Plus,Super Grok,YouTube,Netflix 会员等资源的购买网址</a><p>优惠码：bestElysia</p></li>
+      <li><a href="https://www.freeconvert.com/zh/audio-converter">Freeconvert</a></li>
+      <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
+    </ul>
+  </section>
 
+  <section>
+    <h2>Eternal Elysia</h2>
+    <p>恭喜你已经完全妥善学习常用VPN技巧</p>
+  </section>
 
+  <footer>
+    订阅使用指南 ver.3.24
+    <br>© bestElysia 2025
+  </footer>
 
-    <section>
-  <h2>测速链接</h2>
-  <ul>
-    <li><a href="https://www.speedtest.net/">Speedtest</a></li>
-    <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
-    <li><a href="http://puspfc.speedtestcustom.com/">Custom Speedtest</a></li> 
-  </ul>
-    </section>
-              
-
-    
-    <section>
-  <h2>一些软件链接</h2>
-  <ul>
-    <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
-    <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
-    <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
-    <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
-    <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
-    <li><a href="https://nssurge.com/">Surge</a></li>
-    <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
-    <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
-    
-  </ul>
-    </section>
-
-<div class="elysia-video-wrapper">
-  <video id="videoA" autoplay muted playsinline preload="auto"></video>
-  <video id="videoB" muted playsinline preload="auto"></video>
-</div>
-
-<style>
-.elysia-video-wrapper {
-  position: relative;
-  margin: 40px auto;
-  width: 90%;
-  max-width: 800px;
-  aspect-ratio: 16 / 9;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 0 30px rgba(150,120,255,0.15);
-}
-.elysia-video-wrapper video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-  transition: opacity 0.8s ease-in-out;
-  background: #000;
-}
-#videoA { opacity: 1; z-index: 2; }
-#videoB { opacity: 0; z-index: 1; }
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const videos = [
-    "assets/elysiatest.mp4",
-    "assets/elysiatest2.mp4",
-    "assets/elysiatest3.mp4",
-    "assets/elysiatest4.mp4",
-    "assets/elysiatest5.mp4",
-    "assets/elysiatest6.mp4",
-    "assets/elysiatest7.mp4",
-    "assets/elysiatest8.mp4",
-    "assets/elysiatest9.mp4.MOV",
-    "assets/elysiatest10.mp4.MOV",
-    "assets/elysiatest11.mp4.MOV",
-    "assets/elysiatest12.mov",
-    "assets/elysiatest13.MOV",
-    "assets/elysiatest14.mov",
-    "assets/elysiatest15.mov",
-    "assets/elysiatest16.mov",
-    "assets/elysiatest17.mov"
-    
-  ];
-
-  const videoA = document.getElementById("videoA");
-  const videoB = document.getElementById("videoB");
-  let current = videoA;
-  let next = videoB;
-  let index = 0;
-  let nextReady = false;
-  let switching = false;
-
-  // === 预加载所有视频 ===
-  const cachePool = videos.map(src => {
-    const v = document.createElement("video");
-    v.src = src;
-    v.preload = "auto";
-    v.muted = true;
-    v.load();
-    return v;
-  });
-
-  function preloadNext() {
-    const nextIndex = (index + 1) % videos.length;
-    next.src = cachePool[nextIndex].src;
-    nextReady = false;
-    next.load();
-    next.addEventListener("canplaythrough", () => nextReady = true, { once: true });
-  }
-
-  function switchVideo() {
-    if (switching) return;
-    switching = true;
-
-    if (!nextReady) {
-      console.log("⏳ 等待下一段缓冲...");
-      setTimeout(() => { switching = false; switchVideo(); }, 300);
-      return;
-    }
-
-    next.currentTime = 0;
-    next.play().then(() => {
-      next.style.opacity = "1";
-      current.style.opacity = "0";
-
-      setTimeout(() => {
-        current.pause();
-        [current, next] = [next, current];
-        index = (index + 1) % videos.length;
-        switching = false;
-        preloadNext();
-        bindEvents(); // 🔥 切换后重新绑定事件
-      }, 800);
-    }).catch(err => {
-      switching = false;
-      console.warn("⚠️ 播放被阻止:", err);
-    });
-  }
-
-  function bindEvents() {
-    current.onended = switchVideo;
-    current.ontimeupdate = () => {
-      if (!nextReady && current.duration && current.currentTime / current.duration > 0.85) {
-        preloadNext();
-      }
-      // 容错: 若时间卡死不触发 ended
-      if (current.currentTime > 0 && current.duration && current.currentTime >= current.duration - 0.05) {
-        switchVideo();
-      }
-    };
-  }
-
-  // === 初始播放 ===
-  current.src = videos[index];
-  bindEvents();
-  preloadNext();
-
-  current.play().catch(err => console.log("⚠️ 自动播放被阻止:", err));
-});
-</script>
-
-  <h2>一些实用&有趣的网址</h2>
-  <ul>
-    <li><a href="https://www.nodeseek.com/post-183694-1">常用VPS脚本</a></li>
-    <li><a href="https://downloads.khinsider.com/">本站使用的音乐下载地址1</a></li>
-    <li><a href="https://mp3juice.co/">本站使用的音乐下载地址2</a></li>
-    <li><a href="https://wallhaven.cc/index.php">好用的PC壁纸</a></li>
-    <li><a href="https://hstock.org/?referrer=01k9gngv">Apple ID等资源的购买网址</a></li>
-    <li><a href="https://www.naifeistation.com/i/2EEaDt">ChatGpt Plus,Super Grok,YouTube,Netflix 会员等资源的购买网址</a><p>优惠码：bestElysia</p></li>
-    <li><a href="https://www.freeconvert.com/zh/audio-converter">Freeconvert</a></li>
-    <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
-  </ul>
-    </section>
-
-     <section>
-      <h2>Eternal Elysia</h2>
-      <p>恭喜你已经完全妥善学习常用VPN技巧</p>
-
-    </section>
-
-    <footer>
-  订阅使用指南 ver.3.24
-  <br>© bestElysia 2025
-</footer>
-
-  </main>
-
-  <script>
-    // Countdown to 2025-12-31 23:59:59 (UTC+8)
-    const target = new Date('2025-12-31T23:59:59+08:00').getTime();
-    const el = document.getElementById('countdownNums');
-    function updateCount() {
-      const now = Date.now();
-      let diff = target - now;
-      if (diff < 0) diff = 0;
-      const days = Math.floor(diff / (24*60*60*1000));
-      diff -= days * 24*60*60*1000;
-      const hrs = Math.floor(diff / (60*60*1000));
-      diff -= hrs * 60*60*1000;
-      const mins = Math.floor(diff / (60*1000));
-      diff -= mins * 60*1000;
-      const secs = Math.floor(diff / 1000);
-      el.textContent = `${days} 天 ${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
-    }
-    updateCount(); setInterval(updateCount, 1000);
-  </script>
-
-<style>
-#starfield {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -2;  /* 更靠后一层 */
-  background: transparent;  /* 去掉浅色背景 */
-  pointer-events: none;  /* 防止拦截鼠标点击 */
-}
-</style>
-
-
-<script>
-// 🌌 裸眼3D + 呼吸浮动 Banner
-const banner3d = document.getElementById("banner3d");
-const bannerLayer = banner3d?.querySelector(".banner-layer");
-const bannerGlow = banner3d?.querySelector(".banner-glow");
-
-// 🌈 桌面端：鼠标 3D 视差
-if (window.matchMedia("(pointer:fine)").matches && banner3d) {
-  banner3d.addEventListener("mousemove", e => {
-    const rect = banner3d.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const rotY = ((x / rect.width) - 0.5) * 16;
-    const rotX = ((y / rect.height) - 0.5) * -12;
-    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
-    bannerGlow.style.background = `radial-gradient(circle at ${x / rect.width * 100}% ${y / rect.height * 100}%, rgba(255,255,255,0.35), transparent 70%)`;
-  });
-
-  banner3d.addEventListener("mouseleave", () => {
-    bannerLayer.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
-    bannerGlow.style.background = "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%)";
-  });
-}
-
-// 📱 移动端：滚动视差（假3D）
-if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
-  window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-    const rotX = Math.min(scrollY / 30, 10);
-    const rotY = Math.sin(scrollY / 180) * 8;
-    bannerLayer.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
-  });
-}
-</script>
-
-<style>
-/* 🌬️ Banner 呼吸浮动动画 */
-@keyframes bannerFloaty {
-  0%, 100% {
-    transform: translateY(0);
-    filter: brightness(1);
-  }
-  50% {
-    transform: translateY(-6px);
-    filter: brightness(1.05);
-  }
-}
-
-/* 🌈 裸眼3D Banner 容器 */
-.banner-3d {
-  position: relative;
-  width: 100%;
-  max-width: 980px;
-  margin: 0 auto 28px auto;
-  perspective: 1000px;
-  border-radius: 16px;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
-  animation: bannerFloaty 8s ease-in-out infinite; /* 🫧 呼吸浮动 */
-}
-
-.banner-3d .banner-layer {
-  transition: transform 0.25s ease-out;
-  transform-origin: center;
-}
-
-.banner-3d img {
-  width: 100%;
-  display: block;
-  border-radius: 16px;
-}
-
-/* ✨ 光影高光层 */
-.banner-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  opacity: 0.5;
-  transition: background-position 0.2s ease-out;
-}
-</style>
+</main>
 
 <div class="elysia-player">
   <div class="elysia-controls">
@@ -691,14 +247,8 @@ if (window.matchMedia("(pointer:coarse)").matches && banner3d) {
 </div>
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
-<script>
-document.querySelectorAll('a[href]').forEach(a => {
-  if (!a.target) a.setAttribute('target', '_blank');
-  a.setAttribute('rel', 'noopener noreferrer');
-});
-</script>
-
 <script src="deeptools.js"></script>
+<script src="elysiastyle.js"></script>
 <script src="hamburger.js" defer></script>
 <script src="elysiamusic.js" defer></script>
 

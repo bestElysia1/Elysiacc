@@ -1,19 +1,21 @@
-/* hamburger.js */
+/* hamburger.js - Logic for the physics menu */
 
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById('hamburger-menu');
   const menu = document.getElementById('dropdown');
+  
+  // 配置参数
+  const AUTO_HIDE_DELAY = 30000; // 30秒自动隐藏按钮
   let hideTimer;
-  let isMenuAnimating = false;
+  let isAnimating = false;
 
   // ============================
-  // 1. 菜单开关逻辑 (含动画处理)
+  // 1. 核心开关逻辑
   // ============================
   function toggleMenu() {
-    if (isMenuAnimating) return; // 防止狂点导致动画错乱
+    if (isAnimating) return; // 动画播放中禁止操作，防止鬼畜
 
     const isOpen = menu.classList.contains('is-open');
-
     if (isOpen) {
       closeMenu();
     } else {
@@ -22,39 +24,47 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openMenu() {
+    isAnimating = true;
     menu.classList.remove('is-closing');
     menu.classList.add('is-open');
-    // 显示后重置自动隐藏计时器
-    resetHideTimer();
+    
+    // 打开时，按钮本身也可以做一个微小的交互
+    if(hamburger) hamburger.style.transform = "scale(0.9)";
+    setTimeout(() => { if(hamburger) hamburger.style.transform = ""; }, 150);
+
+    // 动画结束后解除锁定
+    menu.addEventListener('animationend', () => {
+      isAnimating = false;
+    }, { once: true });
+
+    resetHideTimer(); // 打开菜单时重置隐藏计时器
   }
 
   function closeMenu() {
-    // 标记开始关闭动画
-    isMenuAnimating = true;
+    isAnimating = true;
     menu.classList.remove('is-open');
     menu.classList.add('is-closing');
 
-    // 监听动画结束事件，动画播完后再完全隐藏
+    // 监听退出动画结束
     menu.addEventListener('animationend', function onEnd() {
       menu.classList.remove('is-closing');
-      isMenuAnimating = false;
-      menu.removeEventListener('animationend', onEnd);
+      isAnimating = false;
     }, { once: true });
   }
 
-  // 绑定点击事件
+  // ============================
+  // 2. 事件绑定
+  // ============================
   if (hamburger) {
     hamburger.addEventListener('click', (e) => {
-      e.stopPropagation(); // 阻止冒泡
+      e.stopPropagation();
       toggleMenu();
     });
   }
 
-  // ============================
-  // 2. 点击外部关闭菜单
-  // ============================
+  // 点击空白处关闭
   document.addEventListener('click', (event) => {
-    // 如果菜单是打开的，且点击目标既不是菜单也不是按钮
+    // 只有当菜单打开，且点击位置不在菜单内也不在按钮内时才关闭
     if (menu.classList.contains('is-open') && 
         !menu.contains(event.target) && 
         !hamburger.contains(event.target)) {
@@ -63,10 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ============================
-  // 3. 按钮自动隐藏/显示逻辑 (30秒无操作)
+  // 3. 按钮自动沉浸模式 (自动隐藏)
   // ============================
   function hideHamburger() {
-    // 如果菜单正开着，不要隐藏按钮
+    // 菜单打开时绝对不隐藏按钮
     if (menu.classList.contains('is-open')) return;
     
     if (hamburger) {
@@ -79,14 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
       hamburger.classList.remove('fade-out');
     }
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(hideHamburger, 30000); // 30秒
+    hideTimer = setTimeout(hideHamburger, AUTO_HIDE_DELAY);
   }
 
-  // 监听交互来重置计时器
+  // 任何操作都唤醒按钮
   ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
     window.addEventListener(evt, showHamburger);
   });
 
-  // 初始化计时器
+  // 初始化
   showHamburger();
 });

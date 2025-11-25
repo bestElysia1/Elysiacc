@@ -69,7 +69,7 @@
 }
 
 /* =========================================
-   2. 下拉菜单 (Dropdown Menu)
+   2. 下拉菜单 (Dropdown Menu) - 视觉同步版
    ========================================= */
 .dropdown-menu {
   position: fixed;
@@ -77,58 +77,79 @@
   top: 80px;
   width: 200px;
   
-  /* 强力磨砂玻璃 */
-  background: rgba(255, 250, 255, 0.65);
-  backdrop-filter: blur(25px) saturate(200%);
-  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  /* --- 核心修改：同步 Elysia Playlist 的液态玻璃参数 --- */
   
+  /* 1. 背景：降低透明度 (从 0.65 降至 0.25)，增加淡紫色调 */
+  background: rgba(255, 240, 255, 0.25);
+  
+  /* 2. 模糊：降低模糊半径，增加饱和度，更通透 */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  
+  /* 3. 边框：更轻薄的紫色边框 */
+  border: 1px solid rgba(255, 210, 255, 0.35);
+  
+  /* 4. 阴影：同步紫色光晕与内发光 */
+  box-shadow: 
+    0 8px 24px rgba(200, 160, 255, 0.25), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  /* ------------------------------------------------- */
+
   border-radius: 16px;
-  padding: 8px;
+  padding: 10px; /* 稍微增加内边距以匹配播放列表 */
   list-style: none;
   margin: 0;
   z-index: 10000;
-  
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 
-    0 20px 50px rgba(120, 80, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
-  /* 初始隐藏状态 */
+  /* 初始状态 */
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  
-  /* 变形原点：左上角 */
   transform-origin: 0% 0%;
-  /* 初始位置：稍微向上位移且缩小 */
   transform: translateY(-10px) scale(0.95);
 }
 
-/* 菜单项 */
+/* 菜单项容器 */
 .dropdown-menu li {
   margin: 4px 0;
 }
 
+/* 菜单链接 - 样式同步 */
 .dropdown-menu a {
   display: block;
   padding: 10px 14px;
-  border-radius: 10px;
-  color: #5b4aa1;
+  border-radius: 8px;
+  
+  /* 文字颜色同步：默认使用淡紫色，而非深紫色 */
+  color: #cdbaff; 
+  
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  
+  /* 防止长文字换行 */
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* 菜单项 Hover */
+/* 菜单项 Hover - 样式同步 */
 .dropdown-menu a:hover {
-  background: rgba(154, 110, 240, 0.12);
-  color: #7b3fe4;
+  /* Hover 背景：同步播放列表的高亮色 */
+  background: rgba(160, 120, 255, 0.15);
+  
+  /* Hover 文字：变白 */
+  color: #ffffff;
+  
   transform: translateX(4px);
-  text-shadow: 0 0 8px rgba(154, 110, 240, 0.2);
+  /* 添加柔和的文字光晕 */
+  text-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  box-shadow: none;
 }
+
 
 /* =========================================
    3. 动画控制 (Animations) - 核心优化部分

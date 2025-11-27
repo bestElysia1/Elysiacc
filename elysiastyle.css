@@ -353,64 +353,51 @@ footer:hover {
 }
 
 /* =========================================
-   🌊 海蓝魏紫 - 幻彩流光文字特效 (Elysia 专属定制)
+   🌊 海蓝魏紫 - 静止幻彩文字 (Elysia 专属定制)
    ========================================= */
 
-/* 精准定位：main.container 下的第一个 section 标签（即“唯云”列表所在区域）
-   效果：Deep Ocean Blue (海蓝) -> Cyan -> Wei Purple (魏紫/牡丹红) -> Iridescent
-*/
+/* 定位：main.container 下的第一个 section 标签 */
 main.container > section:nth-of-type(1) p {
-  /* 定义渐变：从左上到右下 */
+  /* 定义静止渐变：从左到右 (90deg)
+     颜色：青海蓝 -> 深海蓝 -> 魏紫 -> 深紫红
+  */
   background: linear-gradient(
-    120deg, 
-    #00c6fb 0%,   /* 浅海蓝/青色 */
-    #005bea 25%,  /* 深海蓝 */
-    #9a6ef0 50%,  /* 原始 Elysia 紫 */
-    #d4145a 75%,  /* 魏紫 (深紫红/洋红) */
-    #00c6fb 100%  /* 闭环回到浅海蓝 */
+    90deg, 
+    #00c6fb 0%,   /* 青蓝 */
+    #005bea 30%,  /* 海蓝 */
+    #9a6ef0 60%,  /* 魏紫 (Elysia紫) */
+    #d4145a 100%  /* 洋红/深牡丹 */
   );
-  
-  /* 放大背景以便动画流动 */
-  background-size: 300% 300%;
   
   /* 将背景裁剪为文字形状 */
   -webkit-background-clip: text;
   background-clip: text;
   
-  /* 强制覆盖原有的淡紫色设置，将文字设为透明以透出背景 */
+  /* 文字设为透明以显示背景 */
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
   
-  /* 稍微加粗以增强渐变可见度 */
-  font-weight: 600;
-  
-  /* 执行流光动画 */
-  animation: seaPurpleFlow 6s linear infinite;
+  /* 修改：恢复正常字体粗细 (之前是600) */
+  font-weight: normal;
   
   /* 移除下划线等干扰 */
   text-decoration: none;
 }
 
-/* 确保 strong 标签（粗体标题如“唯云”、“纯净”）也继承流光效果 */
+/* 确保 strong 标签（如“唯云”、“纯净”）依然加粗并继承渐变效果 */
 main.container > section:nth-of-type(1) p strong {
   background: inherit;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent !important;
-  font-weight: 800; /* 标题更粗一点 */
+  /* 标题保持加粗 */
+  font-weight: 700;
 }
 
-/* 定义流光动画关键帧 */
-@keyframes seaPurpleFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* 鼠标悬停加速流光，增加互动感 */
+/* 鼠标悬停时稍微变亮（不流动，只提亮） */
 main.container > section:nth-of-type(1) p:hover {
-  animation-duration: 3s;
-  filter: brightness(1.2); /* 悬停时稍微变亮 */
+  filter: brightness(1.2);
+  cursor: default;
 }
 
 

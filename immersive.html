@@ -2,182 +2,346 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Elysia Immersive Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Elysia Music</title>
   <style>
-    /* === 沉浸式样式 === */
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --text-main: rgba(255, 255, 255, 0.92);
+      --text-sub: rgba(255, 255, 255, 0.6);
+      --primary-glow: rgba(255, 255, 255, 0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
     body {
-      background: #000;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #111;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* 动态模糊背景 */
-    .bg-blur {
+    /* === 动态极光背景 === */
+    .ambient-bg {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      z-index: -1;
       background-size: cover;
       background-position: center;
-      filter: blur(80px) brightness(0.5);
+      filter: blur(80px) saturate(220%) brightness(0.7);
+      opacity: 0.8;
+      animation: aurora 20s ease-in-out infinite alternate;
+      transition: background-image 1s ease;
+    }
+    .ambient-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, #000 120%);
       z-index: -1;
-      transition: background-image 0.8s ease;
-      transform: scale(1.2); /* 防止白边 */
     }
 
-    /* 顶部导航 */
-    .header {
-      padding: 20px;
+    @keyframes aurora {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(5deg) scale(1.1); }
+      100% { transform: rotate(-5deg) scale(1); }
+    }
+
+    /* === 顶部导航 === */
+    .nav-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: max(20px, env(safe-area-inset-top)) 24px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 10;
     }
-    .back-btn {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      width: 40px; height: 40px;
-      border-radius: 50%;
+    
+    .capsule-btn {
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 500;
       color: #fff;
-      font-size: 20px;
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
     }
+    .capsule-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.1); }
 
-    /* 主要内容区 */
-    .main-stage {
-      flex: 1;
+    /* === 主容器 (响应式布局) === */
+    .player-layout {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
       width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 1200px;
+      height: 100%;
+      padding: 20px;
+      justify-content: center;
     }
 
-    /* 唱片封面 */
-    .cover-wrapper {
-      width: 80vw;
-      height: 80vw;
-      max-width: 350px;
-      max-height: 350px;
-      margin-bottom: 40px;
-      position: relative;
-      border-radius: 20px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* 平板/桌面端改为左右布局 */
+    @media (min-width: 768px) {
+      .player-layout {
+        flex-direction: row;
+        gap: 60px;
+        padding: 60px;
+      }
+      .art-section, .controls-section { flex: 1; }
+      .controls-section { max-width: 450px; }
     }
-    .cover-wrapper img {
+
+    /* === 唱片封面区域 === */
+    .art-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    @media (min-width: 768px) { margin-bottom: 0; }
+
+    .album-art-wrapper {
+      width: 85vw;
+      height: 85vw;
+      max-width: 380px;
+      max-height: 380px;
+      border-radius: 12px;
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      /* Apple Music 经典的封面倒影/阴影处理 */
+    }
+    
+    .album-art-wrapper img {
       width: 100%; height: 100%;
       object-fit: cover;
-      border-radius: 20px;
+      border-radius: 12px;
+      display: block;
     }
-    /* 播放时的呼吸效果 */
-    .playing .cover-wrapper { transform: scale(1.05); }
+
+    /* 播放时的缩放呼吸感 */
+    .is-playing .album-art-wrapper { transform: scale(1); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+    .is-paused .album-art-wrapper { transform: scale(0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+    /* === 控制与信息区域 === */
+    .controls-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .song-info { margin-bottom: 30px; text-align: center; }
+    @media (min-width: 768px) { .song-info { text-align: left; } }
+
+    .song-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.2;
+      /* 文本溢出跑马灯效果后续可加，这里先截断 */
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .artist-name {
+      font-size: 18px;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    /* 进度条 - 苹果风格 */
+    .progress-container {
+      margin-bottom: 40px;
+      width: 100%;
+      cursor: pointer;
+    }
     
-    /* 歌曲信息 */
-    .info { text-align: center; margin-bottom: 30px; width: 100%; }
-    .song-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    .artist-name { font-size: 1rem; color: rgba(255,255,255,0.7); }
-
-    /* 进度条 */
-    .progress-area { width: 100%; display: flex; align-items: center; gap: 15px; font-size: 12px; color: #ccc; margin-bottom: 40px; }
+    .slider-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden; /* 隐藏溢出部分 */
+    }
+    
+    /* 自定义 Range Input */
     input[type=range] {
-      flex: 1; -webkit-appearance: none; background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; outline: none;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.5);
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      position: absolute;
+      top: -6px; bottom: -6px; /* 扩大触摸区域 */
+      margin: auto;
+      z-index: 2;
+      opacity: 0; /* 隐藏原生滑块，用下面的 div 模拟 */
+      cursor: pointer;
     }
 
-    /* 控制按钮 */
-    .controls { display: flex; align-items: center; justify-content: space-between; width: 80%; max-width: 300px; }
-    .btn { background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; opacity: 0.9; transition: transform 0.2s; }
-    .btn:active { transform: scale(0.9); }
-    .btn-play {
-      width: 70px; height: 70px;
-      background: #fff; color: #000;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.2rem;
-      box-shadow: 0 0 20px rgba(255,255,255,0.4);
+    /* 模拟已播放进度条 */
+    .progress-fill {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 0%;
+      background: #fff;
+      border-radius: 3px;
+      pointer-events: none;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
+
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 8px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 按钮组 */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center; /* 桌面端也居中比较好看，或者 space-between */
+      gap: 40px;
+    }
+    @media (min-width: 768px) { .controls-row { justify-content: flex-start; gap: 50px; } }
+
+    .ctrl-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .ctrl-btn:active { transform: scale(0.85); }
+    .ctrl-btn:hover { opacity: 0.8; }
+
+    .ctrl-icon { width: 32px; height: 32px; fill: currentColor; }
+    
+    /* 播放按钮特殊样式 */
+    .btn-play-pause {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #fff;
+      color: #000;
+      box-shadow: 0 8px 20px rgba(255,255,255,0.25);
+    }
+    .btn-play-pause .ctrl-icon { width: 30px; height: 30px; margin-left: 2px; }
+    .btn-play-pause.playing .ctrl-icon { margin-left: 0; } /* 暂停图标居中 */
+    
+    .btn-play-pause:active { transform: scale(0.92); box-shadow: 0 4px 10px rgba(255,255,255,0.2); }
+
   </style>
 </head>
-<body>
+<body class="is-paused"> <div class="ambient-bg" id="ambientBg"></div>
+  <div class="ambient-overlay"></div>
 
-  <div class="bg-blur" id="bgBlur"></div>
+  <nav class="nav-bar">
+    <button class="capsule-btn" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Back
+    </button>
+  </nav>
 
-  <header class="header">
-    <button class="back-btn" onclick="goBack()">↓</button>
-    <span style="font-size:14px; opacity:0.6; letter-spacing:1px">NOW PLAYING</span>
-    <div style="width:40px"></div> </header>
+  <main class="player-layout">
+    
+    <section class="art-section">
+      <div class="album-art-wrapper">
+        <img id="coverImg" src="" alt="Album Art">
+      </div>
+    </section>
 
-  <main class="main-stage" id="playerContainer">
-    <div class="cover-wrapper">
-      <img id="coverImg" src="" alt="Cover">
-    </div>
+    <section class="controls-section">
+      <div class="song-info">
+        <div class="song-title" id="songTitle">Loading...</div>
+        <div class="artist-name">Elysia Collection</div>
+      </div>
 
-    <div class="info">
-      <h1 class="song-title" id="songTitle">Loading...</h1>
-      <p class="artist-name">Elysia Collection</p>
-    </div>
+      <div class="progress-container">
+        <div class="slider-track">
+          <div class="progress-fill" id="progressFill"></div>
+          <input type="range" id="progressBar" min="0" value="0" step="0.1">
+        </div>
+        <div class="time-labels">
+          <span id="currTime">0:00</span>
+          <span id="totalTime">-:--</span>
+        </div>
+      </div>
 
-    <div class="progress-area">
-      <span id="currTime">0:00</span>
-      <input type="range" id="progressBar" min="0" value="0" step="0.1">
-      <span id="totalTime">0:00</span>
-    </div>
+      <div class="controls-row">
+        <button class="ctrl-btn" id="prevBtn" aria-label="Previous">
+          <svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
 
-    <div class="controls">
-      <button class="btn" id="prevBtn">⏮</button>
-      <button class="btn btn-play" id="playBtn">▶</button>
-      <button class="btn" id="nextBtn">⏭</button>
-    </div>
+        <button class="ctrl-btn btn-play-pause" id="playBtn" aria-label="Play">
+          <svg class="ctrl-icon" id="iconPlay" style="display:block" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ctrl-icon" id="iconPause" style="display:none" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+
+        <button class="ctrl-btn" id="nextBtn" aria-label="Next">
+          <svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      </div>
+    </section>
+
   </main>
 
 <script>
-  /* ===== 歌曲数据 (需与主页保持一致) ===== */
-  // ⚠️ 注意：这里必须包含你 index.html 里所有的歌曲数据
-  // 为了演示，我放了部分，请务必把 elysiamusic.js 里的 songs 数组完整复制到这里
+  /* ===========================================
+     🎵 歌曲数据源 (必须与 elysiamusic.js 一致)
+     ===========================================
+     请在这里粘贴完整的歌曲列表！
+  */
   const songs = [
     { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
     { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
     { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
-    // ... 请在此处补全所有歌曲 ...
-    // ... 必须保证 index 和主页一致 ...
+    // ... 请务必将主页的所有歌曲复制到这里，否则索引对不上 ...
+    // ... 省略 ...
   ];
 
+  /* 核心逻辑 */
   const audio = new Audio();
   let currentIndex = 0;
   let isDragging = false;
 
-  // DOM 元素
+  // DOM 元素缓存
   const els = {
-    bg: document.getElementById('bgBlur'),
+    body: document.body,
+    bg: document.getElementById('ambientBg'),
     cover: document.getElementById('coverImg'),
     title: document.getElementById('songTitle'),
+    progressFill: document.getElementById('progressFill'),
+    progressBar: document.getElementById('progressBar'),
+    currTime: document.getElementById('currTime'),
+    totalTime: document.getElementById('totalTime'),
     playBtn: document.getElementById('playBtn'),
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
-    progress: document.getElementById('progressBar'),
-    currTime: document.getElementById('currTime'),
-    totalTime: document.getElementById('totalTime'),
-    container: document.getElementById('playerContainer')
+    iconPlay: document.getElementById('iconPlay'),
+    iconPause: document.getElementById('iconPause')
   };
 
-  // 初始化：解析 URL 参数
   function init() {
     const params = new URLSearchParams(window.location.search);
     const indexParam = params.get('index');
     const timeParam = params.get('time');
-    const statusParam = params.get('status');
+    const statusParam = params.get('status'); // 'play' or 'pause'
 
     if (indexParam !== null) {
       currentIndex = parseInt(indexParam);
@@ -186,22 +350,18 @@
 
     loadSong(currentIndex);
 
-    // 设置初始进度
     if (timeParam) {
       audio.currentTime = parseFloat(timeParam);
     }
 
-    // 尝试自动播放
-    if (statusParam === 'play' || !statusParam) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          updatePlayIcon(true);
-        }).catch(() => {
-          // 浏览器阻止自动播放，需要用户点击
-          updatePlayIcon(false);
-        });
-      }
+    // 状态同步
+    if (statusParam === 'play') {
+      // 这里的 timeout 是为了给浏览器一点缓冲，让 UI 动画先就位
+      setTimeout(() => {
+        playMusic();
+      }, 100);
+    } else {
+      updatePlayState(false);
     }
   }
 
@@ -210,82 +370,121 @@
     audio.src = song.src;
     els.title.innerText = song.title;
     els.cover.src = song.cover;
+    // 背景图切换
     els.bg.style.backgroundImage = `url('${song.cover}')`;
     
-    // 更新 Media Session
+    // Media Session (手机锁屏控制)
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: song.title,
-        artist: 'Elysia Player',
+        artist: 'Elysia Collection',
         artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
+      });
+      navigator.mediaSession.setActionHandler('play', playMusic);
+      navigator.mediaSession.setActionHandler('pause', pauseMusic);
+      navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+      navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    }
+  }
+
+  /* 播放控制 */
+  function playMusic() {
+    const promise = audio.play();
+    if (promise !== undefined) {
+      promise.then(() => {
+        updatePlayState(true);
+      }).catch(err => {
+        console.warn("Auto-play prevented:", err);
+        updatePlayState(false);
       });
     }
   }
 
-  function togglePlay() {
-    if (audio.paused) {
-      audio.play();
-      updatePlayIcon(true);
+  function pauseMusic() {
+    audio.pause();
+    updatePlayState(false);
+  }
+
+  function updatePlayState(isPlaying) {
+    if (isPlaying) {
+      els.body.classList.remove('is-paused');
+      els.body.classList.add('is-playing');
+      els.iconPlay.style.display = 'none';
+      els.iconPause.style.display = 'block';
+      els.playBtn.classList.add('playing'); // 调整图标边距
     } else {
-      audio.pause();
-      updatePlayIcon(false);
+      els.body.classList.remove('is-playing');
+      els.body.classList.add('is-paused');
+      els.iconPlay.style.display = 'block';
+      els.iconPause.style.display = 'none';
+      els.playBtn.classList.remove('playing');
     }
   }
 
-  function updatePlayIcon(isPlaying) {
-    els.playBtn.innerText = isPlaying ? "⏸" : "▶";
-    if (isPlaying) els.container.classList.add('playing');
-    else els.container.classList.remove('playing');
-  }
-
-  // 切换歌曲
-  function changeSong(dir) {
-    if (dir === 'next') currentIndex = (currentIndex + 1) % songs.length;
-    else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  function playNext() {
+    currentIndex = (currentIndex + 1) % songs.length;
     loadSong(currentIndex);
-    audio.play();
-    updatePlayIcon(true);
+    playMusic();
   }
 
-  // 返回主页
-  window.goBack = function() {
-    // 返回时带上状态，以便主页接续播放（如果你需要主页也同步的话）
-    // 这里简单处理：直接返回，因为主页是多页面逻辑，音乐会断开是物理限制
-    window.location.href = "index.html"; 
-    // 或者 history.back();
+  function playPrev() {
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(currentIndex);
+    playMusic();
   }
 
-  // 事件监听
-  els.playBtn.onclick = togglePlay;
-  els.nextBtn.onclick = () => changeSong('next');
-  els.prevBtn.onclick = () => changeSong('prev');
-  
+  /* 事件绑定 */
+  els.playBtn.onclick = () => {
+    if (audio.paused) playMusic();
+    else pauseMusic();
+  };
+  els.nextBtn.onclick = playNext;
+  els.prevBtn.onclick = playPrev;
+
+  // 进度更新
   audio.ontimeupdate = () => {
     if (!isDragging) {
-      const percent = (audio.currentTime / audio.duration) * 100 || 0;
-      els.progress.value = percent;
+      const duration = audio.duration || 1;
+      const percent = (audio.currentTime / duration) * 100;
+      els.progressFill.style.width = percent + '%';
+      els.progressBar.value = percent; // 这里的 value 是 0-100
+      
       els.currTime.innerText = formatTime(audio.currentTime);
-      els.totalTime.innerText = formatTime(audio.duration || 0);
+      els.totalTime.innerText = formatTime(duration);
     }
   };
+  
+  audio.onended = playNext;
 
-  audio.onended = () => changeSong('next');
-
-  // 进度条拖拽
-  els.progress.oninput = () => { isDragging = true; };
-  els.progress.onchange = (e) => {
-    const time = (e.target.value / 100) * audio.duration;
-    audio.currentTime = time;
-    isDragging = false;
-    if (audio.paused) audio.play();
+  // 拖拽进度条
+  els.progressBar.oninput = (e) => {
+    isDragging = true;
+    const percent = e.target.value;
+    els.progressFill.style.width = percent + '%';
   };
 
+  els.progressBar.onchange = (e) => {
+    isDragging = false;
+    const duration = audio.duration || 0;
+    const seekTo = (e.target.value / 100) * duration;
+    audio.currentTime = seekTo;
+    if (audio.paused) playMusic();
+  };
+
+  /* 工具函数 */
   function formatTime(s) {
+    if (isNaN(s)) return "0:00";
     const min = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
     return `${min}:${sec<10?'0':''}${sec}`;
   }
 
+  window.goBack = function() {
+    // 使用 history.back() 体验更自然，但为了确保去主页，也可以指定 href
+    window.location.href = "index.html";
+  };
+
+  // 启动
   init();
 </script>
 </body>

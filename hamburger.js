@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const AUTO_HIDE_DELAY = 30000;
 
   // ============================
-  // 1. 菜单开关逻辑 (保持不变)
+  // 1. 菜单开关逻辑
   // ============================
   function toggleMenu() {
     if (!menu) return;
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // 2. 交互事件监听 (保持不变)
+  // 2. 交互事件监听
   // ============================
   if (hamburger) {
     hamburger.addEventListener('click', (e) => {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ============================
-  // 3. 按钮自动隐藏逻辑 (保持不变)
+  // 3. 按钮自动隐藏逻辑
   // ============================
   function hideHamburger() {
     if (menu && menu.classList.contains('show')) return;
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(document.documentElement, { attributes: true });
 
   // =========================================
-  // 5. 语言切换与 Cookie 控制 (修复的核心部分)
+  // 5. 语言切换与 Cookie 控制 (核心修复)
   // =========================================
 
   // 获取 Cookie
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.cookie = name + "=" + value + ";path=/";
   }
 
-  // 【新增】彻底清除 Google 翻译痕迹的函数
+  // 【功能】彻底清除 Google 翻译状态（不仅仅是 Cookie，还有 Storage）
   function clearTranslationState() {
       // 1. 清除当前域名的 cookie
       document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -149,21 +149,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const langSpan = langSwitch ? langSwitch.querySelector('.lang-text') : null;
   const langIcon = langSwitch ? langSwitch.querySelector('.lang-badge') : null;
 
-  // 判断当前是否处于“非中文”状态
-  // 只要 cookie 包含 /en 或者 /zh-CN/en 即视为英文模式
+  // 判断当前是否处于“非中文”状态 (Cookie 包含 /en)
   const isTranslated = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
 
   if (langSpan && langIcon) {
       if (isTranslated) {
-          // 当前是英文 -> 按钮显示“关闭翻译/中文”
-          langSpan.innerText = '关闭翻译'; // 也可以写 '中文'
-          langIcon.innerText = '×';      // 用叉号表示关闭，或者写 'CN'
-          langIcon.style.borderColor = "#ff9999"; // 给个红色边框提示这是关闭
+          // 当前是英文 -> 按钮显示“中文” (实际功能是关闭翻译)
+          langSpan.innerText = '中文'; 
+          langIcon.innerText = 'CN';
       } else {
-          // 当前是默认(中文) -> 按钮显示“EN”
+          // 当前是默认(中文) -> 按钮显示“EN” (实际功能是开启翻译)
           langSpan.innerText = 'EN';
           langIcon.innerText = '文';
-          langIcon.style.borderColor = ""; // 恢复默认颜色
       }
   }
 
@@ -174,12 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
           e.stopPropagation(); 
           
           if (isTranslated) {
-              // 【核心逻辑变化】
-              // 如果当前是翻译状态，不要“翻译回中文”，而是“炸毁所有配置”
-              // 这样浏览器就会以原生代码加载页面（即中文）
+              // 逻辑：如果当前已经翻译了，点击“中文”意味着“销毁翻译配置”，回归原生页面
               clearTranslationState();
           } else {
-              // 开启英文翻译
+              // 逻辑：如果当前是原生页面，点击“EN”意味着“开启英文翻译”
               setCookie('googtrans', '/zh-CN/en', 1);
           }
 

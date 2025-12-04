@@ -1,4 +1,4 @@
-/* hamburger.css - Elysia Style with "DockPop" Rebound */
+/* hamburger.css - Elysia Style with "DockPop" Rebound & Translation Logic */
 
 /* =========================================
    1. 汉堡按钮 (Liquid Glass Button)
@@ -78,26 +78,16 @@
   width: 200px;
   
   /* --- 核心修改：同步 Elysia Playlist 的液态玻璃参数 --- */
-  
-  /* 1. 背景：降低透明度 (从 0.65 降至 0.25)，增加淡紫色调 */
   background: rgba(255, 240, 255, 0.25);
-  
-  /* 2. 模糊：降低模糊半径，增加饱和度，更通透 */
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
-  
-  /* 3. 边框：更轻薄的紫色边框 */
   border: 1px solid rgba(255, 210, 255, 0.35);
-  
-  /* 4. 阴影：同步紫色光晕与内发光 */
   box-shadow: 
     0 8px 24px rgba(200, 160, 255, 0.25), 
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
-  /* ------------------------------------------------- */
-
   border-radius: 16px;
-  padding: 10px; /* 稍微增加内边距以匹配播放列表 */
+  padding: 10px;
   list-style: none;
   margin: 0;
   z-index: 10000;
@@ -120,82 +110,145 @@
   display: block;
   padding: 10px 14px;
   border-radius: 8px;
-  
-  /* 文字颜色同步：默认使用淡紫色，而非深紫色 */
   color: #cdbaff; 
-  
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  
-  /* 防止长文字换行 */
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 /* 菜单项 Hover - 样式同步 */
 .dropdown-menu a:hover {
-  /* Hover 背景：同步播放列表的高亮色 */
   background: rgba(160, 120, 255, 0.15);
-  
-  /* Hover 文字：变白 */
   color: #ffffff;
-  
   transform: translateX(4px);
-  /* 添加柔和的文字光晕 */
   text-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   box-shadow: none;
 }
 
+/* =========================================
+   3. 语言切换按钮 (New Translation Styles)
+   ========================================= */
+.menu-divider {
+  height: 1px;
+  background: rgba(160, 120, 255, 0.15);
+  margin: 8px 10px;
+}
+
+/* 语言按钮布局 */
+.dropdown-menu a.lang-switch-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 语言图标 Badge */
+.lang-badge {
+  font-size: 10px;
+  border: 1px solid rgba(160, 120, 255, 0.4);
+  color: #cdbaff;
+  padding: 1px 5px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu a.lang-switch-item:hover .lang-badge {
+  color: #fff;
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
 
 /* =========================================
-   3. 动画控制 (Animations) - 核心优化部分
+   4. 【核弹级】隐藏 Google 翻译自带 UI
    ========================================= */
 
-/* 显示状态：应用参考的 dockPop 逻辑 */
+/* 隐藏 Google 插入的 iframe 横幅 */
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget-simple {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
+    position: absolute !important;
+    top: -9999px !important;
+}
+
+/* 强制锁定 body 位置，防止下沉 */
+body {
+    top: 0px !important;
+    position: static !important;
+    min-height: 100% !important; 
+}
+
+/* 隐藏原来的下拉框容器 */
+#google_translate_element {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 隐藏悬浮提示与高亮 */
+.goog-tooltip, 
+.goog-tooltip:hover,
+.goog-text-highlight {
+    display: none !important;
+    visibility: hidden !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 移动端横幅暴力隐藏 */
+body > .skiptranslate {
+    display: none !important;
+    height: 0 !important;
+    visibility: hidden !important;
+}
+
+/* =========================================
+   5. 动画控制 (Animations)
+   ========================================= */
 .dropdown-menu.show {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  
-  /* 使用参考代码的贝塞尔曲线，实现有重量感的回弹 */
   animation: menuReboundOpen 0.62s cubic-bezier(0.22, 0.9, 0.36, 1) forwards;
 }
 
-/* 隐藏状态：快速收回 */
 .dropdown-menu:not(.show) {
-  /* 如果需要关闭动画，可以使用这个 */
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
   visibility: hidden;
 }
 
-/* 核心动画：Menu Rebound (参考 dockPop) 
-   特点：0% -> 55%(过冲/变亮) -> 100%(回稳)
-*/
 @keyframes menuReboundOpen {
   0% { 
     opacity: 0; 
-    transform: translateY(-15px) scale(0.92); /* 初始位置：偏上，稍暗 */
+    transform: translateY(-15px) scale(0.92);
     filter: brightness(0.92);
   }
   55% {
     opacity: 1;
-    transform: translateY(4px) scale(1.05); /* 过冲位置：偏下，放大，变亮 */
+    transform: translateY(4px) scale(1.05);
     filter: brightness(1.12);
   }
   100% { 
     opacity: 1; 
-    transform: translateY(0) scale(1); /* 最终位置：复原 */
+    transform: translateY(0) scale(1);
     filter: brightness(1);
   }
 }
 
-/* 线条流动动画 */
 @keyframes glowFlow {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }

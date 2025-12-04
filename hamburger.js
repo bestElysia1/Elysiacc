@@ -155,12 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (langSpan && langIcon) {
       if (isEnglish) {
           // 当前是英文，显示“中文”按钮
-          langSpan.innerText = '中文'; 
-          langIcon.innerText = 'CN';
+          langSpan.innerText = 'CN'; 
       } else {
           // 当前是中文（或默认），显示“EN”按钮
           langSpan.innerText = 'EN';
-          langIcon.innerText = '文';
       }
   }
 

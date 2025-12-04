@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(document.documentElement, { attributes: true });
 
   // =========================================
-  // 5. 语言切换与 Cookie 控制 (逻辑修复版)
+  // 5. 语言切换与 Cookie 控制 (修复UI更新问题)
   // =========================================
 
   // 获取 Cookie
@@ -127,37 +127,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const d = new Date();
       d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
       
-      // 设置根路径 cookie
-      document.cookie = name + "=" + value + ";path=/;expires=" + d.toUTCString();
-      
-      // 尝试设置带域名的 cookie，以覆盖可能的子域名配置
       const domain = document.domain;
+      // 设置根路径
+      document.cookie = name + "=" + value + ";path=/;expires=" + d.toUTCString();
+      // 设置带域名的路径
       document.cookie = name + "=" + value + ";path=/;domain=" + domain + ";expires=" + d.toUTCString();
       document.cookie = name + "=" + value + ";path=/;domain=." + domain + ";expires=" + d.toUTCString();
-  }
-
-  // 清除 Cookie (辅助函数)
-  function deleteCookie(name) {
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    const domain = document.domain;
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain;
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=." + domain;
   }
 
   // UI 更新逻辑
   const currentLangCookie = getCookie('googtrans');
   const langSpan = langSwitch ? langSwitch.querySelector('.lang-text') : null;
-  const langIcon = langSwitch ? langSwitch.querySelector('.lang-badge') : null;
+  // 注意：这里删除了对 langIcon 的获取，因为HTML中已经没有这个元素了
 
   // 判断是否是英文状态 (Cookie 包含 /en)
   const isEnglish = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
 
-  if (langSpan && langIcon) {
+  // 只要找到文字 span 就进行更新
+  if (langSpan) {
       if (isEnglish) {
-          // 当前是英文，显示“中文”按钮
+          // 当前是英文 -> 按钮显示 CN (提示可以切回中文)
           langSpan.innerText = 'CN'; 
       } else {
-          // 当前是中文（或默认），显示“EN”按钮
+          // 当前是中文 -> 按钮显示 EN (提示可以切到英文)
           langSpan.innerText = 'EN';
       }
   }
@@ -169,14 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
           e.stopPropagation(); 
           
           if (isEnglish) {
-              // 【核心修复】切换回中文
-              // 1. 不要只是删除 Cookie，要强制设为“中文到中文”
-              // 这样 Google 翻译会认为已经翻译完成了，不会再自动跳回英文
+              // 切换回中文：强制设置中文对中文翻译，并清除缓存
               setCookie('googtrans', '/zh-CN/zh-CN', 1);
-              
-              // 2. 清除 localStorage 防止脚本缓存
               localStorage.removeItem('googtrans');
-              
           } else {
               // 切换到英文
               setCookie('googtrans', '/zh-CN/en', 1);

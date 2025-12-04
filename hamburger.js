@@ -1,5 +1,3 @@
-/* hamburger.js - Logic for Elysia Navigation & Google Translate Integration */
-
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById('hamburger-menu');
   const menu = document.getElementById('dropdown');
@@ -10,22 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const AUTO_HIDE_DELAY = 30000;
 
   // ============================
-  // 1. 菜单开关逻辑
+  // 1. 菜单开关逻辑 (保持不变)
   // ============================
   function toggleMenu() {
     if (!menu) return;
-
-    // 切换 .show 类触发 CSS 动画
     const isOpening = !menu.classList.contains('show');
-    
     if (isOpening) {
       menu.classList.add('show');
-      // 打开时，给按钮一个微小的缩放反馈
       if (hamburger) {
         hamburger.style.transform = "scale(0.92)";
         setTimeout(() => { hamburger.style.transform = ""; }, 200);
       }
-      // 菜单打开时，重置并暂停自动隐藏
       showHamburger();
     } else {
       menu.classList.remove('show');
@@ -37,9 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // 2. 交互事件监听
+  // 2. 交互事件监听 (保持不变)
   // ============================
-  
   if (hamburger) {
     hamburger.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -56,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ============================
-  // 3. 按钮自动隐藏逻辑 (沉浸模式)
+  // 3. 按钮自动隐藏逻辑 (保持不变)
   // ============================
   function hideHamburger() {
     if (menu && menu.classList.contains('show')) return;
@@ -76,10 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
   showHamburger();
 
   // =========================================
-  // 4. Google 翻译集成逻辑 (核弹修复版)
+  // 4. Google 翻译集成逻辑 (保持不变)
   // =========================================
-
-  // 4.1 动态注入 Google 翻译脚本
   if (!document.getElementById('google-translate-script')) {
       const script = document.createElement('script');
       script.id = 'google-translate-script';
@@ -87,33 +77,26 @@ document.addEventListener("DOMContentLoaded", () => {
       script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
       document.body.appendChild(script);
 
-      // 创建隐藏的容器
       const div = document.createElement('div');
       div.id = 'google_translate_element';
       div.style.display = 'none';
       document.body.insertBefore(div, document.body.firstChild);
   }
 
-  // 4.2 初始化配置
   window.googleTranslateElementInit = function() {
       new google.translate.TranslateElement({
           pageLanguage: 'zh-CN',
           includedLanguages: 'en,zh-CN',
-          // 使用 SIMPLE 布局，减少原生横幅出现的概率
           layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
           autoDisplay: false
       }, 'google_translate_element');
   };
 
-  // 4.3 【核弹监控】防止 Google 强行修改 body 样式或插入横幅
   const observer = new MutationObserver((mutations) => {
-      // A. 强制重置 body 的 top 样式 (防止页面下沉)
       if (document.body.style.top !== '0px' && document.body.style.top !== '') {
           document.body.style.top = '0px';
           document.body.style.position = 'static';
       }
-      
-      // B. 暴力隐藏所有谷歌相关的 iframe 和横幅
       const banners = document.querySelectorAll('.goog-te-banner-frame, iframe.skiptranslate, body > .skiptranslate');
       banners.forEach(el => {
           if (el.style.display !== 'none') {
@@ -126,63 +109,81 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       });
   });
-
-  // 开始监控
   observer.observe(document.body, { attributes: true, childList: true, subtree: true });
   observer.observe(document.documentElement, { attributes: true });
 
   // =========================================
-  // 5. 语言切换与 Cookie 控制
+  // 5. 语言切换与 Cookie 控制 (修复的核心部分)
   // =========================================
 
+  // 获取 Cookie
   function getCookie(name) {
       const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
       return v ? v[2] : null;
   }
 
+  // 设置 Cookie
   function setCookie(name, value, days) {
       const d = new Date();
       d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
       document.cookie = name + "=" + value + ";path=/";
   }
 
-  // 根据当前状态更新按钮文字
+  // 【新增】彻底清除 Google 翻译痕迹的函数
+  function clearTranslationState() {
+      // 1. 清除当前域名的 cookie
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      
+      // 2. 清除带域名的 cookie (防止子域名干扰)
+      const domain = document.domain;
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + domain + "; path=/;";
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=." + domain + "; path=/;";
+
+      // 3. 【关键】清除 localStorage，Google 经常把设置存在这里
+      localStorage.removeItem('googtrans');
+      sessionStorage.removeItem('googtrans');
+  }
+
+  // UI 更新逻辑
   const currentLangCookie = getCookie('googtrans');
   const langSpan = langSwitch ? langSwitch.querySelector('.lang-text') : null;
   const langIcon = langSwitch ? langSwitch.querySelector('.lang-badge') : null;
 
+  // 判断当前是否处于“非中文”状态
+  // 只要 cookie 包含 /en 或者 /zh-CN/en 即视为英文模式
+  const isTranslated = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
+
   if (langSpan && langIcon) {
-      if (currentLangCookie && currentLangCookie.includes('/en')) {
-          // 当前是英文，显示切回中文的提示
-          langSpan.innerText = '中文';
-          langIcon.innerText = 'CN';
+      if (isTranslated) {
+          // 当前是英文 -> 按钮显示“关闭翻译/中文”
+          langSpan.innerText = '关闭翻译'; // 也可以写 '中文'
+          langIcon.innerText = '×';      // 用叉号表示关闭，或者写 'CN'
+          langIcon.style.borderColor = "#ff9999"; // 给个红色边框提示这是关闭
       } else {
-          // 当前是中文，显示切到英文的提示
+          // 当前是默认(中文) -> 按钮显示“EN”
           langSpan.innerText = 'EN';
           langIcon.innerText = '文';
+          langIcon.style.borderColor = ""; // 恢复默认颜色
       }
   }
 
-  // 点击按钮切换语言
+  // 点击事件
   if (langSwitch) {
       langSwitch.addEventListener('click', (e) => {
           e.preventDefault();
-          e.stopPropagation(); // 防止菜单立即关闭，虽然会刷新
+          e.stopPropagation(); 
           
-          const currentCookie = getCookie('googtrans');
-
-          if (currentCookie && currentCookie.includes('/en')) {
-              // 切换回中文：清除 Cookie
-              setCookie('googtrans', '/zh-CN/zh-CN', 0);
-              // 彻底清除可能的残留
-              document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-              document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + document.domain + "; path=/;";
+          if (isTranslated) {
+              // 【核心逻辑变化】
+              // 如果当前是翻译状态，不要“翻译回中文”，而是“炸毁所有配置”
+              // 这样浏览器就会以原生代码加载页面（即中文）
+              clearTranslationState();
           } else {
-              // 切换到英文
+              // 开启英文翻译
               setCookie('googtrans', '/zh-CN/en', 1);
           }
 
-          // 刷新页面以应用
+          // 刷新页面生效
           location.reload();
       });
   }

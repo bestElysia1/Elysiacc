@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showHamburger();
 
   // =========================================
-  // 4. Google 翻译集成逻辑 (保持不变)
+  // 4. Google 翻译集成逻辑
   // =========================================
   if (!document.getElementById('google-translate-script')) {
       const script = document.createElement('script');
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(document.documentElement, { attributes: true });
 
   // =========================================
-  // 5. 语言切换与 Cookie 控制 (核心修复)
+  // 5. 语言切换与 Cookie 控制 (逻辑修复版)
   // =========================================
 
   // 获取 Cookie
@@ -122,26 +122,26 @@ document.addEventListener("DOMContentLoaded", () => {
       return v ? v[2] : null;
   }
 
-  // 设置 Cookie
+  // 设置 Cookie (增加 domain 处理，确保覆盖)
   function setCookie(name, value, days) {
       const d = new Date();
       d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
-      document.cookie = name + "=" + value + ";path=/";
+      
+      // 设置根路径 cookie
+      document.cookie = name + "=" + value + ";path=/;expires=" + d.toUTCString();
+      
+      // 尝试设置带域名的 cookie，以覆盖可能的子域名配置
+      const domain = document.domain;
+      document.cookie = name + "=" + value + ";path=/;domain=" + domain + ";expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";path=/;domain=." + domain + ";expires=" + d.toUTCString();
   }
 
-  // 【功能】彻底清除 Google 翻译状态（不仅仅是 Cookie，还有 Storage）
-  function clearTranslationState() {
-      // 1. 清除当前域名的 cookie
-      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      
-      // 2. 清除带域名的 cookie (防止子域名干扰)
-      const domain = document.domain;
-      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + domain + "; path=/;";
-      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=." + domain + "; path=/;";
-
-      // 3. 【关键】清除 localStorage，Google 经常把设置存在这里
-      localStorage.removeItem('googtrans');
-      sessionStorage.removeItem('googtrans');
+  // 清除 Cookie (辅助函数)
+  function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    const domain = document.domain;
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain;
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=." + domain;
   }
 
   // UI 更新逻辑
@@ -149,16 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const langSpan = langSwitch ? langSwitch.querySelector('.lang-text') : null;
   const langIcon = langSwitch ? langSwitch.querySelector('.lang-badge') : null;
 
-  // 判断当前是否处于“非中文”状态 (Cookie 包含 /en)
-  const isTranslated = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
+  // 判断是否是英文状态 (Cookie 包含 /en)
+  const isEnglish = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
 
   if (langSpan && langIcon) {
-      if (isTranslated) {
-          // 当前是英文 -> 按钮显示“中文” (实际功能是关闭翻译)
+      if (isEnglish) {
+          // 当前是英文，显示“中文”按钮
           langSpan.innerText = '中文'; 
           langIcon.innerText = 'CN';
       } else {
-          // 当前是默认(中文) -> 按钮显示“EN” (实际功能是开启翻译)
+          // 当前是中文（或默认），显示“EN”按钮
           langSpan.innerText = 'EN';
           langIcon.innerText = '文';
       }
@@ -170,11 +170,17 @@ document.addEventListener("DOMContentLoaded", () => {
           e.preventDefault();
           e.stopPropagation(); 
           
-          if (isTranslated) {
-              // 逻辑：如果当前已经翻译了，点击“中文”意味着“销毁翻译配置”，回归原生页面
-              clearTranslationState();
+          if (isEnglish) {
+              // 【核心修复】切换回中文
+              // 1. 不要只是删除 Cookie，要强制设为“中文到中文”
+              // 这样 Google 翻译会认为已经翻译完成了，不会再自动跳回英文
+              setCookie('googtrans', '/zh-CN/zh-CN', 1);
+              
+              // 2. 清除 localStorage 防止脚本缓存
+              localStorage.removeItem('googtrans');
+              
           } else {
-              // 逻辑：如果当前是原生页面，点击“EN”意味着“开启英文翻译”
+              // 切换到英文
               setCookie('googtrans', '/zh-CN/en', 1);
           }
 

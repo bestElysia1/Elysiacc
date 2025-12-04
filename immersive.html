@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Elysia Immersive Player</title>
+  <style>
+    /* === 沉浸式样式 === */
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 动态模糊背景 */
+    .bg-blur {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(80px) brightness(0.5);
+      z-index: -1;
+      transition: background-image 0.8s ease;
+      transform: scale(1.2); /* 防止白边 */
+    }
+
+    /* 顶部导航 */
+    .header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* 主要内容区 */
+    .main-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 唱片封面 */
+    .cover-wrapper {
+      width: 80vw;
+      height: 80vw;
+      max-width: 350px;
+      max-height: 350px;
+      margin-bottom: 40px;
+      position: relative;
+      border-radius: 20px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .cover-wrapper img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+    /* 播放时的呼吸效果 */
+    .playing .cover-wrapper { transform: scale(1.05); }
+    
+    /* 歌曲信息 */
+    .info { text-align: center; margin-bottom: 30px; width: 100%; }
+    .song-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .artist-name { font-size: 1rem; color: rgba(255,255,255,0.7); }
+
+    /* 进度条 */
+    .progress-area { width: 100%; display: flex; align-items: center; gap: 15px; font-size: 12px; color: #ccc; margin-bottom: 40px; }
+    input[type=range] {
+      flex: 1; -webkit-appearance: none; background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    /* 控制按钮 */
+    .controls { display: flex; align-items: center; justify-content: space-between; width: 80%; max-width: 300px; }
+    .btn { background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; opacity: 0.9; transition: transform 0.2s; }
+    .btn:active { transform: scale(0.9); }
+    .btn-play {
+      width: 70px; height: 70px;
+      background: #fff; color: #000;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 0 20px rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-blur" id="bgBlur"></div>
+
+  <header class="header">
+    <button class="back-btn" onclick="goBack()">↓</button>
+    <span style="font-size:14px; opacity:0.6; letter-spacing:1px">NOW PLAYING</span>
+    <div style="width:40px"></div> </header>
+
+  <main class="main-stage" id="playerContainer">
+    <div class="cover-wrapper">
+      <img id="coverImg" src="" alt="Cover">
+    </div>
+
+    <div class="info">
+      <h1 class="song-title" id="songTitle">Loading...</h1>
+      <p class="artist-name">Elysia Collection</p>
+    </div>
+
+    <div class="progress-area">
+      <span id="currTime">0:00</span>
+      <input type="range" id="progressBar" min="0" value="0" step="0.1">
+      <span id="totalTime">0:00</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="prevBtn">⏮</button>
+      <button class="btn btn-play" id="playBtn">▶</button>
+      <button class="btn" id="nextBtn">⏭</button>
+    </div>
+  </main>
+
+<script>
+  /* ===== 歌曲数据 (需与主页保持一致) ===== */
+  // ⚠️ 注意：这里必须包含你 index.html 里所有的歌曲数据
+  // 为了演示，我放了部分，请务必把 elysiamusic.js 里的 songs 数组完整复制到这里
+  const songs = [
+    { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
+    { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
+    { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
+    // ... 请在此处补全所有歌曲 ...
+    // ... 必须保证 index 和主页一致 ...
+  ];
+
+  const audio = new Audio();
+  let currentIndex = 0;
+  let isDragging = false;
+
+  // DOM 元素
+  const els = {
+    bg: document.getElementById('bgBlur'),
+    cover: document.getElementById('coverImg'),
+    title: document.getElementById('songTitle'),
+    playBtn: document.getElementById('playBtn'),
+    prevBtn: document.getElementById('prevBtn'),
+    nextBtn: document.getElementById('nextBtn'),
+    progress: document.getElementById('progressBar'),
+    currTime: document.getElementById('currTime'),
+    totalTime: document.getElementById('totalTime'),
+    container: document.getElementById('playerContainer')
+  };
+
+  // 初始化：解析 URL 参数
+  function init() {
+    const params = new URLSearchParams(window.location.search);
+    const indexParam = params.get('index');
+    const timeParam = params.get('time');
+    const statusParam = params.get('status');
+
+    if (indexParam !== null) {
+      currentIndex = parseInt(indexParam);
+      if (currentIndex >= songs.length) currentIndex = 0;
+    }
+
+    loadSong(currentIndex);
+
+    // 设置初始进度
+    if (timeParam) {
+      audio.currentTime = parseFloat(timeParam);
+    }
+
+    // 尝试自动播放
+    if (statusParam === 'play' || !statusParam) {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updatePlayIcon(true);
+        }).catch(() => {
+          // 浏览器阻止自动播放，需要用户点击
+          updatePlayIcon(false);
+        });
+      }
+    }
+  }
+
+  function loadSong(index) {
+    const song = songs[index];
+    audio.src = song.src;
+    els.title.innerText = song.title;
+    els.cover.src = song.cover;
+    els.bg.style.backgroundImage = `url('${song.cover}')`;
+    
+    // 更新 Media Session
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: 'Elysia Player',
+        artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
+      });
+    }
+  }
+
+  function togglePlay() {
+    if (audio.paused) {
+      audio.play();
+      updatePlayIcon(true);
+    } else {
+      audio.pause();
+      updatePlayIcon(false);
+    }
+  }
+
+  function updatePlayIcon(isPlaying) {
+    els.playBtn.innerText = isPlaying ? "⏸" : "▶";
+    if (isPlaying) els.container.classList.add('playing');
+    else els.container.classList.remove('playing');
+  }
+
+  // 切换歌曲
+  function changeSong(dir) {
+    if (dir === 'next') currentIndex = (currentIndex + 1) % songs.length;
+    else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(currentIndex);
+    audio.play();
+    updatePlayIcon(true);
+  }
+
+  // 返回主页
+  window.goBack = function() {
+    // 返回时带上状态，以便主页接续播放（如果你需要主页也同步的话）
+    // 这里简单处理：直接返回，因为主页是多页面逻辑，音乐会断开是物理限制
+    window.location.href = "index.html"; 
+    // 或者 history.back();
+  }
+
+  // 事件监听
+  els.playBtn.onclick = togglePlay;
+  els.nextBtn.onclick = () => changeSong('next');
+  els.prevBtn.onclick = () => changeSong('prev');
+  
+  audio.ontimeupdate = () => {
+    if (!isDragging) {
+      const percent = (audio.currentTime / audio.duration) * 100 || 0;
+      els.progress.value = percent;
+      els.currTime.innerText = formatTime(audio.currentTime);
+      els.totalTime.innerText = formatTime(audio.duration || 0);
+    }
+  };
+
+  audio.onended = () => changeSong('next');
+
+  // 进度条拖拽
+  els.progress.oninput = () => { isDragging = true; };
+  els.progress.onchange = (e) => {
+    const time = (e.target.value / 100) * audio.duration;
+    audio.currentTime = time;
+    isDragging = false;
+    if (audio.paused) audio.play();
+  };
+
+  function formatTime(s) {
+    const min = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${min}:${sec<10?'0':''}${sec}`;
+  }
+
+  init();
+</script>
+</body>
+</html>

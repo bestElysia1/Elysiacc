@@ -24,7 +24,7 @@
       justify-content: center;
     }
 
-    /* === 核心修改：视频背景 === */
+    /* === 视频背景 === */
     #bgVideo {
       position: fixed;
       right: 0;
@@ -33,23 +33,21 @@
       min-height: 100%;
       width: auto; 
       height: auto;
-      z-index: -2; /* 在最底层 */
-      object-fit: cover; /* 确保填满屏幕 */
-      /* 添加一点模糊，消除视频压缩噪点，让质感更像Shader */
+      z-index: -2;
+      object-fit: cover;
       filter: blur(40px) brightness(0.8); 
-      transform: scale(1.2); /* 放大一点防止模糊带来的边缘白边 */
+      transform: scale(1.2);
     }
 
-    /* 遮罩层，确保文字清晰 */
     .overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.15); /* 微微压暗 */
+      background: rgba(0, 0, 0, 0.15);
       z-index: -1;
       pointer-events: none;
     }
 
-    /* === UI 布局 (保持不变) === */
+    /* === UI 布局 === */
     .nav-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -76,7 +74,7 @@
     }
 
     /* 封面 */
-    .art-section { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; }
+    .art-section { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
     @media (min-width: 768px) { margin-bottom: 0; }
 
     .album-art-wrapper {
@@ -93,11 +91,20 @@
 
     /* 控制区 */
     .controls-section { width: 100%; max-width: 450px; display: flex; flex-direction: column; }
-    .song-info { text-align: center; margin-bottom: 30px; }
+    .song-info { text-align: center; margin-bottom: 5px; } /* 减小间距给频谱腾位置 */
     @media (min-width: 768px) { .song-info { text-align: left; } }
     
     .song-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .artist-name { font-size: 17px; color: var(--text-sub); }
+
+    /* === 新增：频谱画布样式 === */
+    #visualizer {
+      width: 100%;
+      height: 50px; /* 控制频谱高度 */
+      display: block;
+      margin-bottom: 25px; /* 与进度条的距离 */
+      opacity: 0.9;
+    }
 
     /* 进度条 */
     .progress-container { margin-bottom: 40px; width: 100%; }
@@ -142,6 +149,7 @@
         <div class="artist-name">Loading...</div>
       </div>
 
+      <canvas id="visualizer"></canvas>
       <div class="progress-container">
         <div class="slider-track">
           <div class="progress-fill" id="progressFill"></div>
@@ -165,18 +173,26 @@
   </main>
 
   <script>
-    // ================== 音乐播放逻辑 ==================
-    // ⚠️ 请务必确保这里的歌曲列表和 elysiamusic.js 一致
+    // ================== 音乐数据 ==================
     const songs = [
       { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
       { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
       { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
     ];
 
+    // 初始化音频对象，设置跨域许可（重要）
     const audio = new Audio();
+    audio.crossOrigin = "anonymous";
+
     let currentIndex = 0;
     let isDragging = false;
     
+    // === 频谱相关变量 ===
+    let audioContext, analyser, source;
+    let canvas, ctx;
+    let isVisualizerInited = false;
+    let animationId;
+
     const els = {
       body: document.body, cover: document.getElementById('coverImg'),
       title: document.getElementById('songTitle'), artist: document.querySelector('.artist-name'),
@@ -186,6 +202,89 @@
       iconPlay: document.getElementById('iconPlay'), iconPause: document.getElementById('iconPause')
     };
 
+    // ================== 频谱可视化逻辑 ==================
+    const initVisualizer = () => {
+      if (isVisualizerInited) return;
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioContext();
+
+        analyser = audioContext.createAnalyser();
+        // fftSize 决定条的数量 (值越大条越细: 64, 128, 256)
+        analyser.fftSize = 128; 
+
+        // 连接音频源
+        source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        // 初始化画布
+        canvas = document.getElementById('visualizer');
+        ctx = canvas.getContext('2d');
+        resizeCanvas(); // 调整初始大小
+
+        isVisualizerInited = true;
+        renderFrame();
+      } catch (e) {
+        console.warn("Visualizer init failed (likely CORS or browser policy):", e);
+      }
+    };
+
+    const renderFrame = () => {
+      animationId = requestAnimationFrame(renderFrame);
+
+      if (!analyser) return;
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(dataArray);
+
+      // 清除画布
+      const width = canvas.width / (window.devicePixelRatio || 1);
+      const height = canvas.height / (window.devicePixelRatio || 1);
+      ctx.clearRect(0, 0, width, height);
+
+      // 绘制参数
+      const barWidth = (width / bufferLength) * 2.5; // 间距系数
+      let barHeight;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++) {
+        // 让高度变化平滑一些
+        barHeight = (dataArray[i] / 255) * height * 0.9;
+        
+        // 动态透明度：声音越大越亮
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + (barHeight/height) * 0.7})`;
+
+        // 绘制圆角条 (垂直居中)
+        const y = (height - barHeight) / 2;
+        
+        // 兼容性写法绘制圆角矩形
+        if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth - 2, barHeight, 50);
+            ctx.fill();
+        } else {
+            ctx.fillRect(x, y, barWidth - 2, barHeight);
+        }
+
+        x += barWidth;
+      }
+    };
+
+    const resizeCanvas = () => {
+      if(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+      }
+    };
+    window.addEventListener('resize', resizeCanvas);
+
+    // ================== 播放器核心逻辑 ==================
     const initPlayer = () => {
       const params = new URLSearchParams(window.location.search);
       const idx = params.get('index');
@@ -221,6 +320,15 @@
     };
 
     const playMusic = () => {
+      // 1. 尝试初始化频谱（如果是第一次点击）
+      if (!isVisualizerInited) initVisualizer();
+      
+      // 2. 恢复 AudioContext（浏览器要求必须在用户交互中 resume）
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      // 3. 播放
       audio.play().then(() => updateUI(true)).catch(e => {
         updateUI(false);
       });

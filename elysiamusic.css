@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Bright & Unified Version) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Unified & Enlarged UI) */
 
 /* =========================================
    1. 基础容器
@@ -52,7 +52,7 @@
 }
 
 /* =========================================
-   3. 前后两面 (核心修改：完全统一且明亮)
+   3. 前后两面 (完全统一明亮风格)
    ========================================= */
 .player-face {
   position: absolute;
@@ -63,11 +63,10 @@
   gap: 14px;
   border-radius: 16px;
   
-  /* --- 关键修改：统一使用明亮的白色渐变 --- */
+  /* --- 核心玻璃质感 (明亮) --- */
   background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
   border: 1px solid rgba(255,255,255,0.25);
   
-  /* 高强度模糊：不用深色也能遮挡背后的字 */
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);
   
@@ -92,8 +91,7 @@
 .face-back {
   transform: rotateX(180deg);
   justify-content: space-between;
-  
-  /* 关键修改：强制背景与正面一致，绝不使用深色 */
+  /* 强制一致 */
   background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
 }
 
@@ -120,7 +118,7 @@
 }
 
 /* =========================================
-   4. 控件样式 (统一风格)
+   4. 控件样式
    ========================================= */
 
 .elysia-controls button,
@@ -129,7 +127,6 @@
   height: 32px; 
   border-radius: 50%;
   
-  /* 统一按钮样式 */
   background: rgba(255,255,255,0.15); 
   border: 1px solid rgba(255,255,255,0.3);
   color: #fff; 
@@ -170,24 +167,25 @@
   cursor: pointer;
 }
 
-/* --- 歌单选择器 (点击灵敏 + 明亮风格) --- */
+/* --- 歌单选择器 (加大版) --- */
 .playlist-selector-wrapper {
   position: relative;
   flex: 1;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem; /* 字体加大 */
   color: #fff;
   font-weight: 600;
   cursor: pointer;
   
-  /* 明亮玻璃材质 */
+  /* 材质样式 */
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px; 
+  border-radius: 24px; /* 胶囊更加圆润 */
   margin: 0 8px;
   
-  height: 32px;
-  padding: 0 12px; 
+  /* 加大尺寸：高度 32px -> 40px */
+  height: 40px; 
+  padding: 0 16px; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -225,7 +223,7 @@
 }
 
 /* =========================================
-   5. 播放列表 (明亮统一)
+   5. 播放列表 (完全统一风格 - 明亮版)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -238,8 +236,8 @@
   padding: 10px;
   border-radius: 20px;
   
-  /* 统一明亮玻璃 */
-  background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+  /* 这里的样式与 .player-face 完全一致 */
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
   border: 1px solid rgba(255,255,255,0.25);
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);

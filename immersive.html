@@ -59,7 +59,7 @@
       font-size: 14px; color: #fff; cursor: pointer; display: flex; gap: 6px; align-items: center;
     }
 
-    /* === 主播放界面 (添加过渡以配合播放列表动画) === */
+    /* === 主播放界面 === */
     .player-layout {
       display: flex; flex-direction: column; align-items: center;
       width: 100%; max-width: 1000px; height: 100%;
@@ -67,7 +67,6 @@
       position: relative; z-index: 1;
       transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
     }
-    /* 当播放列表打开时，主界面稍微后退 */
     body.playlist-open .player-layout {
         transform: scale(0.92);
         opacity: 0.6;
@@ -104,7 +103,7 @@
 
     /* 频谱 */
     #visualizer {
-      width: 100%; height: 60px; display: block; margin-bottom: 10px; opacity: 0.85; pointer-events: none;
+      width: 100%; height: 60px; display: block; margin-bottom: 10px; opacity: 0.9; pointer-events: none;
     }
 
     /* 进度条 */
@@ -132,10 +131,10 @@
     .btn-play-pause:active { transform: scale(0.95); }
     .btn-play-pause .ctrl-icon { width:28px; height:28px; fill: #000; }
 
-    /* === 播放列表弹窗 (动画优化版) === */
+    /* === 播放列表弹窗 === */
     .playlist-drawer {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0); /* 背景色动画单独控制 */
+        background: rgba(0,0,0,0);
         z-index: 100;
         pointer-events: none;
         display: flex; flex-direction: column; justify-content: flex-end;
@@ -152,37 +151,22 @@
         width: 100%; max-height: 65vh;
         border-radius: 24px 24px 0 0; padding: 24px 24px 40px 24px;
         display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.1);
-        
-        /* 核心动画：弹簧效果 */
         transform: translateY(110%); 
         transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .playlist-drawer.active .playlist-content { transform: translateY(0); }
 
     .playlist-header { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .playlist-close { 
-        font-size: 14px; color: var(--text-sub); cursor: pointer; padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; 
-    }
-    
+    .playlist-close { font-size: 14px; color: var(--text-sub); cursor: pointer; padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; }
     .song-list { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; }
 
-    /* 列表项动画 */
     .list-item { 
         display: flex; align-items: center; gap: 12px; padding: 12px 0; 
         border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; 
-        
-        /* 初始状态：下沉且透明 */
-        opacity: 0;
-        transform: translateY(20px);
+        opacity: 0; transform: translateY(20px);
         transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    
-    /* 当列表打开时，列表项变为可见 (延迟由 JS 控制) */
-    .playlist-drawer.active .list-item {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
+    .playlist-drawer.active .list-item { opacity: 1; transform: translateY(0); }
     .list-item:last-child { border-bottom: none; }
     .list-item.active .item-title { color: var(--accent); font-weight: bold; }
     .list-item.active .item-idx { color: var(--accent); }
@@ -283,7 +267,6 @@
 
     const audio = new Audio();
     audio.crossOrigin = "anonymous";
-    // 关键：确保移动端后台播放权限
     audio.playsInline = true; 
     
     let currentIndex = 0;
@@ -293,7 +276,7 @@
     // 频谱变量
     let audioContext, analyser, source;
     let canvas, ctx, isVisualizerInited = false;
-    let animationId; // 记录动画帧ID，方便恢复
+    let animationId; 
 
     const els = {
       body: document.body, cover: document.getElementById('coverImg'),
@@ -308,31 +291,25 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 修复：后台播放逻辑 ==================
-    // 监听页面的可见性变化
+    // ================== 后台播放恢复 ==================
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'visible') {
-            // 切回前台：如果 AudioContext 被挂起，则恢复它
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            // 确保 Canvas 动画继续
+            if (audioContext && audioContext.state === 'suspended') { audioContext.resume(); }
             cancelAnimationFrame(animationId);
             renderFrame();
         }
     });
 
-    // ================== 频谱 ==================
+    // ================== 频谱逻辑 ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 1024; 
+        // 修改点：从1024降到512，保证条目宽度足够
+        analyser.fftSize = 512; 
         
-        // 注意：createMediaElementSource 会将 audio 的输出重定向到 AudioContext
-        // 如果 AudioContext 挂起，声音就会消失。
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
@@ -362,10 +339,17 @@
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
 
       for (let i = 0; i < bufferLength; i++) {
-        let barHeight = h * (dataArray[i] / 255) * 0.9;
+        // 稍微放大高度倍率
+        let barHeight = h * (dataArray[i] / 255) * 1.0; 
+        
+        // 修改点：确保最小高度为 0
         if (barHeight < 1) barHeight = 0;
+        
         const y = (h - barHeight) / 2;
-        let drawWidth = barWidth > 2 ? barWidth - 1 : barWidth;
+        
+        // 核心修改：确保绘制宽度至少为 1px，避免消失
+        let drawWidth = barWidth - 1; 
+        if (drawWidth < 1) drawWidth = 1; 
         
         ctx.beginPath();
         if (barHeight > 4 && ctx.roundRect) ctx.roundRect(x, y, drawWidth, barHeight, 5);
@@ -400,8 +384,6 @@
       els.title.textContent = s.title;
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
-      // 此时不渲染列表，等打开时渲染以获得动画效果
-      
       if('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
         navigator.mediaSession.setActionHandler('play', playMusic);
@@ -413,14 +395,8 @@
 
     const playMusic = () => {
       if (!isVisualizerInited) initVisualizer();
-      
-      // 强行恢复 context，防止后台切换回来后没声音
       if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-      
-      audio.play().then(() => updateUI(true)).catch(e => {
-          console.warn("Play failed:", e);
-          updateUI(false);
-      });
+      audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
     const pauseMusic = () => { audio.pause(); updateUI(false); };
     
@@ -473,16 +449,9 @@
     els.pBar.onchange = (e) => { isDragging = false; audio.currentTime = (e.target.value / 100) * (audio.duration || 0); if(audio.paused) playMusic(); };
     const formatTime = (s) => { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; };
 
-    // ================== 列表动画优化 ==================
-    const openPlaylist = () => { 
-        renderPlaylist(); // 先渲染内容
-        els.body.classList.add('playlist-open'); // 主界面后退效果
-        els.drawer.classList.add('active'); 
-    };
-    window.closePlaylist = () => {
-        els.body.classList.remove('playlist-open');
-        els.drawer.classList.remove('active'); 
-    };
+    // ================== 列表逻辑 ==================
+    const openPlaylist = () => { renderPlaylist(); els.body.classList.add('playlist-open'); els.drawer.classList.add('active'); };
+    window.closePlaylist = () => { els.body.classList.remove('playlist-open'); els.drawer.classList.remove('active'); };
     els.drawer.addEventListener('click', (e) => { if (e.target === els.drawer) closePlaylist(); });
     els.listBtn.onclick = openPlaylist;
 
@@ -491,17 +460,12 @@
         songs.forEach((s, i) => {
             const div = document.createElement('div');
             div.className = `list-item ${i === currentIndex ? 'active' : ''}`;
-            
-            // 关键：设置延迟，制造瀑布流效果 (Stagger Animation)
-            // 每个项目比前一个晚 0.05秒出现
             div.style.transitionDelay = `${i * 0.05}s`; 
-
             div.innerHTML = `<span class="item-idx">${i === currentIndex ? '♫' : (i+1)}</span><div class="item-info"><span class="item-title">${s.title}</span><span class="item-artist">Elysia Collection</span></div>`;
             div.onclick = () => { if (i !== currentIndex) { currentIndex = i; loadSong(currentIndex); } playMusic(); window.closePlaylist(); };
             els.listContainer.appendChild(div);
         });
     };
-    
     window.goBack = () => window.location.href = "index.html";
     initPlayer();
   </script>

@@ -67,10 +67,7 @@
       position: relative; z-index: 1;
       transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
     }
-    body.playlist-open .player-layout {
-        transform: scale(0.92);
-        opacity: 0.6;
-    }
+    body.playlist-open .player-layout { transform: scale(0.92); opacity: 0.6; }
 
     @media (min-width: 768px) {
       .player-layout { flex-direction: row; gap: 60px; padding: 60px; }
@@ -101,10 +98,10 @@
     .song-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .artist-name { font-size: 16px; color: var(--text-sub); }
 
-    /* 频谱 */
+    /* === 频谱 Canvas === */
     #visualizer {
       width: 100%; 
-      height: 80px; /* 稍微增加 Canvas 高度，给波形更多空间 */
+      height: 70px; /* 适中的高度 */
       display: block; margin-bottom: 10px; opacity: 0.95; pointer-events: none;
     }
 
@@ -142,10 +139,7 @@
         display: flex; flex-direction: column; justify-content: flex-end;
         transition: background 0.4s ease;
     }
-    .playlist-drawer.active { 
-        pointer-events: auto;
-        background: rgba(0,0,0,0.4); 
-    }
+    .playlist-drawer.active { pointer-events: auto; background: rgba(0,0,0,0.4); }
 
     .playlist-content {
         background: rgba(30, 30, 30, 0.9);
@@ -292,17 +286,17 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 频谱逻辑 (增强可见度版) ==================
+    // ================== 频谱逻辑 (回复经典 256版) ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
-      
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
-        
-        // 降低 fftSize，减少条目数量，增加单个条目宽度
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256; // 128个条目，足够宽
+        
+        // === 这里的 512 会产生 256 个频谱条 ===
+        // 这是原来的设置，既不粗也不细，恰到好处
+        analyser.fftSize = 512; 
         
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
@@ -311,7 +305,6 @@
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
         resizeCanvas();
-        
         isVisualizerInited = true;
         renderFrame();
       } catch (e) { console.warn("Visualizer init warning:", e); }
@@ -321,7 +314,7 @@
       animationId = requestAnimationFrame(renderFrame);
       if (!analyser) return;
       
-      const bufferLength = analyser.frequencyBinCount;
+      const bufferLength = analyser.frequencyBinCount; // 256
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
@@ -334,37 +327,24 @@
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
 
       for (let i = 0; i < bufferLength; i++) {
-        // === 核心修改 1: 大幅增加增益 ===
-        // 电脑端声音小导致数值很低，乘以 2.5 倍让它变高
+        // 保持高度增强，防止看不见
         let value = dataArray[i];
-        
-        // 使用非线性增强，让小声音也稍微明显一点 (Math.pow(normalized, 0.8))
         let percent = value / 255;
         let enhancedPercent = Math.pow(percent, 0.9); 
+        let barHeight = h * enhancedPercent * 2.5; 
         
-        // 基础高度 * 增益系数 (3.0)
-        let barHeight = h * enhancedPercent * 3.0; 
-        
-        // 限制最大高度不要超过画布
         if (barHeight > h) barHeight = h;
-        // 过滤掉极小的噪音
-        if (barHeight < 2) barHeight = 0;
+        if (barHeight < 1) barHeight = 0;
 
         const y = (h - barHeight) / 2;
         
-        // === 核心修改 2: 强制最小宽度 ===
-        // 在高分屏上，计算出的宽度可能小于 1px，导致看不见
-        // 强制减去 1px 做间隙，但保证绘制宽度至少 2px (如果空间够的话)
+        // 计算间隙
         let drawWidth = barWidth - 1;
-        if (drawWidth < 2) drawWidth = barWidth; // 如果太窄就不留间隙了
+        if (drawWidth < 1) drawWidth = 1;
         
         ctx.beginPath();
-        // 只有高度足够才画圆角
-        if (barHeight > 6 && ctx.roundRect) {
-            ctx.roundRect(x, y, drawWidth, barHeight, 5);
-        } else {
-            ctx.fillRect(x, y, drawWidth, barHeight);
-        }
+        if (barHeight > 4 && ctx.roundRect) ctx.roundRect(x, y, drawWidth, barHeight, 5);
+        else ctx.fillRect(x, y, drawWidth, barHeight);
         
         x += barWidth;
       }
@@ -395,7 +375,6 @@
       els.title.textContent = s.title;
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
-      
       if('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
         navigator.mediaSession.setActionHandler('play', playMusic);
@@ -406,25 +385,17 @@
     };
 
     const playMusic = () => {
-      // iOS 要求: 必须在用户点击事件中创建/恢复 Context
-      // 我们把 initVisualizer 放在这里，确保它是响应用户操作的
       if (!isVisualizerInited) initVisualizer();
-      
-      if (audioContext && audioContext.state === 'suspended') {
-          audioContext.resume();
-      }
-      
+      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
       audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
-    
     const pauseMusic = () => { audio.pause(); updateUI(false); };
-    
     const updateUI = (isPlaying) => {
       if (isPlaying) { els.body.classList.add('is-playing'); els.body.classList.remove('is-paused'); els.iconPlay.style.display = 'none'; els.iconPause.style.display = 'block'; } 
       else { els.body.classList.remove('is-playing'); els.body.classList.add('is-paused'); els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; }
     };
 
-    // 后台切回来时的恢复逻辑
+    // 后台切回恢复
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'visible') {
             if (audioContext && audioContext.state === 'suspended') audioContext.resume();
@@ -433,7 +404,6 @@
         }
     });
 
-    // 播放控制
     const playNextAuto = () => {
         if (playMode === 1) { audio.currentTime = 0; playMusic(); }
         else if (playMode === 2) { 
@@ -465,7 +435,6 @@
     els.nextBtn.onclick = playNext; els.prevBtn.onclick = playPrev; els.modeBtn.onclick = toggleMode;
     audio.onended = playNextAuto;
     
-    // 进度条
     audio.ontimeupdate = () => {
       if (!isDragging) {
         const d = audio.duration || 0; const ct = audio.currentTime; const p = d > 0 ? (ct / d) * 100 : 0;
@@ -478,7 +447,6 @@
     els.pBar.onchange = (e) => { isDragging = false; audio.currentTime = (e.target.value / 100) * (audio.duration || 0); if(audio.paused) playMusic(); };
     const formatTime = (s) => { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; };
 
-    // 列表逻辑
     const openPlaylist = () => { renderPlaylist(); els.body.classList.add('playlist-open'); els.drawer.classList.add('active'); };
     window.closePlaylist = () => { els.body.classList.remove('playlist-open'); els.drawer.classList.remove('active'); };
     els.drawer.addEventListener('click', (e) => { if (e.target === els.drawer) closePlaylist(); });

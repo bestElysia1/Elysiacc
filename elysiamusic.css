@@ -1,7 +1,6 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Flip Version) */
+/* elysiamusic.css - Elysia Liquid Glass Player (3D Flip Version) */
 
 /* ====== 1. 基础容器：负责定位、悬浮动画、3D透视 ====== */
-/* 注意：原本的背景和模糊特效已移至 .player-glass-card，此处只留布局属性 */
 .elysia-player {
   position: fixed;
   bottom: 20px;
@@ -11,12 +10,12 @@
   
   /* 设定固定尺寸，保证翻转时布局稳定 (参考原UI视觉大小) */
   width: 320px; 
-  height: 60px;
+  height: 54px; /* 根据原 padding(8px)+按钮(32px)+边框 计算得出 */
   
   /* 开启 3D 空间 */
   perspective: 1000px;
   
-  /* 移除原本的 padding/flex，移交给内部 Face */
+  /* 移除原本的视觉样式，移交给内部 card */
   padding: 0;
   background: transparent;
   border: none;
@@ -24,8 +23,12 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 
-  /* 基础悬浮动画 */
+  /* 保持基础悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
+  
+  /* 禁止用户选中文本，提升长按体验 */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ====== 2. 核心：液态玻璃卡片 (承载原本的所有视觉特效) ====== */
@@ -44,7 +47,7 @@
   
   /* 3D 翻转设置 */
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 加入一点回弹效果 */
 }
 
 /* 翻转激活状态 (由 JS 添加类名控制) */
@@ -56,7 +59,7 @@
 .elysia-player:active .player-glass-card {
   transform: scale(0.96);
 }
-/* 翻转状态下长按也要缩放，保持翻转角度 */
+/* 翻转状态下长按也要缩放 */
 .elysia-player.flipped:active .player-glass-card {
   transform: rotateX(180deg) scale(0.96);
 }
@@ -97,22 +100,20 @@
 /* --- 正面 (Front): 播放控制 --- */
 .face-front {
   transform: rotateX(0deg);
-  /* 默认左对齐 */
-  justify-content: flex-start;
+  justify-content: flex-start; /* 左对齐 */
 }
 
 /* --- 背面 (Back): 设置选项 --- */
 .face-back {
   transform: rotateX(180deg);
-  /* 左右分散对齐 */
-  justify-content: space-between;
+  justify-content: space-between; /* 两端对齐 */
   
-  /* 背面稍微加深一点点背景，防止文字看不清 */
-  background: rgba(0, 0, 0, 0.15); 
+  /* 背面稍微加深一点点背景，防止文字在复杂背景下看不清，同时区分状态 */
+  background: rgba(0, 0, 0, 0.1); 
   border-radius: 16px;
 }
 
-/* ====== 4. 内部元素样式 ====== */
+/* ====== 4. 内部元素样式 (保持原样) ====== */
 
 /* 按钮组 */
 .elysia-controls { 
@@ -156,9 +157,9 @@
   will-change: transform;
 }
 
-/* ====== 5. 背面新控件样式 ====== */
+/* ====== 5. 背面新控件样式 (风格统一) ====== */
 
-/* 背面按钮 (模式/返回) */
+/* 背面按钮 (模式切换) */
 .control-btn {
   width: 32px;
   height: 32px;
@@ -170,7 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   transition: all 0.2s;
 }
 
@@ -188,11 +189,15 @@
   font-size: 0.9rem;
   color: #f2eaff;
   font-weight: bold;
-  /* 加个半透明背景条显得整洁 */
-  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  /* 增加一个微弱的背景条，表示可点击 */
   padding: 4px 0;
-  border-radius: 12px;
-  margin: 0 4px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.playlist-selector-wrapper:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* 隐藏 Select 下拉框但保留点击区域 */
@@ -209,7 +214,7 @@
 /* ====== 6. 播放列表 (保持原样) ====== */
 .elysia-playlist {
   position: fixed;
-  bottom: 90px; /* 稍微抬高一点，因为播放器可能有翻转空间 */
+  bottom: 85px; /* 稍微抬高，避开翻转空间 */
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;

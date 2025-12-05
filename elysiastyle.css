@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Ultimate UI Unified) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Fixed Version) */
 
 /* =========================================
    1. 基础容器：负责定位、悬浮动画、3D透视
@@ -13,7 +13,7 @@
   width: 320px; 
   height: 56px; 
   
-  perspective: 1000px;
+  perspective: 1000px; /* 开启 3D 空间 */
   
   padding: 0;
   background: transparent;
@@ -30,17 +30,20 @@
 }
 
 /* =========================================
-   2. 核心：3D 骨架 (只负责旋转)
+   2. 核心：3D 骨架 (只负责旋转，不负责视觉)
    ========================================= */
 .player-glass-card {
   position: relative;
   width: 100%;
   height: 100%;
+  
+  /* 必须透明，否则 iOS 会扁平化 3D 效果 */
   background: transparent;
   border: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
+  
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -82,6 +85,8 @@
   backface-visibility: hidden;
   transform-style: preserve-3d;
   z-index: 1; 
+  
+  /* 默认交互状态：关闭，由下方的类控制 */
   pointer-events: none;
   transition: pointer-events 0s linear 0.1s;
 }
@@ -97,11 +102,10 @@
 .face-back {
   transform: rotateX(180deg);
   justify-content: space-between;
-  /* 移除特殊背景，保持完全一致 */
   background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
 }
 
-/* 翻转交互控制 */
+/* 翻转交互控制 (核心) */
 .elysia-player.flipped .face-front { pointer-events: none !important; }
 .elysia-player.flipped .face-back { pointer-events: auto !important; }
 
@@ -124,17 +128,16 @@
 }
 
 /* =========================================
-   4. 控件样式 (统一按钮与胶囊)
+   4. 控件样式
    ========================================= */
 
-/* 通用按钮样式 (正面播放键 + 背面模式键) */
+/* 通用按钮样式 */
 .elysia-controls button,
 .control-btn {
   width: 32px; 
   height: 32px; 
   border-radius: 50%;
   
-  /* 统一的按钮玻璃质感 */
   background: rgba(255,255,255,0.1); 
   border: 1px solid rgba(255,255,255,0.25);
   color: #fff; 
@@ -155,7 +158,6 @@
 
 .elysia-controls { display: flex; gap: 10px; flex-shrink: 0; }
 
-/* 悬停效果 */
 .elysia-controls button:hover,
 .control-btn:hover { 
   background: rgba(255,255,255,0.25);
@@ -177,7 +179,7 @@
   cursor: pointer;
 }
 
-/* --- 歌单选择器 (样式重构：玻璃胶囊) --- */
+/* --- 歌单选择器 (点击灵敏度修复版) --- */
 .playlist-selector-wrapper {
   position: relative;
   flex: 1;
@@ -187,17 +189,22 @@
   font-weight: 600;
   cursor: pointer;
   
-  /* 长胶囊形状，材质与按钮一致 */
+  /* 材质样式 */
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 4px 12px;
   border-radius: 20px; 
   margin: 0 8px;
   
-  transition: all 0.2s ease;
+  /* 强制高度与按钮对齐，撑满点击区域 */
+  height: 32px;
+  padding: 0 12px; 
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  transition: all 0.2s ease;
+  /* 稍微抬起背景 */
+  transform: translateZ(2px);
 }
 
 .playlist-selector-wrapper:hover {
@@ -211,6 +218,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0 0 8px rgba(160,120,255,0.4);
+  /* 关键：防止文字阻挡点击 */
+  pointer-events: none;
+  max-width: 100%;
 }
 
 #playlistSelect {
@@ -220,8 +230,13 @@
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  z-index: 10;
+  
+  /* 关键：将选择框推向屏幕最前方，保证最先被点击 */
+  z-index: 100;
+  transform: translateZ(5px); 
+  
   -webkit-appearance: none;
+  appearance: none;
 }
 
 /* =========================================
@@ -236,15 +251,14 @@
   width: 280px; 
   max-height: 280px;
   padding: 10px;
-  border-radius: 20px; /* 圆角一致 */
+  border-radius: 20px;
   
-  /* --- 统一玻璃风格，完全复刻 player-face --- */
+  /* 统一玻璃风格 */
   background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
   border: 1px solid rgba(255,255,255,0.2);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   
-  /* 阴影稍重一点，增加悬浮感 */
   box-shadow: 0 12px 40px rgba(100, 80, 200, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
   
   overflow-y: auto;
@@ -260,7 +274,7 @@
 
 .playlist-item {
   padding: 8px 12px;
-  color: #e0d0ff; /* 稍微亮一点的紫色 */
+  color: #e0d0ff; 
   font-size: 0.9rem;
   border-radius: 12px;
   cursor: pointer;

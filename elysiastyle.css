@@ -1,418 +1,318 @@
-/* elysiastyle.css - Core Layout & Visual Effects */
+/* elysiamusic.css - Elysia Liquid Glass Player (Ultimate UI Unified) */
 
-:root {
-  --accent-start: #9a6ef0;
-  --accent-end: #7b3fe4;
-  --link: #8f66f0;
-  --bg: #ffffff;
-  --maxw: 980px;
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
+/* =========================================
+   1. 基础容器：负责定位、悬浮动画、3D透视
+   ========================================= */
+.elysia-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  
+  width: 320px; 
+  height: 56px; 
+  
+  perspective: 1000px;
+  
   padding: 0;
-  background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial, sans-serif;
-  color: #333;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-}
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
-body {
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
-  letter-spacing: 0.3px;
-  line-height: 1.85;
-}
-
-.container {
-  max-width: var(--maxw);
-  margin: 28px auto;
-  padding: 0 48px;
-}
-
-.banner {
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 18px;
-}
-
-.banner img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.title h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-}
-
-.subtitle {
-  color: #888;
-  margin-top: 6px;
-  font-size: 0.92rem;
-}
-
-.music {
-  margin-left: auto;
-}
-
-iframe {
-  border-radius: 6px;
-  border: 0;
+  animation: elysiaFloat 6s ease-in-out infinite;
+  
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================================
-   🌌 Elysia — 液态紫粉玻璃倒计时 (修复模糊版)
+   2. 核心：3D 骨架 (只负责旋转)
    ========================================= */
-.countdown {
+.player-glass-card {
   position: relative;
-  margin: 22px 0;
-  padding: 20px 28px;
-  border-radius: 18px;
-  overflow: hidden;
-  
-  /* 修复1：保留毛玻璃，但强制硬件加速 */
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.18);
-  
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    0 4px 18px rgba(160,120,255,0.3);
-    
-  /* 修复2：优化动画渲染，防止文字变糊 */
-  animation: countdownFloat 8s ease-in-out infinite;
-  transform: translateZ(0); /* 开启3D加速 */
-  will-change: transform;   /* 告诉浏览器这个元素会动，请提前准备 */
-  backface-visibility: hidden; /* 修复边缘锯齿 */
-  
-  /* 建立层叠上下文，确保文字在伪元素之上 */
-  z-index: 1; 
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 💫 液态流光背景 */
-.countdown::before {
+.elysia-player.flipped .player-glass-card {
+  transform: rotateX(180deg);
+}
+
+.elysia-player:active .player-glass-card {
+  transform: scale(0.96);
+}
+.elysia-player.flipped:active .player-glass-card {
+  transform: rotateX(180deg) scale(0.96);
+}
+
+/* =========================================
+   3. 前后两面 (完全统一的玻璃风格)
+   ========================================= */
+.player-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px; 
+  gap: 14px;
+  border-radius: 16px;
+  
+  /* --- 统一的核心玻璃质感 --- */
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.2);
+  
+  /* 强模糊，既好看又能防文字重叠 */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  box-shadow: 0 8px 32px rgba(130, 90, 230, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  z-index: 1; 
+  pointer-events: none;
+  transition: pointer-events 0s linear 0.1s;
+}
+
+/* --- 正面 (Front) --- */
+.face-front {
+  transform: rotateX(0deg);
+  justify-content: flex-start;
+  pointer-events: auto;
+}
+
+/* --- 背面 (Back) --- */
+.face-back {
+  transform: rotateX(180deg);
+  justify-content: space-between;
+  /* 移除特殊背景，保持完全一致 */
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+}
+
+/* 翻转交互控制 */
+.elysia-player.flipped .face-front { pointer-events: none !important; }
+.elysia-player.flipped .face-back { pointer-events: auto !important; }
+
+/* 液态光斑 (底层) */
+.player-glass-card::before {
   content: "";
   position: absolute;
-  inset: -25%;
+  inset: -30%;
   background:
-    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
-    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-  
-  filter: blur(40px);
-  animation: blobMove 14s ease-in-out infinite;
-  mix-blend-mode: screen;
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
   pointer-events: none;
-  
-  /* 修复3：关键！把模糊的光斑放到最底层，不要盖住文字 */
+  mix-blend-mode: screen;
+  transform: translateZ(-10px); 
   z-index: -1; 
 }
 
-
-/* 🕒 倒计时数字与标题 */
-.countdown div {
-  color: rgba(240,230,255,0.9);
-  font-size: 0.96rem;
-  margin-bottom: 8px;
-  text-shadow: 0 0 10px rgba(180,140,255,0.6);
-}
-
-.countdown .nums {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  color: #d9caff;
-  text-shadow:
-    0 0 10px rgba(180,140,255,0.8),
-    0 0 20px rgba(160,120,255,0.4);
-}
-
-/* ✨ 轻微呼吸漂浮 */
-@keyframes countdownFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* 🌊 背景液态移动 */
-@keyframes blobMove {
-  0% { transform: translate(0,0) scale(1); }
-  25% { transform: translate(6%, -4%) scale(1.05); }
-  50% { transform: translate(-5%, 5%) scale(1.02); }
-  75% { transform: translate(3%, -3%) scale(1.07); }
-  100% { transform: translate(0,0) scale(1); }
-}
-
 /* =========================================
-   内容排版
+   4. 控件样式 (统一按钮与胶囊)
    ========================================= */
-section {
-  margin-top: 28px;
-  animation: fadeInUp 0.8s ease both;
-}
 
-h2 {
-  font-size: 1.02rem;
-  margin: 8px 0 14px 0;
-  padding-left: 10px;
-  border-left: 4px solid rgba(123,63,228,0.12);
-  color: var(--accent-end);
-  background: linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));
-  padding: 8px;
-  border-radius: 6px;
-  /* 标题渐变 */
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  transition: all 0.6s ease;
-}
-
-h2:hover {
-  animation: gradientFlow 3s linear infinite;
-}
-
-/* 全局正文淡紫色优化 */
-p, ul, li {
-  color: #7a66c7 !important;
-  line-height: 1.8;
-  font-size: 0.95rem;
-}
-
-a {
-  color: var(--link);
-  text-decoration: none;
-  transition: all 0.4s ease;
-}
-a:hover { text-decoration: underline; }
-
-/* 鼠标悬停轻微变色 */
-main.container p:hover,
-main.container li:hover {
-  color: #9a6ef0 !important;
-  transition: all 0.3s ease;
-}
-
-pre {
-  background: #faf6ff;
-  border: 1px solid rgba(123,63,228,0.06);
-  padding: 10px;
-  border-radius: 8px;
-  overflow: auto;
-  color: #5b4aa1;
-}
-
-footer {
-  margin: 36px 0 0 0;
-  padding-top: 12px;
-  color: #999;
+/* 通用按钮样式 (正面播放键 + 背面模式键) */
+.elysia-controls button,
+.control-btn {
+  width: 32px; 
+  height: 32px; 
+  border-radius: 50%;
+  
+  /* 统一的按钮玻璃质感 */
+  background: rgba(255,255,255,0.1); 
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; 
+  
+  cursor: pointer; 
+  transition: all .25s ease;
+  backdrop-filter: blur(4px);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.85rem;
+  
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.elysia-controls { display: flex; gap: 10px; flex-shrink: 0; }
+
+/* 悬停效果 */
+.elysia-controls button:hover,
+.control-btn:hover { 
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.1); 
+  box-shadow: 0 0 12px rgba(180,150,255,0.4); 
+  border-color: rgba(255,255,255,0.5);
+}
+
+/* 歌曲标题 */
+#songTitle {
+  color: #fff; 
+  font-weight: 600; 
+  flex: 1; 
+  font-size: 0.95rem;
+  text-shadow: 0 0 10px rgba(160,120,255,0.6);
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  cursor: pointer;
+}
+
+/* --- 歌单选择器 (样式重构：玻璃胶囊) --- */
+.playlist-selector-wrapper {
+  position: relative;
+  flex: 1;
   text-align: center;
-  border-top: 1px solid rgba(156,107,255,0.2);
-  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
-  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
-  transition: all 0.4s ease;
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  
+  /* 长胶囊形状，材质与按钮一致 */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 4px 12px;
+  border-radius: 20px; 
+  margin: 0 8px;
+  
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-footer:hover {
-  text-shadow: 0 0 6px rgba(156,107,255,0.6);
-  color: #bca9ff;
+.playlist-selector-wrapper:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 12px rgba(180,150,255,0.3);
 }
 
-/* =========================================
-   布局与响应式
-   ========================================= */
-.leftnav {
-  position: fixed;
-  left: 12px;
-  top: 120px;
-  width: 160px;
-}
-.leftnav ul { list-style: none; padding: 0; margin: 0; }
-.leftnav li { margin: 8px 0; color: var(--link); font-size: 0.9rem; }
-
-@media (max-width: 900px) {
-  .container { padding: 0 18px; }
-  .leftnav { display: none; }
-  header { flex-direction: column; align-items: flex-start; }
-  .music { margin-left: 0; margin-top: 8px; }
-}
-
-/* 动画关键帧 */
-@keyframes glowPulse {
-  0%, 100% { color: #9a6ef0; text-shadow: 0 0 4px rgba(156,107,255,0.4); }
-  50% { color: #ffffff; text-shadow: 0 0 10px rgba(156,107,255,0.9); }
-}
-
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================
-   🌈 裸眼3D Banner
-   ========================================= */
-.banner-3d {
-  position: relative;
-  width: 100%;
-  max-width: 980px;
-  margin: 0 auto 28px auto;
-  perspective: 1000px;
-  border-radius: 16px;
+#currentPlaylistText {
+  white-space: nowrap;
   overflow: hidden;
-  transform-style: preserve-3d;
-  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
-  animation: bannerFloaty 8s ease-in-out infinite;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 8px rgba(160,120,255,0.4);
 }
 
-.banner-3d .banner-layer {
-  transition: transform 0.25s ease-out;
-  transform-origin: center;
-}
-
-.banner-3d img {
-  width: 100%;
-  display: block;
-  border-radius: 16px;
-}
-
-.banner-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  opacity: 0.5;
-  transition: background-position 0.2s ease-out;
-}
-
-@keyframes bannerFloaty {
-  0%, 100% { transform: translateY(0); filter: brightness(1); }
-  50% { transform: translateY(-6px); filter: brightness(1.05); }
-}
-
-/* =========================================
-   📺 视频容器
-   ========================================= */
-.elysia-video-wrapper {
-  position: relative;
-  margin: 40px auto;
-  width: 90%;
-  max-width: 800px;
-  aspect-ratio: 16 / 9;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 0 30px rgba(150,120,255,0.15);
-}
-
-.elysia-video-wrapper video {
+#playlistSelect {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-  transition: opacity 0.8s ease-in-out;
-  background: #000;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+  -webkit-appearance: none;
 }
-#videoA { opacity: 1; z-index: 2; }
-#videoB { opacity: 0; z-index: 1; }
 
-/* 星空背景容器 */
-#starfield {
+/* =========================================
+   5. 播放列表 (完全统一风格)
+   ========================================= */
+.elysia-playlist {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -2;
-  background: transparent;
+  bottom: 85px; 
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  transform-origin: 50% 100%;
+  width: 280px; 
+  max-height: 280px;
+  padding: 10px;
+  border-radius: 20px; /* 圆角一致 */
+  
+  /* --- 统一玻璃风格，完全复刻 player-face --- */
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  /* 阴影稍重一点，增加悬浮感 */
+  box-shadow: 0 12px 40px rgba(100, 80, 200, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  opacity: 0; 
   pointer-events: none;
+  z-index: 9998;
+  scrollbar-width: thin;
+  will-change: transform, opacity;
+}
+
+.playlist-item {
+  padding: 8px 12px;
+  color: #e0d0ff; /* 稍微亮一点的紫色 */
+  font-size: 0.9rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.playlist-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.35);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(130, 80, 240, 0.3);
+  font-weight: 600;
 }
 
 /* =========================================
-   🌊 海蓝魏紫 - 整行贯通幻彩 (修复版)
+   6. 动画优化
    ========================================= */
-
-/* 定位：main.container 下的第一个 section 标签中的所有 p */
-main.container > section:nth-of-type(1) p {
-  /* 定义渐变：从左到右，贯穿整行文字 */
-  background: linear-gradient(
-    90deg, 
-    #0E52D4 0%,   /* 左边：青海蓝 (唯云) */
-    #A639D7 100%  /* 右边：洋红/深牡丹 (顶级专线) */
-  );
-  
-  /* 关键1：让背景适应文字内容的宽度，而不是撑满整个屏幕宽度 */
-  /* 这样即使文字很短，也会完整显示出“蓝->紫”的渐变全过程 */
-  width: fit-content;
-  width: -moz-fit-content; 
-  
-  /* 将背景裁剪为文字形状 */
-  -webkit-background-clip: text;
-  background-clip: text;
-  
-  /* 文字透明，透出背景 */
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-  
-  /* 保持正常粗细 */
-  font-weight: normal;
-  text-decoration: none;
-  
-  /* 保持行间距 */
-  margin-bottom: 12px;
+.elysia-playlist.show {
+  opacity: 1; 
+  pointer-events: auto;
+  animation: playlistPopUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
-/* 关键2：修复标题 (strong) 单独渐变的问题 */
-/* 强制标题背景透明，只显示粗体，让它“透出”父元素的整行渐变背景 */
-main.container > section:nth-of-type(1) p strong {
-  background: none; 
-  -webkit-text-fill-color: transparent; 
-  font-weight: 700; /* 仅保留加粗 */
+.elysia-playlist.hide {
+  animation: playlistPopDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-/* 鼠标悬停整体提亮 */
-main.container > section:nth-of-type(1) p:hover {
-  filter: brightness(1.2);
-  cursor: default;
+@keyframes playlistPopUp {
+  0%   { transform: translateX(-50%) scale(0.8) translateY(20px); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
 }
 
+@keyframes playlistPopDown {
+  0%   { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
+}
 
-/* =========================================
-   📱 iOS 排版修复 (放在最后)
-   ========================================= */
-@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  .container p, .container ul, .container li, .container h2, .container .subtitle, .container .countdown div {
-    word-break: break-word !important;
-    overflow-wrap: anywhere !important;
-    hyphens: auto !important;
-    text-align: justify !important;
-    line-height: 1.85 !important;
-  }
-  .container ul li { padding-left: 0.3em; text-indent: -0.3em; }
-  .container ul li::marker { unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
-  .container p:not(:empty) { text-indent: 0; }
+@keyframes moveBlobs { 
+  0%,100%{transform:translate3d(0,0,-10px) scale(1.03);} 
+  50%{transform:translate3d(4%,-3,-10px) scale(1.05);} 
+}
+
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
 }

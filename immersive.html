@@ -186,6 +186,8 @@
 </head>
 <body class="is-paused">
 
+  <audio id="mainAudio" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></audio>
+
   <img id="bgStatic" class="bg-layer" src="assets/bg.jpg" alt="Background">
   <video id="bgVideo" class="bg-layer" autoplay muted loop playsinline>
     <source src="assets/bg.mp4" type="video/mp4">
@@ -265,9 +267,8 @@
       { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
     ];
 
-    const audio = new Audio();
-    audio.crossOrigin = "anonymous";
-    audio.playsInline = true; 
+    // 核心修复 2：获取 DOM 中的音频元素，而不是 new Audio()
+    const audio = document.getElementById('mainAudio');
     
     let currentIndex = 0;
     let isDragging = false;
@@ -294,6 +295,7 @@
     // ================== 后台播放恢复 ==================
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'visible') {
+            // 切回前台：如果 AudioContext 被挂起，则恢复它
             if (audioContext && audioContext.state === 'suspended') { audioContext.resume(); }
             cancelAnimationFrame(animationId);
             renderFrame();
@@ -307,9 +309,12 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
-        // 修改点：从1024降到512，保证条目宽度足够
         analyser.fftSize = 512; 
         
+        // 注意：这步操作在 iOS 可能会“接管”音频，导致音频流走 AudioContext
+        // 如果 AudioContext 在后台被挂起，音频就停了。
+        // 但如果不走这一步，频谱无法工作。
+        // 放在 DOM 中的 <audio> 配合 mediaSession 通常能缓解这个问题。
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
@@ -339,15 +344,9 @@
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
 
       for (let i = 0; i < bufferLength; i++) {
-        // 稍微放大高度倍率
         let barHeight = h * (dataArray[i] / 255) * 1.0; 
-        
-        // 修改点：确保最小高度为 0
         if (barHeight < 1) barHeight = 0;
-        
         const y = (h - barHeight) / 2;
-        
-        // 核心修改：确保绘制宽度至少为 1px，避免消失
         let drawWidth = barWidth - 1; 
         if (drawWidth < 1) drawWidth = 1; 
         
@@ -384,6 +383,8 @@
       els.title.textContent = s.title;
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
+      
+      // 更新 MediaSession（通知栏控制）
       if('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
         navigator.mediaSession.setActionHandler('play', playMusic);
@@ -394,8 +395,10 @@
     };
 
     const playMusic = () => {
+      // 必须在用户交互（点击）时尝试恢复 context
       if (!isVisualizerInited) initVisualizer();
       if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+      
       audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
     const pauseMusic = () => { audio.pause(); updateUI(false); };

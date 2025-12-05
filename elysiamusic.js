@@ -1,7 +1,7 @@
-/* elysiamusic.js - Unified UI Logic */
+/* elysiamusic.js - Logic & Data for Elysia Player (Fixed Seek Logic) */
 
 document.addEventListener("DOMContentLoaded", () => {
-  /* ===== 🎹 数据源 ===== */
+  /* ===== 🎵 歌曲数据源 (All Songs) ===== */
   const allSongsLibrary = [
     { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
     { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
@@ -45,20 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
   ];
 
-  /* ===== 📂 歌单分类定义 ===== */
-  // 这里定义每个歌单的名字、ID和图标
-  const categories = [
-    { id: 'piano', name: '钢琴曲', icon: '🎹' },
-    { id: 'mon', name: '月曜日', icon: '🌙' },
-    { id: 'tue', name: '火曜日', icon: '🔥' },
-    { id: 'wed', name: '水曜日', icon: '💧' },
-    { id: 'thu', name: '木曜日', icon: '🌲' },
-    { id: 'fri', name: '金曜日', icon: '💰' },
-    { id: 'sat', name: '土曜日', icon: '🪐' },
-    { id: 'sun', name: '日曜日', icon: '☀️' }
-  ];
-
-  // 生成实际歌单数据
+  /* ===== 歌单管理系统 ===== */
   const playlists = {
     piano: allSongsLibrary, 
     mon: allSongsLibrary.filter((_, i) => i % 7 === 0),
@@ -70,155 +57,43 @@ document.addEventListener("DOMContentLoaded", () => {
     sun: allSongsLibrary.filter((_, i) => i % 7 === 6),
   };
 
+  /* ===== 状态变量 ===== */
   let currentPlaylistKey = 'piano';
   let currentList = playlists[currentPlaylistKey];
   let currentIndex = 0;
-  let playMode = 0; // 0=List, 1=Single, 2=Random
-  const playModes = [ { icon: "🔁" }, { icon: "🔂" }, { icon: "🔀" } ];
+  
+  // 0=列表循环, 1=单曲循环, 2=随机播放
+  let playMode = 0; 
+  const playModes = [
+    { icon: "🔁", name: "列表循环" },
+    { icon: "🔂", name: "单曲循环" },
+    { icon: "🔀", name: "随机播放" }
+  ];
 
-  /* ===== DOM 元素 ===== */
+  /* ===== 初始化 ===== */
   const audio = new Audio();
   audio.preload = "auto";
+
   const player = document.getElementById("elysiaPlayer");
   const playPauseBtn = document.getElementById("playPauseBtn");
   const nextBtn = document.getElementById("nextBtn");
   const titleEl = document.getElementById("songTitle");
+  const playlistEl = document.getElementById("playlist");
   
-  // 关键元素：复用的列表容器
-  const playlistEl = document.getElementById("playlist"); 
-  
-  // 背面元素
   const modeBtn = document.getElementById("modeBtn");
-  const playlistSelectorBtn = document.getElementById("playlistSelectorBtn"); // 新的胶囊按钮
+  const playlistSelect = document.getElementById("playlistSelect");
   const currentPlaylistText = document.getElementById("currentPlaylistText");
 
   if (!player || !playPauseBtn) return;
 
   /* =========================================================
-     📃 列表渲染逻辑 (核心：一份 UI，两种内容)
-     ========================================================= */
-  
-  // 1. 渲染当前歌曲列表
-  function renderSongList() {
-    playlistEl.innerHTML = currentList.map((s, i) => `
-      <div class="playlist-item ${i === currentIndex ? 'active' : ''}" 
-           data-type="song" 
-           data-index="${i}">
-        ${s.title}
-      </div>
-    `).join("");
-  }
-
-  // 2. 渲染歌单分类列表 (UI完全一致)
-  function renderCategoryList() {
-    playlistEl.innerHTML = categories.map(cat => `
-      <div class="playlist-item ${cat.id === currentPlaylistKey ? 'active' : ''}" 
-           data-type="category" 
-           data-id="${cat.id}"
-           data-name="${cat.name}"
-           data-icon="${cat.icon}">
-        <span style="margin-right:8px; opacity:0.9;">${cat.icon}</span> ${cat.name}
-      </div>
-    `).join("");
-  }
-
-  /* =========================================================
-     🎮 交互控制
-     ========================================================= */
-
-  function toggleList(type) {
-    const isShow = playlistEl.classList.contains("show");
-    
-    // 如果已经显示，且点击的是同一个类型，则关闭
-    if (isShow && playlistEl.dataset.currentType === type) {
-      playlistEl.classList.remove("show");
-      playlistEl.classList.add("hide");
-      return;
-    }
-
-    // 渲染对应内容
-    if (type === 'song') {
-      renderSongList();
-    } else {
-      renderCategoryList();
-    }
-    
-    // 标记当前列表类型
-    playlistEl.dataset.currentType = type;
-
-    // 显示列表 (重置动画)
-    playlistEl.classList.remove("hide");
-    // 强制重绘以触发动画
-    void playlistEl.offsetWidth; 
-    playlistEl.classList.add("show");
-  }
-
-  // 点击正面标题 -> 显示歌曲
-  titleEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (player.classList.contains("flipped")) return; // 翻转时正面不可点
-    toggleList('song');
-  });
-
-  // 点击背面胶囊 -> 显示分类
-  playlistSelectorBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleList('category');
-  });
-
-  // 统一列表点击代理
-  playlistEl.addEventListener("click", e => {
-    const item = e.target.closest(".playlist-item");
-    if (!item) return;
-
-    const type = item.dataset.type;
-
-    // 🅰️ 点击了具体的歌曲
-    if (type === 'song') {
-      loadSong(parseInt(item.dataset.index));
-      audio.play();
-      playPauseBtn.textContent = "⏸";
-      
-      // 更新高亮
-      renderSongList(); 
-    } 
-    // 🅱️ 点击了分类 (切换歌单)
-    else if (type === 'category') {
-      const newKey = item.dataset.id;
-      const newName = item.dataset.name;
-      const newIcon = item.dataset.icon;
-
-      // 切换数据
-      currentPlaylistKey = newKey;
-      currentList = playlists[newKey];
-      
-      // 更新背面胶囊文字
-      currentPlaylistText.textContent = `${newIcon} ${newName}`;
-      
-      // 重置播放
-      currentIndex = 0;
-      loadSong(0);
-      audio.play();
-      playPauseBtn.textContent = "⏸";
-      player.classList.add("playing");
-
-      // 更新高亮 (视觉反馈)
-      renderCategoryList(); 
-      
-      // 可选：切完歌单后自动关闭列表
-      setTimeout(() => {
-        playlistEl.classList.remove("show");
-        playlistEl.classList.add("hide");
-      }, 300);
-    }
-  });
-
-  /* =========================================================
-     🎵 播放器核心功能 (保持不变)
+     核心播放控制逻辑
      ========================================================= */
 
   function loadSong(index) {
     if (!currentList || currentList.length === 0) return;
+    
+    // 索引循环保护
     if (index < 0) index = currentList.length - 1;
     if (index >= currentList.length) index = 0;
     
@@ -228,16 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.src = song.src;
     titleEl.textContent = song.title;
     
-    // 如果当前开着歌曲列表，需要同步高亮
-    if (playlistEl.classList.contains("show") && playlistEl.dataset.currentType === 'song') {
-      renderSongList();
-    }
+    renderPlaylistDOM(); 
+    // 重置并更新 MediaSession
     updateMediaSession(song);
   }
 
   function togglePlay() {
     if (audio.paused) {
-      audio.play();
+      audio.play().catch(e => console.log("Waiting for interaction"));
       playPauseBtn.textContent = "⏸";
       player.classList.add("playing");
     } else {
@@ -247,18 +120,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // 切歌核心逻辑
   function playNext(isAuto = false) {
     let nextIndex;
+
+    // 模式 1: 单曲循环 (🔂)
     if (playMode === 1 && isAuto) {
       audio.currentTime = 0;
       audio.play();
       return;
     } 
+    
+    // 模式 2: 随机播放 (🔀)
     if (playMode === 2) {
-      nextIndex = Math.floor(Math.random() * currentList.length);
-    } else {
+      if (currentList.length > 1) {
+        let newIndex = currentIndex;
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * currentList.length);
+        }
+        nextIndex = newIndex;
+      } else {
+        nextIndex = 0;
+      }
+    } 
+    // 模式 0: 列表循环 (🔁)
+    else {
       nextIndex = (currentIndex + 1) % currentList.length;
     }
+
     loadSong(nextIndex);
     audio.play();
     playPauseBtn.textContent = "⏸";
@@ -266,46 +155,114 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     📱 其他交互 (长按翻转、锁屏等)
+     长按翻转逻辑
      ========================================================= */
-  
-  // 模式切换
-  modeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    playMode = (playMode + 1) % 3;
-    modeBtn.textContent = playModes[playMode].icon;
-  });
+  let pressTimer;
+  let isDrag = false;
+  const LONG_PRESS_DURATION = 500;
 
-  // 播放控制
-  playPauseBtn.addEventListener("click", togglePlay);
-  nextBtn.addEventListener("click", () => playNext(false));
-  audio.addEventListener("ended", () => playNext(true));
-
-  // 长按翻转
-  let pressTimer; let isDrag = false;
   const startPress = (e) => {
-    if (e.target.closest('button') || e.target.closest('.playlist-selector-wrapper')) return;
+    // 忽略按钮点击
+    if (e.target.closest('button') || e.target.closest('select')) return;
+    
     isDrag = false;
     pressTimer = setTimeout(() => {
       if (!isDrag) {
         player.classList.toggle("flipped");
+        // 翻转时隐藏列表
         playlistEl.classList.remove("show");
         playlistEl.classList.add("hide");
       }
-    }, 500);
+    }, LONG_PRESS_DURATION);
   };
+
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
-  
+
   player.addEventListener('mousedown', startPress);
-  player.addEventListener('touchstart', startPress, {passive:true});
+  player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
   player.addEventListener('mouseleave', cancelPress);
   player.addEventListener('touchend', cancelPress);
   player.addEventListener('mousemove', onMove);
-  player.addEventListener('touchmove', onMove, {passive:true});
+  player.addEventListener('touchmove', onMove, { passive: true });
 
-  // 点击外部关闭列表
+
+  /* =========================================================
+     背面功能逻辑
+     ========================================================= */
+
+  // 1. 模式切换
+  modeBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); 
+    playMode = (playMode + 1) % 3;
+    modeBtn.textContent = playModes[playMode].icon;
+  });
+
+  // 2. 歌单切换
+  playlistSelect.addEventListener('change', (e) => {
+    e.stopPropagation(); 
+    const selectedKey = e.target.value;
+    const newList = playlists[selectedKey];
+
+    if (newList && newList.length > 0) {
+      currentPlaylistKey = selectedKey;
+      currentList = newList;
+      
+      const optionText = e.target.options[e.target.selectedIndex].text;
+      currentPlaylistText.textContent = optionText;
+
+      currentIndex = 0;
+      loadSong(0);
+      audio.play();
+      playPauseBtn.textContent = "⏸";
+      player.classList.add("playing");
+    }
+  });
+
+  // 阻止 select 点击时的冒泡
+  playlistSelect.addEventListener('click', (e) => e.stopPropagation());
+
+
+  /* =========================================================
+     UI 交互与初始化
+     ========================================================= */
+
+  playPauseBtn.addEventListener("click", togglePlay);
+  nextBtn.addEventListener("click", () => playNext(false));
+  audio.addEventListener("ended", () => playNext(true));
+
+  function renderPlaylistDOM() {
+    playlistEl.innerHTML = currentList.map((s, i) => `
+      <div class="playlist-item ${i === currentIndex ? 'active' : ''}" data-index="${i}">
+        ${s.title}
+      </div>
+    `).join("");
+  }
+
+  playlistEl.addEventListener("click", e => {
+    const item = e.target.closest(".playlist-item");
+    if (item) {
+      loadSong(parseInt(item.dataset.index));
+      audio.play();
+      playPauseBtn.textContent = "⏸";
+    }
+  });
+
+  // 列表显示控制
+  titleEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (player.classList.contains("flipped")) return; 
+
+    if (playlistEl.classList.contains("show")) {
+      playlistEl.classList.remove("show");
+      playlistEl.classList.add("hide");
+    } else {
+      playlistEl.classList.remove("hide");
+      playlistEl.classList.add("show");
+    }
+  });
+
   document.addEventListener("click", e => {
     if (!player.contains(e.target) && !playlistEl.contains(e.target)) {
       if (playlistEl.classList.contains("show")) {
@@ -315,29 +272,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 锁屏控制 & 进度条修复
-  function updateMediaSession(song) {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.title,
-        artist: "Elysia Player",
-        album: currentPlaylistText.textContent,
-        artwork: [{ src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }]
-      });
-      navigator.mediaSession.setActionHandler('play', togglePlay);
-      navigator.mediaSession.setActionHandler('pause', togglePlay);
-      navigator.mediaSession.setActionHandler('nexttrack', () => playNext(false));
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        loadSong(currentIndex - 1); audio.play();
-      });
-      navigator.mediaSession.setActionHandler('seekto', (details) => {
-        if (details.fastSeek && 'fastSeek' in audio) audio.fastSeek(details.seekTime);
-        else audio.currentTime = details.seekTime;
-        updatePositionState();
-      });
+  // 自动隐藏逻辑
+  let inactivityTimer;
+  function hidePlayerUI() {
+    player.style.opacity = '0';
+    player.style.transform = 'translate(-50%, 40px)'; 
+    player.style.pointerEvents = 'none'; 
+    if (playlistEl.classList.contains("show")) {
+      playlistEl.classList.remove("show");
+      playlistEl.classList.add("hide");
     }
   }
 
+  function showPlayerUI() {
+    player.style.opacity = '1';
+    player.style.transform = 'translate(-50%, 0)'; 
+    player.style.pointerEvents = 'auto'; 
+    resetTimer();
+  }
+
+  function resetTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(hidePlayerUI, 30000);
+  }
+
+  ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
+    window.addEventListener(evt, showPlayerUI)
+  );
+
+
+  /* =========================================================
+     🎧 Media Session API (锁屏控制 + 修复进度条拖动)
+     ========================================================= */
+
+  // 关键修复：更新位置状态给浏览器
   function updatePositionState() {
     if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
       navigator.mediaSession.setPositionState({
@@ -347,9 +315,64 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+
+  function updateMediaSession(song) {
+    if ('mediaSession' in navigator) {
+      // 1. 设置元数据
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: "Elysia Player",
+        album: currentPlaylistText.textContent,
+        artwork: [{ src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }]
+      });
+
+      // 2. 基础控制 Action
+      navigator.mediaSession.setActionHandler('play', togglePlay);
+      navigator.mediaSession.setActionHandler('pause', togglePlay);
+      navigator.mediaSession.setActionHandler('nexttrack', () => playNext(false));
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        let prevIndex = currentIndex - 1;
+        if (prevIndex < 0) prevIndex = currentList.length - 1;
+        loadSong(prevIndex);
+        audio.play();
+      });
+
+      // 3. 【关键修复】添加 seekto 处理器，允许锁屏拖动
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.fastSeek && 'fastSeek' in audio) {
+          audio.fastSeek(details.seekTime);
+        } else {
+          audio.currentTime = details.seekTime;
+        }
+        updatePositionState(); // 拖动后立即更新UI
+      });
+    }
+  }
+
+  // 4. 【关键修复】事件监听，保持进度条同步
   audio.addEventListener('loadedmetadata', updatePositionState);
-  audio.addEventListener('timeupdate', () => { if(Math.floor(audio.currentTime)%5===0) updatePositionState(); });
+  
+  audio.addEventListener('play', () => {
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+    updatePositionState();
+  });
+  
+  audio.addEventListener('pause', () => {
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+    updatePositionState();
+  });
+
+  // timeupdate 可以让进度条走动更平滑，但为了性能通常不需要过于频繁
+  // 浏览器通常会自动推算，但更新一下更稳妥
+  audio.addEventListener('timeupdate', () => {
+    // 简单的节流，防止过于频繁调用 (每秒同步一次即可)
+    if (Math.floor(audio.currentTime) % 5 === 0) {
+      updatePositionState();
+    }
+  });
+
 
   // 启动
+  resetTimer();
   loadSong(0);
 });

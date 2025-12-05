@@ -104,6 +104,7 @@
       display: block;
       margin-bottom: 25px; /* 与进度条的距离 */
       opacity: 0.9;
+      pointer-events: none; /* 防止点击干扰 */
     }
 
     /* 进度条 */
@@ -192,6 +193,7 @@
     let canvas, ctx;
     let isVisualizerInited = false;
     let animationId;
+    let isPageVisible = true; // 跟踪页面是否在前台
 
     const els = {
       body: document.body, cover: document.getElementById('coverImg'),
@@ -202,7 +204,7 @@
       iconPlay: document.getElementById('iconPlay'), iconPause: document.getElementById('iconPause')
     };
 
-    // ================== 频谱可视化逻辑 ==================
+    // ================== 频谱可视化逻辑 (含后台保活 Hack) ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
 
@@ -210,8 +212,17 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
 
+        // --- 核心修复：Keep-Alive Hack (静音振荡器) ---
+        // 播放一个听不见的声音，欺骗浏览器保持 AudioContext 活跃
+        const fakeOsc = audioContext.createOscillator();
+        const fakeGain = audioContext.createGain();
+        fakeGain.gain.value = 0.001; // 极低音量
+        fakeOsc.connect(fakeGain);
+        fakeGain.connect(audioContext.destination);
+        fakeOsc.start();
+        // -------------------------------------------
+
         analyser = audioContext.createAnalyser();
-        // fftSize 决定条的数量 (值越大条越细: 64, 128, 256)
         analyser.fftSize = 128; 
 
         // 连接音频源
@@ -222,7 +233,7 @@
         // 初始化画布
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
-        resizeCanvas(); // 调整初始大小
+        resizeCanvas();
 
         isVisualizerInited = true;
         renderFrame();
@@ -232,6 +243,9 @@
     };
 
     const renderFrame = () => {
+      // 如果页面不可见，停止绘制以省电，但音频线程因上面的 Hack 会继续运行
+      if (!isPageVisible) return;
+
       animationId = requestAnimationFrame(renderFrame);
 
       if (!analyser) return;
@@ -240,27 +254,21 @@
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
-      // 清除画布
       const width = canvas.width / (window.devicePixelRatio || 1);
       const height = canvas.height / (window.devicePixelRatio || 1);
       ctx.clearRect(0, 0, width, height);
 
-      // 绘制参数
-      const barWidth = (width / bufferLength) * 2.5; // 间距系数
+      const barWidth = (width / bufferLength) * 2.5; 
       let barHeight;
       let x = 0;
 
       for (let i = 0; i < bufferLength; i++) {
-        // 让高度变化平滑一些
         barHeight = (dataArray[i] / 255) * height * 0.9;
         
-        // 动态透明度：声音越大越亮
         ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + (barHeight/height) * 0.7})`;
 
-        // 绘制圆角条 (垂直居中)
         const y = (height - barHeight) / 2;
         
-        // 兼容性写法绘制圆角矩形
         if (ctx.roundRect) {
             ctx.beginPath();
             ctx.roundRect(x, y, barWidth - 2, barHeight, 50);
@@ -283,6 +291,23 @@
       }
     };
     window.addEventListener('resize', resizeCanvas);
+
+    // ================== 页面可见性管理 (后台播放关键) ==================
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+            isPageVisible = false;
+            // 停止 Canvas 渲染循环 (防止浏览器认为耗能过高而强杀)
+            // 音频会因为 Oscillator 保持播放
+            cancelAnimationFrame(animationId);
+        } else {
+            isPageVisible = true;
+            // 回到前台，检查并恢复状态
+            if (audioContext && audioContext.state === 'suspended' && !audio.paused) {
+                audioContext.resume();
+            }
+            renderFrame(); // 重启绘图
+        }
+    });
 
     // ================== 播放器核心逻辑 ==================
     const initPlayer = () => {
@@ -323,7 +348,7 @@
       // 1. 尝试初始化频谱（如果是第一次点击）
       if (!isVisualizerInited) initVisualizer();
       
-      // 2. 恢复 AudioContext（浏览器要求必须在用户交互中 resume）
+      // 2. 恢复 AudioContext（必须在用户交互中调用）
       if (audioContext && audioContext.state === 'suspended') {
         audioContext.resume();
       }

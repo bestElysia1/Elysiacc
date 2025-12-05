@@ -3,123 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Elysia Player</title>
+  <title>Aura Style Player</title>
   <style>
     :root {
-      --text-main: rgba(255, 255, 255, 0.95);
-      --text-sub: rgba(255, 255, 255, 0.65);
+      --text-main: #ffffff;
+      --text-sub: rgba(255, 255, 255, 0.7);
+      --primary-color: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --bg-blur: 60px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
     
     body {
       background: #000;
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", Roboto, sans-serif;
       height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
-    /* === 视频背景 === */
+    /* === 沉浸式背景 === */
     #bgVideo {
       position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%; 
-      min-height: 100%;
-      width: auto; 
-      height: auto;
+      top: 50%; left: 50%;
+      min-width: 100%; min-height: 100%;
+      width: auto; height: auto;
       z-index: -2;
       object-fit: cover;
-      filter: blur(40px) brightness(0.8); 
-      transform: scale(1.2);
+      /* 增加模糊度和压暗，突出前景 */
+      filter: blur(var(--bg-blur)) brightness(0.6) saturate(1.2); 
+      transform: translate(-50%, -50%) scale(1.2);
     }
 
     .overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.15);
+      background: rgba(0, 0, 0, 0.2); /* 轻微遮罩 */
       z-index: -1;
       pointer-events: none;
     }
 
-    /* === UI 布局 === */
+    /* === 导航栏 === */
     .nav-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
-      padding: max(20px, env(safe-area-inset-top)) 24px;
-      display: flex; justify-content: space-between; align-items: center; z-index: 10;
+      padding: max(24px, env(safe-area-inset-top)) 32px;
+      z-index: 10;
+      display: flex; align-items: center;
     }
     
-    .capsule-btn {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.15);
-      padding: 8px 18px; border-radius: 99px;
-      font-size: 14px; color: #fff; cursor: pointer; display: flex; gap: 6px; align-items: center;
+    .icon-btn {
+      background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 8px;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.2s;
     }
+    .icon-btn:active { opacity: 0.6; }
+    .icon-btn svg { width: 28px; height: 28px; }
 
+    /* === 主体布局 === */
     .player-layout {
-      display: flex; flex-direction: column; align-items: center;
-      width: 100%; max-width: 1000px; height: 100%;
-      padding: 20px; justify-content: center;
-    }
-    @media (min-width: 768px) {
-      .player-layout { flex-direction: row; gap: 60px; padding: 60px; }
-      .art-section, .controls-section { flex: 1; }
+      flex: 1; width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      padding: 24px;
+      padding-top: calc(max(24px, env(safe-area-inset-top)) + 60px); /* 为导航栏留空 */
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+      justify-content: space-evenly; /* 内容垂直分布 */
     }
 
-    /* 封面 */
-    .art-section { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
-    @media (min-width: 768px) { margin-bottom: 0; }
+    /* 桌面端布局优化 (Aura风格核心) */
+    @media (min-width: 900px) {
+      .player-layout {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 80px; /* 左右间距 */
+        padding: 60px;
+      }
 
+      /* 左侧封面区 */
+      .art-section {
+        flex: 1;
+        max-width: 500px;
+        display: flex; justify-content: flex-end;
+        margin-bottom: 0 !important;
+      }
+      .album-art-wrapper {
+        width: 45vh !important; height: 45vh !important; /* 使用视口高度基准 */
+        max-width: 500px !important; max-height: 500px !important;
+      }
+
+      /* 右侧控制区：玻璃卡片 */
+      .controls-section {
+        flex: 1;
+        max-width: 500px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(40px) saturate(1.5); -webkit-backdrop-filter: blur(40px) saturate(1.5);
+        border-radius: 32px;
+        border: 1px solid var(--glass-border);
+        padding: 48px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        align-items: stretch !important; /* 拉伸宽度 */
+      }
+      .song-info { text-align: left !important; margin-bottom: 30px !important; }
+      .song-title { font-size: 36px !important; }
+      .artist-name { font-size: 20px !important; }
+    }
+
+    /* === 封面区域 === */
+    .art-section { width: 100%; display: flex; justify-content: center; margin-bottom: 2vh; transition: all 0.3s ease;}
     .album-art-wrapper {
-      width: 80vw; height: 80vw; max-width: 340px; max-height: 340px;
-      border-radius: 16px; position: relative;
-      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      width: min(80vw, 380px); height: min(80vw, 380px);
+      border-radius: 20px; /* 更圆润 */
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease; /* 更有弹性的动画 */
+      box-shadow: 0 20px 60px -15px rgba(0,0,0,0.6);
+      overflow: hidden;
     }
-    .album-art-wrapper img {
-      width: 100%; height: 100%; object-fit: cover; border-radius: 16px; display: block;
-    }
-    .is-playing .album-art-wrapper { transform: scale(1); }
-    .is-paused .album-art-wrapper { transform: scale(0.85); box-shadow: none; opacity: 0.8; }
-
-    /* 控制区 */
-    .controls-section { width: 100%; max-width: 450px; display: flex; flex-direction: column; }
-    .song-info { text-align: center; margin-bottom: 5px; } /* 减小间距给频谱腾位置 */
-    @media (min-width: 768px) { .song-info { text-align: left; } }
+    .album-art-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
     
-    .song-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .artist-name { font-size: 17px; color: var(--text-sub); }
+    /* 播放/暂停动画状态 */
+    .is-paused .album-art-wrapper { transform: scale(0.9); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3); opacity: 0.9; }
 
-    /* === 新增：频谱画布样式 === */
+    /* === 控制区域 === */
+    .controls-section { width: 100%; max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;}
+    
+    /* 歌曲信息：更大、更清晰 */
+    .song-info { text-align: center; margin-bottom: 20px; width: 100%; }
+    .song-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px;}
+    .artist-name { font-size: 18px; color: var(--text-sub); font-weight: 500; }
+
+    /* === 频谱可视化 (更大、更显眼) === */
     #visualizer {
       width: 100%;
-      height: 50px; /* 控制频谱高度 */
+      height: 80px; /* 增加高度 */
       display: block;
-      margin-bottom: 25px; /* 与进度条的距离 */
-      opacity: 0.9;
+      margin-bottom: 20px;
+      opacity: 0.8;
+      /* 尝试添加混合模式让它看起来更融合 (可选) */
+      /* mix-blend-mode: overlay; */ 
     }
 
-    /* 进度条 */
-    .progress-container { margin-bottom: 40px; width: 100%; }
-    .slider-track { width: 100%; height: 5px; background: rgba(255,255,255,0.15); border-radius: 10px; position: relative; }
-    .progress-fill { position: absolute; left:0; top:0; bottom:0; width:0%; background:#fff; border-radius:10px; }
-    input[type=range] { -webkit-appearance:none; position:absolute; width:100%; height:20px; top:-8px; left:0; background:transparent; z-index:2; }
-    .time-labels { display:flex; justify-content:space-between; font-size:12px; color:var(--text-sub); margin-top:10px; font-weight:600; font-variant-numeric: tabular-nums; }
+    /* === 优化的进度条 === */
+    .progress-container { margin-bottom: 32px; width: 100%; position: relative; padding-top: 10px; }
+    .slider-track { 
+      width: 100%; height: 6px; /* 变粗 */
+      background: rgba(255,255,255,0.15); 
+      border-radius: 99px; position: relative; overflow: hidden;
+    }
+    .progress-fill { 
+      position: absolute; left:0; top:0; bottom:0; width:0%; 
+      background: var(--primary-color); 
+      border-radius: 99px; 
+    }
+    /* 自定义 Range Input 样式 (增加 Thumb) */
+    input[type=range] { 
+      -webkit-appearance:none; position:absolute; width:100%; height:26px; top:-10px; left:0; background:transparent; z-index:3; cursor: pointer;
+    }
+    /* Webkit Thumb */
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+      background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      margin-top: -5px; /* 调整对齐 */
+      transition: transform 0.1s;
+    }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.3); }
 
-    /* 按钮 */
-    .controls-row { display:flex; align-items:center; justify-content:center; gap:40px; }
-    .ctrl-btn { background:none; border:none; color:#fff; cursor:pointer; display:flex; transition:0.2s; }
-    .ctrl-btn:active { transform:scale(0.85); }
-    .ctrl-icon { width:32px; height:32px; fill:currentColor; }
-    .btn-play-pause { width:70px; height:70px; background:#fff; color:#000; border-radius:50%; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(255,255,255,0.2); }
-    .btn-play-pause .ctrl-icon { width:28px; height:28px; }
+    .time-labels { display:flex; justify-content:space-between; font-size: 13px; color:var(--text-sub); margin-top: 12px; font-weight: 600; letter-spacing: 0.5px; }
+
+    /* === 控制按钮 (使用填充风格图标) === */
+    .controls-row { display:flex; align-items:center; justify-content:center; gap: 32px; width: 100%; }
+    .ctrl-btn { background:none; border:none; color: var(--text-main); cursor:pointer; display:flex; transition:transform 0.2s, color 0.2s; padding: 8px;}
+    .ctrl-btn:active { transform:scale(0.88); color: var(--text-sub); }
+    .ctrl-icon { width: 42px; height: 42px; fill:currentColor; } /* 增大侧边图标 */
+    
+    /* 主播放按钮 */
+    .btn-play-pause { 
+      width: 88px; height: 88px; /* 更大 */
+      background: var(--primary-color); color:#000; 
+      border-radius: 50%; align-items:center; justify-content:center; 
+      box-shadow: 0 12px 32px rgba(255,255,255,0.25); 
+    }
+    .btn-play-pause:active { transform: scale(0.92); }
+    .btn-play-pause .ctrl-icon { width: 36px; height: 36px; }
   </style>
 </head>
 <body class="is-paused">
@@ -130,9 +200,8 @@
   <div class="overlay"></div>
 
   <nav class="nav-bar">
-    <button class="capsule-btn" onclick="goBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      Back
+    <button class="icon-btn" onclick="goBack()" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
     </button>
   </nav>
 
@@ -146,14 +215,15 @@
     <section class="controls-section">
       <div class="song-info">
         <div class="song-title" id="songTitle">Elysia</div>
-        <div class="artist-name">Loading...</div>
+        <div class="artist-name">Elysia Collection</div>
       </div>
 
       <canvas id="visualizer"></canvas>
+
       <div class="progress-container">
         <div class="slider-track">
           <div class="progress-fill" id="progressFill"></div>
-          <input type="range" id="progressBar" min="0" value="0" step="0.1">
+          <input type="range" id="progressBar" min="0" value="0" step="any">
         </div>
         <div class="time-labels">
           <span id="currTime">0:00</span>
@@ -162,12 +232,18 @@
       </div>
 
       <div class="controls-row">
-        <button class="ctrl-btn" id="prevBtn"><svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-        <button class="ctrl-btn btn-play-pause" id="playBtn">
+        <button class="ctrl-btn" id="prevBtn" aria-label="Previous">
+          <svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        
+        <button class="ctrl-btn btn-play-pause" id="playBtn" aria-label="Play/Pause">
           <svg class="ctrl-icon" id="iconPlay" style="display:block" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           <svg class="ctrl-icon" id="iconPause" style="display:none" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
-        <button class="ctrl-btn" id="nextBtn"><svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+        
+        <button class="ctrl-btn" id="nextBtn" aria-label="Next">
+          <svg class="ctrl-icon" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
       </div>
     </section>
   </main>
@@ -180,9 +256,8 @@
       { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
     ];
 
-    // 初始化音频对象，设置跨域许可（重要）
     const audio = new Audio();
-    audio.crossOrigin = "anonymous";
+    audio.crossOrigin = "anonymous"; // 重要：允许跨域分析音频
 
     let currentIndex = 0;
     let isDragging = false;
@@ -202,7 +277,7 @@
       iconPlay: document.getElementById('iconPlay'), iconPause: document.getElementById('iconPause')
     };
 
-    // ================== 频谱可视化逻辑 ==================
+    // ================== 优化后的频谱可视化逻辑 ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
 
@@ -211,78 +286,87 @@
         audioContext = new AudioContext();
 
         analyser = audioContext.createAnalyser();
-        // fftSize 决定条的数量 (值越大条越细: 64, 128, 256)
-        analyser.fftSize = 128; 
+        // fftSize 决定条的数量。128或256比较适合这种现代风格
+        analyser.fftSize = 256; 
+        // smoothingTimeConstant 让频谱跳动更平滑 (0-1, 越大越平滑)
+        analyser.smoothingTimeConstant = 0.75;
 
-        // 连接音频源
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
 
-        // 初始化画布
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
-        resizeCanvas(); // 调整初始大小
+        resizeCanvas();
 
         isVisualizerInited = true;
         renderFrame();
       } catch (e) {
-        console.warn("Visualizer init failed (likely CORS or browser policy):", e);
+        console.warn("Visualizer init failed:", e);
       }
     };
 
     const renderFrame = () => {
       animationId = requestAnimationFrame(renderFrame);
-
       if (!analyser) return;
 
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
-      // 清除画布
       const width = canvas.width / (window.devicePixelRatio || 1);
       const height = canvas.height / (window.devicePixelRatio || 1);
       ctx.clearRect(0, 0, width, height);
 
-      // 绘制参数
-      const barWidth = (width / bufferLength) * 2.5; // 间距系数
-      let barHeight;
-      let x = 0;
+      // 我们只取低频到中频部分，舍弃高频，让视觉效果更集中
+      const usefulBufferLength = Math.floor(bufferLength * 0.7);
+      
+      // 计算条宽和间距，让它们占满画布
+      const totalBarWidth = width / usefulBufferLength;
+      const barPadding = totalBarWidth * 0.2; // 20% 的间距
+      const barWidth = totalBarWidth - barPadding;
+      
+      let x = barPadding / 2;
 
-      for (let i = 0; i < bufferLength; i++) {
-        // 让高度变化平滑一些
-        barHeight = (dataArray[i] / 255) * height * 0.9;
+      for (let i = 0; i < usefulBufferLength; i++) {
+        // 数据归一化 并稍微放大
+        let barHeight = (dataArray[i] / 255) * height * 1.1;
+        // 限制最大高度
+        if (barHeight > height) barHeight = height;
         
         // 动态透明度：声音越大越亮
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + (barHeight/height) * 0.7})`;
+        const alpha = 0.25 + (barHeight / height) * 0.75;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
 
         // 绘制圆角条 (垂直居中)
         const y = (height - barHeight) / 2;
         
-        // 兼容性写法绘制圆角矩形
         if (ctx.roundRect) {
             ctx.beginPath();
-            ctx.roundRect(x, y, barWidth - 2, barHeight, 50);
+            // 使用更大的圆角半径
+            ctx.roundRect(x, y, barWidth, barHeight, 50);
             ctx.fill();
         } else {
-            ctx.fillRect(x, y, barWidth - 2, barHeight);
+            ctx.fillRect(x, y, barWidth, barHeight);
         }
-
-        x += barWidth;
+        x += totalBarWidth;
       }
     };
 
     const resizeCanvas = () => {
       if(canvas) {
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        // 获取父容器宽度，确保填满
+        const rect = canvas.parentNode.getBoundingClientRect();
+        canvas.width = (rect.width - 48) * dpr; // 减去父容器padding
+        canvas.height = canvas.clientHeight * dpr;
         ctx.scale(dpr, dpr);
       }
     };
+    // 监听窗口调整，但也监听横竖屏切换
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', resizeCanvas);
+
 
     // ================== 播放器核心逻辑 ==================
     const initPlayer = () => {
@@ -297,7 +381,11 @@
       loadSong(currentIndex);
 
       if (t && !isNaN(parseFloat(t))) audio.currentTime = parseFloat(t);
-      if (st === 'play') setTimeout(() => playMusic(), 150);
+      // 如果 URL 要求播放，尝试自动播放（可能会被浏览器拦截）
+      if (st === 'play') {
+         // 现代浏览器通常不允许未交互的自动播放音频，所以这里只是尝试
+         playMusic().catch(() => updateUI(false));
+      }
     };
 
     const loadSong = (i) => {
@@ -306,11 +394,12 @@
       audio.src = s.src;
       els.title.textContent = s.title;
       els.cover.src = s.cover;
-      els.artist.textContent = "Elysia Collection";
+      // 固定艺术家名称，或在数组中添加
+      // els.artist.textContent = s.artist || "Elysia Collection"; 
       
       if('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
-           title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}]
+           title: s.title, artist: els.artist.textContent, artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}]
         });
         navigator.mediaSession.setActionHandler('play', playMusic);
         navigator.mediaSession.setActionHandler('pause', pauseMusic);
@@ -319,19 +408,19 @@
       }
     };
 
-    const playMusic = () => {
-      // 1. 尝试初始化频谱（如果是第一次点击）
+    const playMusic = async () => {
+      // 1. 用户交互后初始化频谱
       if (!isVisualizerInited) initVisualizer();
-      
-      // 2. 恢复 AudioContext（浏览器要求必须在用户交互中 resume）
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
+      // 2. 恢复 AudioContext 状态
+      if (audioContext && audioContext.state === 'suspended') await audioContext.resume();
 
-      // 3. 播放
-      audio.play().then(() => updateUI(true)).catch(e => {
+      try {
+        await audio.play();
+        updateUI(true);
+      } catch (e) {
+        console.log("播放被阻止，等待用户交互", e);
         updateUI(false);
-      });
+      }
     };
     
     const pauseMusic = () => { audio.pause(); updateUI(false); };
@@ -367,7 +456,14 @@
     
     audio.onended = playNext;
     
-    els.pBar.oninput = (e) => { isDragging = true; els.pFill.style.width = e.target.value + '%'; };
+    // 优化拖动体验
+    els.pBar.oninput = (e) => { 
+        isDragging = true; 
+        els.pFill.style.width = e.target.value + '%'; 
+        // 拖动时实时更新时间显示（可选）
+        const d = audio.duration || 0;
+        els.currT.textContent = formatTime((e.target.value / 100) * d);
+    };
     els.pBar.onchange = (e) => {
       isDragging = false;
       const d = audio.duration || 0;
@@ -383,7 +479,11 @@
 
     window.goBack = () => window.location.href = "index.html";
 
-    initPlayer();
+    // 页面加载完成后初始化，并尝试调整一次画布大小
+    window.addEventListener('DOMContentLoaded', () => {
+        initPlayer();
+        setTimeout(resizeCanvas, 100); // 延时确保布局完成
+    });
   </script>
 </body>
 </html>

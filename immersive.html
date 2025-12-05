@@ -101,10 +101,10 @@
     /* === 频谱 Canvas === */
     #visualizer {
       width: 100%; 
-      height: 50px; 
+      height: 40px; /* 稍微调低高度以匹配图片风格 */
       display: block; 
-      margin-bottom: 5px; 
-      opacity: 0.8; 
+      margin-bottom: 15px; /* 增加一点间距 */
+      opacity: 0.9;
       pointer-events: none;
     }
 
@@ -289,7 +289,7 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 频谱逻辑 (128条 高密度版) ==================
+    // ================== 频谱逻辑 (模仿参考图: 药丸状, 居中, 稀疏) ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
       try {
@@ -297,14 +297,29 @@
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
         
-        // fftSize 256 => 128 个条目 (frequencyBinCount)
-        analyser.fftSize = 256; 
-        analyser.smoothingTimeConstant = 0.8;
+        // 使用较小的fftSize来获得较少的条目，看起来更稀疏干净
+        analyser.fftSize = 128; // 结果是64个数据点
+        analyser.smoothingTimeConstant = 0.85; // 让跳动更柔和
         
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
         
+        // --- 修复后台暂停的关键部分 ---
+        // 监听 AudioContext 状态变化。如果它被系统挂起（suspended），但音乐应该在播放，则尝试恢复。
+        audioContext.onstatechange = () => {
+            if (audioContext.state === 'suspended' && !audio.paused) {
+                audioContext.resume();
+            }
+        };
+        // 额外的安全措施：在用户交互时尝试恢复上下文（对iOS特别有用）
+        ['touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, () => {
+                if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+            }, { once: true });
+        });
+        // ---------------------------
+
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
         resizeCanvas();
@@ -317,7 +332,7 @@
       animationId = requestAnimationFrame(renderFrame);
       if (!analyser) return;
       
-      const bufferLength = analyser.frequencyBinCount; // 128
+      const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
@@ -325,32 +340,41 @@
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const barCount = bufferLength; 
+      const barCount = bufferLength; // 64个条目
+      const dpr = window.devicePixelRatio || 1;
+
+      // 计算间距和宽度，使其看起来比较稀疏
+      const gapRatio = 0.6; // 间距是宽度的0.6倍
+      // 总宽度 = N * barWidth + (N-1) * gap
+      // w = N * bw + (N-1) * (bw * gapRatio)
+      const barWidthRaw = w / (barCount + (barCount - 1) * gapRatio);
+      const barWidth = Math.max(2 * dpr, Math.floor(barWidthRaw)); // 确保最小宽度
+      const gap = barWidth * gapRatio;
       
-      // 间距非常小，模拟高密度效果
-      const gap = 1 * (window.devicePixelRatio || 1); 
-      
-      const totalGap = gap * (barCount - 1);
-      const barWidth = (w - totalGap) / barCount;
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; 
+      // 略微透明的白色
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; 
 
       for (let i = 0; i < barCount; i++) {
         let value = dataArray[i];
-        let percent = value / 255;
+        // 使用平方让峰值更明显，低音更平坦，看起来更干净
+        let percent = (value / 255);
+        percent = percent * percent; 
+
         let barHeight = h * percent * 0.8; 
         
-        // 保证即使没声音也有一条细线，维持视觉结构
-        if (barHeight < 2) barHeight = 2;
+        // 最小高度，保证是一个小圆点
+        if (barHeight < barWidth) barHeight = barWidth;
 
         const x = i * (barWidth + gap);
-        const y = h - barHeight;
+        // 垂直居中计算
+        const y = (h - barHeight) / 2;
         
-        // 使用 barWidth/2 作为半径，确保是完美的胶囊形
+        // 绘制药丸形状 (圆角半径为宽度的一半)
         ctx.beginPath();
         if (ctx.roundRect) {
             ctx.roundRect(x, y, barWidth, barHeight, barWidth / 2);
         } else {
+            // 回退兼容
             ctx.fillRect(x, y, barWidth, barHeight);
         }
         ctx.fill();
@@ -393,6 +417,7 @@
 
     const playMusic = () => {
       if (!isVisualizerInited) initVisualizer();
+      // 确保 context 是运行状态
       if (audioContext && audioContext.state === 'suspended') audioContext.resume();
       audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
@@ -402,12 +427,15 @@
       else { els.body.classList.remove('is-playing'); els.body.classList.add('is-paused'); els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; }
     };
 
+    // 页面可见性变化处理 (辅助后台恢复)
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'visible') {
-            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+            // 切回前台时，确保状态正确
+            if (audioContext && audioContext.state === 'suspended' && !audio.paused) audioContext.resume();
             cancelAnimationFrame(animationId);
             renderFrame();
         }
+        // 注意：不要在这里写 audio.pause()，否则切后台就会暂停
     });
 
     const playNextAuto = () => {

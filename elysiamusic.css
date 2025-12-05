@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Fixed 3D Flip Interaction) */
+/* elysiamusic.css - Elysia Liquid Glass Player (iOS Fixed Version) */
 
 /* =========================================
    1. 基础容器：负责定位、悬浮动画、3D透视
@@ -13,8 +13,10 @@
   width: 320px; 
   height: 56px; 
   
-  perspective: 1000px; /* 开启 3D 空间 */
+  /* 开启 3D 空间 */
+  perspective: 1000px;
   
+  /* 清除默认样式 */
   padding: 0;
   background: transparent;
   border: none;
@@ -26,26 +28,27 @@
   
   user-select: none;
   -webkit-user-select: none;
+  
+  /* 消除点击高亮 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================================
-   2. 核心：液态玻璃卡片 (承载视觉特效)
+   2. 核心：3D 骨架 (只负责旋转，不负责视觉)
    ========================================= */
 .player-glass-card {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
   
-  /* 玻璃质感 */
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  /* !!!关键修复：父容器必须透明，否则 iOS 会扁平化 3D 效果!!! */
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
   
-  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-  
-  /* 3D 翻转设置 */
+  /* 3D 翻转核心设置 */
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -63,7 +66,71 @@
   transform: rotateX(180deg) scale(0.96);
 }
 
-/* 液态光斑动画 */
+/* =========================================
+   3. 前后两面 (Faces) - 视觉样式移至此处
+   ========================================= */
+.player-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px; 
+  gap: 14px;
+  border-radius: 16px;
+  
+  /* --- 样式层：玻璃质感 --- */
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.15);
+  
+  /* 模糊滤镜 */
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  
+  /* 阴影 */
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+
+  /* --- 3D 属性 --- */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  
+  /* 确保 iOS 渲染层级正确 */
+  transform-style: preserve-3d;
+  
+  z-index: 1; 
+
+  /* 默认交互状态：关闭，由下方的类控制 */
+  pointer-events: none;
+  transition: pointer-events 0s linear 0.1s;
+}
+
+/* --- 正面 (Front) --- */
+.face-front {
+  transform: rotateX(0deg);
+  justify-content: flex-start;
+  
+  /* 默认正面可点击 */
+  pointer-events: auto;
+}
+
+/* --- 背面 (Back) --- */
+.face-back {
+  transform: rotateX(180deg);
+  justify-content: space-between;
+  
+  /* 背面加深背景，防止正面的字透过来 */
+  background: linear-gradient(180deg, rgba(40,30,50,0.65), rgba(40,30,50,0.45));
+}
+
+/* --- 翻转状态下的交互切换 (核心) --- */
+.elysia-player.flipped .face-front {
+  pointer-events: none !important;
+}
+
+.elysia-player.flipped .face-back {
+  pointer-events: auto !important;
+}
+
+/* 液态光斑 (放在父容器内底层) */
 .player-glass-card::before {
   content: "";
   position: absolute;
@@ -77,66 +144,11 @@
   animation: moveBlobs 14s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
-  z-index: 0;
-}
-
-/* =========================================
-   3. 前后两面 (Faces) - iOS 3D 渲染修复版
-   ========================================= */
-.player-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  padding: 0 20px; 
-  gap: 14px;
   
-  /* 关键：隐藏背面，防止透视穿帮 */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  
-  /* 关键修复：开启硬件加速，防止 iOS 渲染闪烁 */
-  transform-style: preserve-3d;
-  
-  z-index: 1; 
-  border-radius: 16px;
-
-  /* 交互切换延迟 */
-  transition: pointer-events 0s linear 0.3s;
-  pointer-events: none; 
+  /* 放在最底层，不影响点击 */
+  transform: translateZ(-10px); 
+  z-index: -1; 
 }
-
-/* --- 正面 (Front) --- */
-.face-front {
-  /* 关键修复：Z轴前移 1px，确保不与背面冲突 */
-  transform: rotateX(0deg) translateZ(1px);
-  justify-content: flex-start;
-  pointer-events: auto;
-}
-
-/* --- 背面 (Back) --- */
-.face-back {
-  /* 关键修复：Z轴前移 1px（在 180度翻转系中），撑开厚度 */
-  transform: rotateX(180deg) translateZ(1px);
-  justify-content: space-between; 
-  
-  /* 加深背面背景，确保正面镜像文字不会透过玻璃干扰视觉 */
-  background: rgba(30, 30, 35, 0.65); 
-  backdrop-filter: blur(8px); /* 自带模糊，防止透视干扰 */
-  -webkit-backdrop-filter: blur(8px);
-  
-  pointer-events: none; 
-}
-
-/* --- 翻转状态下的交互控制 --- */
-.elysia-player.flipped .face-front {
-  pointer-events: none;
-}
-
-.elysia-player.flipped .face-back {
-  pointer-events: auto;
-}
-
 
 /* =========================================
    4. 内部元素样式
@@ -161,6 +173,9 @@
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
+  /* 修复 iOS 按钮点击 */
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .elysia-controls button:hover { 
@@ -195,6 +210,7 @@
   justify-content: center;
   font-size: 0.9rem;
   transition: all 0.2s;
+  -webkit-appearance: none;
 }
 
 .control-btn:hover {
@@ -231,10 +247,11 @@
   opacity: 0;
   cursor: pointer;
   z-index: 10;
+  -webkit-appearance: none; /* 移除原生样式 */
 }
 
 /* =========================================
-   6. 播放列表
+   5. 播放列表 (保持原样)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -303,7 +320,7 @@
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   7. 动画定义
+   6. 动画定义
    ========================================= */
 .elysia-playlist.show {
   opacity: 1; 
@@ -328,8 +345,8 @@
 }
 
 @keyframes moveBlobs { 
-  0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
-  50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
+  0%,100%{transform:translate3d(0,0,-10px) scale(1.03);} 
+  50%{transform:translate3d(4%,-3%,-10px) scale(1.05);} 
 }
 
 @keyframes softPulse { 

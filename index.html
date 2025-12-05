@@ -245,7 +245,7 @@ domain:chatgpt.com</pre>
 </main>
 
 <div class="elysia-player" id="elysiaPlayer">
-  <div class="player-inner" id="playerInner">
+  <div class="player-glass-card">
     
     <div class="player-face face-front">
       <div class="elysia-controls">
@@ -256,27 +256,28 @@ domain:chatgpt.com</pre>
     </div>
 
     <div class="player-face face-back">
-      <button id="modeBtn" class="icon-btn" aria-label="切换模式">🔁</button>
+      <button id="modeBtn" class="control-btn" aria-label="模式">🔁</button>
       
-      <div class="playlist-selector">
-        <span id="currentPlaylistName">🎹 钢琴曲</span>
+      <div class="playlist-selector-wrapper">
+        <span id="currentPlaylistText">🎹 钢琴曲</span>
         <select id="playlistSelect">
-          <option value="piano">🎹 钢琴曲 (Piano)</option>
-          <option value="mon">🌙 月曜日 (Mon)</option>
-          <option value="tue">🔥 火曜日 (Tue)</option>
-          <option value="wed">💧 水曜日 (Wed)</option>
-          <option value="thu">🌲 木曜日 (Thu)</option>
-          <option value="fri">💰 金曜日 (Fri)</option>
-          <option value="sat">🪐 土曜日 (Sat)</option>
-          <option value="sun">☀️ 日曜日 (Sun)</option>
+          <option value="piano">🎹 钢琴曲</option>
+          <option value="mon">🌙 月曜日</option>
+          <option value="tue">🔥 火曜日</option>
+          <option value="wed">💧 水曜日</option>
+          <option value="thu">🌲 木曜日</option>
+          <option value="fri">💰 金曜日</option>
+          <option value="sat">🪐 土曜日</option>
+          <option value="sun">☀️ 日曜日</option>
         </select>
       </div>
 
-      <button id="flipBackBtn" class="icon-btn" aria-label="返回">↩</button>
+      <button id="flipBackBtn" class="control-btn" aria-label="返回">↩</button>
     </div>
-
+    
   </div>
 </div>
+
 
 <script src="deeptools.js"></script>
 <script src="elysiastyle.js"></script>

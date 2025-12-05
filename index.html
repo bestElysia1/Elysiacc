@@ -2,13 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.4.27</title>
   
   <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
   <link rel="apple-touch-icon" href="assets/bannernetwork.png" />
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <link rel="stylesheet" href="elysiastyle.css">
   <link rel="stylesheet" href="hamburger.css">
@@ -251,39 +249,36 @@ domain:chatgpt.com</pre>
     
     <div class="player-face face-front">
       <div class="elysia-controls">
-        <button id="btnPrev"><i class="fas fa-step-backward"></i></button>
-        <button id="btnPlayPause"><i class="fas fa-play"></i></button>
-        <button id="btnNext"><i class="fas fa-step-forward"></i></button>
+        <button id="playPauseBtn" aria-label="Play/Pause">▶</button>
+        <button id="nextBtn" aria-label="Next">⏭</button>
       </div>
-      <div id="songTitle">Loading...</div>
-      <div class="elysia-controls">
-        <button id="btnFlipToBack"><i class="fas fa-bars"></i></button>
-      </div>
+      <span id="songTitle" class="clickable" role="button" tabindex="0">加载中...</span>
     </div>
 
     <div class="player-face face-back">
-      <div class="elysia-controls">
-        <button id="btnFlipToFront"><i class="fas fa-undo"></i></button>
+      <button id="modeBtn" class="control-btn" aria-label="模式">🔁</button>
+      
+      <div class="playlist-selector-wrapper">
+        <span id="currentPlaylistText">🎹 钢琴曲</span>
+        <select id="playlistSelect">
+          <option value="piano">🎹 钢琴曲</option>
+          <option value="mon">🌙 月曜日</option>
+          <option value="tue">🔥 火曜日</option>
+          <option value="wed">💧 水曜日</option>
+          <option value="thu">🌲 木曜日</option>
+          <option value="fri">💰 金曜日</option>
+          <option value="sat">🪐 土曜日</option>
+          <option value="sun">☀️ 日曜日</option>
+        </select>
       </div>
       
-      <div class="playlist-selector-wrapper" id="sourceTrigger">
-        <span id="currentPlaylistText">🎹 钢琴曲</span>
-        <i class="fas fa-caret-up" style="margin-left:8px; font-size:0.8rem; opacity:0.7;"></i>
-      </div>
-
-      <div class="elysia-controls">
-        <button style="opacity:0.5; pointer-events:none;"><i class="fas fa-cog"></i></button>
-      </div>
+      <div style="width:32px;"></div>
     </div>
 
   </div>
 </div>
 
-<div id="elysiaPlaylist" class="elysia-playlist hide">
-    </div>
-
-<div id="elysiaSourceList" class="elysia-playlist hide">
-    </div>
+<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script src="deeptools.js"></script>
 <script src="elysiastyle.js"></script>

@@ -1,4 +1,4 @@
-/* elysiamusic.js - Logic & Data for Elysia Player (Fixed Interaction) */
+/* elysiamusic.js - Logic & Data for Elysia Player (Fixed Seek Logic) */
 
 document.addEventListener("DOMContentLoaded", () => {
   /* ===== 🎵 歌曲数据源 (All Songs) ===== */
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!player || !playPauseBtn) return;
 
   /* =========================================================
-     核心播放控制逻辑 (已修复循环与随机算法)
+     核心播放控制逻辑
      ========================================================= */
 
   function loadSong(index) {
@@ -104,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     titleEl.textContent = song.title;
     
     renderPlaylistDOM(); 
+    // 重置并更新 MediaSession
     updateMediaSession(song);
   }
 
@@ -125,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 模式 1: 单曲循环 (🔂)
     if (playMode === 1 && isAuto) {
-      // 只有自动播放结束才重播，手动点下一首则跳过
       audio.currentTime = 0;
       audio.play();
       return;
@@ -149,8 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadSong(nextIndex);
-    
-    // 只要切歌就播放
     audio.play();
     playPauseBtn.textContent = "⏸";
     player.classList.add("playing");
@@ -191,19 +189,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =========================================================
-     背面功能逻辑 (已修复交互冲突)
+     背面功能逻辑
      ========================================================= */
 
   // 1. 模式切换
   modeBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // 关键：防止冒泡触发翻转
+    e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
     modeBtn.textContent = playModes[playMode].icon;
   });
 
   // 2. 歌单切换
   playlistSelect.addEventListener('change', (e) => {
-    e.stopPropagation(); // 关键：防止冒泡
+    e.stopPropagation(); 
     const selectedKey = e.target.value;
     const newList = playlists[selectedKey];
 
@@ -222,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 阻止 select 点击时的冒泡，防止误触翻转
+  // 阻止 select 点击时的冒泡
   playlistSelect.addEventListener('click', (e) => e.stopPropagation());
 
 
@@ -254,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 列表显示控制
   titleEl.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (player.classList.contains("flipped")) return; // 翻转时不显示列表
+    if (player.classList.contains("flipped")) return; 
 
     if (playlistEl.classList.contains("show")) {
       playlistEl.classList.remove("show");
@@ -279,8 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function hidePlayerUI() {
     player.style.opacity = '0';
     player.style.transform = 'translate(-50%, 40px)'; 
-    player.style.pointerEvents = 'none'; // 隐藏时完全不可点
-    
+    player.style.pointerEvents = 'none'; 
     if (playlistEl.classList.contains("show")) {
       playlistEl.classList.remove("show");
       playlistEl.classList.add("hide");
@@ -290,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function showPlayerUI() {
     player.style.opacity = '1';
     player.style.transform = 'translate(-50%, 0)'; 
-    // 显示时恢复交互 (具体交互由 CSS .flipped 类控制)
     player.style.pointerEvents = 'auto'; 
     resetTimer();
   }
@@ -304,9 +300,25 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener(evt, showPlayerUI)
   );
 
-  // 锁屏媒体控制
+
+  /* =========================================================
+     🎧 Media Session API (锁屏控制 + 修复进度条拖动)
+     ========================================================= */
+
+  // 关键修复：更新位置状态给浏览器
+  function updatePositionState() {
+    if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime
+      });
+    }
+  }
+
   function updateMediaSession(song) {
     if ('mediaSession' in navigator) {
+      // 1. 设置元数据
       navigator.mediaSession.metadata = new MediaMetadata({
         title: song.title,
         artist: "Elysia Player",
@@ -314,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         artwork: [{ src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }]
       });
 
+      // 2. 基础控制 Action
       navigator.mediaSession.setActionHandler('play', togglePlay);
       navigator.mediaSession.setActionHandler('pause', togglePlay);
       navigator.mediaSession.setActionHandler('nexttrack', () => playNext(false));
@@ -323,8 +336,41 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSong(prevIndex);
         audio.play();
       });
+
+      // 3. 【关键修复】添加 seekto 处理器，允许锁屏拖动
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.fastSeek && 'fastSeek' in audio) {
+          audio.fastSeek(details.seekTime);
+        } else {
+          audio.currentTime = details.seekTime;
+        }
+        updatePositionState(); // 拖动后立即更新UI
+      });
     }
   }
+
+  // 4. 【关键修复】事件监听，保持进度条同步
+  audio.addEventListener('loadedmetadata', updatePositionState);
+  
+  audio.addEventListener('play', () => {
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+    updatePositionState();
+  });
+  
+  audio.addEventListener('pause', () => {
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+    updatePositionState();
+  });
+
+  // timeupdate 可以让进度条走动更平滑，但为了性能通常不需要过于频繁
+  // 浏览器通常会自动推算，但更新一下更稳妥
+  audio.addEventListener('timeupdate', () => {
+    // 简单的节流，防止过于频繁调用 (每秒同步一次即可)
+    if (Math.floor(audio.currentTime) % 5 === 0) {
+      updatePositionState();
+    }
+  });
+
 
   // 启动
   resetTimer();

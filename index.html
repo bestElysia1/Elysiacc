@@ -245,7 +245,7 @@ domain:chatgpt.com</pre>
 </main>
 
 <div class="elysia-player" id="elysiaPlayer">
-  <div class="player-glass-card">
+  <div class="player-glass-card" id="playerCard">
     
     <div class="player-face face-front">
       <div class="elysia-controls">
@@ -271,13 +271,14 @@ domain:chatgpt.com</pre>
           <option value="sun">☀️ 日曜日</option>
         </select>
       </div>
-
-      <button id="flipBackBtn" class="control-btn" aria-label="返回">↩</button>
+      
+      <div style="width:32px;"></div>
     </div>
-    
+
   </div>
 </div>
 
+<div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
 <script src="deeptools.js"></script>
 <script src="elysiastyle.js"></script>

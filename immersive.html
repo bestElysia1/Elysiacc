@@ -101,9 +101,9 @@
     /* === 频谱 Canvas === */
     #visualizer {
       width: 100%; 
-      height: 40px; /* 稍微调低高度以匹配图片风格 */
+      height: 40px; 
       display: block; 
-      margin-bottom: 15px; /* 增加一点间距 */
+      margin-bottom: 15px; 
       opacity: 0.9;
       pointer-events: none;
     }
@@ -185,7 +185,7 @@
 </head>
 <body class="is-paused">
 
-  <audio id="mainAudio" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></audio>
+  <audio id="mainAudio" crossorigin="anonymous" playsinline webkit-playsinline preload="metadata"></audio>
 
   <img id="bgStatic" class="bg-layer" src="assets/bg.jpg" alt="Background">
   <video id="bgVideo" class="bg-layer" autoplay muted loop playsinline>
@@ -275,6 +275,7 @@
     let audioContext, analyser, source;
     let canvas, ctx, isVisualizerInited = false;
     let animationId; 
+    let isPageVisible = true; // 追踪页面可见性状态
 
     const els = {
       body: document.body, cover: document.getElementById('coverImg'),
@@ -289,7 +290,7 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 频谱逻辑 (模仿参考图: 药丸状, 居中, 稀疏) ==================
+    // ================== 频谱逻辑 ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
       try {
@@ -297,28 +298,19 @@
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
         
-        // 使用较小的fftSize来获得较少的条目，看起来更稀疏干净
-        analyser.fftSize = 128; // 结果是64个数据点
-        analyser.smoothingTimeConstant = 0.85; // 让跳动更柔和
+        analyser.fftSize = 128; 
+        analyser.smoothingTimeConstant = 0.85; 
         
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
         
-        // --- 修复后台暂停的关键部分 ---
-        // 监听 AudioContext 状态变化。如果它被系统挂起（suspended），但音乐应该在播放，则尝试恢复。
+        // --- 核心修复：监听 AudioContext 状态，防止被系统挂起 ---
         audioContext.onstatechange = () => {
-            if (audioContext.state === 'suspended' && !audio.paused) {
+            if (audioContext.state === 'suspended' && !audio.paused && isPageVisible) {
                 audioContext.resume();
             }
         };
-        // 额外的安全措施：在用户交互时尝试恢复上下文（对iOS特别有用）
-        ['touchstart', 'click'].forEach(event => {
-            document.addEventListener(event, () => {
-                if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-            }, { once: true });
-        });
-        // ---------------------------
 
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
@@ -329,6 +321,10 @@
     };
 
     const renderFrame = () => {
+      // 核心修复：如果页面不可见，直接停止循环，不请求下一帧
+      // 这能防止浏览器因为后台高能耗而强杀 JS 线程
+      if (!isPageVisible) return;
+
       animationId = requestAnimationFrame(renderFrame);
       if (!analyser) return;
       
@@ -340,41 +336,30 @@
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const barCount = bufferLength; // 64个条目
+      const barCount = bufferLength; 
       const dpr = window.devicePixelRatio || 1;
 
-      // 计算间距和宽度，使其看起来比较稀疏
-      const gapRatio = 0.6; // 间距是宽度的0.6倍
-      // 总宽度 = N * barWidth + (N-1) * gap
-      // w = N * bw + (N-1) * (bw * gapRatio)
+      const gapRatio = 0.6;
       const barWidthRaw = w / (barCount + (barCount - 1) * gapRatio);
-      const barWidth = Math.max(2 * dpr, Math.floor(barWidthRaw)); // 确保最小宽度
+      const barWidth = Math.max(2 * dpr, Math.floor(barWidthRaw));
       const gap = barWidth * gapRatio;
       
-      // 略微透明的白色
       ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; 
 
       for (let i = 0; i < barCount; i++) {
         let value = dataArray[i];
-        // 使用平方让峰值更明显，低音更平坦，看起来更干净
         let percent = (value / 255);
         percent = percent * percent; 
-
         let barHeight = h * percent * 0.8; 
-        
-        // 最小高度，保证是一个小圆点
         if (barHeight < barWidth) barHeight = barWidth;
 
         const x = i * (barWidth + gap);
-        // 垂直居中计算
         const y = (h - barHeight) / 2;
         
-        // 绘制药丸形状 (圆角半径为宽度的一半)
         ctx.beginPath();
         if (ctx.roundRect) {
             ctx.roundRect(x, y, barWidth, barHeight, barWidth / 2);
         } else {
-            // 回退兼容
             ctx.fillRect(x, y, barWidth, barHeight);
         }
         ctx.fill();
@@ -406,19 +391,29 @@
       els.title.textContent = s.title;
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
+      
+      // 确保 MediaSession 更新，这对于 iOS 控制中心显示至关重要
       if('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
-        navigator.mediaSession.setActionHandler('play', playMusic);
-        navigator.mediaSession.setActionHandler('pause', pauseMusic);
-        navigator.mediaSession.setActionHandler('previoustrack', playPrev);
-        navigator.mediaSession.setActionHandler('nexttrack', playNextAuto);
+        navigator.mediaSession.metadata = new MediaMetadata({ 
+            title: s.title, 
+            artist: 'Elysia Collection', 
+            artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] 
+        });
+        navigator.mediaSession.setActionHandler('play', () => { playMusic(); });
+        navigator.mediaSession.setActionHandler('pause', () => { pauseMusic(); });
+        navigator.mediaSession.setActionHandler('previoustrack', () => { playPrev(); });
+        navigator.mediaSession.setActionHandler('nexttrack', () => { playNextAuto(); });
       }
     };
 
     const playMusic = () => {
       if (!isVisualizerInited) initVisualizer();
-      // 确保 context 是运行状态
-      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+      
+      // 尝试恢复 AudioContext，如果它被挂起
+      if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume();
+      }
+
       audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
     const pauseMusic = () => { audio.pause(); updateUI(false); };
@@ -427,15 +422,22 @@
       else { els.body.classList.remove('is-playing'); els.body.classList.add('is-paused'); els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; }
     };
 
-    // 页面可见性变化处理 (辅助后台恢复)
+    // ================== 核心修复：后台播放处理 ==================
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === 'visible') {
-            // 切回前台时，确保状态正确
-            if (audioContext && audioContext.state === 'suspended' && !audio.paused) audioContext.resume();
+        if (document.visibilityState === 'hidden') {
+            isPageVisible = false;
+            // 1. 进入后台：立即停止 Canvas 渲染循环
+            // 这很重要，否则浏览器会为了省电把整个 JS 线程挂起，导致音频也停了
             cancelAnimationFrame(animationId);
+        } else {
+            isPageVisible = true;
+            // 2. 回到前台：恢复 AudioContext（如果被系统挂起）并重启渲染
+            if (audioContext && audioContext.state === 'suspended' && !audio.paused) {
+                audioContext.resume();
+            }
+            // 重新启动渲染循环
             renderFrame();
         }
-        // 注意：不要在这里写 audio.pause()，否则切后台就会暂停
     });
 
     const playNextAuto = () => {

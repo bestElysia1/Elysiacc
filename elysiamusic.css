@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Complete 3D Flip Version) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Fixed 3D Flip Interaction) */
 
 /* =========================================
    1. 基础容器：负责定位、悬浮动画、3D透视
@@ -10,14 +10,11 @@
   transform: translateX(-50%);
   z-index: 9999;
   
-  /* 设定固定尺寸，保证翻转时布局稳定 (参考原UI视觉大小) */
   width: 320px; 
-  height: 56px; /* 包含原本的 padding */
+  height: 56px; 
   
-  /* 开启 3D 空间 */
-  perspective: 1000px;
+  perspective: 1000px; /* 开启 3D 空间 */
   
-  /* 清除原有视觉样式，移交给内部 card */
   padding: 0;
   background: transparent;
   border: none;
@@ -25,16 +22,14 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 
-  /* 保持基础悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
   
-  /* 禁止用户选中文本，提升长按体验 */
   user-select: none;
   -webkit-user-select: none;
 }
 
 /* =========================================
-   2. 核心：液态玻璃卡片 (承载原本所有的视觉特效)
+   2. 核心：液态玻璃卡片 (承载视觉特效)
    ========================================= */
 .player-glass-card {
   position: relative;
@@ -42,21 +37,20 @@
   height: 100%;
   border-radius: 16px;
   
-  /* --- 恢复原有的玻璃质感 (原 .elysia-player 样式) --- */
+  /* 玻璃质感 */
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
   
-  /* 阴影效果 */
   box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   
-  /* 3D 翻转核心设置 */
+  /* 3D 翻转设置 */
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 加入回弹效果 */
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 翻转激活状态 (由 JS 添加类名控制) */
+/* 翻转激活状态 */
 .elysia-player.flipped .player-glass-card {
   transform: rotateX(180deg);
 }
@@ -65,12 +59,11 @@
 .elysia-player:active .player-glass-card {
   transform: scale(0.96);
 }
-/* 翻转状态下长按也要缩放 */
 .elysia-player.flipped:active .player-glass-card {
   transform: rotateX(180deg) scale(0.96);
 }
 
-/* --- 恢复内部流动的液态光斑 (原 .elysia-player::before) --- */
+/* 液态光斑动画 */
 .player-glass-card::before {
   content: "";
   position: absolute;
@@ -84,57 +77,66 @@
   animation: moveBlobs 14s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
-  z-index: 0; /* 确保不遮挡内容 */
+  z-index: 0;
 }
 
 /* =========================================
-   3. 前后两面 (Faces)
+   3. 前后两面 (Faces) - 核心交互修复
    ========================================= */
 .player-face {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  
-  /* 恢复原本的内边距和间距 */
   padding: 0 20px; 
   gap: 14px;
   
-  /* 关键：隐藏背面，防止透视穿帮 */
+  /* 隐藏背面视觉 */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   
-  z-index: 1; /* 内容层级高于光斑 */
-  border-radius: 16px; /* 确保圆角匹配 */
+  z-index: 1; 
+  border-radius: 16px;
+
+  /* 延迟切换点击事件，配合翻转动画时长 */
+  transition: pointer-events 0s linear 0.3s;
+  pointer-events: none; /* 默认不接收点击 */
 }
 
-/* --- 正面 (Front): 播放控制 --- */
+/* --- 正面 (Front) --- */
 .face-front {
   transform: rotateX(0deg);
-  justify-content: flex-start; /* 左对齐 */
+  justify-content: flex-start;
+  pointer-events: auto; /* 默认状态下正面可点击 */
 }
 
-/* --- 背面 (Back): 设置选项 --- */
+/* --- 背面 (Back) --- */
 .face-back {
   transform: rotateX(180deg);
-  justify-content: space-between; /* 两端对齐 */
-  
-  /* 背面稍微加深一点点背景，防止文字在复杂光斑下看不清 */
+  justify-content: space-between; 
   background: rgba(0, 0, 0, 0.15); 
+  pointer-events: none; /* 默认状态下背面不可点 */
+}
+
+/* --- 翻转状态下的交互控制 --- */
+/* 当容器拥有 .flipped 类时： */
+.elysia-player.flipped .face-front {
+  pointer-events: none; /* 正面禁用 */
+}
+
+.elysia-player.flipped .face-back {
+  pointer-events: auto; /* 背面启用 */
 }
 
 /* =========================================
-   4. 内部元素样式 (完全保留原样)
+   4. 内部元素样式
    ========================================= */
-
-/* 按钮组容器 */
 .elysia-controls { 
   display: flex; 
   gap: 10px; 
   flex-shrink: 0;
 }
 
-/* 播放控制按钮 */
 .elysia-controls button {
   width: 32px; 
   height: 32px; 
@@ -156,11 +158,10 @@
   box-shadow: 0 0 12px rgba(160,120,255,0.4); 
 }
 
-/* 歌曲标题 */
 #songTitle {
   color: #f2eaff; 
   font-weight: 600; 
-  flex: 1; /* 占满剩余空间 */
+  flex: 1; 
   font-size: 0.95rem;
   text-shadow: 0 0 10px rgba(160,120,255,0.45);
   white-space: nowrap; 
@@ -170,11 +171,7 @@
   will-change: transform;
 }
 
-/* =========================================
-   5. 背面新控件样式 (新增部分)
-   ========================================= */
-
-/* 背面圆形按钮 (模式切换) */
+/* 背面按钮 */
 .control-btn {
   width: 32px;
   height: 32px;
@@ -196,7 +193,7 @@
   transform: scale(1.1);
 }
 
-/* 歌单选择器容器 */
+/* 歌单选择器 */
 .playlist-selector-wrapper {
   position: relative;
   flex: 1;
@@ -205,8 +202,6 @@
   color: #f2eaff;
   font-weight: bold;
   cursor: pointer;
-  
-  /* 增加一个微弱的背景条 */
   background: rgba(255, 255, 255, 0.05);
   padding: 4px 0;
   border-radius: 8px;
@@ -218,7 +213,6 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* 隐藏 Select 下拉框但保留点击区域 */
 #playlistSelect {
   position: absolute;
   inset: 0;
@@ -230,54 +224,42 @@
 }
 
 /* =========================================
-   6. 播放列表 (完全保留原样)
+   6. 播放列表
    ========================================= */
 .elysia-playlist {
   position: fixed;
-  bottom: 85px; /* 稍微抬高，避开翻转空间 */
+  bottom: 85px; 
   left: 50%;
-  
-  /* 初始状态：缩小且隐藏 */
   transform: translateX(-50%) scale(0.98);
-  transform-origin: 50% 100%; /* 底部中心缩放 */
-  
+  transform-origin: 50% 100%;
   width: 260px;
   max-height: 260px;
   padding: 10px 14px;
   border-radius: 16px;
-  
-  /* 玻璃质感 */
   background: rgba(255,240,255,0.25);
   border: 1px solid rgba(255,210,255,0.35);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  
-  /* 滚动条与交互设置 */
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: none;
-  
   opacity: 0; 
   pointer-events: none;
   z-index: 9998;
-  
-  /* 滚动条美化 */
   scrollbar-width: thin;
   will-change: transform, opacity;
 }
 
-/* 播放列表项 */
 .playlist-item {
   padding: 6px 10px;
-  color: #cdbaff; /* 淡紫色文字 */
+  color: #cdbaff;
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   outline: none;
-  
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -295,7 +277,6 @@
   animation: softPulse 3s ease-in-out infinite;
 }
 
-/* 播放列表后面的光晕 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
@@ -312,50 +293,40 @@
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   7. 动画定义 (Keyframes - 完全保留)
+   7. 动画定义
    ========================================= */
-
-/* 显示列表：Dock 弹出 */
 .elysia-playlist.show {
   opacity: 1; 
   pointer-events: auto;
   animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transform-origin: 50% 100%;
 }
 
-/* 隐藏列表：Dock 收回 */
 .elysia-playlist.hide {
   animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 50% 100%;
 }
 
-/* 列表打开动画 */
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
   100% { transform: translateX(-50%) scale(1) translateY(0); }
 }
 
-/* 列表关闭动画 */
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
   35%  { transform: translateX(-50%) scale(1.02); }
   100% { transform: translateX(-50%) scale(0.8) translateY(10px); opacity: 0; }
 }
 
-/* 播放器光斑移动 */
 @keyframes moveBlobs { 
   0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
 
-/* 选中歌曲呼吸光 */
 @keyframes softPulse { 
   0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
   50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
 
-/* 播放器整体悬浮 */
 @keyframes elysiaFloat {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(-6px); }

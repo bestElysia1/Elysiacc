@@ -25,32 +25,19 @@
       justify-content: center;
     }
 
-    /* === 背景层 (视频 + 静态图) === */
-    /* 提取公共样式，确保图片和视频完美重叠 */
+    /* === 背景层 === */
     .bg-layer {
       position: fixed;
       right: 0; bottom: 0;
       min-width: 100%; min-height: 100%;
       width: auto; height: auto;
       object-fit: cover;
-      /* 保持滤镜和缩放一致 */
       filter: blur(40px) brightness(0.7); 
       transform: scale(1.2);
     }
+    #bgStatic { z-index: -3; }
+    #bgVideo { z-index: -2; opacity: 0; transition: opacity 1.5s ease; }
 
-    /* 静态封面图：层级最低，默认显示 */
-    #bgStatic {
-      z-index: -3;
-    }
-
-    /* 视频：层级在图片之上，初始透明 */
-    #bgVideo {
-      z-index: -2;
-      opacity: 0; /* 关键：初始隐藏，防止黑屏 */
-      transition: opacity 1.5s ease; /* 优雅的淡入效果 */
-    }
-
-    /* 遮罩层 */
     .overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.2);
@@ -72,13 +59,20 @@
       font-size: 14px; color: #fff; cursor: pointer; display: flex; gap: 6px; align-items: center;
     }
 
-    /* === 主播放界面 === */
+    /* === 主播放界面 (添加过渡以配合播放列表动画) === */
     .player-layout {
       display: flex; flex-direction: column; align-items: center;
       width: 100%; max-width: 1000px; height: 100%;
       padding: 20px; justify-content: center;
       position: relative; z-index: 1;
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
     }
+    /* 当播放列表打开时，主界面稍微后退 */
+    body.playlist-open .player-layout {
+        transform: scale(0.92);
+        opacity: 0.6;
+    }
+
     @media (min-width: 768px) {
       .player-layout { flex-direction: row; gap: 60px; padding: 60px; }
       .art-section, .controls-section { flex: 1; }
@@ -108,9 +102,9 @@
     .song-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .artist-name { font-size: 16px; color: var(--text-sub); }
 
-    /* === 频谱画布 === */
+    /* 频谱 */
     #visualizer {
-      width: 100%; height: 60px; display: block; margin-bottom: 10px; opacity: 0.8; pointer-events: none;
+      width: 100%; height: 60px; display: block; margin-bottom: 10px; opacity: 0.85; pointer-events: none;
     }
 
     /* 进度条 */
@@ -123,7 +117,6 @@
         transition: transform 0.2s;
     }
     .slider-track:hover .slider-thumb, .slider-track:active .slider-thumb { transform: translateY(-50%) scale(1); }
-    
     input[type=range] { -webkit-appearance:none; position:absolute; width:100%; height:20px; top:-8px; left:0; background:transparent; z-index:2; cursor: pointer; }
     .time-labels { display:flex; justify-content:space-between; font-size:12px; color:var(--text-sub); margin-top:8px; font-weight:500; font-variant-numeric: tabular-nums; }
 
@@ -139,27 +132,57 @@
     .btn-play-pause:active { transform: scale(0.95); }
     .btn-play-pause .ctrl-icon { width:28px; height:28px; fill: #000; }
 
-    /* === 播放列表弹窗 === */
+    /* === 播放列表弹窗 (动画优化版) === */
     .playlist-drawer {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); z-index: 100;
-        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        background: rgba(0,0,0,0); /* 背景色动画单独控制 */
+        z-index: 100;
+        pointer-events: none;
         display: flex; flex-direction: column; justify-content: flex-end;
+        transition: background 0.4s ease;
     }
-    .playlist-drawer.active { opacity: 1; pointer-events: auto; }
+    .playlist-drawer.active { 
+        pointer-events: auto;
+        background: rgba(0,0,0,0.4); 
+    }
+
     .playlist-content {
-        background: rgba(30, 30, 30, 0.85);
-        backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-        width: 100%; max-height: 60vh;
-        border-radius: 24px 24px 0 0; padding: 24px;
-        transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        background: rgba(30, 30, 30, 0.9);
+        backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
+        width: 100%; max-height: 65vh;
+        border-radius: 24px 24px 0 0; padding: 24px 24px 40px 24px;
         display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.1);
+        
+        /* 核心动画：弹簧效果 */
+        transform: translateY(110%); 
+        transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .playlist-drawer.active .playlist-content { transform: translateY(0); }
-    .playlist-header { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; }
-    .playlist-close { font-size: 14px; color: var(--text-sub); cursor: pointer; padding: 5px; }
+
+    .playlist-header { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .playlist-close { 
+        font-size: 14px; color: var(--text-sub); cursor: pointer; padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; 
+    }
+    
     .song-list { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; }
-    .list-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+
+    /* 列表项动画 */
+    .list-item { 
+        display: flex; align-items: center; gap: 12px; padding: 12px 0; 
+        border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; 
+        
+        /* 初始状态：下沉且透明 */
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    /* 当列表打开时，列表项变为可见 (延迟由 JS 控制) */
+    .playlist-drawer.active .list-item {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
     .list-item:last-child { border-bottom: none; }
     .list-item.active .item-title { color: var(--accent); font-weight: bold; }
     .list-item.active .item-idx { color: var(--accent); }
@@ -180,7 +203,6 @@
 <body class="is-paused">
 
   <img id="bgStatic" class="bg-layer" src="assets/bg.jpg" alt="Background">
-
   <video id="bgVideo" class="bg-layer" autoplay muted loop playsinline>
     <source src="assets/bg.mp4" type="video/mp4">
   </video>
@@ -247,16 +269,10 @@
   </div>
 
   <script>
-    // ================== 处理视频平滑加载 ==================
+    // ================== 处理视频加载 ==================
     const bgVideo = document.getElementById('bgVideo');
-    // 当视频可以播放时（即缓冲完成），淡入视频覆盖静态图
-    bgVideo.addEventListener('canplay', () => {
-        bgVideo.style.opacity = 1; 
-    });
-    // 如果视频缓存很快，事件可能已经错过了，手动检查一下
-    if (bgVideo.readyState >= 3) {
-        bgVideo.style.opacity = 1;
-    }
+    bgVideo.addEventListener('canplay', () => { bgVideo.style.opacity = 1; });
+    if (bgVideo.readyState >= 3) { bgVideo.style.opacity = 1; }
 
     // ================== 音乐数据 ==================
     const songs = [
@@ -267,15 +283,18 @@
 
     const audio = new Audio();
     audio.crossOrigin = "anonymous";
+    // 关键：确保移动端后台播放权限
+    audio.playsInline = true; 
+    
     let currentIndex = 0;
     let isDragging = false;
-    let playMode = 0; // 0=Loop, 1=One, 2=Shuffle
+    let playMode = 0;
     
     // 频谱变量
     let audioContext, analyser, source;
     let canvas, ctx, isVisualizerInited = false;
+    let animationId; // 记录动画帧ID，方便恢复
 
-    // DOM References
     const els = {
       body: document.body, cover: document.getElementById('coverImg'),
       title: document.getElementById('songTitle'), artist: document.querySelector('.artist-name'),
@@ -289,6 +308,20 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
+    // ================== 修复：后台播放逻辑 ==================
+    // 监听页面的可见性变化
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'visible') {
+            // 切回前台：如果 AudioContext 被挂起，则恢复它
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            // 确保 Canvas 动画继续
+            cancelAnimationFrame(animationId);
+            renderFrame();
+        }
+    });
+
     // ================== 频谱 ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
@@ -296,40 +329,52 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
+        analyser.fftSize = 1024; 
+        
+        // 注意：createMediaElementSource 会将 audio 的输出重定向到 AudioContext
+        // 如果 AudioContext 挂起，声音就会消失。
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
+        
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
         resizeCanvas();
         isVisualizerInited = true;
         renderFrame();
-      } catch (e) { console.warn(e); }
+      } catch (e) { console.warn("Visualizer init warning:", e); }
     };
 
     const renderFrame = () => {
-      requestAnimationFrame(renderFrame);
+      animationId = requestAnimationFrame(renderFrame);
       if (!analyser) return;
+      
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
-      const w = canvas.width, h = canvas.height;
+
+      const w = canvas.width;
+      const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const barWidth = (w / bufferLength) * 1.5;
+
+      const barWidth = w / bufferLength;
       let x = 0;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
+
       for (let i = 0; i < bufferLength; i++) {
-        let barHeight = h * (dataArray[i] / 255) * 0.8; 
-        if (barHeight < 2) barHeight = 2;
+        let barHeight = h * (dataArray[i] / 255) * 0.9;
+        if (barHeight < 1) barHeight = 0;
         const y = (h - barHeight) / 2;
+        let drawWidth = barWidth > 2 ? barWidth - 1 : barWidth;
+        
         ctx.beginPath();
-        if(ctx.roundRect) ctx.roundRect(x, y, barWidth, barHeight, 20);
-        else ctx.rect(x, y, barWidth, barHeight);
-        ctx.fill();
-        x += barWidth + 1;
+        if (barHeight > 4 && ctx.roundRect) ctx.roundRect(x, y, drawWidth, barHeight, 5);
+        else ctx.fillRect(x, y, drawWidth, barHeight);
+        
+        x += barWidth;
       }
     };
+
     const resizeCanvas = () => {
       if(canvas) {
         const dpr = window.devicePixelRatio || 1;
@@ -340,13 +385,12 @@
     };
     window.addEventListener('resize', resizeCanvas);
 
-    // ================== 核心逻辑 ==================
+    // ================== 播放器逻辑 ==================
     const initPlayer = () => {
       const params = new URLSearchParams(window.location.search);
       const idx = params.get('index');
       if (idx !== null) currentIndex = parseInt(idx) || 0;
       loadSong(currentIndex);
-      renderPlaylist();
     };
 
     const loadSong = (i) => {
@@ -356,11 +400,10 @@
       els.title.textContent = s.title;
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
-      renderPlaylist();
+      // 此时不渲染列表，等打开时渲染以获得动画效果
+      
       if('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-           title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}]
-        });
+        navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
         navigator.mediaSession.setActionHandler('play', playMusic);
         navigator.mediaSession.setActionHandler('pause', pauseMusic);
         navigator.mediaSession.setActionHandler('previoustrack', playPrev);
@@ -370,18 +413,20 @@
 
     const playMusic = () => {
       if (!isVisualizerInited) initVisualizer();
+      
+      // 强行恢复 context，防止后台切换回来后没声音
       if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-      audio.play().then(() => updateUI(true)).catch(() => updateUI(false));
+      
+      audio.play().then(() => updateUI(true)).catch(e => {
+          console.warn("Play failed:", e);
+          updateUI(false);
+      });
     };
     const pauseMusic = () => { audio.pause(); updateUI(false); };
+    
     const updateUI = (isPlaying) => {
-      if (isPlaying) {
-        els.body.classList.add('is-playing'); els.body.classList.remove('is-paused');
-        els.iconPlay.style.display = 'none'; els.iconPause.style.display = 'block';
-      } else {
-        els.body.classList.remove('is-playing'); els.body.classList.add('is-paused');
-        els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none';
-      }
+      if (isPlaying) { els.body.classList.add('is-playing'); els.body.classList.remove('is-paused'); els.iconPlay.style.display = 'none'; els.iconPause.style.display = 'block'; } 
+      else { els.body.classList.remove('is-playing'); els.body.classList.add('is-paused'); els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; }
     };
 
     const playNextAuto = () => {
@@ -392,7 +437,6 @@
             currentIndex = nextIndex; loadSong(currentIndex); playMusic();
         } else { playNext(); }
     };
-
     const playNext = () => { 
         if (playMode === 2) { 
              let nextIndex = currentIndex;
@@ -401,13 +445,8 @@
         } else { currentIndex = (currentIndex + 1) % songs.length; }
         loadSong(currentIndex); playMusic(); 
     };
-
-    const playPrev = () => { 
-        if (audio.currentTime > 3) audio.currentTime = 0;
-        else { currentIndex = (currentIndex - 1 + songs.length) % songs.length; loadSong(currentIndex); }
-        playMusic(); 
-    };
-
+    const playPrev = () => { if (audio.currentTime > 3) audio.currentTime = 0; else { currentIndex = (currentIndex - 1 + songs.length) % songs.length; loadSong(currentIndex); } playMusic(); };
+    
     const toggleMode = () => {
         playMode = (playMode + 1) % 3;
         els.iconLoop.style.display = playMode === 0 ? 'block' : 'none';
@@ -421,13 +460,12 @@
     els.playBtn.onclick = () => audio.paused ? playMusic() : pauseMusic();
     els.nextBtn.onclick = playNext; els.prevBtn.onclick = playPrev; els.modeBtn.onclick = toggleMode;
     audio.onended = playNextAuto;
-
+    
     audio.ontimeupdate = () => {
       if (!isDragging) {
         const d = audio.duration || 0; const ct = audio.currentTime; const p = d > 0 ? (ct / d) * 100 : 0;
         els.pBar.value = p; els.pFill.style.width = p + '%';
-        els.thumb.style.transform = `translateY(-50%) scale(${p > 0 ? 1 : 0})`;
-        els.thumb.style.left = p + '%';
+        els.thumb.style.transform = `translateY(-50%) scale(${p > 0 ? 1 : 0})`; els.thumb.style.left = p + '%';
         els.currT.textContent = formatTime(ct); els.totalT.textContent = formatTime(d);
       }
     };
@@ -435,9 +473,16 @@
     els.pBar.onchange = (e) => { isDragging = false; audio.currentTime = (e.target.value / 100) * (audio.duration || 0); if(audio.paused) playMusic(); };
     const formatTime = (s) => { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; };
 
-    // ================== 列表 ==================
-    const openPlaylist = () => { els.drawer.classList.add('active'); renderPlaylist(); };
-    window.closePlaylist = () => els.drawer.classList.remove('active');
+    // ================== 列表动画优化 ==================
+    const openPlaylist = () => { 
+        renderPlaylist(); // 先渲染内容
+        els.body.classList.add('playlist-open'); // 主界面后退效果
+        els.drawer.classList.add('active'); 
+    };
+    window.closePlaylist = () => {
+        els.body.classList.remove('playlist-open');
+        els.drawer.classList.remove('active'); 
+    };
     els.drawer.addEventListener('click', (e) => { if (e.target === els.drawer) closePlaylist(); });
     els.listBtn.onclick = openPlaylist;
 
@@ -446,14 +491,17 @@
         songs.forEach((s, i) => {
             const div = document.createElement('div');
             div.className = `list-item ${i === currentIndex ? 'active' : ''}`;
+            
+            // 关键：设置延迟，制造瀑布流效果 (Stagger Animation)
+            // 每个项目比前一个晚 0.05秒出现
+            div.style.transitionDelay = `${i * 0.05}s`; 
+
             div.innerHTML = `<span class="item-idx">${i === currentIndex ? '♫' : (i+1)}</span><div class="item-info"><span class="item-title">${s.title}</span><span class="item-artist">Elysia Collection</span></div>`;
-            div.onclick = () => {
-                if (i !== currentIndex) { currentIndex = i; loadSong(currentIndex); }
-                playMusic();
-            };
+            div.onclick = () => { if (i !== currentIndex) { currentIndex = i; loadSong(currentIndex); } playMusic(); window.closePlaylist(); };
             els.listContainer.appendChild(div);
         });
     };
+    
     window.goBack = () => window.location.href = "index.html";
     initPlayer();
   </script>

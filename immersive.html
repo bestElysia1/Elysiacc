@@ -92,17 +92,20 @@
 
     /* 控制区 */
     .controls-section { width: 100%; max-width: 420px; display: flex; flex-direction: column; }
-    .song-info { text-align: center; margin-bottom: 15px; }
+    .song-info { text-align: center; margin-bottom: 10px; } /* 减小间距 */
     @media (min-width: 768px) { .song-info { text-align: left; } }
     
     .song-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .artist-name { font-size: 16px; color: var(--text-sub); }
 
-    /* === 频谱 Canvas === */
+    /* === 频谱 Canvas (新样式) === */
     #visualizer {
       width: 100%; 
-      height: 70px; /* 适中的高度 */
-      display: block; margin-bottom: 10px; opacity: 0.95; pointer-events: none;
+      height: 50px; /* 调整为更像图片中的细长条 */
+      display: block; 
+      margin-bottom: 5px; 
+      opacity: 0.8; /* 稍微透明一点，更有质感 */
+      pointer-events: none;
     }
 
     /* 进度条 */
@@ -286,7 +289,7 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 频谱逻辑 (回复经典 256版) ==================
+    // ================== 新版频谱逻辑 (模仿图片风格) ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
       try {
@@ -294,9 +297,9 @@
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
         
-        // === 这里的 512 会产生 256 个频谱条 ===
-        // 这是原来的设置，既不粗也不细，恰到好处
-        analyser.fftSize = 512; 
+        // 降低采样数，使条目更宽更清晰，像图片里那样
+        analyser.fftSize = 128; // 64个条目
+        analyser.smoothingTimeConstant = 0.8; // 让跳动更柔和
         
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
@@ -314,7 +317,7 @@
       animationId = requestAnimationFrame(renderFrame);
       if (!analyser) return;
       
-      const bufferLength = analyser.frequencyBinCount; // 256
+      const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
@@ -322,31 +325,39 @@
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const barWidth = w / bufferLength;
-      let x = 0;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
+      // 样式配置：模仿图片中的白色细条，底部对齐
+      const barCount = bufferLength; 
+      // 计算每个条的宽度和间距
+      const gap = 3 * (window.devicePixelRatio || 1); // 间距
+      const totalGap = gap * (barCount - 1);
+      const barWidth = (w - totalGap) / barCount;
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; // 纯白带一点透明
 
-      for (let i = 0; i < bufferLength; i++) {
-        // 保持高度增强，防止看不见
+      for (let i = 0; i < barCount; i++) {
+        // 数据处理：只取低频到中高频部分，忽略极高频（通常没声音）
+        // 简单的映射
         let value = dataArray[i];
+        
+        // 计算高度：让它不要太高，看起来像装饰性波形
         let percent = value / 255;
-        let enhancedPercent = Math.pow(percent, 0.9); 
-        let barHeight = h * enhancedPercent * 2.5; 
+        let barHeight = h * percent * 0.8; 
         
-        if (barHeight > h) barHeight = h;
-        if (barHeight < 1) barHeight = 0;
+        // 最小高度，保证静音时也有一条细线（可选，如果想要完全消失则去掉）
+        if (barHeight < 2) barHeight = 2;
 
-        const y = (h - barHeight) / 2;
+        const x = i * (barWidth + gap);
+        // 底部对齐
+        const y = h - barHeight;
         
-        // 计算间隙
-        let drawWidth = barWidth - 1;
-        if (drawWidth < 1) drawWidth = 1;
-        
+        // 绘制圆角矩形
         ctx.beginPath();
-        if (barHeight > 4 && ctx.roundRect) ctx.roundRect(x, y, drawWidth, barHeight, 5);
-        else ctx.fillRect(x, y, drawWidth, barHeight);
-        
-        x += barWidth;
+        if (ctx.roundRect) {
+            ctx.roundRect(x, y, barWidth, barHeight, 20); // 20是圆角半径，让它变圆
+        } else {
+            ctx.fillRect(x, y, barWidth, barHeight);
+        }
+        ctx.fill();
       }
     };
 

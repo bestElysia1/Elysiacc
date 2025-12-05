@@ -103,7 +103,9 @@
 
     /* 频谱 */
     #visualizer {
-      width: 100%; height: 60px; display: block; margin-bottom: 10px; opacity: 0.9; pointer-events: none;
+      width: 100%; 
+      height: 80px; /* 稍微增加 Canvas 高度，给波形更多空间 */
+      display: block; margin-bottom: 10px; opacity: 0.95; pointer-events: none;
     }
 
     /* 进度条 */
@@ -267,9 +269,7 @@
       { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
     ];
 
-    // 核心修复 2：获取 DOM 中的音频元素，而不是 new Audio()
     const audio = document.getElementById('mainAudio');
-    
     let currentIndex = 0;
     let isDragging = false;
     let playMode = 0;
@@ -292,29 +292,18 @@
       iconLoop: document.getElementById('iconLoop'), iconOne: document.getElementById('iconOne'), iconShuffle: document.getElementById('iconShuffle')
     };
 
-    // ================== 后台播放恢复 ==================
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === 'visible') {
-            // 切回前台：如果 AudioContext 被挂起，则恢复它
-            if (audioContext && audioContext.state === 'suspended') { audioContext.resume(); }
-            cancelAnimationFrame(animationId);
-            renderFrame();
-        }
-    });
-
-    // ================== 频谱逻辑 ==================
+    // ================== 频谱逻辑 (增强可见度版) ==================
     const initVisualizer = () => {
       if (isVisualizerInited) return;
+      
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 512; 
         
-        // 注意：这步操作在 iOS 可能会“接管”音频，导致音频流走 AudioContext
-        // 如果 AudioContext 在后台被挂起，音频就停了。
-        // 但如果不走这一步，频谱无法工作。
-        // 放在 DOM 中的 <audio> 配合 mediaSession 通常能缓解这个问题。
+        // 降低 fftSize，减少条目数量，增加单个条目宽度
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256; // 128个条目，足够宽
+        
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
@@ -322,6 +311,7 @@
         canvas = document.getElementById('visualizer');
         ctx = canvas.getContext('2d');
         resizeCanvas();
+        
         isVisualizerInited = true;
         renderFrame();
       } catch (e) { console.warn("Visualizer init warning:", e); }
@@ -344,15 +334,37 @@
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
 
       for (let i = 0; i < bufferLength; i++) {
-        let barHeight = h * (dataArray[i] / 255) * 1.0; 
-        if (barHeight < 1) barHeight = 0;
+        // === 核心修改 1: 大幅增加增益 ===
+        // 电脑端声音小导致数值很低，乘以 2.5 倍让它变高
+        let value = dataArray[i];
+        
+        // 使用非线性增强，让小声音也稍微明显一点 (Math.pow(normalized, 0.8))
+        let percent = value / 255;
+        let enhancedPercent = Math.pow(percent, 0.9); 
+        
+        // 基础高度 * 增益系数 (3.0)
+        let barHeight = h * enhancedPercent * 3.0; 
+        
+        // 限制最大高度不要超过画布
+        if (barHeight > h) barHeight = h;
+        // 过滤掉极小的噪音
+        if (barHeight < 2) barHeight = 0;
+
         const y = (h - barHeight) / 2;
-        let drawWidth = barWidth - 1; 
-        if (drawWidth < 1) drawWidth = 1; 
+        
+        // === 核心修改 2: 强制最小宽度 ===
+        // 在高分屏上，计算出的宽度可能小于 1px，导致看不见
+        // 强制减去 1px 做间隙，但保证绘制宽度至少 2px (如果空间够的话)
+        let drawWidth = barWidth - 1;
+        if (drawWidth < 2) drawWidth = barWidth; // 如果太窄就不留间隙了
         
         ctx.beginPath();
-        if (barHeight > 4 && ctx.roundRect) ctx.roundRect(x, y, drawWidth, barHeight, 5);
-        else ctx.fillRect(x, y, drawWidth, barHeight);
+        // 只有高度足够才画圆角
+        if (barHeight > 6 && ctx.roundRect) {
+            ctx.roundRect(x, y, drawWidth, barHeight, 5);
+        } else {
+            ctx.fillRect(x, y, drawWidth, barHeight);
+        }
         
         x += barWidth;
       }
@@ -384,7 +396,6 @@
       els.cover.src = s.cover;
       els.artist.textContent = "Elysia Collection";
       
-      // 更新 MediaSession（通知栏控制）
       if('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({ title: s.title, artist: 'Elysia Collection', artwork: [{src: s.cover, sizes: '512x512', type: 'image/jpeg'}] });
         navigator.mediaSession.setActionHandler('play', playMusic);
@@ -395,12 +406,17 @@
     };
 
     const playMusic = () => {
-      // 必须在用户交互（点击）时尝试恢复 context
+      // iOS 要求: 必须在用户点击事件中创建/恢复 Context
+      // 我们把 initVisualizer 放在这里，确保它是响应用户操作的
       if (!isVisualizerInited) initVisualizer();
-      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+      
+      if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume();
+      }
       
       audio.play().then(() => updateUI(true)).catch(e => { console.warn("Play failed:", e); updateUI(false); });
     };
+    
     const pauseMusic = () => { audio.pause(); updateUI(false); };
     
     const updateUI = (isPlaying) => {
@@ -408,6 +424,16 @@
       else { els.body.classList.remove('is-playing'); els.body.classList.add('is-paused'); els.iconPlay.style.display = 'block'; els.iconPause.style.display = 'none'; }
     };
 
+    // 后台切回来时的恢复逻辑
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'visible') {
+            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+            cancelAnimationFrame(animationId);
+            renderFrame();
+        }
+    });
+
+    // 播放控制
     const playNextAuto = () => {
         if (playMode === 1) { audio.currentTime = 0; playMusic(); }
         else if (playMode === 2) { 
@@ -425,7 +451,6 @@
         loadSong(currentIndex); playMusic(); 
     };
     const playPrev = () => { if (audio.currentTime > 3) audio.currentTime = 0; else { currentIndex = (currentIndex - 1 + songs.length) % songs.length; loadSong(currentIndex); } playMusic(); };
-    
     const toggleMode = () => {
         playMode = (playMode + 1) % 3;
         els.iconLoop.style.display = playMode === 0 ? 'block' : 'none';
@@ -440,6 +465,7 @@
     els.nextBtn.onclick = playNext; els.prevBtn.onclick = playPrev; els.modeBtn.onclick = toggleMode;
     audio.onended = playNextAuto;
     
+    // 进度条
     audio.ontimeupdate = () => {
       if (!isDragging) {
         const d = audio.duration || 0; const ct = audio.currentTime; const p = d > 0 ? (ct / d) * 100 : 0;
@@ -452,7 +478,7 @@
     els.pBar.onchange = (e) => { isDragging = false; audio.currentTime = (e.target.value / 100) * (audio.duration || 0); if(audio.paused) playMusic(); };
     const formatTime = (s) => { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; };
 
-    // ================== 列表逻辑 ==================
+    // 列表逻辑
     const openPlaylist = () => { renderPlaylist(); els.body.classList.add('playlist-open'); els.drawer.classList.add('active'); };
     window.closePlaylist = () => { els.body.classList.remove('playlist-open'); els.drawer.classList.remove('active'); };
     els.drawer.addEventListener('click', (e) => { if (e.target === els.drawer) closePlaylist(); });

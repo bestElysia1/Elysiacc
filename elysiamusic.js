@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================================= */
   let pressTimer;
   let isDrag = false;
-  const LONG_PRESS_DURATION = 800;
+  const LONG_PRESS_DURATION = 500;
 
   const startPress = (e) => {
     // 忽略按钮点击

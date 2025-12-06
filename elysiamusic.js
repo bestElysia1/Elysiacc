@@ -23,7 +23,61 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "真夜中のドアstay with me", 
       src: "https://music.bestxuyi.us/月曜日/真夜中のドアstay_with_me.mp3", // 请替换链接
       cover: "assets/Elysia11.jpg", 
-      category: "mon" // 只要标记为 'mon'，就会自动进入月曜日歌单
+      category: "mon" // 
+    },
+    { 
+      title: "Someday ft. Emarie シンシアのロンドン物語", 
+      src: "https://music.bestxuyi.us/月曜日/Someday_ft._Emarie_シンシアのロンドン物語.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "mon" // 
+    },
+    { 
+      title: "不該", 
+      src: "https://music.bestxuyi.us/火曜日/JayChou_aMEI_不該.mp3", 
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" //
+    },
+    { 
+      title: "黑色毛衣", 
+      src: "https://music.bestxuyi.us/火曜日/JayChou_黑色毛衣.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" 
+    },
+    { 
+      title: "爱的华尔兹", 
+      src: "https://music.bestxuyi.us/火曜日/爱的华尔兹_若雾唐媛.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" //
+    },
+    { 
+      title: "感謝你曾來過", 
+      src: "https://music.bestxuyi.us/火曜日/Ayo97_感謝你曾來過_ft.阿涵.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" // 
+    },
+    { 
+      title: "夜曲", 
+      src: "https://music.bestxuyi.us/火曜日/JayChou_夜曲.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" // 
+    },
+    { 
+      title: "擱淺", 
+      src: "https://music.bestxuyi.us/火曜日/周杰倫_擱淺.mp3", 
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" // 
+    },
+    { 
+      title: "春嬌與志明", 
+      src: "https://music.bestxuyi.us/火曜日/春嬌與志明街道辦歐陽耀瑩.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" // 
+    },
+    { 
+      title: "訣愛", 
+      src: "https://music.bestxuyi.us/火曜日/訣愛_詹雯婷.mp3",
+      cover: "assets/Elysia11.jpg", 
+      category: "tue" //
     },
 
     // 分类标签) ---
@@ -82,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================================= */
   const playlistsConfig = [
     // 逻辑升级：不再使用 i%7，而是匹配 category 标签
+    { key: "All songs", name: "所有歌曲",   filter: (s) => true },
     { key: "piano", name: " ピアノ音楽",   filter: (s) => s.category === 'piano' },
     { key: "mon",   name: "月曜日",   filter: (s) => s.category === 'mon' },
     { key: "tue",   name: "火曜日",   filter: (s) => s.category === 'tue' },

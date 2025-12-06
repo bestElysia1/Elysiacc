@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Refactored Back Face) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Fixed Alignment) */
 
 /* =========================================
    1. 基础容器
@@ -9,18 +9,11 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-
-  /* 标准宽高：内边距40 + 按钮32 + 间距14 + 标题200 + 间距14 + 按钮32 */
   width: 332px; 
   height: 50px; 
-  
-  /* 3D 翻转必须属性 */
   perspective: 1000px;
   background: transparent;
-  
-  /* 悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
-  
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -49,19 +42,18 @@
 }
 
 /* =========================================
-   3. 前后两面 (Faces)
+   3. 前后两面 (Face Layout)
    ========================================= */
 .player-face {
   position: absolute;
   inset: 0;
-
   display: flex;
   align-items: center;
+  /* 关键：前后两面使用相同的 gap 和 padding，确保完美重合 */
   gap: 14px;
   padding: 8px 20px;
-  border-radius: 16px;
   
-  /* 液态背景 & 玻璃质感 */
+  border-radius: 16px;
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
@@ -78,16 +70,15 @@
 /* --- 正面 (Front) --- */
 .face-front {
   transform: rotateX(0deg);
-  justify-content: flex-start;
+  justify-content: flex-start; /* 靠左对齐 */
   pointer-events: auto;
 }
 
-/* --- 背面 (Back) - 更新布局 --- */
+/* --- 背面 (Back) - 修改为与正面一致 --- */
 .face-back {
   transform: rotateX(180deg);
-  /* 强制两端对齐：左边按钮组，右边标题 */
-  justify-content: space-between; 
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  justify-content: flex-start; /* 改回靠左对齐，与正面一致 */
+  pointer-events: auto;
 }
 
 .elysia-player.flipped .face-front { pointer-events: none !important; }
@@ -114,7 +105,12 @@
 /* =========================================
    4. 控件与文字
    ========================================= */
-.elysia-controls { display:flex; gap:10px; }
+.elysia-controls { 
+  display: flex; 
+  gap: 10px; 
+  /* 确保按钮组宽度固定，防止文字挤压 */
+  flex-shrink: 0; 
+}
 
 .elysia-controls button,
 .control-btn {
@@ -142,90 +138,71 @@
   box-shadow: 0 0 12px rgba(160,120,255,0.4); 
 }
 
-/* --- 爱心按钮激活状态 (新增) --- */
+/* 爱心激活 */
 #heartBtn.liked {
-  color: #ff6b81; /* 粉红色 */
+  color: #ff6b81;
   text-shadow: 0 0 10px rgba(255, 107, 129, 0.6);
   border-color: rgba(255, 107, 129, 0.4);
   background: rgba(255, 107, 129, 0.1);
   animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 @keyframes heartPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }
-  100% { transform: scale(1.08); } /* 回到 hover 状态的大小 */
+  100% { transform: scale(1.08); }
 }
 
-/* --- 正面：歌曲标题 --- */
-#songTitle {
-  color: #f2eaff; 
-  font-weight: 600; 
-  width: 200px; 
-  font-size: 0.95rem;
-  text-shadow: 0 0 10px rgba(160,120,255,0.45);
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  cursor: pointer;
-}
-
-/* --- 背面：歌单标题 (新增) --- */
+/* --- 统一标题样式 --- */
+/* 定义一个通用标题样式，确保位置完全重合 */
+#songTitle,
 #playlistTitleBtn {
   color: #f2eaff; 
   font-weight: 600; 
-  /* 确保有足够点击区域，同时靠右对齐 */
-  width: 160px; 
+  width: 200px; /* 宽度固定 */
   font-size: 0.95rem;
-  text-align: right; 
+  
+  /* 关键：统一左对齐 */
+  text-align: left; 
+  
   text-shadow: 0 0 10px rgba(160,120,255,0.45);
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   cursor: pointer;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition: color 0.3s ease;
 }
 
-#playlistTitleBtn:hover {
+#playlistTitleBtn:hover, #songTitle:hover {
   color: #fff;
   text-shadow: 0 0 15px rgba(180,140,255,0.8);
 }
 
 
 /* =========================================
-   5. 播放列表 & 歌单菜单 (通用样式)
+   5. 播放列表 & 歌单菜单 (通用)
    ========================================= */
-/* 此类名现在同时用于 #playlist 和 #playlistMenu */
 .elysia-playlist {
   position: fixed;
   bottom: 70px;
   left: 50%;
-  
-  /* 初始状态 */
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
-  
   width: 260px;
   max-height: 260px;
   padding: 10px 14px;
   border-radius: 16px;
-  
-  /* 玻璃质感 */
   background: rgba(255,240,255,0.25);
   border: 1px solid rgba(255,210,255,0.35);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: none;
-  
   opacity: 0; 
   pointer-events: none;
   z-index: 9998;
-  
   scrollbar-width: thin;
   will-change: transform, opacity;
 }
@@ -255,7 +232,6 @@
   animation: softPulse 3s ease-in-out infinite;
 }
 
-/* 列表光晕 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
@@ -273,43 +249,36 @@
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   6. 动画 (Animations)
+   6. 动画
    ========================================= */
-
 .elysia-playlist.show {
   opacity: 1; 
   pointer-events: auto;
   animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   transform-origin: 50% 100%;
 }
-
 .elysia-playlist.hide {
   animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
   transform-origin: 50% 100%;
 }
-
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
   100% { transform: translateX(-50%) scale(1) translateY(0); }
 }
-
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
   35%  { transform: translateX(-50%) scale(1.02); }
   100% { transform: translateX(-50%) scale(0.8) translateY(10px); opacity: 0; }
 }
-
 @keyframes moveBlobs { 
   0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
-
 @keyframes softPulse { 
   0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
   50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
-
 @keyframes elysiaFloat {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(-6px); }

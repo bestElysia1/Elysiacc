@@ -256,23 +256,11 @@ domain:chatgpt.com</pre>
     </div>
 
     <div class="player-face face-back">
-      <button id="modeBtn" class="control-btn" aria-label="模式">🔁</button>
-      
-      <div class="playlist-selector-wrapper">
-        <span id="currentPlaylistText">🎹 钢琴曲</span>
-        <select id="playlistSelect">
-          <option value="piano">🎹 钢琴曲</option>
-          <option value="mon">🌙 月曜日</option>
-          <option value="tue">🔥 火曜日</option>
-          <option value="wed">💧 水曜日</option>
-          <option value="thu">🌲 木曜日</option>
-          <option value="fri">💰 金曜日</option>
-          <option value="sat">🪐 土曜日</option>
-          <option value="sun">☀️ 日曜日</option>
-        </select>
+      <div class="elysia-controls">
+        <button id="modeBtn" class="control-btn" aria-label="切换模式">🔁</button>
+        <button id="heartBtn" class="control-btn" aria-label="喜欢">🤍</button>
       </div>
-      
-      <div style="width:32px;"></div>
+      <span id="playlistTitleBtn" class="clickable" role="button" tabindex="0">🎹 钢琴曲</span>
     </div>
 
   </div>
@@ -280,6 +268,7 @@ domain:chatgpt.com</pre>
 
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 
+<div class="elysia-playlist" id="playlistMenu" aria-hidden="true"></div>
 <script src="deeptools.js"></script>
 <script src="elysiastyle.js"></script>
 <script src="hamburger.js" defer></script>

@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   let currentPlaylistKey = 'piano';
-  let currentList = allSongsLibrary; 
+  let currentList = allSongsLibrary.filter: (s => s.category === 'piano') };
   let currentIndex = 0;
   
   let playMode = 0; 

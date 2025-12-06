@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Fixed Alignment) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Apple Music Style & Fixed Alignment) */
 
 /* =========================================
    1. 基础容器
@@ -49,7 +49,7 @@
   inset: 0;
   display: flex;
   align-items: center;
-  /* 关键：前后两面使用相同的 gap 和 padding，确保完美重合 */
+  /* 前后两面使用相同的 gap 和 padding，确保完美重合 */
   gap: 14px;
   padding: 8px 20px;
   
@@ -70,14 +70,14 @@
 /* --- 正面 (Front) --- */
 .face-front {
   transform: rotateX(0deg);
-  justify-content: flex-start; /* 靠左对齐 */
+  justify-content: flex-start; 
   pointer-events: auto;
 }
 
-/* --- 背面 (Back) - 修改为与正面一致 --- */
+/* --- 背面 (Back) --- */
 .face-back {
   transform: rotateX(180deg);
-  justify-content: flex-start; /* 改回靠左对齐，与正面一致 */
+  justify-content: flex-start; /* 与正面保持一致，靠左 */
   pointer-events: auto;
 }
 
@@ -103,65 +103,91 @@
 }
 
 /* =========================================
-   4. 控件与文字
+   4. 控件按钮 (Apple Music Style)
    ========================================= */
 .elysia-controls { 
   display: flex; 
-  gap: 10px; 
-  /* 确保按钮组宽度固定，防止文字挤压 */
+  gap: 12px; /* 稍微增加间距 */
   flex-shrink: 0; 
+  align-items: center;
 }
 
 .elysia-controls button,
 .control-btn {
-  width: 32px; 
-  height: 32px; 
+  width: 34px; 
+  height: 34px; 
   border-radius: 50%;
-  background: rgba(255,255,255,0.08); 
-  border: 1px solid rgba(255,255,255,0.2);
+  
+  /* 磨砂玻璃风格，去掉实线边框，改用内发光 */
+  background: rgba(255, 255, 255, 0.1); 
+  border: none; 
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+  
   color: #fff; 
   cursor: pointer; 
-  transition: all .25s ease; 
-  backdrop-filter: blur(6px);
+  transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  backdrop-filter: blur(8px);
+  
+  /* Flex 居中 SVG */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
   padding: 0;
   -webkit-appearance: none;
   outline: none;
 }
 
-.elysia-controls button:hover,
-.control-btn:hover { 
-  transform: scale(1.08); 
-  box-shadow: 0 0 12px rgba(160,120,255,0.4); 
+/* SVG 图标通用样式 */
+.elysia-controls button svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  fill: currentColor; /* 跟随文字颜色 */
+  transition: transform 0.2s;
 }
 
-/* 爱心激活 */
+/* 播放按钮视觉修正：Play 三角形通常视觉重心偏左，需要向右移一点点 */
+#playPauseBtn:not(.playing) svg {
+  margin-left: 2px;
+}
+
+/* 悬停效果 */
+.elysia-controls button:hover,
+.control-btn:hover { 
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05); 
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+}
+
+/* 点击按压效果 */
+.elysia-controls button:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- 爱心激活样式 --- */
 #heartBtn.liked {
-  color: #ff6b81;
-  text-shadow: 0 0 10px rgba(255, 107, 129, 0.6);
-  border-color: rgba(255, 107, 129, 0.4);
-  background: rgba(255, 107, 129, 0.1);
+  color: #ff6b81; /* 粉色 */
+  background: rgba(255, 107, 129, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 107, 129, 0.3);
   animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 @keyframes heartPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }
-  100% { transform: scale(1.08); }
+  100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题样式 --- */
-/* 定义一个通用标题样式，确保位置完全重合 */
+/* --- 统一标题样式 (位置完美重合) --- */
 #songTitle,
 #playlistTitleBtn {
   color: #f2eaff; 
   font-weight: 600; 
-  width: 200px; /* 宽度固定 */
+  width: 200px; 
   font-size: 0.95rem;
   
-  /* 关键：统一左对齐 */
+  /* 统一左对齐 */
   text-align: left; 
   
   text-shadow: 0 0 10px rgba(160,120,255,0.45);
@@ -179,7 +205,7 @@
 
 
 /* =========================================
-   5. 播放列表 & 歌单菜单 (通用)
+   5. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;

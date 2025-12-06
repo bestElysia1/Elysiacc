@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg", category: "piano" },
     { title: "Merry Christmas, Mr. Lawrence 1986", src: "assets/merry.mp3", cover: "assets/banner1.jpg", category: "piano" },
     
-    // --- 华语流行歌曲 (Tag: cn) ---
+    // --- 华语流行歌曲  ---
     { title: "反方向的钟", src: "assets/反方向的钟.mp3", cover: "assets/Elysia11.jpg", category: "piano" },
     { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg", category: "piano" },
     { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg", category: "piano" },
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   let currentPlaylistKey = 'piano';
-  let currentList = allSongsLibrary.filter: (s => s.category === 'piano') };
+  let currentList = allSongsLibrary.filter: (s => s.category === 'piano');
   let currentIndex = 0;
   
   let playMode = 0; 

@@ -1,84 +1,95 @@
-/* elysiamusic.js - Logic & Data for Elysia Player (SVG Icons & 0.3s Flip) */
+/* elysiamusic.js - Logic & Data for Elysia Player (Category System & SVG Icons) */
 
 document.addEventListener("DOMContentLoaded", () => {
   /* =========================================================
      0. SVG 图标定义 (Apple Music Style)
      ========================================================= */
   const ICONS = {
-    // 播放 (实心三角形)
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
-    // 暂停 (双竖线)
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
-    // 下一曲
     next: `<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>`,
-    // 列表循环
     loopList: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
-    // 单曲循环
     loopOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
-    // 随机播放
     shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
-    // 喜欢 (初始形状)
     heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
   };
 
   /* =========================================================
-     1. 🎵 歌曲数据源 (All Songs)
+     1. 🎵 歌曲数据源 (Category System Implemented)
      ========================================================= */
   const allSongsLibrary = [
-    { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
-    { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg" },
-    { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", cover: "assets/Shiteki.jpg" },
-    { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg" },
-    { title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3", cover: "assets/Megumeru Gensoukyoku.jpg" },
-    { title: "Call of Silence", src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3", cover: "assets/Call of Silence.jpg" },
-    { title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", cover: "assets/Level5.jpg" },
-    { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", cover: "assets/Aoi Tori - The iDOLM.jpg" },
-    { title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/Gurenge - Demon Slayer OP [Piano].mp3", cover: "assets/Shinobu Kocho.jpg" },
-    { title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg" },
-    { title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", cover: "assets/theme of SSS.jpg" },
-    { title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg" },
-    { title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", cover: "assets/banner1.jpg" },
-    { title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", cover: "assets/Key anime piano medley.jpg" },
-    { title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", cover: "assets/banner1.jpg" },
-    { title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", cover: "assets/GIRLS BAND CRY.jpg" },
-    { title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", cover: "assets/banner1.jpg" },
-    { title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", cover: "assets/banner1.jpg" },
-    { title: "Flower Dance Super Trick Version", src: "assets/Flower Dance Super Trick Version (mp3cut.net).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg" },
-    { title: "Departures - Guilty Crown ED1", src: "assets/Departures - Guilty Crown ED1 [Piano].mp3", cover: "assets/Elysia11.jpg" },
-    { title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", cover: "assets/Majo no Tabitabi.jpg" },
-    { title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", cover: "assets/Mydearest.jpg" },
-    { title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", cover: "assets/ninelie.jpg" },
-    { title: "One Last Kiss", src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", cover: "assets/one last kiss.jpg" },
-    { title: "secret base", src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", cover: "assets/secret base.jpg" },
-    { title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", cover: "assets/banner1.jpg" },
-    { title: "Hikaru Nara - Your Lie in Apri", src: "assets/Hikaru Nara - Your Lie in April OP1 [Piano].mp3", cover: "assets/Elysia11.jpg"},
-    { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", cover: "assets/banner1.jpg" },
-    { title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg" },
-    { title: "Merry Christmas, Mr. Lawrence 1986", src: "assets/merry.mp3", cover: "assets/banner1.jpg" },
-    { title: "反方向的钟", src: "assets/反方向的钟.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg" },
-    { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg" },
-    { title: "溯", src: "assets/su.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "潮汐", src: "assets/Natural.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "游京", src: "assets/游京 东雪莲.mp3", cover: "assets/游京 东雪莲.jpg" },
-    { title: "还是会想你", src: "assets/还是会想你曼波 (mp3cut.net) 2.mp3", cover: "assets/Elysia11.jpg" },
-    { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg" }
+    // --- ⬇️ 在这里填入你的 R2 歌曲 ⬇️ ---
+    { 
+      title: "月曜日 (R2 New)", 
+      src: "https://你的CloudflareR2链接.mp3", // 请替换链接
+      cover: "assets/banner1.jpg", 
+      category: "mon" // 只要标记为 'mon'，就会自动进入月曜日歌单
+    },
+
+    // --- 原有歌曲 (已为您添加分类标签) ---
+    { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg", category: "mon" },
+    { title: "My Most Precious Treasure", src: "assets/My Most Precious Treasure (From My Most Precious Treasure).mp3", cover: "assets/Key anime piano medley.jpg", category: "tue" },
+    { title: "Shiteki de Souseiteki na Tori-tachi e no Shirabe", src: "assets/Shiteki de Souseiteki na Tori-tachi e no Shirabe (Yokunin no Tame no Piano Sanka).mp3", cover: "assets/Shiteki.jpg", category: "wed" },
+    { title: "Last regrets, foretting me", src: "assets/Last regrets,foretting me.mp3", cover: "assets/Last regrets, foretting me.jpg", category: "thu" },
+    { title: "Megumeru Gensoukyoku", src: "assets/Megumeru Gensoukyoku.mp3", cover: "assets/Megumeru Gensoukyoku.jpg", category: "fri" },
+    { title: "Call of Silence", src: "assets/Call of Silence (From Attack on Titian) Piano Cover.mp3", cover: "assets/Call of Silence.jpg", category: "sat" },
+    { title: "Only my Railgun OP1 fripSide", src: "assets/Only my Railgun - A Certain Scientific Railgun OP1 [Piano]  fripSide.mp3", cover: "assets/Level5.jpg", category: "sun" },
+    
+    { title: "Aoi Tori - The iDOLM", src: "assets/[Pianeet] Aoi Tori - The iDOLM@STER OST - Piano Tutorial  Synthesia.mp3", cover: "assets/Aoi Tori - The iDOLM.jpg", category: "mon" },
+    { title: "鬼滅之刃 OPLiSA - 紅蓮華", src: "assets/Gurenge - Demon Slayer OP [Piano].mp3", cover: "assets/Shinobu Kocho.jpg", category: "tue" },
+    { title: "Flower Dance - DJ Okawari", src: "assets/Flower Dance - DJ Okawari (Piano Cover by Riyandi Kusuma).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg", category: "wed" },
+    { title: "theme of SSS -Piano Arrange ", src: "assets/theme of SSS -Piano Arrange Ver.-.mp3", cover: "assets/theme of SSS.jpg", category: "thu" },
+    { title: "My Soul, Your Beats! Classic", src: "assets/My Soul, Your Beats! ~Classic~ Instrumental.mp3", cover: "assets/My Soul, Your Beats! ~Classic~ Instrumental.jpg", category: "fri" },
+    { title: "Pachelbel's Canon", src: "assets/Bi.Bi PianoPachelbel's Canon 终于弹了这首 世界上最治愈的钢琴曲卡农.mp3", cover: "assets/banner1.jpg", category: "sat" },
+    { title: "Heroism endures in nothingness", src: "assets/英雄主义-在虚无中永存.mp3", cover: "assets/Elysia11.jpg", category: "sun" },
+    
+    { title: "诀别书", src: "assets/钢琴演奏诀别书纯音乐精编完整版.mp3", cover: "assets/Elysia11.jpg", category: "mon" },
+    { title: "Key anime piano medley", src: "assets/Air (TV), Kanon (2006), Clannad After Story - Key anime piano medley.mp3", cover: "assets/Key anime piano medley.jpg", category: "tue" },
+    { title: "Crying for Rain", src: "assets/Crying for Rain (Kawaki wo Ameku) - Domestic na Kanojo OP [Piano]  Minami.mp3", cover: "assets/banner1.jpg", category: "wed" },
+    { title: "GIRLS BAND CRY", src: "assets/GIRLS BAND CRY OP - Wrong World - Piano Cover  TOGENASHI TOGEARI.mp3", cover: "assets/GIRLS BAND CRY.jpg", category: "thu" },
+    { title: "Hikari no Senritsu", src: "assets/Hikari no Senritsu - Sora no Woto OP Arr. Animenz (2024 Fan Remaster Visualized).mp3", cover: "assets/banner1.jpg", category: "fri" },
+    { title: "LEVEL5 -judgelight", src: "assets/LEVEL5 -judgelight- A Certain Scientific Railgun OP2 [Piano].mp3", cover: "assets/banner1.jpg", category: "sat" },
+    { title: "Flower Dance Super Trick Version", src: "assets/Flower Dance Super Trick Version (mp3cut.net).mp3", cover: "assets/Flower Dance - DJ Okawari.jpg", category: "sun" },
+    
+    { title: "Departures - Guilty Crown ED1", src: "assets/Departures - Guilty Crown ED1 [Piano].mp3", cover: "assets/Elysia11.jpg", category: "mon" },
+    { title: "Majo no Tabitabi", src: "assets/Majo no Tabitabi OPLiterature Piano Cover.mp3", cover: "assets/Majo no Tabitabi.jpg", category: "tue" },
+    { title: "My Dearest ", src: "assets/My Dearest - Guilty Crown OP [10 Year Anniversary Edition] [Piano].mp3", cover: "assets/Mydearest.jpg", category: "wed" },
+    { title: "Ninelie Kabaneri", src: "assets/Ninelie - Kabaneri of the Iron Fortress ED [Piano].mp3", cover: "assets/ninelie.jpg", category: "thu" },
+    { title: "One Last Kiss", src: "assets/One Last Kiss - Evangelion_ 3.0  1.0 Theme Song [Piano]  Hikaru Utada.mp3", cover: "assets/one last kiss.jpg", category: "fri" },
+    { title: "secret base", src: "assets/secret base - Kimi ga Kureta Mono - AnoHana ED [Piano].mp3", cover: "assets/secret base.jpg", category: "sat" },
+    { title: "Blue Bird 2022 ver.", src: "assets/Blue Bird (2022 ver.) - Naruto Shippuuden OP3 [Piano]  Ikimono-gakari.mp3", cover: "assets/banner1.jpg", category: "sun" },
+    
+    { title: "Hikaru Nara - Your Lie in Apri", src: "assets/Hikaru Nara - Your Lie in April OP1 [Piano].mp3", cover: "assets/Elysia11.jpg", category: "mon" },
+    { title: "AKIBA POP the Future - Pianeet", src: "assets/AKIBA POP the Future - Pianeet [Piano Transcription].mp3", cover: "assets/banner1.jpg", category: "tue" },
+    { title: "SWORD ART ONLINE", src: "assets/SWORD ART ONLINE PIANO MEDLEY!!! (30,000 Subscribers Special).mp3", cover: "assets/SWORD ART ONLINE.jpg", category: "wed" },
+    { title: "Merry Christmas, Mr. Lawrence 1986", src: "assets/merry.mp3", cover: "assets/banner1.jpg", category: "thu" },
+    
+    // --- 华语流行歌曲 (Tag: cn) ---
+    { title: "反方向的钟", src: "assets/反方向的钟.mp3", cover: "assets/Elysia11.jpg", category: "cn" },
+    { title: "给我一首歌的时间", src: "assets/给我一首歌的时间 piano ver-.mp3", cover: "assets/banner1.jpg", category: "cn" },
+    { title: "晴天", src: "assets/周杰伦晴天 钢琴独奏 Jay ChouBi.Bi Piano.mp3", cover: "assets/banner1.jpg", category: "cn" },
+    { title: "溯", src: "assets/su.mp3", cover: "assets/Elysia11.jpg", category: "cn" },
+    { title: "潮汐", src: "assets/Natural.mp3", cover: "assets/Elysia11.jpg", category: "cn" },
+    { title: "游京", src: "assets/游京 东雪莲.mp3", cover: "assets/游京 东雪莲.jpg", category: "cn" },
+    { title: "还是会想你", src: "assets/还是会想你曼波 (mp3cut.net) 2.mp3", cover: "assets/Elysia11.jpg", category: "cn" },
+    { title: "Duvert 四季 Merry mixed", src: "assets/mix.mp3", cover: "assets/Elysia11.jpg", category: "cn" }
   ];
 
   /* =========================================================
-     2. 歌单配置与状态管理
+     2. 歌单配置与状态管理 (Playlist Configuration)
      ========================================================= */
   const playlistsConfig = [
-    { key: "piano", name: "钢琴曲", filter: (l) => true },
-    { key: "mon",   name: "月曜日", filter: (l, i) => i % 7 === 0 },
-    { key: "tue",   name: "火曜日", filter: (l, i) => i % 7 === 1 },
-    { key: "wed",   name: "水曜日", filter: (l, i) => i % 7 === 2 },
-    { key: "thu",   name: "木曜日", filter: (l, i) => i % 7 === 3 },
-    { key: "fri",   name: "金曜日", filter: (l, i) => i % 7 === 4 },
-    { key: "sat",   name: "土曜日", filter: (l, i) => i % 7 === 5 },
-    { key: "sun",   name: "日曜日", filter: (l, i) => i % 7 === 6 },
+    // 逻辑升级：不再使用 i%7，而是匹配 category 标签
+    { key: "piano", name: "🎹 全部歌曲", filter: (s) => true }, // 全部显示
+    { key: "cn",    name: "🎤 华语流行", filter: (s) => s.category === 'cn' }, // 新增：只显示中文歌
+    
+    { key: "mon",   name: "🌙 月曜日",   filter: (s) => s.category === 'mon' },
+    { key: "tue",   name: "🔥 火曜日",   filter: (s) => s.category === 'tue' },
+    { key: "wed",   name: "💧 水曜日",   filter: (s) => s.category === 'wed' },
+    { key: "thu",   name: "🌲 木曜日",   filter: (s) => s.category === 'thu' },
+    { key: "fri",   name: "💰 金曜日",   filter: (s) => s.category === 'fri' },
+    { key: "sat",   name: "🪐 土曜日",   filter: (s) => s.category === 'sat' },
+    { key: "sun",   name: "☀️ 日曜日",   filter: (s) => s.category === 'sun' },
   ];
 
   let currentPlaylistKey = 'piano';
@@ -269,6 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPlaylistKey = key;
     playlistTitleBtn.textContent = config.name; 
     
+    // 使用新的 filter 逻辑
     currentList = allSongsLibrary.filter(config.filter);
 
     currentIndex = 0;

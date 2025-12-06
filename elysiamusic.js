@@ -1,8 +1,28 @@
-/* elysiamusic.js - Logic & Data for Elysia Player (Refactored Back Face) */
+/* elysiamusic.js - Logic & Data for Elysia Player (SVG Icons & 0.3s Flip) */
 
 document.addEventListener("DOMContentLoaded", () => {
   /* =========================================================
-     1. 🎵 歌曲数据源 (All Songs - 完整保留)
+     0. SVG 图标定义 (Apple Music Style)
+     ========================================================= */
+  const ICONS = {
+    // 播放 (实心三角形)
+    play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
+    // 暂停 (双竖线)
+    pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
+    // 下一曲
+    next: `<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>`,
+    // 列表循环
+    loopList: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
+    // 单曲循环
+    loopOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
+    // 随机播放
+    shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
+    // 喜欢 (初始形状)
+    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
+  };
+
+  /* =========================================================
+     1. 🎵 歌曲数据源 (All Songs)
      ========================================================= */
   const allSongsLibrary = [
     { title: "My Soul, Your Beats!", src: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.mp3", cover: "assets/My Soul, Your Beats! -Piano Arrange Ver.-.jpg" },
@@ -50,10 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================================================
      2. 歌单配置与状态管理
      ========================================================= */
-  
-  // 歌单配置表：定义key, 显示名称, 和过滤规则
   const playlistsConfig = [
-    { key: "piano", name: "🎹 钢琴曲", filter: (l) => true }, // 全部展示
+    { key: "piano", name: "🎹 钢琴曲", filter: (l) => true },
     { key: "mon",   name: "🌙 月曜日", filter: (l, i) => i % 7 === 0 },
     { key: "tue",   name: "🔥 火曜日", filter: (l, i) => i % 7 === 1 },
     { key: "wed",   name: "💧 水曜日", filter: (l, i) => i % 7 === 2 },
@@ -63,17 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "sun",   name: "☀️ 日曜日", filter: (l, i) => i % 7 === 6 },
   ];
 
-  // 核心状态变量
   let currentPlaylistKey = 'piano';
-  let currentList = allSongsLibrary; // 默认加载全部
+  let currentList = allSongsLibrary; 
   let currentIndex = 0;
   
-  // 播放模式: 0=列表循环, 1=单曲循环, 2=随机播放
   let playMode = 0; 
   const playModes = [
-    { icon: "🔁", name: "列表循环" },
-    { icon: "🔂", name: "单曲循环" },
-    { icon: "🔀", name: "随机播放" }
+    { icon: ICONS.loopList, name: "列表循环" },
+    { icon: ICONS.loopOne, name: "单曲循环" },
+    { icon: ICONS.shuffle, name: "随机播放" }
   ];
 
   /* =========================================================
@@ -87,26 +103,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const titleEl = document.getElementById("songTitle");
   
-  // 列表容器
-  const songListEl = document.getElementById("playlist");     // 正面：歌曲列表
-  const playlistMenuEl = document.getElementById("playlistMenu"); // 背面：歌单选择列表 (需在HTML添加此ID)
+  const songListEl = document.getElementById("playlist"); 
+  const playlistMenuEl = document.getElementById("playlistMenu");
 
-  // 背面控件
   const modeBtn = document.getElementById("modeBtn");
   const heartBtn = document.getElementById("heartBtn");
-  const playlistTitleBtn = document.getElementById("playlistTitleBtn"); // 点击切换歌单
+  const playlistTitleBtn = document.getElementById("playlistTitleBtn");
 
-  // 如果基础元素不存在，停止执行
   if (!player || !playPauseBtn) return;
+
+  // ⚡️ 立即初始化 SVG 图标，替换 HTML 中的空按钮 ⚡️
+  function initIcons() {
+    playPauseBtn.innerHTML = ICONS.play;
+    nextBtn.innerHTML = ICONS.next;
+    modeBtn.innerHTML = playModes[0].icon;
+    heartBtn.innerHTML = ICONS.heart; 
+  }
+  initIcons();
 
   /* =========================================================
      4. 核心播放控制逻辑
      ========================================================= */
-
   function loadSong(index) {
     if (!currentList || currentList.length === 0) return;
-    
-    // 索引越界保护
     if (index < 0) index = currentList.length - 1;
     if (index >= currentList.length) index = 0;
     
@@ -116,41 +135,40 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.src = song.src;
     titleEl.textContent = song.title;
     
-    renderSongListDOM();  // 更新歌曲列表高亮
-    updateMediaSession(song); // 更新系统媒体中心
+    renderSongListDOM(); 
+    updateMediaSession(song);
     
-    // 切换歌曲时，重置爱心状态 (模拟效果)
+    // 重置爱心状态
     heartBtn.classList.remove("liked");
-    heartBtn.textContent = "🤍";
   }
 
   function togglePlay() {
     if (audio.paused) {
       audio.play().catch(e => console.log("Waiting for interaction"));
-      playPauseBtn.textContent = "⏸";
+      // 切换图标：暂停
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing"); // 用于CSS修正对齐
       player.classList.add("playing");
     } else {
       audio.pause();
-      playPauseBtn.textContent = "▶";
+      // 切换图标：播放
+      playPauseBtn.innerHTML = ICONS.play;
+      playPauseBtn.classList.remove("playing");
       player.classList.remove("playing");
     }
   }
 
   function playNext(isAuto = false) {
     let nextIndex;
-
-    // 模式 1: 单曲循环
-    if (playMode === 1 && isAuto) {
+    if (playMode === 1 && isAuto) { // 单曲循环
       audio.currentTime = 0;
       audio.play();
       return;
     } 
     
-    // 模式 2: 随机播放
-    if (playMode === 2) {
+    if (playMode === 2) { // 随机播放
       if (currentList.length > 1) {
         let newIndex = currentIndex;
-        // 简单的随机算法，避免随到同一首
         while (newIndex === currentIndex) {
           newIndex = Math.floor(Math.random() * currentList.length);
         }
@@ -158,23 +176,21 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         nextIndex = 0;
       }
-    } 
-    // 模式 0: 列表循环 (默认)
-    else {
+    } else { // 列表循环
       nextIndex = (currentIndex + 1) % currentList.length;
     }
-
     loadSong(nextIndex);
     audio.play();
-    playPauseBtn.textContent = "⏸";
+    
+    // 确保图标同步为暂停
+    playPauseBtn.innerHTML = ICONS.pause;
+    playPauseBtn.classList.add("playing");
     player.classList.add("playing");
   }
 
   /* =========================================================
-     5. 列表渲染与交互逻辑 (核心改动)
+     5. 列表渲染与交互逻辑
      ========================================================= */
-
-  // 通用菜单显示/隐藏辅助函数
   function toggleMenu(el) {
     if (el.classList.contains("show")) {
       hideMenu(el);
@@ -192,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* --- A. 正面：歌曲列表逻辑 --- */
-  
   function renderSongListDOM() {
     if (!songListEl) return;
     songListEl.innerHTML = currentList.map((s, i) => `
@@ -202,28 +217,25 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  // 点击标题打开歌曲列表
   titleEl.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (player.classList.contains("flipped")) return; // 背面时不响应
-    
-    hideMenu(playlistMenuEl); // 确保另一个菜单关闭
+    if (player.classList.contains("flipped")) return; 
+    hideMenu(playlistMenuEl); 
     toggleMenu(songListEl);
   });
 
-  // 点击列表切歌
   songListEl.addEventListener("click", e => {
     const item = e.target.closest(".playlist-item");
     if (item) {
       loadSong(parseInt(item.dataset.index));
       audio.play();
-      playPauseBtn.textContent = "⏸";
-      // 这里不自动关闭列表，方便连续切歌
+      // 同步暂停图标
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing");
     }
   });
 
   /* --- B. 背面：歌单选择逻辑 --- */
-
   function renderPlaylistMenu() {
     if (!playlistMenuEl) return;
     playlistMenuEl.innerHTML = playlistsConfig.map(cfg => `
@@ -233,23 +245,19 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  // 点击背面歌单标题 -> 打开歌单选择菜单
   playlistTitleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    hideMenu(songListEl); // 确保歌曲列表关闭
+    hideMenu(songListEl); 
     toggleMenu(playlistMenuEl);
   });
 
-  // 点击歌单项 -> 切换歌单
   if (playlistMenuEl) {
     playlistMenuEl.addEventListener('click', (e) => {
       const item = e.target.closest(".playlist-item");
       if (item) {
         const key = item.dataset.key;
-        if (key !== currentPlaylistKey) {
-          changePlaylist(key);
-        }
-        hideMenu(playlistMenuEl); // 选完后关闭菜单
+        if (key !== currentPlaylistKey) changePlaylist(key);
+        hideMenu(playlistMenuEl);
       }
     });
   }
@@ -259,49 +267,40 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!config) return;
 
     currentPlaylistKey = key;
-    playlistTitleBtn.textContent = config.name; // 更新背面标题
+    playlistTitleBtn.textContent = config.name; 
     
-    // 重新生成当前播放列表数据
     currentList = allSongsLibrary.filter(config.filter);
 
-    // 重置并播放第一首
     currentIndex = 0;
     loadSong(0);
     audio.play();
-    playPauseBtn.textContent = "⏸";
+    
+    // 同步暂停图标
+    playPauseBtn.innerHTML = ICONS.pause;
+    playPauseBtn.classList.add("playing");
     player.classList.add("playing");
     
-    // 更新两个列表的高亮状态
     renderPlaylistMenu();
     renderSongListDOM();
   }
-
-  // 初始化渲染一次歌单菜单
   renderPlaylistMenu();
 
   /* --- C. 背面：按钮逻辑 --- */
-
-  // 模式切换
   modeBtn.addEventListener('click', (e) => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
-    modeBtn.textContent = playModes[playMode].icon;
+    // 切换 SVG 图标
+    modeBtn.innerHTML = playModes[playMode].icon;
   });
 
-  // 喜欢按钮
   heartBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     heartBtn.classList.toggle("liked");
-    if (heartBtn.classList.contains("liked")) {
-        heartBtn.textContent = "❤️";
-    } else {
-        heartBtn.textContent = "🤍";
-    }
+    // 爱心颜色变红由 CSS .liked 类控制，图标形状保持不变
   });
 
   /* --- D. 全局点击关闭菜单 --- */
   document.addEventListener("click", e => {
-    // 如果点击区域不在播放器、歌曲列表、歌单菜单内，则关闭浮窗
     const inPlayer = player.contains(e.target);
     const inSongList = songListEl && songListEl.contains(e.target);
     const inPlayListMenu = playlistMenuEl && playlistMenuEl.contains(e.target);
@@ -313,21 +312,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =========================================================
-     6. 长按翻转逻辑 (3D Flip)
+     6. 长按翻转逻辑 (0.3s)
      ========================================================= */
   let pressTimer;
   let isDrag = false;
-  const LONG_PRESS_DURATION = 500;
+  const LONG_PRESS_DURATION = 300; 
 
   const startPress = (e) => {
-    // 忽略按钮和可点击文本的触发
-    if (e.target.closest('button') || e.target.closest('.clickable')) return;
+    // 忽略直接点击按钮的操作，避免翻转
+    if (e.target.closest('button')) return;
     
     isDrag = false;
     pressTimer = setTimeout(() => {
       if (!isDrag) {
         player.classList.toggle("flipped");
-        // 翻转时隐藏所有列表
         hideMenu(songListEl);
         hideMenu(playlistMenuEl);
       }
@@ -367,13 +365,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function resetTimer() {
     clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(hidePlayerUI, 30000); // 30秒无操作隐藏
+    inactivityTimer = setTimeout(hidePlayerUI, 30000); 
   }
 
   ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt =>
     window.addEventListener(evt, showPlayerUI)
   );
-
 
   /* =========================================================
      8. UI 按钮基础绑定
@@ -382,11 +379,9 @@ document.addEventListener("DOMContentLoaded", () => {
   nextBtn.addEventListener("click", () => playNext(false));
   audio.addEventListener("ended", () => playNext(true));
 
-
   /* =========================================================
-     9. Media Session API (锁屏控制优化)
+     9. Media Session API
      ========================================================= */
-  
   function updatePositionState() {
     if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
       navigator.mediaSession.setPositionState({
@@ -402,7 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: song.title,
         artist: "Elysia Player",
-        // 将专辑名设置为当前歌单名称
         album: playlistTitleBtn ? playlistTitleBtn.textContent : "Music",
         artwork: [{ src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }]
       });
@@ -415,9 +409,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (prevIndex < 0) prevIndex = currentList.length - 1;
         loadSong(prevIndex);
         audio.play();
+        // 更新图标状态
+        playPauseBtn.innerHTML = ICONS.pause;
+        playPauseBtn.classList.add("playing");
       });
-
-      // 允许锁屏进度条拖动
       navigator.mediaSession.setActionHandler('seekto', (details) => {
         if (details.fastSeek && 'fastSeek' in audio) {
           audio.fastSeek(details.seekTime);
@@ -429,29 +424,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 进度条状态同步
   audio.addEventListener('loadedmetadata', updatePositionState);
-  
-  audio.addEventListener('play', () => {
-    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
-    updatePositionState();
-  });
-  
-  audio.addEventListener('pause', () => {
-    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
-    updatePositionState();
-  });
-  
-  audio.addEventListener('timeupdate', () => {
-    // 简单的节流，防止过于频繁调用 (每5秒同步一次即可)
-    if (Math.floor(audio.currentTime) % 5 === 0) {
-      updatePositionState();
-    }
-  });
+  audio.addEventListener('play', () => { if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; updatePositionState(); });
+  audio.addEventListener('pause', () => { if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; updatePositionState(); });
+  audio.addEventListener('timeupdate', () => { if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState(); });
 
-  /* =========================================================
-     10. 启动播放器
-     ========================================================= */
   resetTimer();
   loadSong(0);
 });

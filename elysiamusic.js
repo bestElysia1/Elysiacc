@@ -71,14 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
      2. 歌单配置与状态管理
      ========================================================= */
   const playlistsConfig = [
-    { key: "piano", name: "🎹 钢琴曲", filter: (l) => true },
-    { key: "mon",   name: "🌙 月曜日", filter: (l, i) => i % 7 === 0 },
-    { key: "tue",   name: "🔥 火曜日", filter: (l, i) => i % 7 === 1 },
-    { key: "wed",   name: "💧 水曜日", filter: (l, i) => i % 7 === 2 },
-    { key: "thu",   name: "🌲 木曜日", filter: (l, i) => i % 7 === 3 },
-    { key: "fri",   name: "💰 金曜日", filter: (l, i) => i % 7 === 4 },
-    { key: "sat",   name: "🪐 土曜日", filter: (l, i) => i % 7 === 5 },
-    { key: "sun",   name: "☀️ 日曜日", filter: (l, i) => i % 7 === 6 },
+    { key: "piano", name: "钢琴曲", filter: (l) => true },
+    { key: "mon",   name: "月曜日", filter: (l, i) => i % 7 === 0 },
+    { key: "tue",   name: "火曜日", filter: (l, i) => i % 7 === 1 },
+    { key: "wed",   name: "水曜日", filter: (l, i) => i % 7 === 2 },
+    { key: "thu",   name: "木曜日", filter: (l, i) => i % 7 === 3 },
+    { key: "fri",   name: "金曜日", filter: (l, i) => i % 7 === 4 },
+    { key: "sat",   name: "土曜日", filter: (l, i) => i % 7 === 5 },
+    { key: "sun",   name: "日曜日", filter: (l, i) => i % 7 === 6 },
   ];
 
   let currentPlaylistKey = 'piano';

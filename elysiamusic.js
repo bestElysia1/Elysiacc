@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Version (Expanded Format & Logic Fixed) */
+/* elysiamusic.js - Ultimate Version (Fixed for New Layout & Covers) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -17,7 +17,6 @@ import {
   browserLocalPersistence   
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 🔥 引入新的 Firestore 初始化模块，修复过时警告
 import { 
   initializeFirestore, 
   doc, 
@@ -43,8 +42,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔥🔥🔥 修复部分：使用新版 API 初始化 Firestore 并开启离线持久化 🔥🔥🔥
-// 这消除了 "enableIndexedDbPersistence will be deprecated" 的警告
+// Firestore 离线持久化初始化
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager()
@@ -56,12 +54,10 @@ const provider = new GoogleAuthProvider();
 
 
 /* =========================================================
-   🔥 PART 1.5: Cloudflare 全局逻辑 (已修复按钮判定)
+   🔥 PART 1.5: Cloudflare & Auth 全局逻辑
    ========================================================= */
-// 使用 window 全局变量，防止模块作用域导致的状态不同步
 window.isCaptchaVerified = false;
 
-// 🔥 核心修复：更严谨的按钮状态检查逻辑
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
   const emailInput = document.getElementById("email-input");
@@ -72,8 +68,6 @@ window.checkLoginButtonState = function() {
 
   const emailVal = emailInput.value.trim();
   const passVal = passInput.value.trim();
-  
-  // 判定条件：邮箱不为空 && 密码大于等于6位 && 验证码通过
   const isValid = emailVal.length > 0 && passVal.length >= 6 && window.isCaptchaVerified;
 
   if (isValid) {
@@ -82,7 +76,6 @@ window.checkLoginButtonState = function() {
     btn.style.cursor = "pointer";
     btn.style.filter = "none";
     btn.style.background = "linear-gradient(135deg, #9c6bff, #7b3fe4)";
-    // 如果之前有提示“请输入邮箱”，可以清除
     if (errorMsg && errorMsg.innerText === "请输入邮箱和密码") {
         errorMsg.innerText = "";
     }
@@ -90,11 +83,10 @@ window.checkLoginButtonState = function() {
     btn.disabled = true;
     btn.style.opacity = "0.6";
     btn.style.cursor = "not-allowed";
-    btn.style.background = ""; // 恢复 CSS 默认的禁用样式
+    btn.style.background = ""; 
   }
 };
 
-// Turnstile 回调：成功
 window.onTurnstileSuccess = function(token) {
   console.log("[Turnstile] 验证成功");
   window.isCaptchaVerified = true;
@@ -103,7 +95,6 @@ window.onTurnstileSuccess = function(token) {
   window.checkLoginButtonState();
 };
 
-// Turnstile 回调：过期/失败
 window.onTurnstileExpired = function() {
   console.log("[Turnstile] 验证过期");
   window.isCaptchaVerified = false;
@@ -117,9 +108,8 @@ window.onTurnstileExpired = function() {
 document.addEventListener("DOMContentLoaded", () => {
   
   const allSongsLibrary = window.allSongsLibrary || [];
-
   if (!window.allSongsLibrary) {
-      console.error("严重错误：未找到歌单数据！请检查 song.js 是否在 elysiamusic.js 之前加载。");
+      console.error("严重错误：未找到歌单数据！请检查 song.js。");
   }
 
   let userFavorites = [];
@@ -128,14 +118,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastSaveTime = 0; 
   let initialRestoreDone = false; 
 
-  /* --- 🎵 歌词相关变量 --- */
+  /* 歌词变量 */
   let currentLyrics = [];     
   let hasLyrics = false;      
   let isLyricsLoading = false; 
   let currentLyricIndex = -1; 
   let lastCountTime = 0;
 
-  /* ... SVG ICONS ... */
+  /* SVG ICONS */
   const ICONS = {
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
@@ -146,63 +136,19 @@ document.addEventListener("DOMContentLoaded", () => {
     heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
   };
 
-  /* 2. 歌单配置与状态管理 */
+  /* 歌单配置 */
   let playlistsConfig = [
-    { 
-        key: "All songs", 
-        name: "所有歌曲", 
-        filter: (s) => s.category !== 'piano' 
-    },
-    { 
-        key: "history_rank", 
-        name: "我的听歌排行", 
-        filter: (s) => (userPlayHistory[s.title] || 0) > 0 
-    },
-    { 
-        key: "piano", 
-        name: " ピアノ音楽", 
-        filter: (s) => s.category === 'piano' 
-    },
-    { 
-        key: "mon", 
-        name: "月曜日", 
-        filter: (s) => s.category === 'mon' 
-    },
-    { 
-        key: "tue", 
-        name: "火曜日", 
-        filter: (s) => s.category === 'tue' 
-    },
-    { 
-        key: "wed", 
-        name: "水曜日", 
-        filter: (s) => s.category === 'wed' 
-    },
-    { 
-        key: "thu", 
-        name: "木曜日", 
-        filter: (s) => s.category === 'thu' 
-    },
-    { 
-        key: "fri", 
-        name: "金曜日", 
-        filter: (s) => s.category === 'fri' 
-    },
-    { 
-        key: "sat", 
-        name: "土曜日", 
-        filter: (s) => s.category === 'sat' 
-    },
-    { 
-        key: "sun", 
-        name: "日曜日", 
-        filter: (s) => s.category === 'sun' 
-    },
-    { 
-        key: "unknown", 
-        name: "前方的区域后面再来探索吧～", 
-        filter: (s) => s.category === 'unknown' 
-    },
+    { key: "All songs", name: "所有歌曲", filter: (s) => s.category !== 'piano' },
+    { key: "history_rank", name: "我的听歌排行", filter: (s) => (userPlayHistory[s.title] || 0) > 0 },
+    { key: "piano", name: " ピアノ音楽", filter: (s) => s.category === 'piano' },
+    { key: "mon", name: "月曜日", filter: (s) => s.category === 'mon' },
+    { key: "tue", name: "火曜日", filter: (s) => s.category === 'tue' },
+    { key: "wed", name: "水曜日", filter: (s) => s.category === 'wed' },
+    { key: "thu", name: "木曜日", filter: (s) => s.category === 'thu' },
+    { key: "fri", name: "金曜日", filter: (s) => s.category === 'fri' },
+    { key: "sat", name: "土曜日", filter: (s) => s.category === 'sat' },
+    { key: "sun", name: "日曜日", filter: (s) => s.category === 'sun' },
+    { key: "unknown", name: "探索区域", filter: (s) => s.category === 'unknown' },
   ];
 
   function updatePlaylistConfig() {
@@ -214,68 +160,43 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (currentUser && userFavorites.length > 0) {
-        if (favIndex === -1) {
-            playlistsConfig.splice(1, 0, myFavPlaylist);
-        } else {
-             playlistsConfig[favIndex] = myFavPlaylist;
-        }
+        if (favIndex === -1) playlistsConfig.splice(1, 0, myFavPlaylist);
+        else playlistsConfig[favIndex] = myFavPlaylist;
     } else {
         if (favIndex !== -1) {
             playlistsConfig.splice(favIndex, 1);
-            if (currentPlaylistKey === 'my_favorites') {
-                changePlaylist('All songs');
-            }
+            if (currentPlaylistKey === 'my_favorites') changePlaylist('All songs');
         }
     }
     renderPlaylistMenu();
   }
 
-  // 🔥 核心逻辑：原子级增加计数 (支持离线增量合并)
   async function recordPlayHistory(songTitle) {
     if (!currentUser) return; 
-
-    // 1. 立即更新本地 UI (Firestore 会处理离线时的本地视图，但手动更新更灵敏)
     const currentCount = userPlayHistory[songTitle] || 0;
     userPlayHistory[songTitle] = currentCount + 1;
     
-    console.log(`播放计数增加: ${songTitle} -> ${userPlayHistory[songTitle]}`); 
-
-    if (currentPlaylistKey === 'history_rank') {
-        renderSongListDOM(); 
-    }
+    if (currentPlaylistKey === 'history_rank') renderSongListDOM(); 
 
     const userDocRef = doc(db, "users", currentUser.uid);
     try {
-        // 🔥 使用 increment(1) 而不是覆盖 userPlayHistory
-        // 这样离线播放的次数会在联网时“累加”到云端现有数值上
         await setDoc(userDocRef, {
-            playHistory: {
-                [songTitle]: increment(1)
-            } 
+            playHistory: { [songTitle]: increment(1) } 
         }, { merge: true });
-    } catch (e) {
-        console.error("更新播放次数失败", e);
-    }
+    } catch (e) { console.error("History update failed", e); }
   }
 
   async function savePlaybackState() {
     if (!currentUser || !currentList[currentIndex]) return;
-
-    const songTitle = currentList[currentIndex].title;
-    const currentTime = audio.currentTime;
-
-    const userDocRef = doc(db, "users", currentUser.uid);
     try {
-      await setDoc(userDocRef, { 
+      await setDoc(doc(db, "users", currentUser.uid), { 
         lastPlayed: {
-          title: songTitle,
-          time: currentTime,
+          title: currentList[currentIndex].title,
+          time: audio.currentTime,
           playlist: currentPlaylistKey 
         }
       }, { merge: true }); 
-    } catch (e) {
-      console.error("保存进度失败", e);
-    }
+    } catch (e) { /* ignore */ }
   }
 
   let currentPlaylistKey = 'piano';
@@ -299,25 +220,29 @@ document.addEventListener("DOMContentLoaded", () => {
     { icon: ICONS.shuffle, name: "随机播放" }
   ];
 
-  /* =========================================================
-     3. DOM 元素初始化 & 播放控制
-     ========================================================= */
+  /* 3. DOM 元素初始化 */
   const audio = new Audio();
-  // 🔥 关键：强制开启 CORS 请求模式，确保缓存入库
   audio.crossOrigin = "anonymous"; 
   audio.preload = "auto";
   audio.playsInline = true; 
 
-  
   const player = document.getElementById("elysiaPlayer");
+  
+  // Controls
   const playPauseBtn = document.getElementById("playPauseBtn");
   const nextBtn = document.getElementById("nextBtn");
-  const titleEl = document.getElementById("songTitle");
-  const songListEl = document.getElementById("playlist"); 
-  const playlistMenuEl = document.getElementById("playlistMenu");
-  const modeBtn = document.getElementById("modeBtn");
+  const modeBtn = document.getElementById("modeBtn"); // 如果保留了模式切换按钮
+  const shuffleBtn = document.getElementById("shuffleBtn"); // 新增：背面专用随机按钮
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
+  
+  // Display & UI
+  const titleEl = document.getElementById("songTitle");
+  const coverArt = document.getElementById("coverArt");         // 🔥 正面封面
+  const coverArtBack = document.getElementById("coverArtBack"); // 🔥 背面封面
+  
+  const songListEl = document.getElementById("playlist"); 
+  const playlistMenuEl = document.getElementById("playlistMenu");
   const progressContainer = document.getElementById("progressContainer");
   const progressBar = document.getElementById("progressBar");
 
@@ -326,45 +251,37 @@ document.addEventListener("DOMContentLoaded", () => {
   function initIcons() {
     playPauseBtn.innerHTML = ICONS.play;
     nextBtn.innerHTML = ICONS.next;
-    modeBtn.innerHTML = playModes[0].icon;
-    heartBtn.innerHTML = ICONS.heart; 
+    if(modeBtn) modeBtn.innerHTML = playModes[0].icon;
+    if(shuffleBtn) shuffleBtn.innerHTML = ICONS.shuffle;
+    if(heartBtn) heartBtn.innerHTML = ICONS.heart; 
   }
   initIcons();
 
   function updateHeartStatus() {
       if (!currentList || !currentList[currentIndex]) return;
       const currentTitle = currentList[currentIndex].title;
-      if (userFavorites.includes(currentTitle)) {
-          heartBtn.classList.add("liked");
-      } else {
-          heartBtn.classList.remove("liked");
+      if (heartBtn) {
+          if (userFavorites.includes(currentTitle)) heartBtn.classList.add("liked");
+          else heartBtn.classList.remove("liked");
       }
   }
 
-  /* --- 🎵 歌词解析函数 --- */
   function parseLRC(lrcText) {
       if(!lrcText) return [];
       const lines = lrcText.split('\n');
       const regex = /^\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
       const result = [];
-      
       lines.forEach(line => {
           const match = line.match(regex);
           if (match) {
-              const min = parseInt(match[1]);
-              const sec = parseInt(match[2]);
-              const ms = parseInt(match[3].padEnd(3, '0').substring(0, 3));
-              const time = min * 60 + sec + ms / 1000;
+              const time = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3].padEnd(3, '0').substring(0, 3)) / 1000;
               const text = match[4].trim();
-              if (text) {
-                  result.push({ time, text });
-              }
+              if (text) result.push({ time, text });
           }
       });
       return result;
   }
 
-  /* --- 🎵 歌词加载函数 --- */
   async function fetchLyrics(song) {
       currentLyrics = [];
       hasLyrics = false;
@@ -380,7 +297,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const cachedLrc = localStorage.getItem(localCacheKey);
 
       if (cachedLrc) {
-          console.log(`[Elysia] 命中本地歌词缓存: ${song.title}`);
           currentLyrics = parseLRC(cachedLrc);
           if (currentLyrics.length > 0) hasLyrics = true;
           isLyricsLoading = false; 
@@ -395,23 +311,18 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch(song.lrc);
           if (response.ok) {
               const lrcText = await response.text();
-              try {
-                  localStorage.setItem(localCacheKey, lrcText);
-              } catch (storageErr) {
-                  console.warn("歌词缓存失败(可能是空间已满):", storageErr);
-              }
+              try { localStorage.setItem(localCacheKey, lrcText); } catch(e){}
               currentLyrics = parseLRC(lrcText);
               if (currentLyrics.length > 0) hasLyrics = true;
           }
-      } catch (e) {
-          console.warn(`[Elysia] 歌词加载失败: ${song.title}`, e);
-      } finally {
+      } catch (e) { console.warn("Lyrics fail", e); } 
+      finally {
           isLyricsLoading = false;
           updateTitleOrLyric(); 
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 + 滚动计算 --- */
+  /* 🔥 核心：更新标题/歌词 (适配 Flex 布局) */
   function updateTitleOrLyric() {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -421,20 +332,15 @@ document.addEventListener("DOMContentLoaded", () => {
           textToShow = song.title;
           titleEl.classList.remove("lyric-mode");
       } else if (isLyricsLoading) {
-          textToShow = "歌词加载中...";
+          textToShow = "Loading...";
           titleEl.classList.add("lyric-mode");
       } else if (!hasLyrics) {
           textToShow = song.title; 
           titleEl.classList.remove("lyric-mode");
       } else {
           if (currentLyricIndex === -1 || currentLyricIndex >= currentLyrics.length) {
-              if(currentLyrics.length > 0 && audio.currentTime < currentLyrics[0].time) {
-                   textToShow = song.title; 
-                   titleEl.classList.remove("lyric-mode");
-              } else {
-                   textToShow = song.title;
-                   titleEl.classList.remove("lyric-mode");
-              }
+              textToShow = song.title; 
+              titleEl.classList.remove("lyric-mode");
           } else {
               textToShow = currentLyrics[currentLyricIndex].text;
               titleEl.classList.add("lyric-mode");
@@ -442,21 +348,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       titleEl.innerHTML = `<span class="scroll-inner">${textToShow}</span>`;
+      
+      // 动态计算滚动
       const innerSpan = titleEl.querySelector('.scroll-inner');
-      const containerWidth = titleEl.clientWidth;
+      const containerWidth = titleEl.clientWidth; // Flex 布局下的实际宽度
       const textWidth = innerSpan.scrollWidth;
 
       if (textWidth > containerWidth) {
           const duration = (textWidth / 50) + 1.5; 
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
-          innerSpan.classList.remove('scrolling');
-          void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
-          titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
-          innerSpan.style.transform = 'translateX(0)';
-          titleEl.style.textAlign = 'left'; 
       }
   }
 
@@ -468,10 +371,15 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = index;
     const song = currentList[currentIndex];
     
+    // 🔥 [NEW] 更新封面图 (正面和背面)
+    const coverSrc = song.cover || 'assets/banner1.jpg'; // 默认封面防止空白
+    if (coverArt) coverArt.src = coverSrc;
+    if (coverArtBack) coverArtBack.src = coverSrc;
+
+    // 重置歌词状态
     currentLyrics = [];
     hasLyrics = false;
     currentLyricIndex = -1;
-    
     isLyricsLoading = true;
     updateTitleOrLyric(); 
 
@@ -479,39 +387,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (startTime > 0) {
         audio.currentTime = startTime; 
-        const seekFn = () => {
-            if(Math.abs(audio.currentTime - startTime) > 1) {
-                audio.currentTime = startTime;
-            }
-        };
+        const seekFn = () => { if(Math.abs(audio.currentTime - startTime) > 1) audio.currentTime = startTime; };
         audio.addEventListener('canplay', seekFn, { once: true });
     }
 
     audio.src = song.src;
-
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
+    audio.loop = (playMode === 1);
     
     renderSongListDOM(); 
     updateMediaSession(song);
     updateHeartStatus();
-
-    if (!isRestore) {
-        savePlaybackState();
-    }
+    if (!isRestore) savePlaybackState();
   }
 
   function togglePlay() {
     if (audio.paused) {
-      audio.play().catch(e => console.log("Waiting for interaction"));
+      audio.play().catch(e => console.log("Auto-play prevented"));
       playPauseBtn.innerHTML = ICONS.pause;
       playPauseBtn.classList.add("playing"); 
       player.classList.add("playing");
       updateTitleOrLyric(); 
-
     } else {
       audio.pause();
       playPauseBtn.innerHTML = ICONS.play;
@@ -523,34 +418,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playNext(isAuto = false) {
     let nextIndex;
-    
-    if (playMode === 1 && isAuto) { 
-      if (audio.paused) audio.play(); 
-      return; 
-    } 
-
+    if (playMode === 1 && isAuto) { audio.play(); return; } 
     if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
-        if (currentList.length > 1 && shuffleQueue[0] === currentIndex) {
-             shuffleQueue.push(shuffleQueue.shift());
-        }
+        if (currentList.length > 1 && shuffleQueue[0] === currentIndex) shuffleQueue.push(shuffleQueue.shift());
       }
       nextIndex = shuffleQueue.shift();
     } else { 
       nextIndex = (currentIndex + 1) % currentList.length;
     }
     loadSong(nextIndex);
-    audio.play().catch(e => console.warn("Auto-play blocked:", e)); 
+    audio.play();
     playPauseBtn.innerHTML = ICONS.pause;
     playPauseBtn.classList.add("playing");
     player.classList.add("playing");
   }
 
   function toggleMenu(el) {
-    if (el.classList.contains("show")) {
-      hideMenu(el);
-    } else {
+    if (el.classList.contains("show")) hideMenu(el);
+    else {
       el.classList.remove("hide");
       el.classList.add("show");
     }
@@ -566,10 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!songListEl) return;
     songListEl.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
-      let countHtml = '';
-      if (currentPlaylistKey === 'history_rank') {
-        countHtml = `<span class="play-count-tag">${count} 次</span>`;
-      }
+      const countHtml = (currentPlaylistKey === 'history_rank') ? `<span class="play-count-tag">${count} 次</span>` : '';
       return `
       <div class="playlist-item ${i === currentIndex ? 'active' : ''}" data-index="${i}">
         <span class="song-name">${s.title}</span>
@@ -589,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = e.target.closest(".playlist-item");
     if (item) {
       loadSong(parseInt(item.dataset.index));
-      audio.play().catch(e => console.log("Play failed:", e));
+      audio.play();
       playPauseBtn.innerHTML = ICONS.pause;
       playPauseBtn.classList.add("playing");
     }
@@ -604,11 +488,13 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  playlistTitleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    hideMenu(songListEl); 
-    toggleMenu(playlistMenuEl);
-  });
+  if (playlistTitleBtn) {
+    playlistTitleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hideMenu(songListEl); 
+        toggleMenu(playlistMenuEl);
+    });
+  }
 
   if (playlistMenuEl) {
     playlistMenuEl.addEventListener('click', (e) => {
@@ -625,16 +511,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const config = playlistsConfig.find(c => c.key === key);
     if (!config) return;
     currentPlaylistKey = key;
-    playlistTitleBtn.textContent = config.name; 
+    if(playlistTitleBtn) playlistTitleBtn.textContent = config.name; 
     
     currentList = allSongsLibrary.filter(config.filter);
 
     if (key === 'history_rank') {
-        currentList.sort((a, b) => {
-            const countA = userPlayHistory[a.title] || 0;
-            const countB = userPlayHistory[b.title] || 0;
-            return countB - countA;
-        });
+        currentList.sort((a, b) => (userPlayHistory[b.title] || 0) - (userPlayHistory[a.title] || 0));
     }
 
     shuffleQueue = [];
@@ -642,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (currentList.length > 0) {
         loadSong(0);
-        audio.play().catch(e => console.warn("Autoplay blocked:", e));
+        audio.play().catch(() => {});
         playPauseBtn.innerHTML = ICONS.pause;
         playPauseBtn.classList.add("playing");
         player.classList.add("playing");
@@ -656,52 +538,68 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   renderPlaylistMenu();
 
-  modeBtn.addEventListener('click', async (e) => {
-    e.stopPropagation(); 
-    playMode = (playMode + 1) % 3;
-    modeBtn.innerHTML = playModes[playMode].icon;
-
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
-
-    if (currentUser) {
-        const userDocRef = doc(db, "users", currentUser.uid);
-        try {
-            await setDoc(userDocRef, { playMode: playMode }, { merge: true });
-        } catch (err) {
-            console.error("保存播放模式失败", err);
+  // 🔥 模式切换 (如果保留了 modeBtn)
+  if (modeBtn) {
+      modeBtn.addEventListener('click', async (e) => {
+        e.stopPropagation(); 
+        playMode = (playMode + 1) % 3;
+        modeBtn.innerHTML = playModes[playMode].icon;
+        audio.loop = (playMode === 1);
+        if (currentUser) {
+            try { await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true }); } catch (err) {}
         }
-    }
-  });
+      });
+  }
 
-  heartBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    if (!currentUser) {
-      alert("请先登录才能收藏歌曲哦~");
-      const modal = document.getElementById("login-modal-overlay");
-      if(modal) modal.classList.add("active");
-      return;
-    }
-    const currentSong = currentList[currentIndex];
-    const songTitle = currentSong.title;
-    const userDocRef = doc(db, "users", currentUser.uid);
-    const isLiked = userFavorites.includes(songTitle);
-    
-    if (isLiked) heartBtn.classList.remove("liked");
-    else heartBtn.classList.add("liked");
+  // 🔥 背面随机播放按钮 (直接开启随机模式)
+  if (shuffleBtn) {
+      shuffleBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        // 切换：如果是随机模式(2)则变回列表(0)，否则变成随机(2)
+        playMode = (playMode === 2) ? 0 : 2; 
+        
+        // 更新视觉反馈 (可选，如果你想让 shuffle 按钮高亮)
+        if (playMode === 2) shuffleBtn.classList.add('active');
+        else shuffleBtn.classList.remove('active');
 
-    try {
-        if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
-        else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
-    } catch (err) {
-        console.error("操作失败", err);
-        updateHeartStatus(); 
-        alert("网络开小差了，同步失败");
-    }
-  });
+        // 如果同时也存在 modeBtn，同步图标
+        if (modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
+
+        audio.loop = false; // 随机模式通常不单曲循环
+        
+        if (currentUser) {
+            try { await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true }); } catch (err) {}
+        }
+      });
+  }
+
+  // 🔥 收藏按钮
+  if (heartBtn) {
+      heartBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!currentUser) {
+          alert("请先登录才能收藏歌曲哦~");
+          const modal = document.getElementById("login-modal-overlay");
+          if(modal) modal.classList.add("active");
+          return;
+        }
+        const currentSong = currentList[currentIndex];
+        const songTitle = currentSong.title;
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const isLiked = userFavorites.includes(songTitle);
+        
+        if (isLiked) heartBtn.classList.remove("liked");
+        else heartBtn.classList.add("liked");
+
+        try {
+            if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
+            else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
+        } catch (err) {
+            updateHeartStatus(); 
+            alert("同步失败");
+        }
+      });
+  }
 
   document.addEventListener("click", e => {
     const inPlayer = player.contains(e.target);
@@ -713,9 +611,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 翻转逻辑 (长按 / 拖拽)
   let isDrag = false;
   let pressTimer;
   const startPress = (e) => {
+    // 排除按钮和进度条，避免误触
     if (e.target.closest('button') || e.target.closest('.elysia-progress-container')) return; 
     isDrag = false;
     pressTimer = setTimeout(() => {
@@ -728,6 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
+  
   player.addEventListener('mousedown', startPress);
   player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
@@ -736,6 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
   player.addEventListener('mousemove', onMove);
   player.addEventListener('touchmove', onMove, { passive: true });
 
+  // 自动隐藏 UI
   let inactivityTimer;
   function hidePlayerUI() {
     player.style.opacity = '0';
@@ -761,9 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   audio.addEventListener("ended", () => {
     if (playMode !== 1) { 
-        if (currentList && currentList[currentIndex]) {
-            recordPlayHistory(currentList[currentIndex].title);
-        }
+        if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
         playNext(true);
     }
   });
@@ -777,6 +677,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+  
   function updateMediaSession(song) {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -818,28 +719,23 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(); 
   });
 
-  /* --- 🔥 timeupdate 监听器 (整合计数逻辑) --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // 1. 更新进度条 UI
+    // UI Progress
     if (progressBar && audio.duration) {
-        const percent = (audio.currentTime / audio.duration) * 100;
-        progressBar.style.width = `${percent}%`;
+        progressBar.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
     }
 
-    // 2. 更新歌词
+    // Lyrics Sync
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
         for (let i = 0; i < currentLyrics.length; i++) {
-            if (currentTime >= currentLyrics[i].time) {
-                activeIndex = i;
-            } else {
-                break; 
-            }
+            if (currentTime >= currentLyrics[i].time) activeIndex = i;
+            else break; 
         }
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
@@ -847,22 +743,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 3. 🔥 检测单曲循环播放计数 (带原子累加防抖)
+    // Loop One Counter
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
              if (now - lastCountTime > 2000) {
-                 console.log("检测到单曲循环：播放次数 +1");
-                 if (currentList && currentList[currentIndex]) {
-                     recordPlayHistory(currentList[currentIndex].title);
-                 }
+                 if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
                  lastCountTime = now;
              }
         }
     }
     lastTimeForLoop = audio.currentTime; 
     
-    // 4. 保存进度
+    // Save state period
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();
@@ -873,28 +766,23 @@ document.addEventListener("DOMContentLoaded", () => {
   if (progressContainer) {
       progressContainer.addEventListener('click', (e) => {
           const width = progressContainer.clientWidth;
-          const clickX = e.offsetX;
           const duration = audio.duration;
-          
           if (duration > 0 && Number.isFinite(duration)) {
-              audio.currentTime = (clickX / width) * duration;
+              audio.currentTime = (e.offsetX / width) * duration;
               updatePositionState(); 
           }
       });
   }
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'hidden') {
-        savePlaybackState();
-    }
+    if (document.visibilityState === 'hidden') savePlaybackState();
   });
 
   resetTimer();
-  
   if(allSongsLibrary.length > 0) loadSong(0);
 
   /* =========================================================
-     🔥 PART 3: 登录 & UI 交互 (已强化按钮状态检查)
+     🔥 PART 3: 登录 & UI (Cloudflare/Firebase)
      ========================================================= */
   const navAuthBtn = document.getElementById("nav-auth-btn");
   const navAuthText = document.getElementById("nav-auth-text");
@@ -911,10 +799,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const emailSubmitBtn = document.getElementById("email-submit-btn");
   const errorMsg = document.getElementById("auth-error-msg");
 
-  // 初始检查
   if(window.checkLoginButtonState) window.checkLoginButtonState();
 
-  // 🔥 增加更多事件监听，确保响应及时
   if (emailInput && passInput) {
       ['input', 'change', 'keyup', 'paste'].forEach(evt => {
           emailInput.addEventListener(evt, window.checkLoginButtonState);
@@ -928,13 +814,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (modalOverlay) modalOverlay.classList.add("active");
       const dropdown = document.getElementById("dropdown");
       if (dropdown && dropdown.classList.contains("show")) dropdown.classList.remove("show");
-      
-      // 打开模态框时，重置 Turnstile 和状态
-      if (window.turnstile) {
-        try { window.turnstile.reset(); } 
-        catch(e) { /* Fallback */ }
-      }
-      window.isCaptchaVerified = false; // 重置全局状态
+      if (window.turnstile) try { window.turnstile.reset(); } catch(e) {}
+      window.isCaptchaVerified = false; 
       if(window.checkLoginButtonState) window.checkLoginButtonState();
     });
   }
@@ -942,29 +823,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModal = () => modalOverlay?.classList.remove("active");
   if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
   if (modalOverlay) {
-    modalOverlay.addEventListener("click", (e) => {
-      if (e.target === modalOverlay) closeModal();
-    });
+    modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
   }
 
   if (emailSubmitBtn) {
     emailSubmitBtn.addEventListener("click", async () => {
       if(emailSubmitBtn.disabled || !window.isCaptchaVerified) return;
-
       const email = emailInput.value;
       const pass = passInput.value;
       
       if (!email || !pass) { errorMsg.innerText = "请输入邮箱和密码"; return; }
-      if (pass.length < 6) { errorMsg.innerText = "密码至少需要6位"; return; }
+      if (pass.length < 6) { errorMsg.innerText = "密码至少6位"; return; }
       errorMsg.innerText = "处理中...";
       
       try {
         await setPersistence(auth, browserLocalPersistence);
-        
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        const defaultName = email.split("@")[0];
         await updateProfile(userCredential.user, {
-          displayName: defaultName,
+          displayName: email.split("@")[0],
           photoURL: "assets/bannernetwork.png" 
         });
         closeModal(); 
@@ -975,9 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
             await signInWithEmailAndPassword(auth, email, pass);
             closeModal();
             errorMsg.innerText = "";
-          } catch (loginError) {
-             errorMsg.innerText = "密码错误或登录失败";
-          }
+          } catch (loginError) { errorMsg.innerText = "密码错误或登录失败"; }
         } else {
           errorMsg.innerText = "错误: " + error.message;
         }
@@ -991,16 +865,12 @@ document.addEventListener("DOMContentLoaded", () => {
           await setPersistence(auth, browserLocalPersistence);
           await signInWithPopup(auth, provider);
           closeModal();
-      } catch(e) {
-          console.error(e);
-      }
+      } catch(e) { console.error(e); }
     });
   }
 
   if (logoutConfirmBtn) {
-    logoutConfirmBtn.addEventListener("click", () => {
-      signOut(auth).then(() => closeModal());
-    });
+    logoutConfirmBtn.addEventListener("click", () => signOut(auth).then(() => closeModal()));
   }
 
   onAuthStateChanged(auth, (user) => {
@@ -1029,15 +899,11 @@ document.addEventListener("DOMContentLoaded", () => {
              
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
-                 modeBtn.innerHTML = playModes[playMode].icon; 
-                 
-                 if (playMode === 1) {
-                     audio.loop = true;
-                 } else {
-                     audio.loop = false;
-                 }
+                 if(modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
+                 audio.loop = (playMode === 1);
              }
              
+             // 恢复播放进度
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
                  let lastTitle = "";
                  let lastTime = 0;
@@ -1047,28 +913,19 @@ document.addEventListener("DOMContentLoaded", () => {
                      lastTitle = data.lastPlayed.title;
                      lastTime = data.lastPlayed.time || 0;
                      lastPlaylist = data.lastPlayed.playlist || "All songs"; 
-                 } else {
-                     lastTitle = data.lastPlayed;
-                 }
+                 } else { lastTitle = data.lastPlayed; }
 
                  const savedPlaylistConfig = playlistsConfig.find(c => c.key === lastPlaylist);
-                 const targetConfig = savedPlaylistConfig || playlistsConfig.find(c => c.key === 'All songs') || playlistsConfig[0];
+                 const targetConfig = savedPlaylistConfig || playlistsConfig.find(c => c.key === 'All songs');
 
                  if (targetConfig) {
                      currentPlaylistKey = targetConfig.key;
                      currentList = allSongsLibrary.filter(targetConfig.filter);
-                     
                      if (currentPlaylistKey === 'history_rank') {
-                        currentList.sort((a, b) => {
-                            const countA = userPlayHistory[a.title] || 0;
-                            const countB = userPlayHistory[b.title] || 0;
-                            return countB - countA;
-                        });
+                        currentList.sort((a, b) => (userPlayHistory[b.title] || 0) - (userPlayHistory[a.title] || 0));
                      }
-
                      if (playlistTitleBtn) playlistTitleBtn.textContent = targetConfig.name;
                      const targetIndex = currentList.findIndex(s => s.title === lastTitle);
-                     
                      if (targetIndex !== -1) {
                          loadSong(targetIndex, true, lastTime);
                          renderPlaylistMenu();
@@ -1076,7 +933,6 @@ document.addEventListener("DOMContentLoaded", () => {
                      }
                  }
              }
-
          } else {
              setDoc(userDocRef, { favorites: [], playHistory: {} }, { merge: true });
              userFavorites = [];
@@ -1084,9 +940,7 @@ document.addEventListener("DOMContentLoaded", () => {
          }
          updatePlaylistConfig();
          updateHeartStatus();
-         if (currentPlaylistKey === 'history_rank') {
-            renderSongListDOM();
-         }
+         if (currentPlaylistKey === 'history_rank') renderSongListDOM();
       });
     } else {
       if (navAuthText) navAuthText.innerText = "登录 / 同步";

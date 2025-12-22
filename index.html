@@ -274,19 +274,25 @@ domain:chatgpt.com</pre>
   <div class="player-glass-card" id="playerCard">
     
     <div class="player-face face-front">
+      <div class="album-cover" id="currentCover"></div>
+      
+      <span id="songTitle" class="clickable" role="button" tabindex="0">loading...</span>
+      
       <div class="elysia-controls">
         <button id="playPauseBtn" aria-label="Play/Pause"></button>
         <button id="nextBtn" aria-label="Next"></button>
       </div>
-      <span id="songTitle" class="clickable" role="button" tabindex="0">loading...</span>
     </div>
 
     <div class="player-face face-back">
+      <div class="album-cover" id="backCover"></div>
+
+      <span id="playlistTitleBtn" class="clickable" role="button" tabindex="0">ピアノ音楽</span>
+
       <div class="elysia-controls">
         <button id="modeBtn" class="control-btn" aria-label="切换模式"></button>
         <button id="heartBtn" class="control-btn" aria-label="喜欢"></button>
       </div>
-      <span id="playlistTitleBtn" class="clickable" role="button" tabindex="0">ピアノ音楽</span>
     </div>
 
   </div>

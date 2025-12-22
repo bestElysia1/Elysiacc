@@ -166,4 +166,72 @@ document.addEventListener("DOMContentLoaded", () => {
     a.setAttribute('rel', 'noopener noreferrer');
   });
 
+  // ======================================
+  // 5. 🔋 智能节能模式 (Elysia Energy Saver)
+  // 当页面不可见（锁屏/切后台）时，暂停视觉视频，防止发烫
+  // ======================================
+  document.addEventListener("visibilitychange", () => {
+    // 获取页面上所有的背景装饰视频 (包含主页和彩蛋页的可能ID)
+    const visualElements = [
+      document.getElementById('sakura-video'), // 樱花特效
+      document.getElementById('videoA'),       // 轮播视频A
+      document.getElementById('videoB')        // 轮播视频B
+    ];
+
+    if (document.hidden) {
+      // 🌙 用户锁屏 或 切换到其他APP -> 暂停所有装饰视频
+      // 这样 GPU 就会停止渲染樱花和混合模式，极大降低发热
+      visualElements.forEach(v => {
+        if (v && !v.paused) {
+          v.pause();
+          v.dataset.wasPlaying = "true"; // 标记它刚才在播放，一会儿回来要接着放
+        }
+      });
+      console.log('[Elysia] 进入后台/锁屏，已暂停视觉特效以省电 🔋');
+    } else {
+      // ☀️ 用户回到网页 -> 恢复播放
+      visualElements.forEach(v => {
+        if (v && v.dataset.wasPlaying === "true") {
+          v.play().catch(err => console.log("恢复播放被阻拦:", err));
+          v.dataset.wasPlaying = "false"; // 重置标记
+        }
+      });
+      
+      // 强制检查：确保樱花视频恢复（因为它最重要且没有复杂的切换逻辑）
+      const sakura = document.getElementById('sakura-video');
+      if (sakura && sakura.paused) {
+         sakura.play().catch(()=>{});
+      }
+      
+      console.log('[Elysia] 回到前台，视觉特效已恢复 ✨');
+    }
+  });
+
+});
+
+/* ====================================
+   📜 滚动交互检测 (Scroll Observer)
+   当内容进入屏幕时，让它淡入显示
+   ==================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  // 创建一个观察器
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      // 如果元素进入了视口 (isIntersecting 为 true)
+      if (entry.isIntersecting) {
+        // 添加 visible 类，触发 CSS 里的上浮淡入效果
+        entry.target.classList.add('visible');
+      } else {
+        // 【可选】如果你希望往回滚的时候元素再次消失，去掉下面这行的注释 //
+        // entry.target.classList.remove('visible'); 
+      }
+    });
+  }, {
+    threshold: 0.1 // 只要元素的 10% 进入屏幕就开始动画
+  });
+
+  // 告诉观察器要盯着哪些元素：所有的 section 和 li
+  document.querySelectorAll('section, .container ul li').forEach((el) => {
+    observer.observe(el);
+  });
 });

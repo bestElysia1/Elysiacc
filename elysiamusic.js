@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Ultimate Version (Fixed: Direction, Speed, No Progress) */
+/* elysiamusic.js - Final Version (Slower Speed + Damping + Instant Sync) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥修复方向向左 & 提升速度) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 (降速 + 阻尼适配) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return; 
       }
 
-      // 重置 DOM 以强制动画从头开始
+      // 重置 DOM
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
@@ -417,11 +417,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (textWidth > containerWidth) {
           const overflow = textWidth - containerWidth;
           
-          // 🔥 修复方向：容器宽 - 文字宽 - 20px (确保负数，强制左滚)
-          const offset = containerWidth - textWidth - 20; 
+          // 方向：向左 (负数)
+          const offset = containerWidth - textWidth - 10;
           
-          // 🔥 修复速度：恒定速度算法 (每秒60px)，最短2秒
-          const duration = Math.max(2, overflow / 35); 
+          // 🔥 速度调整：
+          // overflow / 50 (数字越小，时间越长，越慢)
+          // 基础时间从 2s 增加到 3s，保证短句子也慢下来
+          const duration = Math.max(3, overflow / 50); 
           
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
@@ -492,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if(currentCoverEl) currentCoverEl.classList.add("playing");
       
-      updateTitleOrLyric(true); 
+      updateTitleOrLyric(true); // 暂停/播放切换样式
 
     } else {
       audio.pause();

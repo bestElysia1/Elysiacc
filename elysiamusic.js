@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version (No Progress Bar + No-Loop Lyrics) */
+/* elysiamusic.js - Final Version (Fix: Left Scroll & Speed Optimized) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (修正版：不回滚) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 (修正版：修复方向向左 & 提升速度) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -401,14 +401,12 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       }
 
-      // 如果不是强制更新且文字没变，直接返回
       const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
       if (!forceUpdate && currentHTML === textToShow) {
           return; 
       }
 
-      // 强制重置位置，确保动画从头开始
-      // transform:translateX(0) 是为了防止上一句的偏移量残留在新句子上
+      // 强制重置位置 (transform:translateX(0))
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
@@ -417,17 +415,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          // 动态计算时间：基础3秒 + 每多40px加1秒 (稍微调慢一点，配合 forward 效果更好)
           const overflow = textWidth - containerWidth;
-          const duration = 3 + (overflow / 40); 
+          
+          // 🔥 修复方向：确保结果是负数，强制向左滚
+          // 容器宽 - 文字宽 - 20px余量
+          const offset = containerWidth - textWidth - 20;
+
+          // 🔥 修复速度：采用恒定速度算法 (每秒约 60px)
+          // 数字越大滚得越快。Math.max(2, ...) 确保最少滚动 2 秒，防止短句子闪现
+          const duration = Math.max(2, overflow / 60); 
           
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
+          innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
-          // 🔥 关键：强制重绘 (Reflow)
-          // 确保动画被重置，能从头播放
+          // 强制重绘 (Reflow) 以重启 CSS 动画
           void innerSpan.offsetWidth; 
           
-          // CSS类名负责触发 animation: scrollText ... 1 forwards;
           innerSpan.classList.add('scrolling');
           titleEl.style.textAlign = 'left'; 
       } else {

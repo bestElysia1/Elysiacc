@@ -9,8 +9,9 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  width: 332px; 
-  height: 50px; 
+  width: calc(100% - 36px);  /* 模拟手机端：屏幕总宽 - (18px左 + 18px右) */
+  max-width: 800px;          /* 模拟电脑端：限制最大宽度与视频一致 */
+  height: 52px; 
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;

@@ -1,21 +1,21 @@
 {
-  "name": "Elysia Music",
   "short_name": "Elysia",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
-  "orientation": "portrait",
+  "name": "订阅使用指南 - Elysia Music",
   "icons": [
     {
-      "src": "assets/bannernetwork.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "assets/ico1.jpg",
+      "sizes": "180x180",
+      "type": "image/jpeg"
     },
     {
       "src": "assets/bannernetwork.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0d0b14",
+  "theme_color": "#ffffff",
+  "scope": "/"
 }

@@ -1,4 +1,4 @@
-/* elysiastyle.css - Core Layout & Visual Effects */
+/* elysiastyle.css - Core Layout & Visual (v4.27 Dark Mode Integrated) */
 
 :root {
   --accent-start: #9a6ef0;
@@ -17,6 +17,8 @@ html, body {
   color: #333;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+  /* 增加背景色过渡，切换模式时更丝滑 */
+  transition: background 0.5s ease, color 0.5s ease;
 }
 
 body {
@@ -58,12 +60,14 @@ header {
   background-clip: text;
   color: transparent;
   font-weight: 700;
+  transition: filter 0.3s ease;
 }
 
 .subtitle {
   color: #888;
   margin-top: 6px;
   font-size: 0.92rem;
+  transition: color 0.3s ease;
 }
 
 .music {
@@ -76,7 +80,7 @@ iframe {
 }
 
 /* =========================================
-   🌌 Elysia — 液态紫粉玻璃倒计时 (修复模糊版)
+   🌌 Elysia — 液态紫粉玻璃倒计时
    ========================================= */
 .countdown {
   position: relative;
@@ -84,28 +88,19 @@ iframe {
   padding: 20px 28px;
   border-radius: 18px;
   overflow: hidden;
-  
-  /* 修复1：保留毛玻璃，但强制硬件加速 */
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
   border: 1px solid rgba(255,255,255,0.18);
-  
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    0 4px 18px rgba(160,120,255,0.3);
-    
-  /* 修复2：优化动画渲染，防止文字变糊 */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 18px rgba(160,120,255,0.3);
   animation: countdownFloat 8s ease-in-out infinite;
-  transform: translateZ(0); /* 开启3D加速 */
-  will-change: transform;   /* 告诉浏览器这个元素会动，请提前准备 */
-  backface-visibility: hidden; /* 修复边缘锯齿 */
-  
-  /* 建立层叠上下文，确保文字在伪元素之上 */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
   z-index: 1; 
+  transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
 
-/* 💫 液态流光背景 */
 .countdown::before {
   content: "";
   position: absolute;
@@ -114,42 +109,35 @@ iframe {
     radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
     radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
     radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-  
   filter: blur(40px);
   animation: blobMove 14s ease-in-out infinite;
   mix-blend-mode: screen;
   pointer-events: none;
-  
-  /* 修复3：关键！把模糊的光斑放到最底层，不要盖住文字 */
   z-index: -1; 
 }
 
-
-/* 🕒 倒计时数字与标题 */
 .countdown div {
   color: rgba(240,230,255,0.9);
   font-size: 0.96rem;
   margin-bottom: 8px;
-  text-shadow: 0 0 10px rgba(180,140,255,0.6);
+  text-shadow: none;
+  transition: color 0.3s ease;
 }
 
 .countdown .nums {
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 1px;
-  color: #d9caff;
-  text-shadow:
-    0 0 10px rgba(180,140,255,0.8),
-    0 0 20px rgba(160,120,255,0.4);
+  color: #7a66c7;
+  text-shadow: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-/* ✨ 轻微呼吸漂浮 */
 @keyframes countdownFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
 }
 
-/* 🌊 背景液态移动 */
 @keyframes blobMove {
   0% { transform: translate(0,0) scale(1); }
   25% { transform: translate(6%, -4%) scale(1.05); }
@@ -159,12 +147,26 @@ iframe {
 }
 
 /* =========================================
-   内容排版
+   ✨ 滚动交互淡入淡出 (Scroll Reveal)
    ========================================= */
-section {
-  margin-top: 28px;
-  animation: fadeInUp 0.8s ease both;
+
+/* 1. 初始状态 */
+section, 
+.container ul li {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: opacity, transform;
 }
+
+/* 2. 可见状态 */
+section.visible,
+.container ul li.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================= */
 
 h2 {
   font-size: 1.02rem;
@@ -175,7 +177,6 @@ h2 {
   background: linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));
   padding: 8px;
   border-radius: 6px;
-  /* 标题渐变 */
   background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -187,11 +188,12 @@ h2:hover {
   animation: gradientFlow 3s linear infinite;
 }
 
-/* 全局正文淡紫色优化 */
 p, ul, li {
   color: #7a66c7 !important;
   line-height: 1.8;
   font-size: 0.95rem;
+  margin-bottom: 8px;
+  transition: color 0.3s ease;
 }
 
 a {
@@ -201,11 +203,16 @@ a {
 }
 a:hover { text-decoration: underline; }
 
-/* 鼠标悬停轻微变色 */
 main.container p:hover,
 main.container li:hover {
   color: #9a6ef0 !important;
   transition: all 0.3s ease;
+  transform: translateX(4px); 
+}
+
+/* 修复 hover 冲突 */
+main.container ul li.visible:hover {
+  transform: translateX(4px); 
 }
 
 pre {
@@ -215,6 +222,7 @@ pre {
   border-radius: 8px;
   overflow: auto;
   color: #5b4aa1;
+  transition: background 0.5s ease, color 0.3s ease;
 }
 
 footer {
@@ -234,9 +242,6 @@ footer:hover {
   color: #bca9ff;
 }
 
-/* =========================================
-   布局与响应式
-   ========================================= */
 .leftnav {
   position: fixed;
   left: 12px;
@@ -253,7 +258,6 @@ footer:hover {
   .music { margin-left: 0; margin-top: 8px; }
 }
 
-/* 动画关键帧 */
 @keyframes glowPulse {
   0%, 100% { color: #9a6ef0; text-shadow: 0 0 4px rgba(156,107,255,0.4); }
   50% { color: #ffffff; text-shadow: 0 0 10px rgba(156,107,255,0.9); }
@@ -264,14 +268,7 @@ footer:hover {
   100% { background-position: 100% 50%; }
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================
-   🌈 裸眼3D Banner
-   ========================================= */
+/* Banner 3D */
 .banner-3d {
   position: relative;
   width: 100%;
@@ -294,6 +291,8 @@ footer:hover {
   width: 100%;
   display: block;
   border-radius: 16px;
+  /* ✨ 增加滤镜过渡，防止黑夜模式切换时闪烁 */
+  transition: filter 0.5s ease;
 }
 
 .banner-glow {
@@ -306,7 +305,7 @@ footer:hover {
   mix-blend-mode: overlay;
   pointer-events: none;
   opacity: 0.5;
-  transition: background-position 0.2s ease-out;
+  transition: background-position 0.2s ease-out, mix-blend-mode 0.5s ease, opacity 0.5s ease;
 }
 
 @keyframes bannerFloaty {
@@ -314,19 +313,17 @@ footer:hover {
   50% { transform: translateY(-6px); filter: brightness(1.05); }
 }
 
-/* =========================================
-   📺 视频容器
-   ========================================= */
 .elysia-video-wrapper {
   position: relative;
   margin: 40px auto;
-  width: 90%;
+  width: 100%;
   max-width: 800px;
   aspect-ratio: 16 / 9;
   border-radius: 18px;
   overflow: hidden;
   background: #000;
   box-shadow: 0 0 30px rgba(150,120,255,0.15);
+  transition: box-shadow 0.5s ease;
 }
 
 .elysia-video-wrapper video {
@@ -336,13 +333,13 @@ footer:hover {
   height: 100%;
   object-fit: cover;
   border-radius: 18px;
-  transition: opacity 0.8s ease-in-out;
   background: #000;
+  /* ✨ 增加 opacity 和 filter 过渡 */
+  transition: opacity 0.8s ease-in-out, filter 0.5s ease;
 }
 #videoA { opacity: 1; z-index: 2; }
 #videoB { opacity: 0; z-index: 1; }
 
-/* 星空背景容器 */
 #starfield {
   position: fixed;
   top: 0; left: 0;
@@ -352,60 +349,33 @@ footer:hover {
   pointer-events: none;
 }
 
-/* =========================================
-   🌊 海蓝魏紫 - 整行贯通幻彩 (修复版)
-   ========================================= */
-
-/* 定位：main.container 下的第一个 section 标签中的所有 p */
+/* 第一段特定渐变 (保留) */
 main.container > section:nth-of-type(1) p {
-  /* 定义渐变：从左到右，贯穿整行文字 */
-  background: linear-gradient(
-    90deg, 
-    #0E52D4 0%,   /* 左边：青海蓝 (唯云) */
-    #A639D7 100%  /* 右边：洋红/深牡丹 (顶级专线) */
-  );
-  
-  /* 关键1：让背景适应文字内容的宽度，而不是撑满整个屏幕宽度 */
-  /* 这样即使文字很短，也会完整显示出“蓝->紫”的渐变全过程 */
+  background: linear-gradient(90deg, #0E52D4 0%, #A639D7 100%);
   width: fit-content;
   width: -moz-fit-content; 
-  
-  /* 将背景裁剪为文字形状 */
   -webkit-background-clip: text;
   background-clip: text;
-  
-  /* 文字透明，透出背景 */
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  
-  /* 保持正常粗细 */
   font-weight: normal;
   text-decoration: none;
-  
-  /* 保持行间距 */
   margin-bottom: 12px;
+  transition: filter 0.3s ease;
 }
-
-/* 关键2：修复标题 (strong) 单独渐变的问题 */
-/* 强制标题背景透明，只显示粗体，让它“透出”父元素的整行渐变背景 */
 main.container > section:nth-of-type(1) p strong {
   background: none; 
   -webkit-text-fill-color: transparent; 
-  font-weight: 700; /* 仅保留加粗 */
+  font-weight: 700;
 }
-
-/* 鼠标悬停整体提亮 */
 main.container > section:nth-of-type(1) p:hover {
   filter: brightness(1.2);
   cursor: default;
 }
 
-
-/* =========================================
-   📱 iOS 排版修复 (放在最后)
-   ========================================= */
+/* iOS 适配 */
 @media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  .container p, .container ul, .container li, .container h2, .container .subtitle, .container .countdown div {
+  .container p, .container h2, .container .subtitle, .container .countdown div {
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
     hyphens: auto !important;
@@ -415,4 +385,96 @@ main.container > section:nth-of-type(1) p:hover {
   .container ul li { padding-left: 0.3em; text-indent: -0.3em; }
   .container ul li::marker { unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
   .container p:not(:empty) { text-indent: 0; }
+}
+
+/* =========================================
+   🌙 Dark Mode Support (iOS & System Default)
+   包含：配色反转、文字提亮、媒体压暗
+   ========================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 核心变量重定义 */
+    --bg: #0d0b14; 
+    --accent-start: #b388ff;
+    --accent-end: #9a6ef0;
+    --link: #bca9ff;
+  }
+
+  /* 全局基础 */
+  html, body {
+    background: var(--bg);
+    color: #e0e0e0;
+  }
+
+  /* 倒计时组件 (Glassmorphism) */
+  .countdown {
+    background: linear-gradient(145deg, rgba(30, 25, 40, 0.6), rgba(20, 15, 30, 0.4));
+    border: 1px solid rgba(156, 107, 255, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 25px rgba(0,0,0,0.6);
+  }
+  .countdown div {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .countdown .nums {
+    color: #d1c4e9;
+    text-shadow: 0 0 12px rgba(156, 107, 255, 0.5);
+  }
+
+  /* 文字与标题 */
+  .title h1 {
+    filter: brightness(1.1);
+  }
+  .subtitle {
+    color: #888899;
+  }
+  h2 {
+    background: linear-gradient(90deg, rgba(154,110,240,0.15), transparent);
+    color: #d1c4e9; 
+    -webkit-text-fill-color: #d1c4e9;
+  }
+  p, ul, li {
+    color: #cec2e6 !important; 
+  }
+
+  /* 特殊渐变文字提亮 */
+  main.container > section:nth-of-type(1) p {
+    filter: brightness(1.3) saturate(1.2);
+  }
+
+  /* 代码块 */
+  pre {
+    background: #15121e;
+    border: 1px solid rgba(123,63,228,0.15);
+    color: #e2d9f3;
+  }
+
+  /* Footer */
+  footer {
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02));
+    border-top: 1px solid rgba(255,255,255,0.05);
+    color: #666;
+  }
+
+  /* Banner 3D 光效修正 */
+  .banner-glow {
+    mix-blend-mode: screen; 
+    opacity: 0.2;
+  }
+  
+  /* 链接 Hover */
+  a:hover {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(188, 169, 255, 0.6);
+  }
+
+  /* ✨ 媒体元素压暗 (防刺眼) */
+  .banner-3d img,
+  .elysia-video-wrapper video {
+    filter: brightness(0.85) contrast(1.1) saturate(1.05);
+  }
+
+  /* 视频容器阴影调整 */
+  .elysia-video-wrapper {
+     box-shadow: 0 0 40px rgba(90, 60, 180, 0.25);
+  }
 }

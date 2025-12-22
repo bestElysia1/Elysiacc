@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final Version: Layout Updated) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + Instant Sync) */
 
 /* =========================================
    1. 基础容器
@@ -11,7 +11,7 @@
   z-index: 9999;
   width: calc(100% - 36px);  /* 模拟手机端 */
   max-width: 800px;          /* 模拟电脑端 */
-  height: 52px;              /*稍微增加高度以容纳封面 */
+  height: 58px;              /* 🔥 修正：高度增加至 58px 以完美容纳 44px 封面 */
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;
@@ -50,9 +50,9 @@
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 关键修改：两端对齐 (封面-左，标题-中，按钮-右) */
+  justify-content: space-between; /* 布局：左-中-右 */
   gap: 12px;
-  padding: 6px 16px; /* 调整内边距 */
+  padding: 6px 16px;
   
   border-radius: 16px;
 
@@ -119,17 +119,17 @@
 }
 
 /* =========================================
-   新增：歌曲封面缩略图样式
+   新增：歌曲封面缩略图样式 (左侧)
    ========================================= */
 .album-cover {
-  width: 44px;  /* 封面大小 */
+  width: 44px;  
   height: 44px;
-  border-radius: 8px; /* 圆角矩形，如果想要圆形改为 50% */
+  border-radius: 8px; 
   background-color: rgba(255,255,255,0.1);
   background-size: cover;
   background-position: center;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  flex-shrink: 0; /* 防止被挤压 */
+  flex-shrink: 0; 
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
@@ -140,13 +140,11 @@
   transform: scale(0.9);
 }
 
-/* 封面旋转动画 (可选，JS添加 .playing 类时触发) */
 .album-cover.playing {
-  animation: none; /* 暂时禁用旋转，如果想要黑胶风格旋转，可以开启下面的 spin */
+  /* 如果需要封面旋转动画，可在此开启 */
   /* animation: spinCover 10s linear infinite; */
 }
 
-/* 占位图效果（当没有图片时） */
 .album-cover:empty::before {
   content: "♪";
   position: absolute;
@@ -164,14 +162,14 @@
 }
 
 /* =========================================
-   4. 控件按钮 (Apple Music Style)
+   4. 控件按钮 (靠右)
    ========================================= */
 .elysia-controls { 
   display: flex; 
   gap: 10px; 
   flex-shrink: 0; 
   align-items: center;
-  justify-content: flex-end; /* 靠右对齐 */
+  justify-content: flex-end; 
 }
 
 .elysia-controls button,
@@ -198,7 +196,7 @@
 }
 
 .elysia-controls button svg {
-  width: 18px; /* 图标稍大一点点 */
+  width: 18px; 
   height: 18px;
   pointer-events: none;
   fill: currentColor; 
@@ -232,16 +230,15 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题与歌词样式 (Layout Updated) --- */
+/* --- 统一标题与歌词样式 (中间自适应) --- */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
   font-weight: 600; 
   
-  /* 关键修改：弹性宽度 */
   flex: 1; 
-  min-width: 0; /* 防止Flex子元素溢出 */
-  margin: 0 12px; /* 给左右留出间距 */
+  min-width: 0; 
+  margin: 0 12px; 
   
   height: 24px; 
   font-size: 0.95rem;
@@ -255,6 +252,7 @@
   cursor: pointer;
   transition: color 0.3s ease;
   
+  /* 渐变遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -264,24 +262,28 @@
   text-shadow: none;
 }
 
-/* 内部文本容器 */
+/* --- 🔥 优化的歌词滚动动画 --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
   will-change: transform; 
+  white-space: nowrap;
+  
+  /* 默认位置：强制靠左 */
+  transform: translateX(0); 
 }
 
 .scroll-inner.scrolling {
+  /* 时间由 JS 动态计算 */
   animation: scrollText var(--scroll-duration, 8s) linear infinite;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  20% { transform: translateX(0); } 
-  100% { transform: translateX(calc(-100% + 150px)); } /* 调整滚动距离计算 */
+  20% { transform: translateX(0); } /* 🔥 开头停顿 20% 时间，让人看清 */
+  100% { transform: translateX(calc(-100% + 200px)); } 
 }
 
-/* 歌词模式下的微调 */
 #songTitle.lyric-mode {
   font-size: 0.95rem;            
   color: #cdbaff;
@@ -294,7 +296,7 @@
    ========================================= */
 .elysia-playlist {
   position: fixed;
-  bottom: 84px; /* 调整位置以适应变高的播放器 */
+  bottom: 84px; 
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
@@ -420,58 +422,7 @@
 }
 
 /* =========================================
-   7. 进度条
-   ========================================= */
-.elysia-progress-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px; 
-  background: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  z-index: 20;
-  transition: height 0.2s ease;
-  border-radius: 0 0 16px 16px; 
-  overflow: hidden; 
-}
-
-.elysia-progress-container:hover {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.elysia-progress-bar {
-  height: 100%;
-  width: 0%; 
-  background: linear-gradient(90deg, #b48eff, #ff9eb5); 
-  box-shadow: 0 0 8px rgba(180, 142, 255, 0.8);
-  border-radius: 0 2px 2px 0;
-  position: relative;
-  transition: width 0.1s linear; 
-}
-
-.elysia-progress-bar::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 6px #fff, 0 0 10px #ff9eb5;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.elysia-progress-container:hover .elysia-progress-bar::after {
-  opacity: 1;
-}
-
-/* =========================================
-   8. 滚动条美化
+   7. 滚动条美化
    ========================================= */
 .elysia-playlist::-webkit-scrollbar {
   width: 4px;

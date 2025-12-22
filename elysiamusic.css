@@ -1,7 +1,7 @@
-/* elysiamusic.css - V2: Mini Capsule & Fullscreen Player */
+/* elysiamusic.css - V3: Fixed Glass UI & Fullscreen Logic */
 
 /* =========================================
-   1. 基础容器 (Mini Player Container)
+   1. 基础容器
    ========================================= */
 .elysia-player {
   position: fixed;
@@ -9,67 +9,80 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  width: calc(100% - 32px);
-  max-width: 500px; /* 限制最大宽度，像个胶囊 */
-  height: 64px;     /* 增加高度以容纳封面 */
+  
+  /* 还原原本的尺寸感 */
+  width: calc(100% - 36px);
+  max-width: 600px; 
+  height: 56px; /* 高度还原，比V2稍微矮一点，更精致 */
+  
+  perspective: 1000px;
   user-select: none;
-  -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.4s cubic-bezier(0.3, 0.9, 0.3, 1);
+  
+  /* 恢复原本的悬浮动画 */
+  animation: elysiaFloat 6s ease-in-out infinite;
+  transition: transform 0.4s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.3s;
 }
 
-/* 当页面需要隐藏播放器时可添加此class */
+/* 隐藏时的位置 */
 .elysia-player.ui-hidden {
-  transform: translate(-50%, 150%);
+  transform: translate(-50%, 120%);
+}
+
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
 }
 
 /* =========================================
-   2. 迷你播放器外观 (Glass Capsule)
+   2. 还原：透亮玻璃风格 (Original Glass Style)
    ========================================= */
 .player-glass-card {
   position: relative;
   width: 100%;
   height: 100%;
-  background: rgba(20, 20, 25, 0.75); /* 深色半透明底 */
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 32px; /* 圆润胶囊状 */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  overflow: hidden; /* 裁剪内部溢出，保证圆角 */
+  border-radius: 18px; /* 还原原本的圆角大小，不是完全胶囊 */
+  overflow: hidden;
+
+  /* 🔥 核心修复：还原原本的渐变透亮色 + 边框 + 阴影 */
+  background: linear-gradient(120deg, 
+      rgba(255,255,255,0.08) 0%,   
+      rgba(255,255,255,0.08) 35%,  
+      rgba(255,255,255,0.35) 50%,  
+      rgba(255,255,255,0.08) 65%,  
+      rgba(255,255,255,0.08) 100%
+  );
+  background-size: 250% 250%;   
+  animation: shimmerBg 10s ease infinite; /* 可选：背景微光流动 */
+
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.25), 
+              inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* 内部布局：左图 - 中文 - 右键 */
 .player-face {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  padding: 0 8px; /* 左右留白 */
-  width: 100%;
-  box-sizing: border-box;
+  padding: 0 12px; 
+  gap: 12px;
 }
 
-/* --- 左侧：旋转封面 --- */
+/* --- 左侧：缩略图 (完美嵌入框内) --- */
 .mini-cover-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%; /* 圆形 */
+  width: 40px; 
+  height: 40px;
+  border-radius: 8px; /* 方形圆角，符合原本风格 */
   overflow: hidden;
   flex-shrink: 0;
-  margin-right: 12px;
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   position: relative;
-  
-  /* 旋转动画 */
-  animation: spinCover 10s linear infinite;
-  animation-play-state: paused; 
-}
-
-/* 只有播放时才旋转 */
-.elysia-player.playing .mini-cover-wrapper {
-  animation-play-state: running;
 }
 
 .mini-cover-wrapper img {
@@ -77,92 +90,78 @@
   height: 100%;
   object-fit: cover;
 }
-
-/* 点击反馈 */
 .mini-cover-wrapper:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
   opacity: 0.8;
-  transition: transform 0.2s;
-}
-
-@keyframes spinCover {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 /* --- 中间：歌曲信息 --- */
 .mini-info {
-  flex: 1; /* 占据剩余空间 */
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden; /* 防止文字溢出 */
-  margin-right: 10px;
 }
 
 #songTitle {
   color: #fff;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* 加回文字阴影，更清晰 */
   cursor: pointer;
-  position: relative;
-  
-  /* 右侧渐变遮罩，防止文字突然切断 */
   mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
 }
 
-/* 滚动文字内部容器 */
-.scroll-inner {
-  display: inline-block;
-  padding-right: 20px; /* 滚动间距 */
-  will-change: transform;
-}
-.scroll-inner.scrolling {
-  animation: scrollText var(--scroll-duration, 8s) linear infinite;
-}
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); } /* JS计算时通常会让它滚得更远 */
-}
+.scroll-inner { display: inline-block; padding-right: 20px; }
+.scroll-inner.scrolling { animation: scrollText var(--scroll-duration, 8s) linear infinite; }
+@keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* --- 右侧：控制按钮 --- */
+/* --- 右侧：按钮组 (只保留播放和下一首) --- */
 .elysia-controls {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  flex-shrink: 0;
+  margin-right: 4px;
 }
 
 .elysia-controls button {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.15); /* 微透亮按钮底色 */
   border: none;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
 .elysia-controls button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 .elysia-controls button:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
 }
-
 .elysia-controls button svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
-/* --- 底部迷你进度条 --- */
+/* 🔥 强制隐藏列表按钮 (符合你的要求) */
+#playlistTitleBtn {
+  display: none !important;
+}
+
+/* --- 底部进度条 --- */
 .elysia-progress-container {
   position: absolute;
   bottom: 0;
@@ -171,35 +170,35 @@
   height: 2px;
   background: rgba(255, 255, 255, 0.1);
   z-index: 10;
-  pointer-events: none; /* 迷你条不让拖拽，防止误触 */
 }
-
 .elysia-progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #b48eff, #ff9eb5);
-  transition: width 0.1s linear;
+  background: linear-gradient(90deg, #b48eff, #ff9eb5); /* 保持原本的粉紫渐变 */
+  box-shadow: 0 0 10px rgba(180, 142, 255, 0.5);
 }
 
 /* =========================================
-   3. 全屏播放器 (Fullscreen Modal)
+   3. 全屏播放器 (修复卡顿问题)
    ========================================= */
 .fullscreen-player {
+  /* 🔥 关键：因为移出了 elysia-player 容器，
+     position: fixed 现在的参考系是整个屏幕窗口，
+     所以它不会再被卡在小框框里了。
+  */
   position: fixed;
-  inset: 0; /* top:0, right:0, bottom:0, left:0 */
+  inset: 0; 
   z-index: 10000;
-  background: #111;
+  background: #000;
   display: flex;
   flex-direction: column;
   align-items: center;
   
-  /* 默认向下隐藏 */
   transform: translateY(100%);
   opacity: 0;
   pointer-events: none;
   
-  /* 丝滑的滑出动画 */
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
+  transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
 }
 
 .fullscreen-player.active {
@@ -208,298 +207,117 @@
   pointer-events: auto;
 }
 
-/* 全屏动态模糊背景 */
+/* 背景模糊 */
 .fs-bg {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(50px) brightness(0.35); /* 模糊且压暗 */
-  transform: scale(1.2); /* 防止模糊边缘露白 */
+  filter: blur(40px) brightness(0.5);
+  transform: scale(1.1);
   z-index: -1;
-  transition: background-image 0.6s ease;
+  transition: background-image 0.5s ease;
+}
+/* 遮罩，让字更清楚 */
+.fullscreen-player::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* 顶部下拉指示条 */
+/* 顶部下拉条 */
 .fs-drag-indicator {
-  width: 40px;
+  width: 36px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
-  margin-top: 12px;
-  flex-shrink: 0;
+  margin-top: 15px;
 }
 
-/* 顶部栏 (关闭按钮) */
+/* 头部 (关闭按钮) */
 .fs-header {
   width: 100%;
-  height: 50px;
+  height: 60px;
   display: flex;
-  justify-content: flex-end; /* 按钮靠右或居中看喜好，这里放右边 */
+  justify-content: flex-end; /* 按钮在右边 */
   align-items: center;
-  padding: 0 20px;
+  padding: 0 24px;
   box-sizing: border-box;
 }
-
 .fs-close-btn {
   background: rgba(255,255,255,0.1);
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.8);
+  color: #fff;
   cursor: pointer;
   transition: background 0.2s;
 }
-.fs-close-btn:hover { background: rgba(255,255,255,0.2); }
+.fs-close-btn:active { background: rgba(255,255,255,0.3); }
 
-/* 内容主区域 */
+/* 全屏内容区 */
 .fs-content {
   flex: 1;
   width: 100%;
-  max-width: 420px; /* 限制内容宽度 */
-  padding: 10px 30px 50px 30px;
+  max-width: 420px;
+  padding: 0 32px 60px 32px;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly; /* 垂直均匀分布 */
+  justify-content: space-evenly;
   box-sizing: border-box;
 }
 
 /* 大封面 */
 .fs-cover-container {
   width: 100%;
-  aspect-ratio: 1/1; /* 正方形 */
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  aspect-ratio: 1/1;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   overflow: hidden;
-  margin-bottom: 20px;
-  
-  /* 封面进场动画 */
-  transform: scale(0.85);
+  margin-bottom: 24px;
+  transform: scale(0.9);
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .fullscreen-player.active .fs-cover-container {
   transform: scale(1);
 }
+.fs-cover { width: 100%; height: 100%; object-fit: cover; }
 
-.fs-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+/* 字体样式 */
+.fs-info { text-align: left; margin-bottom: 30px; }
+.fs-title { color: #fff; font-size: 1.6rem; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+.fs-artist { color: rgba(255,255,255,0.6); font-size: 1.1rem; }
 
-/* 信息区 */
-.fs-info {
-  text-align: left;
-  margin-bottom: 20px;
-}
-.fs-title {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  line-height: 1.2;
-}
-.fs-artist {
-  color: rgba(255,255,255,0.6);
-  font-size: 1.0rem;
-}
-
-/* 进度条区 */
-.fs-progress-wrap {
-  width: 100%;
-  margin-bottom: 30px;
-  position: relative;
-  padding: 10px 0; /* 增加点击区域 */
-}
-
-.fs-progress-bar-bg {
-  width: 100%;
-  height: 4px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 2px;
-  position: relative;
-  cursor: pointer;
-}
-
-.fs-progress-bar-fill {
-  width: 0%;
-  height: 100%;
-  background: #fff;
-  border-radius: 2px;
-  position: relative;
-}
-
-/* 进度条小圆点 */
+/* 全屏进度条 */
+.fs-progress-wrap { width: 100%; margin-bottom: 40px; position: relative; padding: 10px 0; cursor: pointer; }
+.fs-progress-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative; }
+.fs-progress-bar-fill { width: 0%; height: 100%; background: #fff; border-radius: 2px; position: relative; }
 .fs-progress-dot {
-  position: absolute;
-  right: -6px;
-  top: 50%;
-  transform: translateY(-50%) scale(0);
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%) scale(0);
+  width: 14px; height: 14px; background: #fff; border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5); transition: transform 0.2s;
 }
-
-.fs-progress-bar-bg:hover .fs-progress-dot,
-.fs-progress-wrap:active .fs-progress-dot {
-  transform: translateY(-50%) scale(1);
-}
-
-.fs-time {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
-  font-family: monospace, sans-serif;
-  position: absolute;
-  top: 18px; /* 进度条下方 */
-}
+.fs-progress-wrap:active .fs-progress-dot, .fs-progress-bar-bg:hover .fs-progress-dot { transform: translateY(-50%) scale(1); }
+.fs-time { position: absolute; top: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-family: monospace; }
 .fs-time.current { left: 0; }
 .fs-time.total { right: 0; }
 
-/* 全屏按钮区 */
-.fs-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
-}
-
-.fs-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  transition: transform 0.2s, opacity 0.2s;
-}
-
-.fs-btn:active { transform: scale(0.85); }
-.fs-btn:hover { opacity: 1; }
-
-.fs-btn svg { width: 28px; height: 28px; fill: currentColor; }
-
-/* 中间的大播放键 */
+/* 全屏控制按钮 */
+.fs-controls { display: flex; justify-content: space-between; align-items: center; }
+.fs-btn { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.85; }
+.fs-btn:active { transform: scale(0.9); }
+.fs-btn svg { width: 30px; height: 30px; fill: currentColor; }
 .fs-btn.play-lg {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  opacity: 1;
+  width: 76px; height: 76px; border-radius: 50%; background: #fff; color: #000;
+  box-shadow: 0 8px 20px rgba(255,255,255,0.3); opacity: 1;
 }
-.fs-btn.play-lg svg { width: 36px; height: 36px; fill: #fff; margin-left: 4px; }
-.fs-btn.play-lg.playing svg { margin-left: 0; } /* 暂停图标不需要偏移 */
-.fs-btn.play-lg:active { transform: scale(0.92); background: rgba(255,255,255,0.25); }
-
-/* 喜欢按钮点亮 */
+.fs-btn.play-lg svg { fill: #000; width: 32px; height: 32px; margin-left: 4px; }
+.fs-btn.play-lg.playing svg { margin-left: 0; }
 .fs-btn.heart.liked { color: #ff6b81; opacity: 1; }
-.fs-btn.heart.liked svg { fill: #ff6b81; }
-
-/* =========================================
-   4. 播放列表 & 歌单菜单 (适配调整)
-   ========================================= */
-.elysia-playlist {
-  position: fixed;
-  /* 🔥 调整位置：避免被迷你胶囊遮挡 */
-  bottom: 96px; 
-  left: 50%;
-  transform: translateX(-50%) scale(0.98);
-  transform-origin: 50% 100%;
-  width: 280px;
-  max-height: 300px;
-  padding: 10px;
-  border-radius: 20px;
-  background: rgba(30, 30, 35, 0.85); /* 配色加深以适配新风格 */
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  
-  overflow-y: auto;
-  overflow-x: hidden;
-  opacity: 0; 
-  pointer-events: none;
-  z-index: 9998;
-  scrollbar-width: thin;
-  will-change: transform, opacity;
-}
-
-.playlist-item {
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  gap: 10px; 
-  padding: 10px 14px;
-  color: rgba(255,255,255,0.7); 
-  font-size: 0.9rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.playlist-item .song-name {
-  flex: 1;               
-  white-space: nowrap;    
-  overflow: hidden;       
-  text-overflow: ellipsis;
-  text-align: left;
-}
-
-.play-count-tag {
-  flex-shrink: 0;         
-  font-size: 0.8em;       
-  color: rgba(255,255,255,0.4);
-}
-
-.playlist-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-.playlist-item.active {
-  background: rgba(162, 114, 255, 0.25);
-  color: #c9b0ff;
-}
-
-/* 列表显示隐藏动画 */
-.elysia-playlist.show {
-  opacity: 1; 
-  pointer-events: auto;
-  animation: dockBounceOpen 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.elysia-playlist.hide {
-  animation: dockBounceClose 0.3s ease both;
-}
-
-@keyframes dockBounceOpen {
-  0%   { transform: translateX(-50%) scale(0.9) translateY(20px); opacity: 0; }
-  100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
-}
-@keyframes dockBounceClose {
-  0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  100% { transform: translateX(-50%) scale(0.9) translateY(20px); opacity: 0; }
-}
-
-/* 滚动条样式 */
-.elysia-playlist::-webkit-scrollbar { width: 4px; }
-.elysia-playlist::-webkit-scrollbar-track { background: transparent; }
-.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-/* 喜欢动画 */
-@keyframes heartPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-.elysia-controls #heartBtn.liked,
-.fs-btn.heart.liked {
-  animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}

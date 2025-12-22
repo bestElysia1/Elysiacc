@@ -262,8 +262,7 @@
   text-shadow: none;
 }
 
-/* --- 🔥 优化的歌词滚动动画 (已配置：不回滚) --- */
-/* --- 🔥 修复版：歌词滚动动画 (向左滚 + 速度优化) --- */
+/* --- 🔥 修复版：歌词滚动动画 (阻尼感 + 降速) --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
@@ -275,16 +274,18 @@
 }
 
 .scroll-inner.scrolling {
-  /* 1. var(--scroll-duration): JS 动态计算的快速时间
-     2. linear: 匀速
-     3. 1 forwards: 只滚一次，滚完停在左边，等待下一句
+  /* 1. var(--scroll-duration): JS 计算的时间
+     2. cubic-bezier(0.25, 0.1, 0.25, 1): 关键修改！
+        不再是 linear (匀速)。这个曲线会让文字启动后平滑移动，
+        但在最后 20% 的距离时会明显减速（阻尼感），轻轻停在末尾。
+     3. 1 forwards: 只滚一次，不回弹
   */
-  animation: scrollText var(--scroll-duration, 5s) linear 1 forwards;
+  animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 开头停顿时间缩短，响应更快 */
+  15% { transform: translateX(0); } /* 开头停顿 */
   100% { transform: translateX(var(--scroll-offset)); } /* 滚到 JS 计算的负数值 */
 }
 

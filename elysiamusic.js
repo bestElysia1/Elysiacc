@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Version (Fixed: 2-Button Layout & Mode Logic) */
+/* elysiamusic.js - Ultimate Stable Version (Fixed Playback & Layout) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -48,7 +48,7 @@ const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager()
   })
 });
-console.log("[Firebase] Firestore 离线持久化已启用 (新版 API)");
+console.log("[Firebase] Firestore 离线持久化已启用");
 
 const provider = new GoogleAuthProvider();
 
@@ -125,13 +125,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentLyricIndex = -1; 
   let lastCountTime = 0;
 
-  /* 🔥 [UPDATE] SVG ICONS - 增加了清晰的模式图标 */
+  /* SVG ICONS */
   const ICONS = {
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
     next: `<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>`,
     heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
-    
     // 列表循环
     loopList: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`,
     // 单曲循环
@@ -207,9 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentList = allSongsLibrary.filter(s => s.category === 'piano'); 
   let currentIndex = 0;
   
-  /* 🔥 [UPDATE] 播放模式逻辑变量 */
+  // 播放模式: 0=列表, 1=单曲, 2=随机
   let playMode = 0; 
-  // 0 = 列表循环, 1 = 单曲循环, 2 = 随机播放
   const playModes = [
     { icon: ICONS.loopList, name: "列表循环" },
     { icon: ICONS.loopOne, name: "单曲循环" },
@@ -219,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getShuffledIndices(length) {
     let arr = Array.from({length}, (_, i) => i);
-    // Fisher-Yates 洗牌
     for (let i = length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -238,9 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Controls
   const playPauseBtn = document.getElementById("playPauseBtn");
   const nextBtn = document.getElementById("nextBtn");
-  const modeBtn = document.getElementById("modeBtn"); // 🔥 唯一的模式切换按钮
-  const heartBtn = document.getElementById("heartBtn");
-  const playlistTitleBtn = document.getElementById("playlistTitleBtn");
+  const modeBtn = document.getElementById("modeBtn"); // 背面：模式切换
+  const heartBtn = document.getElementById("heartBtn"); // 背面：收藏
+  const playlistTitleBtn = document.getElementById("playlistTitleBtn"); // 背面：歌单标题
   
   // Display & UI
   const titleEl = document.getElementById("songTitle");
@@ -258,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.innerHTML = ICONS.play;
     nextBtn.innerHTML = ICONS.next;
     if (heartBtn) heartBtn.innerHTML = ICONS.heart; 
-    // 🔥 初始化模式图标
     if (modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
   }
   initIcons();
@@ -396,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     audio.src = song.src;
-    // 🔥 [FIX] 只有单曲循环模式下开启 audio.loop
+    // 只有单曲循环模式下开启 audio.loop
     audio.loop = (playMode === 1);
     
     renderSongListDOM(); 
@@ -407,43 +403,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function togglePlay() {
     if (audio.paused) {
-      audio.play().catch(e => console.log("Auto-play prevented"));
-      playPauseBtn.innerHTML = ICONS.pause;
-      playPauseBtn.classList.add("playing"); 
-      player.classList.add("playing");
-      updateTitleOrLyric(); 
+      audio.play().catch(e => console.log("Play interrupted:", e));
     } else {
       audio.pause();
-      playPauseBtn.innerHTML = ICONS.play;
-      playPauseBtn.classList.remove("playing");
-      player.classList.remove("playing");
-      updateTitleOrLyric(); 
     }
   }
 
-  /* 🔥 [FIX] 下一首逻辑：兼容随机和列表模式 */
+  /* 🔥 核心修复：监听 Audio 真实状态来更新 UI */
+  audio.addEventListener('play', () => {
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing");
+      player.classList.add("playing");
+      updateTitleOrLyric();
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+  });
+
+  audio.addEventListener('pause', () => {
+      playPauseBtn.innerHTML = ICONS.play;
+      playPauseBtn.classList.remove("playing");
+      player.classList.remove("playing");
+      updateTitleOrLyric();
+      savePlaybackState();
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+  });
+
   function playNext(isAuto = false) {
     let nextIndex;
     
     // 1. 单曲循环模式
     if (playMode === 1) { 
        if (isAuto) {
-           // 自动结束时重播 (audio.loop 应该处理，但兜底)
            audio.play(); 
            return; 
        } else {
-           // 用户点击下一首，则切到列表下一首
            nextIndex = (currentIndex + 1) % currentList.length;
        }
     } 
     // 2. 随机播放模式
     else if (playMode === 2) { 
-      if (shuffleQueue.length === 0) {
-        shuffleQueue = getShuffledIndices(currentList.length);
-      }
-      // 取出队列头
+      if (shuffleQueue.length === 0) shuffleQueue = getShuffledIndices(currentList.length);
       let candidate = shuffleQueue.shift();
-      // 避免连续重复
       if (currentList.length > 1 && candidate === currentIndex) {
           if (shuffleQueue.length === 0) shuffleQueue = getShuffledIndices(currentList.length);
           shuffleQueue.push(candidate); 
@@ -457,10 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadSong(nextIndex);
-    audio.play();
-    playPauseBtn.innerHTML = ICONS.pause;
-    playPauseBtn.classList.add("playing");
-    player.classList.add("playing");
+    audio.play().catch(e => console.log("Auto-play blocked:", e));
   }
 
   function toggleMenu(el) {
@@ -497,13 +493,19 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleMenu(songListEl);
   });
 
+  /* 🔥 核心修复：歌单点击事件 */
   songListEl.addEventListener("click", e => {
     const item = e.target.closest(".playlist-item");
     if (item) {
-      loadSong(parseInt(item.dataset.index));
-      audio.play();
-      playPauseBtn.innerHTML = ICONS.pause;
-      playPauseBtn.classList.add("playing");
+      const index = parseInt(item.dataset.index);
+      loadSong(index);
+      // 强行播放并捕获 Promise 错误
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(error => {
+              console.log("Play interrupted or failed:", error);
+          });
+      }
     }
   });
 
@@ -552,10 +554,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (currentList.length > 0) {
         loadSong(0);
-        audio.play().catch(() => {});
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        player.classList.add("playing");
+        // 切歌单不自动播放，等待用户操作
+        playPauseBtn.innerHTML = ICONS.play;
+        playPauseBtn.classList.remove("playing");
     } else {
         titleEl.textContent = "暂无数据";
         songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
@@ -566,22 +567,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   renderPlaylistMenu();
 
-  /* 🔥 [FIX] 模式切换逻辑：循环切换 0->1->2->0 */
+  /* 🔥 模式切换逻辑：循环切换 0->1->2->0 */
   if (modeBtn) {
       modeBtn.addEventListener('click', async (e) => {
         e.stopPropagation(); 
         
         playMode = (playMode + 1) % 3;
         
-        // 更新图标
         modeBtn.innerHTML = playModes[playMode].icon;
-        // 更新 Audio 属性
         audio.loop = (playMode === 1);
 
-        // 如果切到随机，重置队列
-        if (playMode === 2) {
-             shuffleQueue = getShuffledIndices(currentList.length);
-        }
+        if (playMode === 2) shuffleQueue = getShuffledIndices(currentList.length);
 
         if (currentUser) {
             try { await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true }); } catch (err) {}
@@ -589,7 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // 🔥 收藏按钮
+  // 收藏按钮
   if (heartBtn) {
       heartBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -627,7 +623,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 翻转逻辑 (长按 / 拖拽)
+  // 翻转逻辑
   let isDrag = false;
   let pressTimer;
   const startPress = (e) => {
@@ -676,15 +672,13 @@ document.addEventListener("DOMContentLoaded", () => {
   playPauseBtn.addEventListener("click", togglePlay);
   nextBtn.addEventListener("click", () => playNext(false));
   
-  /* 🔥 [FIX] 歌曲结束监听 */
   audio.addEventListener("ended", () => {
     if (playMode === 1) { 
-        // 单曲循环逻辑上不需要这里，因为 audio.loop=true，但作为兜底
         audio.currentTime = 0;
         audio.play();
     } else {
         if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
-        playNext(true); // 自动下一首
+        playNext(true); 
     }
   });
 
@@ -714,8 +708,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (prevIndex < 0) prevIndex = currentList.length - 1;
         loadSong(prevIndex);
         audio.play();
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
       });
       navigator.mediaSession.setActionHandler('seekto', (details) => {
         if (details.fastSeek && 'fastSeek' in audio) audio.fastSeek(details.seekTime);
@@ -725,19 +717,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   audio.addEventListener('loadedmetadata', updatePositionState);
-  
-  audio.addEventListener('play', () => { 
-      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; 
-      updatePositionState(); 
-      updateTitleOrLyric(); 
-  });
-  
-  audio.addEventListener('pause', () => { 
-    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
-    updatePositionState();
-    savePlaybackState();
-    updateTitleOrLyric(); 
-  });
 
   let lastTimeForLoop = 0; 
 
@@ -763,7 +742,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Loop One Counter (手动计数单曲循环播放次数)
+    // Loop One Counter
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
@@ -917,19 +896,16 @@ document.addEventListener("DOMContentLoaded", () => {
              userFavorites = data.favorites || [];
              userPlayHistory = data.playHistory || {}; 
              
-             /* 🔥 [FIX] 恢复用户的播放模式 */
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
                  if(modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
                  audio.loop = (playMode === 1);
                  
-                 // 如果恢复的是随机模式，生成洗牌队列
                  if (playMode === 2 && shuffleQueue.length === 0) {
                      shuffleQueue = getShuffledIndices(currentList.length);
                  }
              }
              
-             // 恢复播放进度
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
                  let lastTitle = "";
                  let lastTime = 0;

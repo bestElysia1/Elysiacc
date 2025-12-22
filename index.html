@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>订阅使用指南 ver.5.01</title>
   
   <link rel="manifest" href="manifest.json">
@@ -18,42 +18,11 @@
   <link rel="stylesheet" href="elysiastyle.css">
   <link rel="stylesheet" href="hamburger.css">
   <link rel="stylesheet" href="elysiamusic.css">
-  
-  <style>
-    .fs-info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
-    .fs-text-col {
-      flex: 1;
-      overflow: hidden;
-    }
-    #fsHeartBtn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.4);
-      padding: 10px;
-      cursor: pointer;
-    }
-    #fsHeartBtn.liked {
-      color: #ff6b81;
-      animation: heartPop 0.3s ease;
-    }
-    #fsHeartBtn svg {
-      width: 28px;
-      height: 28px;
-      fill: currentColor;
-    }
-  </style>
 </head>
 <body>
 
 <div class="hamburger" id="hamburger-menu" aria-label="菜单" role="button" tabindex="0">
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
-  <span class="hb-line"></span>
+  <span class="hb-line"></span><span class="hb-line"></span><span class="hb-line"></span>
 </div>
 
 <ul class="dropdown-menu" id="dropdown">
@@ -71,9 +40,7 @@
     </a>
   </li>
   <li>
-    <a href="#" id="nav-lang-switch" class="lang-switch-item">
-      <span class="lang-text">EN</span> 
-    </a>
+    <a href="#" id="nav-lang-switch" class="lang-switch-item"><span class="lang-text">EN</span></a>
   </li>
 </ul>
 
@@ -81,9 +48,7 @@
 
 <main class="container">
   <div class="banner-3d" id="banner3d">
-    <div class="banner-layer">
-      <img src="assets/banner.jpg" alt="Banner">
-    </div>
+    <div class="banner-layer"><img src="assets/banner.jpg" alt="Banner"></div>
     <div class="banner-glow"></div>
   </div>
 
@@ -116,7 +81,12 @@
     <h2>通知</h2>
     <ul>
       <li>三网优化已完成〜 2025-09-16</li>
-      <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点...</li>
+      <li>ChatGPT 未向香港地区提供服务，如需使用 ChatGPT 请使用新加坡或日本或其他节点，避免无法使用和降智〜 2025-09-16(已完成自动切换)</li>
+      <li>由于部分省份升级省级防火墙原因，移动线路要做特别优化，如果无法使用，请联系我给你单独调优〜 2025-09-19</li>
+      <li>部分省份移动已G，请切换电信，移动网络暂时无法使用〜 2025-09-30（已修复）</li>
+      <li>德国法兰克福 CN2 GIA 专线将于 10月 20日上线〜 2025-10-10</li>
+      <li>预计11月1-7日进行服务器维护，不影响正常使用，11月8日请更新订阅〜 2025-10-30</li>
+      <li>部分节点上游被攻击，暂停服务，请优先选择唯☁️节点〜 2025-11-24（已修复）</li>
     </ul>
   </section>
 
@@ -124,11 +94,159 @@
     <h2>使用细则</h2>
     <p>复制订阅链接到软件中同步后即可使用</p>
   </section>
-  
+
+  <section>
+    <h2>移动端 Mobile Devices</h2>
+    <ul>
+      <li><strong>Android 安卓：</strong>V2rayNG、FIClash、Nekobox、Sing - box for Android、Clash Meta for Android .etc</li>
+      <li><strong>iOS（含 iPadOS/tvOS）：</strong>Shadowrocket（小火箭）、Surge、Loon、Stash、Quantumult .etc</li>
+      <li><strong>Harmony OS NEXT：</strong>同安卓，但不建议使用</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>电脑端 Computers</h2>
+    <ul>
+      <li><strong>Windows：</strong>V2rayN、Clash Party、Clash Verge、FIClash .etc</li>
+      <li><strong>macOS：</strong>Surge、Shadowrocket、Clash Verge Rev、GUI for SingBox、Clash Party .etc</li>
+      <li><strong>Linux：</strong>V2rayN、Singbox for Linux .etc</li>
+      <li><strong>FreeBSD/Unix：</strong>Mihomo（裸核）、Sing - box .etc</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>路由器类 Routers</h2>
+    <ul>
+      <li><strong>华硕 硬路由：</strong>MerlinClash2（梅林）、FancySS</li>
+      <li><strong>小米 硬路由：</strong>ShellCrash</li>
+      <li><strong>OpenWrt 软路由：</strong>OpenClash、PassWall、Nikki</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>规则集</h2>
+    <p><strong>Shadowrocket:</strong></p>
+    <p>打开小火箭－配置－右上角－“+”将此链接粘贴进 URL</p>
+    <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/docs/03.shadowsocks_tiny.conf</pre>
+    <p>使用此配置，然后在同一个页面打开－模块－右上角“+”将直连，代理，拒绝此三条链接分别依次导入模块</p>
+    <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
+https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
+    <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
+  </section>
+
+  <section>
+    <h2>Shadowrocket 进阶</h2>
+    <p><strong>Shadowrocket 最终毕业玩法：</strong></p>
+    <p>如果你有特定的网站需要走代理或直连，打开小火箭－配置－模块，你可以看到有 direct,proxy,reject,三个模块,打开其中 proxy 模块,你可以看到 proxy_list,例如 yhdm.one 这个网站要走代理，请在 rule 下方换行加入：</p>
+    <pre>DOMAIN-SUFFIX,yhdm.one,PROXY
+DOMAIN-SUFFIX,yinhuadm.one,PROXY
+DOMAIN-SUFFIX,anime1.me,PROXY
+DOMAIN-SUFFIX,bestelysia.com,PROXY
+DOMAIN-SUFFIX,firebaseapp.com,PROXY
+DOMAIN-SUFFIX,mp3juice.co,PROXY
+DOMAIN-SUFFIX,openai.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,chatgpt.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,googleapis.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,gemini.googleapis.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,bard.google.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,gemini.google.com,唯☁️｜新加坡01-❄️10Gbps
+DOMAIN-SUFFIX,x.ai,唯☁️｜新加坡01-❄️10Gbps</pre>
+    <p>然后保存即可，注意批量添加时，请确保每个规则一行一起复制粘贴进去即可</p>
+    <p>(Tips：小火箭底部—数据-代理-启用日志记录-可以看到域名)</p>
+    <p>其他诸如特定网站走直连（打开其中direct模块...）等同理~</p>
+  </section>
+
+  <section>
+    <h2>Shadowrocket 负载均衡</h2>
+    <p>打开⼩⽕箭－⾸⻚－全局路由－启⽤回退；分组－简单模式－开启；分组－编辑－选择⾃⼰想要使⽤的节点－完成</p>
+    <p>这里务必包含 唯云香港&新加坡&日本节点 </p>
+    <p>旨在保证永远可⽤&自动切换可用</p>
+  </section>
+
+  <section>
+    <h2>V2rayN-Windows 基础</h2>
+    <p><strong>V2rayN使用</strong></p>
+    <p>打开V2rayN－顶部标签栏－订阅分组－订阅分组设置－添加－填写别名Elysia(任意)－将订阅链接粘贴进 可选URL－确定－再点击订阅分组－更新当前订阅(通过代理)－选择任意节点－右键－设为活动配置文件－底部系统代理－自动配置系统代理－顶部标签栏－设置－以管理员身份重启 即可</p>
+    <p><strong>V2rayN分流</strong></p>
+    <p>打开V2rayN－顶部标签栏－设置－路由设置－双击V3绕过大陆－添加规则－别名：Elysia(任意)－outboundTag: 唯☁️｜新加坡02-❄️10Gbps －在 Domain 处粘贴下面规则：</p>
+    <pre>domain:openai.com,
+domain:chat.openai.com,
+domain:api.openai.com,
+domain:cdn.openai.com,
+domain:x.ai,
+domain:gemini.google.com,
+domain:bard.google.com,
+domain:makersuite.google.com,
+domain:claude.ai,
+domain:gemini.google.com,
+domain:perplexity.ai,
+domain:poe.com,
+domain:huggingface.co,
+domain:chatgpt.com</pre>
+    <p>其他的不用改动，点击确定-标签栏-设置-以管理员身份重启，这样就设置好－在使用ChatGPT等AI时自动切换新加坡节点，不影响现在使用的节点</p>
+  </section>
+
+  <section>
+    <h2>自建VPS节点的教程</h2>
+    <ul>
+      <li><strong>常用工具：</strong>Final shell、Putty、CMD、XUI&3X-UI</li>
+      <li>
+    <strong>Final shell：</strong>购买1台VPS(系统版本unbuntu22以上)打开final shell新建一个ssh连接输入主机IP地址，端口，用户名，秘钥登陆到这个VPS之后，将下面的脚本复制到VPS运行：
+    <pre>bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</pre>
+    然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 
+</li>
+      <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
+      <li><strong>CMD：</strong>windows+R 运行CMD，然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
+      <li><strong>Terminal：</strong>Command+空格 输入 Terminal 运行，然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-p 后面输入VPS提供的端口）登录，后续步骤同上</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>测速链接</h2>
+    <ul>
+      <li><a href="https://www.speedtest.net/">Speedtest</a></li>
+      <li><a href="https://fiber.google.com/speedtest/">Google Speedtest</a></li>
+    </ul>
+  </section>
+            
+  <section>
+    <h2>一些软件链接</h2>
+    <ul>
+      <li><a href="https://github.com/2dust/v2rayN">V2rayN</a></li>
+      <li><a href="https://github.com/mihomo-party-org/clash-party/">Clash-party</a></li>
+      <li><a href="https://github.com/chen08209/FlClash/">FlClash</a></li>
+      <li><a href="https://github.com/clash-verge-rev/clash-verge-rev/">Clash-verge-rev</a></li>
+      <li><a href="https://www.shadowrocket.vip/">Shadowrocket</a></li>
+      <li><a href="https://nssurge.com/">Surge</a></li>
+      <li><a href="https://www.hostbuf.com/t/988.html">Final Shell</a></li>
+      <li><a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">Putty</a></li>
+    </ul>
+  </section>
+
   <div class="elysia-video-wrapper">
-      <video id="videoA" autoplay muted playsinline preload="auto" crossorigin="anonymous"></video>
-      <video id="videoB" muted playsinline preload="auto" crossorigin="anonymous"></video>
+    <video id="videoA" autoplay muted playsinline preload="auto" crossorigin="anonymous"></video>
+    <video id="videoB" muted playsinline preload="auto" crossorigin="anonymous"></video>
   </div>
+
+  <section>
+    <h2>一些实用&有趣的网址</h2>
+    <ul>
+      <li><a href="https://www.nodeseek.com/post-183694-1">常用VPS脚本</a></li>
+      <li><a href="https://downloads.khinsider.com/">本站使用的音乐下载地址1</a></li>
+      <li><a href="https://mp3juice.co/">本站使用的音乐下载地址2</a></li>
+      <li><a href="https://wallhaven.cc/index.php">好用的PC壁纸</a></li>
+      <li><a href="https://hstock.org/?referrer=01k9gngv">Apple ID等资源的购买网址</a></li>
+      <li><a href="https://www.naifeistation.com/i/2EEaDt">ChatGpt Plus,Super Grok,YouTube,Netflix 会员等资源的购买网址</a><p>优惠码：bestElysia</p></li>
+      <li><a href="https://www.freeconvert.com/zh/audio-converter">Freeconvert</a></li>
+      <li><a href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way">How-To-Ask-Questions</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Eternal Elysia</h2>
+    <p>恭喜你已经完全妥善学习常用VPN技巧</p>
+  </section>
 
   <footer>
     订阅使用指南 ver.5.01
@@ -136,31 +254,26 @@
   </footer>
 </main>
 
-
 <div id="elysiaPlayer" class="elysia-player">
   <div class="player-glass-card">
     <div class="player-face">
       <div class="mini-cover-wrapper" id="miniCoverBtn">
         <img id="miniCoverImg" src="assets/cover_placeholder.jpg" alt="cover">
       </div>
-
       <div class="mini-info">
         <div id="songTitle">Waiting for music...</div>
       </div>
-
       <div class="elysia-controls">
         <button id="playPauseBtn"></button>
         <button id="nextBtn"></button>
         <button id="playlistTitleBtn" style="display:none"></button> 
       </div>
-      
       <div class="elysia-progress-container" id="progressContainer">
         <div class="elysia-progress-bar" id="progressBar"></div>
       </div>
     </div>
   </div>
 </div>
-
 
 <div id="fullscreenPlayer" class="fullscreen-player">
   <div class="fs-backdrop" id="fsBackdrop"></div>
@@ -186,7 +299,7 @@
               <div class="fs-title" id="fsTitle">Song Title</div>
               <div class="fs-artist" id="fsArtist">Artist Name</div>
             </div>
-            <button id="fsHeartBtn">
+            <button class="fs-btn heart" id="fsHeartBtn">
                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             </button>
           </div>
@@ -226,52 +339,26 @@
   </div>
 </div>
 
-
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
 <div class="elysia-playlist" id="playlistMenu" aria-hidden="true"></div>
 
-<div id="login-modal-overlay" class="glass-overlay" aria-hidden="true">
+<div id="login-modal-overlay" class="glass-overlay">
   <div class="glass-modal-card">
     <button id="close-modal-btn" class="close-btn">&times;</button>
-    <div class="modal-header">
-      <h2>Welcome</h2>
-      <p>登录以解锁云端歌单同步</p>
-    </div>
-
+    <div class="modal-header"><h2>Welcome</h2><p>登录以解锁云端歌单同步</p></div>
     <div id="login-actions">
-      <div class="email-auth-container">
-        <input type="email" id="email-input" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username" />
-        <input type="password" id="pass-input" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password" />
-        
-        <div class="turnstile-wrapper">
-            <div class="cf-turnstile" 
-                 data-sitekey="0x4AAAAAACFk8I22JCGmIBaq" 
-                 data-callback="onTurnstileSuccess" 
-                 data-expired-callback="onTurnstileExpired"
-                 data-theme="light"></div>
-        </div>
-        
-        <button id="email-submit-btn" class="glass-action-btn email-btn" disabled>
-          <span>登录 / 自动注册</span>
-        </button>
-        <p id="auth-error-msg" class="error-msg"></p>
-      </div>
-
-      <div class="auth-divider"><span>or</span></div>
-
-      <button id="google-login-btn" class="glass-action-btn google-btn">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Sign in with Google
-      </button>
+       <input type="email" id="email-input" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username">
+       <input type="password" id="pass-input" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password">
+       <div class="turnstile-wrapper"><div class="cf-turnstile" data-sitekey="0x4AAAAAACFk8I22JCGmIBaq" data-callback="onTurnstileSuccess"></div></div>
+       <button id="email-submit-btn" class="glass-action-btn email-btn" disabled>登录 / 注册</button>
+       <div class="auth-divider"><span>or</span></div>
+       <button id="google-login-btn" class="glass-action-btn google-btn">Sign in with Google</button>
+       <p id="auth-error-msg" class="error-msg"></p>
     </div>
-
-    <div id="user-info-panel" style="display: none;">
-      <div class="avatar-glow-ring">
-        <img id="modal-user-avatar" src="" alt="Avatar" class="modal-avatar">
-      </div>
-      <h3 id="modal-user-name" style="margin-top:10px; color:#5a4b80;">User</h3>
-      <p style="font-size:0.8rem; margin-bottom:20px; opacity:0.7;">已同步喜欢歌曲</p>
-      <button id="logout-confirm-btn" class="glass-action-btn logout-style">退出登录</button>
+    <div id="user-info-panel" style="display:none">
+       <div class="avatar-glow-ring"><img id="modal-user-avatar" src="" class="modal-avatar"></div>
+       <h3 id="modal-user-name">User</h3>
+       <button id="logout-confirm-btn" class="glass-action-btn logout-style">退出登录</button>
     </div>
   </div>
 </div>
@@ -280,16 +367,10 @@
 <script src="hamburger.js" defer></script>
 <script src="songs.js" defer></script>
 <script src="elysiamusic.js" type="module" defer></script>
-
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { scope: './' })
-        .then(registration => console.log('[Elysia] SW Registered'))
-        .catch(err => console.error('[Elysia] SW Failed:', err));
-    });
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e=>console.log(e)));
   }
 </script>
-
 </body>
 </html>

@@ -1,4 +1,4 @@
-/* hamburger.css - Elysia Style with "DockPop" Rebound & Translation Logic */
+/* hamburger.css - Elysia Style Final: High Readability (0.7 Opacity) & Perfect Alignment */
 
 /* =========================================
    1. 汉堡按钮 (Liquid Glass Button)
@@ -16,15 +16,12 @@
   gap: 5px;
   z-index: 10001;
   
-  /* 液态玻璃背景 */
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.4);
-  
-  /* 柔和光晕阴影 */
   box-shadow: 
     0 8px 24px rgba(150, 110, 240, 0.15), 
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -34,7 +31,6 @@
   will-change: transform, opacity;
 }
 
-/* 悬停状态 */
 .hamburger:hover {
   background: rgba(255, 255, 255, 0.4);
   box-shadow: 
@@ -43,20 +39,17 @@
   transform: scale(1.05);
 }
 
-/* 点击状态 */
 .hamburger:active {
   transform: scale(0.92);
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* 自动隐藏 */
 .hamburger.fade-out {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8);
 }
 
-/* 内部线条 */
 .hb-line {
   display: block;
   width: 22px;
@@ -69,7 +62,7 @@
 }
 
 /* =========================================
-   2. 下拉菜单 (Dropdown Menu) - 视觉同步版
+   2. 下拉菜单 (Dropdown Menu)
    ========================================= */
 .dropdown-menu {
   position: fixed;
@@ -77,7 +70,6 @@
   top: 80px;
   width: 200px;
   
-  /* --- 核心修改：同步 Elysia Playlist 的液态玻璃参数 --- */
   background: rgba(255, 240, 255, 0.25);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
@@ -92,7 +84,6 @@
   margin: 0;
   z-index: 10000;
 
-  /* 初始状态 */
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
@@ -100,12 +91,8 @@
   transform: translateY(-10px) scale(0.95);
 }
 
-/* 菜单项容器 */
-.dropdown-menu li {
-  margin: 4px 0;
-}
+.dropdown-menu li { margin: 4px 0; }
 
-/* 菜单链接 - 样式同步 */
 .dropdown-menu a {
   display: block;
   padding: 10px 14px;
@@ -121,7 +108,6 @@
   text-overflow: ellipsis;
 }
 
-/* 菜单项 Hover - 样式同步 */
 .dropdown-menu a:hover {
   background: rgba(160, 120, 255, 0.15);
   color: #ffffff;
@@ -131,7 +117,7 @@
 }
 
 /* =========================================
-   3. 语言切换按钮 (New Translation Styles)
+   3. 语言切换按钮
    ========================================= */
 .menu-divider {
   height: 1px;
@@ -139,14 +125,12 @@
   margin: 8px 10px;
 }
 
-/* 语言按钮布局 */
 .dropdown-menu a.lang-switch-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* 语言图标 Badge */
 .lang-badge {
   font-size: 10px;
   border: 1px solid rgba(160, 120, 255, 0.4);
@@ -163,10 +147,8 @@
 }
 
 /* =========================================
-   4. 【核弹级】隐藏 Google 翻译自带 UI
+   4. 隐藏 Google 翻译自带 UI
    ========================================= */
-
-/* 隐藏 Google 插入的 iframe 横幅 */
 .goog-te-banner-frame,
 iframe.goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
@@ -182,21 +164,18 @@ iframe.goog-te-banner-frame,
     top: -9999px !important;
 }
 
-/* 强制锁定 body 位置，防止下沉 */
 body {
     top: 0px !important;
     position: static !important;
     min-height: 100% !important; 
 }
 
-/* 隐藏原来的下拉框容器 */
 #google_translate_element {
     display: none !important;
     height: 0 !important;
     overflow: hidden !important;
 }
 
-/* 隐藏悬浮提示与高亮 */
 .goog-tooltip, 
 .goog-tooltip:hover,
 .goog-text-highlight {
@@ -207,7 +186,6 @@ body {
     box-shadow: none !important;
 }
 
-/* 移动端横幅暴力隐藏 */
 body > .skiptranslate {
     display: none !important;
     height: 0 !important;
@@ -215,7 +193,7 @@ body > .skiptranslate {
 }
 
 /* =========================================
-   5. 动画控制 (Animations)
+   5. 动画控制
    ========================================= */
 .dropdown-menu.show {
   opacity: 1;
@@ -232,24 +210,225 @@ body > .skiptranslate {
 }
 
 @keyframes menuReboundOpen {
-  0% { 
-    opacity: 0; 
-    transform: translateY(-15px) scale(0.92);
-    filter: brightness(0.92);
-  }
-  55% {
-    opacity: 1;
-    transform: translateY(4px) scale(1.05);
-    filter: brightness(1.12);
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0) scale(1);
-    filter: brightness(1);
-  }
+  0% { opacity: 0; transform: translateY(-15px) scale(0.92); filter: brightness(0.92); }
+  55% { opacity: 1; transform: translateY(4px) scale(1.05); filter: brightness(1.12); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
 }
 
 @keyframes glowFlow {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
+}
+
+/* =========================================
+   6. 液态玻璃登录弹窗 (经典背景 + 300px 对齐)
+   ========================================= */
+
+.auth-item { display: flex !important; align-items: center; gap: 12px; }
+.auth-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
+  overflow: hidden; color: #cdbaff;
+}
+.auth-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 全屏遮罩 */
+.glass-overlay {
+  position: fixed; inset: 0;
+  background: rgba(20, 10, 40, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 20000;
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.glass-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+/* 🌟 核心：尺寸精准控制 & 经典背景回归 */
+.glass-modal-card {
+  /* 尺寸对齐公式：350px - 25px - 25px = 300px */
+  width: 350px; 
+  max-width: 90%; 
+  padding: 25px;
+  box-sizing: border-box; 
+  
+  text-align: center;
+  position: relative;
+
+  /* 🔥 核心修改：改回高可读性的 0.7 透明度背景 */
+  background: rgba(255, 250, 255, 0.7);
+  
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  
+  /* 边框稍微加深一点点，增强轮廓感 */
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  
+  box-shadow: 0 20px 50px rgba(150, 110, 240, 0.35);
+  border-radius: 20px;
+  
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.glass-overlay.active .glass-modal-card { transform: scale(1) translateY(0); }
+
+/* 标题 */
+.modal-header h2 {
+  margin: 0 0 4px 0;
+  color: #5a4b80;
+  font-size: 1.25rem; 
+  background: linear-gradient(90deg, #9c6bff, #b388ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.modal-header p {
+  color: #887da8;
+  font-size: 0.75rem;
+  margin-bottom: 12px; 
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: transparent; border: none;
+  font-size: 20px; line-height: 1;
+  color: #aaa; cursor: pointer;
+  transition: transform 0.3s;
+}
+.close-btn:hover { transform: rotate(90deg); color: #7b3fe4; }
+
+/* Google 按钮 */
+.glass-action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  /* 100% 填充净内容区 (300px) */
+  width: 100%; 
+  box-sizing: border-box; 
+  
+  padding: 10px; 
+  border: none; border-radius: 8px;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.google-btn { background: #fff; color: #555; }
+.google-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+/* 头像区域 */
+.avatar-glow-ring {
+  width: 60px; height: 60px;
+  margin: 0 auto 5px auto;
+  border-radius: 50%; padding: 3px;
+  background: linear-gradient(135deg, #b388ff, #ffffff);
+  box-shadow: 0 6px 20px rgba(156,107,255,0.25);
+}
+.modal-avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; display: block; }
+
+.logout-style { background: rgba(255, 80, 80, 0.08); color: #d64545; margin-top: 8px; }
+.logout-style:hover { background: rgba(255, 80, 80, 0.15); }
+
+/* =========================================
+   7. 邮箱登录样式 (自动填充对齐)
+   ========================================= */
+
+.email-auth-container {
+  display: flex; flex-direction: column;
+  gap: 8px; 
+  width: 100%; /* 300px width */
+  margin: 0 auto;
+}
+
+/* 输入框 */
+.glass-input {
+  width: 100%;
+  box-sizing: border-box; 
+  padding: 10px 12px;
+  border-radius: 8px;
+  
+  /* 输入框背景稍微加深一点，适配浅色背景 */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.35); 
+  
+  color: #5a4b80;
+  font-size: 16px; 
+  outline: none;
+  transition: all 0.3s ease;
+}
+.glass-input::placeholder { color: rgba(90, 75, 128, 0.6); font-size: 13px; }
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: #9c6bff;
+  box-shadow: 0 0 10px rgba(156, 107, 255, 0.25);
+}
+
+/* 按钮 */
+.email-btn {
+  background: linear-gradient(135deg, #9c6bff, #7b3fe4);
+  color: white; 
+  margin-top: 2px;
+  padding: 10px;
+  width: 100%; /* 300px */
+  box-sizing: border-box; 
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(123, 63, 228, 0.25);
+  transition: all 0.2s;
+}
+.email-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(123, 63, 228, 0.4); }
+
+/* 分割线 */
+.auth-divider {
+  display: flex; align-items: center;
+  margin: 12px auto;
+  color: #9c6bff; font-size: 0.7rem;
+  opacity: 0.8; /* 文字更清楚 */
+  width: 100%; 
+}
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: rgba(156, 107, 255, 0.45); }
+.auth-divider span { padding: 0 8px; }
+
+.error-msg {
+  color: #ff5050; font-size: 0.75rem;
+  min-height: 1em; margin: 0;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5);
+}
+
+/* =========================================
+   8. Cloudflare Turnstile 样式 (自然对齐)
+   ========================================= */
+.turnstile-wrapper {
+  display: flex; justify-content: center; align-items: center;
+  margin: 4px auto; 
+  
+  width: 100%; /* 自然填满 300px */
+  height: 65px; 
+  overflow: hidden;
+}
+
+/* 超小屏适配 */
+@media (max-width: 360px) {
+  .turnstile-wrapper {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+  .glass-modal-card {
+    width: 95%; 
+    padding: 20px 10px;
+  }
+}
+
+.email-btn:disabled {
+  background: rgba(156, 107, 255, 0.2) !important; 
+  color: rgba(90, 75, 128, 0.4) !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+  filter: grayscale(0.5);
+  opacity: 0.6;
+  border: 1px solid rgba(255,255,255,0.2);
 }

@@ -1,0 +1,129 @@
+/* sw.js - iOS Safari 修复版 (V7 - 365天超长缓存) */
+
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.4.1/workbox-sw.js');
+
+// 🔥 升级为 v7，确保之前的 30 天策略被覆盖
+const CACHE_NAME = 'elysia-core-v7';
+
+const PRECACHE_ASSETS = [
+  '/',
+  '/index.html',
+  '/elysia-3d.html',
+  '/speedtest.html',
+  '/elysiastyle.css',
+  '/elysiamusic.css',
+  '/hamburger.css',
+  '/elysiastyle.js',
+  '/elysiamusic.js',
+  '/songs.js',
+  '/hamburger.js',
+  '/deeptools.js',
+  '/manifest.json',
+  '/assets/banner.jpg',
+  '/assets/ico1.jpg',
+  '/assets/bannernetwork.png',
+  '/assets/banner1.jpg'
+];
+
+// --- 🛠 核心工具函数：清洗重定向标记 ---
+async function cleanResponse(response) {
+    if (response && response.redirected) {
+        const body = await response.blob();
+        return new Response(body, {
+            status: 200,
+            statusText: 'OK',
+            headers: response.headers
+        });
+    }
+    return response;
+}
+
+if (workbox) {
+  // 1. 安装阶段
+  self.addEventListener('install', (event) => {
+    self.skipWaiting();
+    event.waitUntil(
+      caches.open(CACHE_NAME).then(cache => {
+        console.log('[Elysia] V7 预缓存...');
+        return cache.addAll(PRECACHE_ASSETS);
+      })
+    );
+  });
+
+  // 2. 激活阶段 (清理旧缓存)
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(
+      Promise.all([
+        clients.claim(),
+        caches.keys().then(keys => Promise.all(
+          keys.map(key => {
+            // 注意：不要删除 elysia-media-cache，否则用户的歌就全没了！
+            // 只删除核心文件的旧版本 (比如 v6)
+            if (key !== CACHE_NAME && key !== 'elysia-media-cache' && key !== 'elysia-dynamic-assets') {
+              console.log('清理旧核心缓存:', key);
+              return caches.delete(key);
+            }
+          })
+        ))
+      ])
+    );
+  });
+
+  // --- 3. 主页/HTML 路由 (防白屏) ---
+  const htmlStrategy = new workbox.strategies.StaleWhileRevalidate({
+    cacheName: CACHE_NAME,
+  });
+
+  workbox.routing.registerRoute(
+    ({ request, url }) => {
+        return request.mode === 'navigate' || 
+               url.pathname === '/' || 
+               url.pathname.endsWith('.html');
+    },
+    async (options) => {
+        try {
+            const response = await htmlStrategy.handle(options);
+            return await cleanResponse(response);
+        } catch (error) {
+            const cache = await caches.open(CACHE_NAME);
+            const cachedResponse = await cache.match('/index.html');
+            return await cleanResponse(cachedResponse);
+        }
+    }
+  );
+
+  // --- 4. 媒体资源 (缓存 365 天) ---
+  workbox.routing.registerRoute(
+    ({ request, url }) => {
+        return (
+            url.hostname === 'cdn-assets.bestelysia.com' || 
+            request.destination === 'audio' || 
+            request.destination === 'video' || 
+            /\.(mp3|wav|flac|mp4|mov)$/i.test(url.pathname)
+        );
+    },
+    new workbox.strategies.CacheFirst({
+      cacheName: 'elysia-media-cache', 
+      fetchOptions: { mode: 'cors', credentials: 'omit' },
+      plugins: [
+        new workbox.rangeRequests.RangeRequestsPlugin(),
+        new workbox.cacheableResponse.CacheableResponsePlugin({ statuses: [0, 200] }),
+        
+        // 🔥这里修改了：365天
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 5000, // 最多存500首，超过了会删最早的
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 365天有效期
+          purgeOnQuotaError: true, // 手机存储空间不足时允许自动清理
+        }),
+      ],
+    })
+  );
+
+  // --- 5. 其他静态资源 ---
+  workbox.routing.registerRoute(
+    ({ request }) => ['script', 'style', 'image', 'font'].includes(request.destination),
+    new workbox.strategies.StaleWhileRevalidate({
+      cacheName: 'elysia-dynamic-assets',
+    })
+  );
+}

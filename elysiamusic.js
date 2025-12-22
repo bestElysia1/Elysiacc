@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Version (Fixed for New Layout & Covers) */
+/* elysiamusic.js - Ultimate Version (Fixed: 2-Button Layout & Mode Logic) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -125,15 +125,19 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentLyricIndex = -1; 
   let lastCountTime = 0;
 
-  /* SVG ICONS */
+  /* 🔥 [UPDATE] SVG ICONS - 增加了清晰的模式图标 */
   const ICONS = {
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
     next: `<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>`,
-    loopList: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
-    loopOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
-    shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
-    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
+    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    
+    // 列表循环
+    loopList: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`,
+    // 单曲循环
+    loopOne: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3zm-2-9h-1l-2 1v1h1.5v4h2V9z"/></svg>`,
+    // 随机播放
+    shuffle: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
   };
 
   /* 歌单配置 */
@@ -202,10 +206,20 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPlaylistKey = 'piano';
   let currentList = allSongsLibrary.filter(s => s.category === 'piano'); 
   let currentIndex = 0;
+  
+  /* 🔥 [UPDATE] 播放模式逻辑变量 */
+  let playMode = 0; 
+  // 0 = 列表循环, 1 = 单曲循环, 2 = 随机播放
+  const playModes = [
+    { icon: ICONS.loopList, name: "列表循环" },
+    { icon: ICONS.loopOne, name: "单曲循环" },
+    { icon: ICONS.shuffle, name: "随机播放" }
+  ];
   let shuffleQueue = []; 
 
   function getShuffledIndices(length) {
     let arr = Array.from({length}, (_, i) => i);
+    // Fisher-Yates 洗牌
     for (let i = length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -213,13 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return arr;
   }
   
-  let playMode = 0; 
-  const playModes = [
-    { icon: ICONS.loopList, name: "列表循环" },
-    { icon: ICONS.loopOne, name: "单曲循环" },
-    { icon: ICONS.shuffle, name: "随机播放" }
-  ];
-
   /* 3. DOM 元素初始化 */
   const audio = new Audio();
   audio.crossOrigin = "anonymous"; 
@@ -231,15 +238,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Controls
   const playPauseBtn = document.getElementById("playPauseBtn");
   const nextBtn = document.getElementById("nextBtn");
-  const modeBtn = document.getElementById("modeBtn"); // 如果保留了模式切换按钮
-  const shuffleBtn = document.getElementById("shuffleBtn"); // 新增：背面专用随机按钮
+  const modeBtn = document.getElementById("modeBtn"); // 🔥 唯一的模式切换按钮
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
   
   // Display & UI
   const titleEl = document.getElementById("songTitle");
-  const coverArt = document.getElementById("coverArt");         // 🔥 正面封面
-  const coverArtBack = document.getElementById("coverArtBack"); // 🔥 背面封面
+  const coverArt = document.getElementById("coverArt");         
+  const coverArtBack = document.getElementById("coverArtBack"); 
   
   const songListEl = document.getElementById("playlist"); 
   const playlistMenuEl = document.getElementById("playlistMenu");
@@ -251,9 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function initIcons() {
     playPauseBtn.innerHTML = ICONS.play;
     nextBtn.innerHTML = ICONS.next;
-    if(modeBtn) modeBtn.innerHTML = playModes[0].icon;
-    if(shuffleBtn) shuffleBtn.innerHTML = ICONS.shuffle;
-    if(heartBtn) heartBtn.innerHTML = ICONS.heart; 
+    if (heartBtn) heartBtn.innerHTML = ICONS.heart; 
+    // 🔥 初始化模式图标
+    if (modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
   }
   initIcons();
 
@@ -322,7 +328,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* 🔥 核心：更新标题/歌词 (适配 Flex 布局) */
   function updateTitleOrLyric() {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -349,9 +354,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       titleEl.innerHTML = `<span class="scroll-inner">${textToShow}</span>`;
       
-      // 动态计算滚动
       const innerSpan = titleEl.querySelector('.scroll-inner');
-      const containerWidth = titleEl.clientWidth; // Flex 布局下的实际宽度
+      const containerWidth = titleEl.clientWidth; 
       const textWidth = innerSpan.scrollWidth;
 
       if (textWidth > containerWidth) {
@@ -371,12 +375,12 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = index;
     const song = currentList[currentIndex];
     
-    // 🔥 [NEW] 更新封面图 (正面和背面)
-    const coverSrc = song.cover || 'assets/banner1.jpg'; // 默认封面防止空白
+    // 更新双封面
+    const coverSrc = song.cover || 'assets/banner1.jpg';
     if (coverArt) coverArt.src = coverSrc;
     if (coverArtBack) coverArtBack.src = coverSrc;
 
-    // 重置歌词状态
+    // 重置歌词
     currentLyrics = [];
     hasLyrics = false;
     currentLyricIndex = -1;
@@ -392,6 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     audio.src = song.src;
+    // 🔥 [FIX] 只有单曲循环模式下开启 audio.loop
     audio.loop = (playMode === 1);
     
     renderSongListDOM(); 
@@ -416,18 +421,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* 🔥 [FIX] 下一首逻辑：兼容随机和列表模式 */
   function playNext(isAuto = false) {
     let nextIndex;
-    if (playMode === 1 && isAuto) { audio.play(); return; } 
-    if (playMode === 2) { 
+    
+    // 1. 单曲循环模式
+    if (playMode === 1) { 
+       if (isAuto) {
+           // 自动结束时重播 (audio.loop 应该处理，但兜底)
+           audio.play(); 
+           return; 
+       } else {
+           // 用户点击下一首，则切到列表下一首
+           nextIndex = (currentIndex + 1) % currentList.length;
+       }
+    } 
+    // 2. 随机播放模式
+    else if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
-        if (currentList.length > 1 && shuffleQueue[0] === currentIndex) shuffleQueue.push(shuffleQueue.shift());
       }
-      nextIndex = shuffleQueue.shift();
-    } else { 
+      // 取出队列头
+      let candidate = shuffleQueue.shift();
+      // 避免连续重复
+      if (currentList.length > 1 && candidate === currentIndex) {
+          if (shuffleQueue.length === 0) shuffleQueue = getShuffledIndices(currentList.length);
+          shuffleQueue.push(candidate); 
+          candidate = shuffleQueue.shift();
+      }
+      nextIndex = candidate;
+    } 
+    // 3. 列表循环模式
+    else { 
       nextIndex = (currentIndex + 1) % currentList.length;
     }
+
     loadSong(nextIndex);
     audio.play();
     playPauseBtn.innerHTML = ICONS.pause;
@@ -538,35 +566,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   renderPlaylistMenu();
 
-  // 🔥 模式切换 (如果保留了 modeBtn)
+  /* 🔥 [FIX] 模式切换逻辑：循环切换 0->1->2->0 */
   if (modeBtn) {
       modeBtn.addEventListener('click', async (e) => {
         e.stopPropagation(); 
+        
         playMode = (playMode + 1) % 3;
+        
+        // 更新图标
         modeBtn.innerHTML = playModes[playMode].icon;
+        // 更新 Audio 属性
         audio.loop = (playMode === 1);
-        if (currentUser) {
-            try { await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true }); } catch (err) {}
+
+        // 如果切到随机，重置队列
+        if (playMode === 2) {
+             shuffleQueue = getShuffledIndices(currentList.length);
         }
-      });
-  }
 
-  // 🔥 背面随机播放按钮 (直接开启随机模式)
-  if (shuffleBtn) {
-      shuffleBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        // 切换：如果是随机模式(2)则变回列表(0)，否则变成随机(2)
-        playMode = (playMode === 2) ? 0 : 2; 
-        
-        // 更新视觉反馈 (可选，如果你想让 shuffle 按钮高亮)
-        if (playMode === 2) shuffleBtn.classList.add('active');
-        else shuffleBtn.classList.remove('active');
-
-        // 如果同时也存在 modeBtn，同步图标
-        if (modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
-
-        audio.loop = false; // 随机模式通常不单曲循环
-        
         if (currentUser) {
             try { await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true }); } catch (err) {}
         }
@@ -615,7 +631,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let isDrag = false;
   let pressTimer;
   const startPress = (e) => {
-    // 排除按钮和进度条，避免误触
     if (e.target.closest('button') || e.target.closest('.elysia-progress-container')) return; 
     isDrag = false;
     pressTimer = setTimeout(() => {
@@ -661,10 +676,15 @@ document.addEventListener("DOMContentLoaded", () => {
   playPauseBtn.addEventListener("click", togglePlay);
   nextBtn.addEventListener("click", () => playNext(false));
   
+  /* 🔥 [FIX] 歌曲结束监听 */
   audio.addEventListener("ended", () => {
-    if (playMode !== 1) { 
+    if (playMode === 1) { 
+        // 单曲循环逻辑上不需要这里，因为 audio.loop=true，但作为兜底
+        audio.currentTime = 0;
+        audio.play();
+    } else {
         if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
-        playNext(true);
+        playNext(true); // 自动下一首
     }
   });
 
@@ -743,7 +763,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Loop One Counter
+    // Loop One Counter (手动计数单曲循环播放次数)
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
@@ -897,10 +917,16 @@ document.addEventListener("DOMContentLoaded", () => {
              userFavorites = data.favorites || [];
              userPlayHistory = data.playHistory || {}; 
              
+             /* 🔥 [FIX] 恢复用户的播放模式 */
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
                  if(modeBtn) modeBtn.innerHTML = playModes[playMode].icon;
                  audio.loop = (playMode === 1);
+                 
+                 // 如果恢复的是随机模式，生成洗牌队列
+                 if (playMode === 2 && shuffleQueue.length === 0) {
+                     shuffleQueue = getShuffledIndices(currentList.length);
+                 }
              }
              
              // 恢复播放进度

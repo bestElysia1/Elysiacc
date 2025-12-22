@@ -1,3 +1,5 @@
+/* hamburger.js - Logic for Dropdown, Auto-hide & Google Translate */
+
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById('hamburger-menu');
   const menu = document.getElementById('dropdown');
@@ -14,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!menu) return;
     const isOpening = !menu.classList.contains('show');
     if (isOpening) {
+      menu.classList.remove('hide'); // 确保移除隐藏类
       menu.classList.add('show');
       if (hamburger) {
         hamburger.style.transform = "scale(0.92)";
@@ -22,11 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
       showHamburger();
     } else {
       menu.classList.remove('show');
+      // 可选：如果要配合 CSS 的退出动画，可以在这里加 class
     }
   }
 
   function closeMenu() {
-    if (menu) menu.classList.remove('show');
+    if (menu && menu.classList.contains('show')) {
+      menu.classList.remove('show');
+    }
   }
 
   // ============================
@@ -39,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 点击页面其他地方关闭菜单
   document.addEventListener('click', (e) => {
     if (menu && menu.classList.contains('show')) {
       if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
@@ -47,11 +54,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 🔥【新增】点击菜单内部的链接后，自动收起菜单
+  // 这对“登录”按钮特别重要，否则点击后弹窗出来了，背景里的菜单还开着
+  if (menu) {
+    menu.addEventListener('click', (e) => {
+      // 如果点击的是链接 (A标签) 或其子元素
+      if (e.target.closest('a')) {
+        //稍微延迟一点点关闭，让用户看到点击反馈
+        setTimeout(closeMenu, 150); 
+      }
+    });
+  }
+
   // ============================
   // 3. 按钮自动隐藏逻辑
   // ============================
   function hideHamburger() {
+    // 如果菜单开着，或者弹窗开着(如果有overlay)，就不隐藏汉堡按钮
     if (menu && menu.classList.contains('show')) return;
+    const modal = document.getElementById('login-modal-overlay');
+    if (modal && modal.classList.contains('active')) return;
+
     if (hamburger) hamburger.classList.add('fade-out');
   }
 
@@ -113,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(document.documentElement, { attributes: true });
 
   // =========================================
-  // 5. 语言切换与 Cookie 控制 (修复UI更新问题)
+  // 5. 语言切换与 Cookie 控制
   // =========================================
 
   // 获取 Cookie
@@ -122,15 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return v ? v[2] : null;
   }
 
-  // 设置 Cookie (增加 domain 处理，确保覆盖)
+  // 设置 Cookie
   function setCookie(name, value, days) {
       const d = new Date();
       d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
-      
       const domain = document.domain;
-      // 设置根路径
       document.cookie = name + "=" + value + ";path=/;expires=" + d.toUTCString();
-      // 设置带域名的路径
       document.cookie = name + "=" + value + ";path=/;domain=" + domain + ";expires=" + d.toUTCString();
       document.cookie = name + "=" + value + ";path=/;domain=." + domain + ";expires=" + d.toUTCString();
   }
@@ -138,18 +158,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // UI 更新逻辑
   const currentLangCookie = getCookie('googtrans');
   const langSpan = langSwitch ? langSwitch.querySelector('.lang-text') : null;
-  // 注意：这里删除了对 langIcon 的获取，因为HTML中已经没有这个元素了
 
-  // 判断是否是英文状态 (Cookie 包含 /en)
+  // 判断是否是英文状态
   const isEnglish = currentLangCookie && (currentLangCookie.includes('/en') || currentLangCookie.includes('en'));
 
-  // 只要找到文字 span 就进行更新
+  // 更新按钮文字
   if (langSpan) {
       if (isEnglish) {
-          // 当前是英文 -> 按钮显示 CN (提示可以切回中文)
           langSpan.innerText = 'CN'; 
       } else {
-          // 当前是中文 -> 按钮显示 EN (提示可以切到英文)
           langSpan.innerText = 'EN';
       }
   }
@@ -161,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
           e.stopPropagation(); 
           
           if (isEnglish) {
-              // 切换回中文：强制设置中文对中文翻译，并清除缓存
+              // 切换回中文
               setCookie('googtrans', '/zh-CN/zh-CN', 1);
               localStorage.removeItem('googtrans');
           } else {
@@ -169,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
               setCookie('googtrans', '/zh-CN/en', 1);
           }
 
-          // 刷新页面生效
           location.reload();
       });
   }

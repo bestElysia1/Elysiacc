@@ -1,7 +1,7 @@
-/* elysiamusic.css - Final Fixed Version (v5.02) */
+/* elysiamusic.css - Final Integration (v5.03) */
 
 /* =========================================
-   1. 底部播放器 (Mini Player) - 332px
+   1. 基础容器 (332px Fixed Width Glass)
    ========================================= */
 .elysia-player {
   position: fixed;
@@ -13,11 +13,16 @@
   height: 50px; 
   perspective: 1000px;
   user-select: none;
+  -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  
+  /* 悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
+  /* 进出全屏时的过渡 */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* 全屏打开时隐藏底部播放器 */
 .elysia-player.ui-hidden {
   opacity: 0;
   pointer-events: none;
@@ -29,57 +34,103 @@
   50% { transform: translateX(-50%) translateY(-6px); }
 }
 
-.player-glass-card { position: relative; width: 100%; height: 100%; }
-
-/* 光斑背景动画 */
-.player-glass-card::before {
-  content: ""; position: absolute; inset: -50%;
-  background: radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
-              radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%);
-  filter: blur(36px); opacity: 0.9; animation: moveBlobs 14s infinite; z-index: -1;
+/* =========================================
+   2. 3D 骨架 & 背景光效
+   ========================================= */
+.player-glass-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
 }
+
+/* 内部流动的液态光斑 (保持原样) */
+.player-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: -1; 
+}
+
 @keyframes moveBlobs { 
   0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
 
+/* =========================================
+   3. 播放器面板 (Face Layout)
+   ========================================= */
 .player-face {
-  position: absolute; inset: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  
   border-radius: 16px;
-  /* 透亮玻璃背景 */
-  background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(255,255,255,0.2));
+
+  /* 核心：透亮玻璃背景 */
+  background: linear-gradient(120deg, 
+      rgba(255,255,255,0.08) 0%,   
+      rgba(255,255,255,0.08) 35%,  
+      rgba(255,255,255,0.35) 50%,  
+      rgba(255,255,255,0.08) 65%,  
+      rgba(255,255,255,0.08) 100%
+  );
+  background-size: 250% 250%;   
+  
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
-/* 缩略图 */
+/* --- 左侧缩略图 --- */
 .mini-cover-wrapper {
-  width: 36px; height: 36px; border-radius: 6px; overflow: hidden;
-  flex-shrink: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+  width: 34px; 
+  height: 34px; 
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.2);
 }
-.mini-cover-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.mini-cover-wrapper img {
+  width: 100%; height: 100%; object-fit: cover;
+}
 .mini-cover-wrapper:active { transform: scale(0.9); opacity: 0.8; }
 
-/* 🔥 修复：歌词滚动区域 */
-.mini-info { 
-  flex: 1; 
-  overflow: hidden; 
-  display: flex; 
-  flex-direction: column; 
-  justify-content: center; 
-  height: 100%; /* 确保高度占满 */
+/* --- 中间歌词/标题 (修复滚动) --- */
+.mini-info {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 }
 
 #songTitle {
   color: #cdbaff; 
   font-weight: 600; 
-  font-size: 0.9rem; 
-  line-height: 50px; /* 垂直居中 */
+  font-size: 0.95rem;
+  line-height: 50px;
   white-space: nowrap; 
-  cursor: pointer; 
+  cursor: pointer;
   position: relative;
-  /* 左右渐变遮罩，防止文字截断生硬 */
+  /* 遮罩防止文字切断生硬 */
   mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
 }
@@ -90,63 +141,102 @@
   will-change: transform; 
 }
 
-/* 只有添加了 .scrolling 类才滚动 */
-.scroll-inner.scrolling { 
-  animation: scrollText var(--scroll-duration, 8s) linear infinite; 
+/* 滚动动画 */
+.scroll-inner.scrolling {
+  animation: scrollText var(--scroll-duration, 8s) linear infinite;
 }
 
-/* 滚动动画：从 0% 滚到 -100% 再加一点缓冲 */
-@keyframes scrollText { 
-  0% { transform: translateX(0); } 
-  20% { transform: translateX(0); } /* 停留一下 */
-  100% { transform: translateX(-100%); } 
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
-/* 按钮组 */
-.elysia-controls { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+/* --- 右侧按钮 --- */
+.elysia-controls { 
+  display: flex; gap: 8px; flex-shrink: 0; align-items: center;
+}
+
 .elysia-controls button {
-  width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, 0.1);
-  border: none; color: #cdbaff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1); 
+  border: none; 
+  color: #cdbaff; cursor: pointer; 
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
 }
-.elysia-controls button:hover { background: rgba(255,255,255,0.2); }
-.elysia-controls button svg { width: 14px; height: 14px; fill: currentColor; }
+
+.elysia-controls button svg { width: 14px; height: 14px; fill: currentColor; pointer-events: none; }
+.elysia-controls button:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+.elysia-controls button:active { transform: scale(0.92); }
+
 #playlistTitleBtn { display: none !important; }
 
-/* 进度条 */
-.elysia-progress-container { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.1); }
-.elysia-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #b48eff, #ff9eb5); }
-
+/* --- 进度条 --- */
+.elysia-progress-container {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: rgba(255, 255, 255, 0.1); z-index: 20;
+}
+.elysia-progress-bar {
+  height: 100%; width: 0%; 
+  background: linear-gradient(90deg, #b48eff, #ff9eb5); 
+}
 
 /* =========================================
-   2. 全屏播放器 (Fullscreen)
+   4. 全屏播放器 (Fullscreen) - 高性能无卡顿
    ========================================= */
 .fullscreen-player {
   position: fixed; inset: 0; z-index: 10000;
   display: flex; flex-direction: column; align-items: center;
-  background: #000; overflow: hidden;
-  transform: translateY(100%); opacity: 0; pointer-events: none;
+  
+  background: #000; /* 纯黑底色打底 */
+  overflow: hidden;
+
+  /* 使用 transform 移出屏幕 */
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+
   will-change: transform, opacity;
   transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
 }
+
 .fullscreen-player.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
 .fullscreen-player.dragging { transition: none !important; }
 
-/* 动态背景 */
+/* 背景动态模糊 (CSS变量控制) */
 .fullscreen-player::before {
   content: ""; position: absolute; inset: -20%;
-  background-image: var(--bg-img); background-size: cover; background-position: center;
-  filter: blur(60px) brightness(0.45) saturate(1.2); transform: scale(1.1); z-index: -1;
+  background-image: var(--bg-img);
+  background-size: cover; background-position: center;
+  filter: blur(60px) brightness(0.45) saturate(1.2);
+  transform: scale(1.1); z-index: -1;
   transition: background-image 0.6s ease;
 }
 
-.fs-drag-indicator { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 15px; flex-shrink: 0; }
-.fs-header { width: 100%; height: 60px; display: flex; justify-content: flex-end; align-items: center; padding: 0 24px; box-sizing: border-box; flex-shrink: 0; }
-.fs-close-btn { background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 50%; color: #fff; border:none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+/* 顶部 */
+.fs-drag-indicator {
+  width: 40px; height: 4px; background: rgba(255,255,255,0.2);
+  border-radius: 2px; margin-top: 15px; flex-shrink: 0;
+}
+.fs-header {
+  width: 100%; height: 60px; display: flex; justify-content: flex-end; align-items: center;
+  padding: 0 24px; box-sizing: border-box; flex-shrink: 0;
+}
+.fs-close-btn {
+  background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px;
+  border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer;
+}
 
-/* 内容容器 */
-.fs-content { position: relative; flex: 1; width: 100%; max-width: 420px; padding: 0 30px 50px 30px; box-sizing: border-box; display: flex; flex-direction: column; }
+/* 内容区 */
+.fs-content {
+  position: relative; flex: 1; width: 100%; max-width: 420px;
+  padding: 0 30px 50px 30px; box-sizing: border-box;
+  display: flex; flex-direction: column;
+}
 
-/* 视图A：封面 */
+/* 视图A: 封面 + 信息 + 爱心 */
 .fs-view-cover {
   position: absolute; inset: 0 30px 180px 30px;
   display: flex; flex-direction: column; justify-content: center;
@@ -155,20 +245,23 @@
 }
 .fs-view-cover.hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
 
-.fs-cover-container { width: 100%; aspect-ratio: 1/1; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; margin-bottom: 30px; }
+.fs-cover-container {
+  width: 100%; aspect-ratio: 1/1; border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; margin-bottom: 30px;
+}
 .fs-cover { width: 100%; height: 100%; object-fit: cover; }
 
-/* 信息栏 */
 .fs-info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .fs-text-col { flex: 1; min-width: 0; padding-right: 10px; text-align: left; }
 .fs-title { color: #fff; font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fs-artist { color: rgba(255,255,255,0.6); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* 爱心按钮 */
 .fs-btn.heart { background: none; border: none; color: rgba(255,255,255,0.4); padding: 8px; cursor: pointer; }
 .fs-btn.heart.liked { color: #ff6b81; }
 .fs-btn.heart svg { width: 28px; height: 28px; fill: currentColor; }
 
-/* 视图B：油画歌词 */
+/* 视图B: 油画歌词 */
 .fs-view-lyrics {
   position: absolute; inset: 0 20px 180px 20px;
   display: flex; flex-direction: column; align-items: center;
@@ -176,41 +269,77 @@
   transition: all 0.4s;
 }
 .fs-view-lyrics.active { opacity: 1; transform: scale(1); pointer-events: auto; z-index: 3; }
-.oil-painting-overlay { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(rgba(255,255,255,0.05) 2px, transparent 3px); background-size: 20px 20px; mix-blend-mode: overlay; opacity: 0.3; }
-.lyrics-scroll-box { width: 100%; height: 100%; overflow-y: auto; text-align: center; scrollbar-width: none; mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); padding: 50% 0; }
-.lyrics-scroll-box p { color: rgba(255,255,255,0.5); font-size: 1.1rem; margin: 24px 0; transition: all 0.4s ease; filter: blur(0.8px); cursor: pointer; }
-.lyrics-scroll-box p.active { color: #fff; font-size: 1.5rem; font-weight: 700; filter: blur(0); transform: scale(1.05); }
+
+.oil-painting-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(rgba(255,255,255,0.05) 2px, transparent 3px);
+  background-size: 20px 20px; mix-blend-mode: overlay; opacity: 0.3;
+}
+.lyrics-scroll-box {
+  width: 100%; height: 100%; overflow-y: auto; text-align: center;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  padding: 50% 0;
+}
+.lyrics-scroll-box p {
+  color: rgba(255,255,255,0.5); font-size: 1.1rem; margin: 24px 0;
+  transition: all 0.4s ease; filter: blur(0.8px); cursor: pointer;
+}
+.lyrics-scroll-box p.active {
+  color: #fff; font-size: 1.5rem; font-weight: 700; filter: blur(0); transform: scale(1.05);
+}
 
 /* 底部控件 */
-.fs-progress-wrap { position: absolute; bottom: 120px; left: 30px; right: 30px; height: 30px; display: flex; align-items: center; cursor: pointer; z-index: 10; }
+.fs-progress-wrap {
+  position: absolute; bottom: 120px; left: 30px; right: 30px;
+  height: 30px; display: flex; align-items: center; cursor: pointer; z-index: 10;
+}
 .fs-progress-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative; }
 .fs-progress-bar-fill { height: 100%; width: 0%; background: #fff; border-radius: 2px; }
 .fs-time { position: absolute; top: 20px; font-size: 0.75rem; color: rgba(255,255,255,0.5); font-family: monospace; }
 .fs-time.current { left: 0; } .fs-time.total { right: 0; }
 
-.fs-controls { position: absolute; bottom: 30px; left: 30px; right: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+.fs-controls {
+  position: absolute; bottom: 30px; left: 30px; right: 30px;
+  display: flex; justify-content: space-between; align-items: center; z-index: 10;
+}
 .fs-btn { background: none; border: none; color: #fff; cursor: pointer; opacity: 0.9; padding: 10px; }
-.fs-btn.play-lg { width: 72px; height: 72px; border-radius: 50%; background: #fff; color: #000; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(255,255,255,0.25); opacity: 1; }
+.fs-btn.play-lg {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #fff; color: #000;
+  display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 8px 20px rgba(255,255,255,0.25); opacity: 1;
+}
 .fs-btn svg { width: 28px; height: 28px; fill: currentColor; }
 
 /* =========================================
-   🔥 修复：播放列表菜单 (透明玻璃风格)
+   5. 播放列表菜单 (UI 透明修复)
    ========================================= */
 .elysia-playlist {
-  position: fixed; 
+  position: fixed;
   bottom: 80px; 
   left: 50%; 
   transform: translateX(-50%) scale(0.95);
   width: 280px; 
   max-height: 40vh;
   
-  /* 🔥 核心修复：完全透明玻璃风格 */
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-  border-radius: 16px; 
+  /* 🔥 核心修复：完全匹配播放器的透亮玻璃风格，去掉了原来的黑色背景 */
+  background: linear-gradient(120deg, 
+      rgba(255,255,255,0.08) 0%,   
+      rgba(255,255,255,0.08) 35%,  
+      rgba(255,255,255,0.35) 50%,  
+      rgba(255,255,255,0.08) 65%,  
+      rgba(255,255,255,0.08) 100%
+  );
+  background-size: 250% 250%;   
+  
   border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
   
   opacity: 0; 
   pointer-events: none; 
@@ -219,21 +348,36 @@
   overflow-y: auto;
 }
 
-.elysia-playlist.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); }
+.elysia-playlist.show {
+  opacity: 1; 
+  pointer-events: auto; 
+  transform: translateX(-50%) scale(1);
+}
 
-.playlist-item { 
-  padding: 12px 16px; 
+.playlist-item {
+  padding: 12px 16px;
   color: rgba(255,255,255,0.7); 
   display: flex; 
-  justify-content: space-between; 
-  border-bottom: 1px solid rgba(255,255,255,0.05); 
-  cursor: pointer; 
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  font-size: 0.9rem;
   transition: background 0.2s, color 0.2s;
 }
-.playlist-item:last-child { border-bottom: none; }
-.playlist-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.playlist-item.active { color: #cdbaff; font-weight: bold; background: rgba(255,255,255,0.08); }
 
-/* 滚动条美化 */
+.playlist-item:last-child { border-bottom: none; }
+
+.playlist-item:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.playlist-item.active {
+  color: #cdbaff; 
+  font-weight: bold;
+  background: rgba(255,255,255,0.1);
+}
+
+/* 滚动条 */
 .elysia-playlist::-webkit-scrollbar { width: 4px; }
-.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }

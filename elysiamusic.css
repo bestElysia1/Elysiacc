@@ -1,7 +1,7 @@
-/* elysiamusic.css - Final Fixed Version */
+/* elysiamusic.css - Final Fixed Version (v5.02) */
 
 /* =========================================
-   1. 底部播放器 (Mini Player) - 332px 固定宽度
+   1. 底部播放器 (Mini Player) - 332px
    ========================================= */
 .elysia-player {
   position: fixed;
@@ -31,7 +31,7 @@
 
 .player-glass-card { position: relative; width: 100%; height: 100%; }
 
-/* 光斑动画 */
+/* 光斑背景动画 */
 .player-glass-card::before {
   content: ""; position: absolute; inset: -50%;
   background: radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
@@ -46,12 +46,14 @@
 .player-face {
   position: absolute; inset: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px;
   border-radius: 16px;
+  /* 透亮玻璃背景 */
   background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(255,255,255,0.2));
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
+/* 缩略图 */
 .mini-cover-wrapper {
   width: 36px; height: 36px; border-radius: 6px; overflow: hidden;
   flex-shrink: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
@@ -59,17 +61,48 @@
 .mini-cover-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 .mini-cover-wrapper:active { transform: scale(0.9); opacity: 0.8; }
 
-.mini-info { flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
-#songTitle {
-  color: #cdbaff; font-weight: 600; font-size: 0.9rem; line-height: 24px;
-  white-space: nowrap; cursor: pointer; position: relative;
-  mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+/* 🔥 修复：歌词滚动区域 */
+.mini-info { 
+  flex: 1; 
+  overflow: hidden; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  height: 100%; /* 确保高度占满 */
 }
-.scroll-inner { display: inline-block; padding-right: 20px; will-change: transform; }
-.scroll-inner.scrolling { animation: scrollText var(--scroll-duration, 8s) linear infinite; }
-@keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
+#songTitle {
+  color: #cdbaff; 
+  font-weight: 600; 
+  font-size: 0.9rem; 
+  line-height: 50px; /* 垂直居中 */
+  white-space: nowrap; 
+  cursor: pointer; 
+  position: relative;
+  /* 左右渐变遮罩，防止文字截断生硬 */
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+.scroll-inner { 
+  display: inline-block; 
+  padding-left: 0; 
+  will-change: transform; 
+}
+
+/* 只有添加了 .scrolling 类才滚动 */
+.scroll-inner.scrolling { 
+  animation: scrollText var(--scroll-duration, 8s) linear infinite; 
+}
+
+/* 滚动动画：从 0% 滚到 -100% 再加一点缓冲 */
+@keyframes scrollText { 
+  0% { transform: translateX(0); } 
+  20% { transform: translateX(0); } /* 停留一下 */
+  100% { transform: translateX(-100%); } 
+}
+
+/* 按钮组 */
 .elysia-controls { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
 .elysia-controls button {
   width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, 0.1);
@@ -79,6 +112,7 @@
 .elysia-controls button svg { width: 14px; height: 14px; fill: currentColor; }
 #playlistTitleBtn { display: none !important; }
 
+/* 进度条 */
 .elysia-progress-container { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.1); }
 .elysia-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #b48eff, #ff9eb5); }
 
@@ -97,7 +131,7 @@
 .fullscreen-player.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
 .fullscreen-player.dragging { transition: none !important; }
 
-/* 动态背景 (伪元素) */
+/* 动态背景 */
 .fullscreen-player::before {
   content: ""; position: absolute; inset: -20%;
   background-image: var(--bg-img); background-size: cover; background-position: center;
@@ -124,13 +158,12 @@
 .fs-cover-container { width: 100%; aspect-ratio: 1/1; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; margin-bottom: 30px; }
 .fs-cover { width: 100%; height: 100%; object-fit: cover; }
 
-/* 信息栏布局修复：Flexbox防止挤压 */
+/* 信息栏 */
 .fs-info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.fs-text-col { flex: 1; min-width: 0; padding-right: 10px; text-align: left; } /* 🔥 关键修复 */
+.fs-text-col { flex: 1; min-width: 0; padding-right: 10px; text-align: left; }
 .fs-title { color: #fff; font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fs-artist { color: rgba(255,255,255,0.6); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* 爱心按钮 */
 .fs-btn.heart { background: none; border: none; color: rgba(255,255,255,0.4); padding: 8px; cursor: pointer; }
 .fs-btn.heart.liked { color: #ff6b81; }
 .fs-btn.heart svg { width: 28px; height: 28px; fill: currentColor; }
@@ -160,15 +193,47 @@
 .fs-btn.play-lg { width: 72px; height: 72px; border-radius: 50%; background: #fff; color: #000; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(255,255,255,0.25); opacity: 1; }
 .fs-btn svg { width: 28px; height: 28px; fill: currentColor; }
 
-/* 播放列表 (z-index 修复：高于全屏) */
+/* =========================================
+   🔥 修复：播放列表菜单 (透明玻璃风格)
+   ========================================= */
 .elysia-playlist {
-  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) scale(0.95);
-  width: 280px; max-height: 40vh;
-  background: rgba(30, 30, 35, 0.95); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  opacity: 0; pointer-events: none; z-index: 10002; /* 🔥 10002 > 10000 */
-  transition: opacity 0.3s, transform 0.3s; overflow-y: auto;
+  position: fixed; 
+  bottom: 80px; 
+  left: 50%; 
+  transform: translateX(-50%) scale(0.95);
+  width: 280px; 
+  max-height: 40vh;
+  
+  /* 🔥 核心修复：完全透明玻璃风格 */
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border-radius: 16px; 
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  
+  opacity: 0; 
+  pointer-events: none; 
+  z-index: 10002; /* 必须高于全屏 */
+  transition: opacity 0.3s, transform 0.3s; 
+  overflow-y: auto;
 }
+
 .elysia-playlist.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); }
-.playlist-item { padding: 12px 16px; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-.playlist-item.active { color: #cdbaff; font-weight: bold; }
+
+.playlist-item { 
+  padding: 12px 16px; 
+  color: rgba(255,255,255,0.7); 
+  display: flex; 
+  justify-content: space-between; 
+  border-bottom: 1px solid rgba(255,255,255,0.05); 
+  cursor: pointer; 
+  transition: background 0.2s, color 0.2s;
+}
+.playlist-item:last-child { border-bottom: none; }
+.playlist-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.playlist-item.active { color: #cdbaff; font-weight: bold; background: rgba(255,255,255,0.08); }
+
+/* 滚动条美化 */
+.elysia-playlist::-webkit-scrollbar { width: 4px; }
+.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }

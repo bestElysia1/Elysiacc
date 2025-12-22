@@ -421,7 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const offset = containerWidth - textWidth - 20; 
           
           // 🔥 修复速度：恒定速度算法 (每秒60px)，最短2秒
-          const duration = Math.max(2, overflow / 50); 
+          const duration = Math.max(2, overflow / 35); 
           
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);

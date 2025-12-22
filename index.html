@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.5.01</title>
   
   <link rel="manifest" href="manifest.json">
@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0d0b14" media="(prefers-color-scheme: dark)">
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
@@ -22,7 +22,9 @@
 <body>
 
 <div class="hamburger" id="hamburger-menu" aria-label="菜单" role="button" tabindex="0">
-  <span class="hb-line"></span><span class="hb-line"></span><span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
+  <span class="hb-line"></span>
 </div>
 
 <ul class="dropdown-menu" id="dropdown">
@@ -30,7 +32,9 @@
   <li><a href="elysia-3d.html">Elysia</a></li>
   <li><a href="speedtest.html">IP Test</a></li>
   <li><a href="http://star.bestelysia.com/">Star</a></li>
+  
   <li class="menu-divider"></li>
+
   <li>
     <a href="#" id="nav-auth-btn" class="auth-item">
       <span class="auth-icon" id="auth-icon-slot">
@@ -39,8 +43,11 @@
       <span class="auth-text" id="nav-auth-text">登录 / 同步</span>
     </a>
   </li>
+
   <li>
-    <a href="#" id="nav-lang-switch" class="lang-switch-item"><span class="lang-text">EN</span></a>
+    <a href="#" id="nav-lang-switch" class="lang-switch-item">
+      <span class="lang-text">EN</span> 
+    </a>
   </li>
 </ul>
 
@@ -48,7 +55,9 @@
 
 <main class="container">
   <div class="banner-3d" id="banner3d">
-    <div class="banner-layer"><img src="assets/banner.jpg" alt="Banner"></div>
+    <div class="banner-layer">
+      <img src="assets/banner.jpg" alt="Banner">
+    </div>
     <div class="banner-glow"></div>
   </div>
 
@@ -132,6 +141,7 @@
     <pre>https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
 https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module</pre>
+
     <p>设置完成后－小火箭－首页－全局路由－更改为－配置 ，重新打开小火箭即可，这样就不需要一直开关小火箭，国内 app 网站默认直连，国外 app 网站默认代理（银行 APP 除外）</p>
   </section>
 
@@ -185,6 +195,8 @@ domain:poe.com,
 domain:huggingface.co,
 domain:chatgpt.com</pre>
     <p>其他的不用改动，点击确定-标签栏-设置-以管理员身份重启，这样就设置好－在使用ChatGPT等AI时自动切换新加坡节点，不影响现在使用的节点</p>
+    <p>其他诸如增加分流节点或修改AI使用节点等同理~</p>
+    <p>其他clash verge、sing - box .etc 略</p>
   </section>
 
   <section>
@@ -196,9 +208,11 @@ domain:chatgpt.com</pre>
     <pre>bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</pre>
     然后根据提示一步步操作就可以了，将生成的节点导入到V2rayN即可使用 
 </li>
+
       <li><strong>Putty：</strong>打开putty 输入主机IP和端口登录，后续步骤同上</li>
       <li><strong>CMD：</strong>windows+R 运行CMD，然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-P 后面输入VPS提供的端口）登录，后续步骤同上</li>
       <li><strong>Terminal：</strong>Command+空格 输入 Terminal 运行，然后复制命令 ssh root@yourIP -p port(root是指用户名，yourip替换成你购买的主机IP地址，-p 后面输入VPS提供的端口）登录，后续步骤同上</li>
+      <li><strong>建议：</strong>搭建节点后配合 前置代理 或者使用 流量转发服务 可以让你的VPS节点十分稳定和加速，避免无法使用等情况</li>
     </ul>
   </section>
 
@@ -224,10 +238,11 @@ domain:chatgpt.com</pre>
     </ul>
   </section>
 
-  <div class="elysia-video-wrapper">
+<div class="elysia-video-wrapper">
     <video id="videoA" autoplay muted playsinline preload="auto" crossorigin="anonymous"></video>
     <video id="videoB" muted playsinline preload="auto" crossorigin="anonymous"></video>
-  </div>
+</div>
+
 
   <section>
     <h2>一些实用&有趣的网址</h2>
@@ -252,114 +267,83 @@ domain:chatgpt.com</pre>
     订阅使用指南 ver.5.01
     <br>© bestElysia 2025
   </footer>
+
 </main>
 
-<div id="elysiaPlayer" class="elysia-player">
-  <div class="player-glass-card">
-    <div class="player-face">
-      <div class="mini-cover-wrapper" id="miniCoverBtn">
-        <img id="miniCoverImg" src="assets/cover_placeholder.jpg" alt="cover">
-      </div>
-      <div class="mini-info">
-        <div id="songTitle">Waiting for music...</div>
-      </div>
-      <div class="elysia-controls">
-        <button id="playPauseBtn"></button>
-        <button id="nextBtn"></button>
-        <button id="playlistTitleBtn" style="display:none"></button> 
-      </div>
-      <div class="elysia-progress-container" id="progressContainer">
-        <div class="elysia-progress-bar" id="progressBar"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="fullscreenPlayer" class="fullscreen-player">
-  <div class="fs-backdrop" id="fsBackdrop"></div>
-  
-  <div class="fs-drag-indicator"></div>
-
-  <div class="fs-header">
-     <button class="fs-close-btn" id="fsCloseBtn">
-       <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-     </button>
-  </div>
-
-  <div class="fs-content" id="fsContent">
+<div class="elysia-player" id="elysiaPlayer">
+  <div class="player-glass-card" id="playerCard">
     
-    <div class="fs-view-cover active" id="fsViewCover">
-        <div class="fs-cover-container" id="fsCoverWrapper">
-          <img id="fsCoverImg" src="" class="fs-cover">
-        </div>
-        
-        <div class="fs-info">
-          <div class="fs-info-row">
-            <div class="fs-text-col">
-              <div class="fs-title" id="fsTitle">Song Title</div>
-              <div class="fs-artist" id="fsArtist">Artist Name</div>
-            </div>
-            <button class="fs-btn heart" id="fsHeartBtn">
-               <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </button>
-          </div>
-        </div>
-    </div>
-
-    <div class="fs-view-lyrics" id="fsViewLyrics">
-        <div class="oil-painting-overlay"></div>
-        <div class="lyrics-scroll-box" id="lyricsBox">
-            <p class="placeholder">点击封面查看歌词</p>
-        </div>
-    </div>
-
-    <div class="fs-progress-wrap" id="fsProgressWrap">
-      <div class="fs-time current" id="fsTimeCurrent">0:00</div>
-      <div class="fs-progress-bar-bg">
-         <div class="fs-progress-bar-fill" id="fsProgressBarFill">
-           <div class="fs-progress-dot"></div>
-         </div>
+    <div class="player-face face-front">
+      <div class="elysia-controls">
+        <button id="playPauseBtn" aria-label="Play/Pause"></button>
+        <button id="nextBtn" aria-label="Next"></button>
       </div>
-      <div class="fs-time total" id="fsTimeTotal">0:00</div>
+      <span id="songTitle" class="clickable" role="button" tabindex="0">loading...</span>
     </div>
 
-    <div class="fs-controls">
-      <button class="fs-btn mode" id="fsModeBtn"></button>
-      <button class="fs-btn prev" id="fsPrevBtn">
-        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" fill="currentColor"/></svg>
-      </button>
-      <button class="fs-btn play-lg" id="fsPlayPauseBtn"></button>
-      <button class="fs-btn next" id="fsNextBtn">
-        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" fill="currentColor"/></svg>
-      </button>
-      <button class="fs-btn list" id="fsListBtn">
-         <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-      </button>
+    <div class="player-face face-back">
+      <div class="elysia-controls">
+        <button id="modeBtn" class="control-btn" aria-label="切换模式"></button>
+        <button id="heartBtn" class="control-btn" aria-label="喜欢"></button>
+      </div>
+      <span id="playlistTitleBtn" class="clickable" role="button" tabindex="0">ピアノ音楽</span>
     </div>
+
   </div>
 </div>
 
 <div class="elysia-playlist" id="playlist" aria-hidden="true"></div>
+
 <div class="elysia-playlist" id="playlistMenu" aria-hidden="true"></div>
 
-<div id="login-modal-overlay" class="glass-overlay">
+<div id="login-modal-overlay" class="glass-overlay" aria-hidden="true">
   <div class="glass-modal-card">
     <button id="close-modal-btn" class="close-btn">&times;</button>
-    <div class="modal-header"><h2>Welcome</h2><p>登录以解锁云端歌单同步</p></div>
+    
+    <div class="modal-header">
+      <h2>Welcome</h2>
+      <p>登录以解锁云端歌单同步</p>
+    </div>
+
     <div id="login-actions">
-       <input type="email" id="email-input" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username">
-       <input type="password" id="pass-input" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password">
-       <div class="turnstile-wrapper"><div class="cf-turnstile" data-sitekey="0x4AAAAAACFk8I22JCGmIBaq" data-callback="onTurnstileSuccess"></div></div>
-       <button id="email-submit-btn" class="glass-action-btn email-btn" disabled>登录 / 注册</button>
-       <div class="auth-divider"><span>or</span></div>
-       <button id="google-login-btn" class="glass-action-btn google-btn">Sign in with Google</button>
-       <p id="auth-error-msg" class="error-msg"></p>
+      <div class="email-auth-container">
+        <input type="email" id="email-input" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username" />
+        <input type="password" id="pass-input" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password" />
+        
+        <div class="turnstile-wrapper">
+            <div class="cf-turnstile" 
+                 data-sitekey="0x4AAAAAACFk8I22JCGmIBaq" 
+                 data-callback="onTurnstileSuccess" 
+                 data-expired-callback="onTurnstileExpired"
+                 data-theme="light"></div>
+        </div>
+        
+        <button id="email-submit-btn" class="glass-action-btn email-btn" disabled>
+          <span>登录 / 自动注册</span>
+        </button>
+        
+        <p id="auth-error-msg" class="error-msg"></p>
+      </div>
+
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <button id="google-login-btn" class="glass-action-btn google-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Sign in with Google
+      </button>
     </div>
-    <div id="user-info-panel" style="display:none">
-       <div class="avatar-glow-ring"><img id="modal-user-avatar" src="" class="modal-avatar"></div>
-       <h3 id="modal-user-name">User</h3>
-       <button id="logout-confirm-btn" class="glass-action-btn logout-style">退出登录</button>
+
+    <div id="user-info-panel" style="display: none;">
+      <div class="avatar-glow-ring">
+        <img id="modal-user-avatar" src="" alt="Avatar" class="modal-avatar">
+      </div>
+      <h3 id="modal-user-name" style="margin-top:10px; color:#5a4b80;">User</h3>
+      <p style="font-size:0.8rem; margin-bottom:20px; opacity:0.7;">已同步喜欢歌曲</p>
+      <button id="logout-confirm-btn" class="glass-action-btn logout-style">退出登录</button>
     </div>
+
   </div>
 </div>
 
@@ -367,10 +351,21 @@ domain:chatgpt.com</pre>
 <script src="hamburger.js" defer></script>
 <script src="songs.js" defer></script>
 <script src="elysiamusic.js" type="module" defer></script>
+
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(e=>console.log(e)));
+    window.addEventListener('load', () => {
+      // 显式指定 scope 为 './'，确保它能控制根目录下的所有文件
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(registration => {
+          console.log('[Elysia] Service Worker 注册成功:', registration.scope);
+        })
+        .catch(err => {
+          console.error('[Elysia] Service Worker 注册失败:', err);
+        });
+    });
   }
 </script>
+
 </body>
 </html>

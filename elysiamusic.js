@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version (Slower Speed + Damping + Instant Sync) */
+/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (降速 + 阻尼适配) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return; 
       }
 
-      // 重置 DOM
+      // 重置 DOM 以强制动画从头开始
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
@@ -415,26 +415,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          const overflow = textWidth - containerWidth;
+          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
+          const duration = (textWidth / 50) + 1.5; 
           
-          // 方向：向左 (负数)
-          const offset = containerWidth - textWidth - 10;
-          
-          // 🔥 速度调整：
-          // overflow / 50 (数字越小，时间越长，越慢)
-          // 基础时间从 2s 增加到 3s，保证短句子也慢下来
-          const duration = Math.max(3, overflow / 50); 
-          
+          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
+          // 容器宽 - 文字宽 - 20px余量 = 负数
+          const offset = containerWidth - textWidth - 20;
+
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
-          // 强制重绘 (Reflow)
+          // 3. 强制重绘 (Reflow)
+          innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
-          
           innerSpan.classList.add('scrolling');
+          
           titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
+          innerSpan.style.transform = 'translateX(0)';
           titleEl.style.textAlign = 'left'; 
       }
   }
@@ -494,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if(currentCoverEl) currentCoverEl.classList.add("playing");
       
-      updateTitleOrLyric(true); // 暂停/播放切换样式
+      updateTitleOrLyric(true); 
 
     } else {
       audio.pause();
@@ -815,7 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // --- 歌词逻辑 ---
+    // --- 歌词逻辑 (核心修复) ---
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;

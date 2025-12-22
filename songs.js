@@ -17,7 +17,7 @@ window.allSongsLibrary = [
     { title: "手心的蔷薇", artist: "林俊傑 & 鄧紫棋", src: "https://cdn-assets.bestelysia.com/火曜日/06 手心的蔷薇(feat.邓紫棋).wav", cover: "assets/Elysia11.jpg", lrc: "lyrics/手心的蔷薇林俊杰邓紫棋.lrc", category: "tue" },
     { title: "被风吹过的夏天", artist: "林俊傑 & 金莎", src: "https://cdn-assets.bestelysia.com/火曜日/10. 被风吹过的夏天.wav", cover: "assets/Elysia11.jpg", lrc: "lyrics/被风吹过的夏天金莎林俊杰.lrc", category: "tue" },
     { title: "你在看孤独的风景", artist: "单小源 & 本兮", src: "https://cdn-assets.bestelysia.com/火曜日/单小源、本兮 - 你在看孤独的风景【有间音乐】.wav", cover: "assets/nizaikangududefengjing .webp", lrc: "lyrics/你在看孤独的风景本兮单小源.lrc", category: "tue" },
-    { title: "風鈴", artist: "蔣孜怡", src: "https://cdn-assets.bestelysia.com/火曜日/蔣孜怡-風鈴(FallingU中文版).mp3", cover: "assets/Elysia11.jpg", lrc: "lyrics/风铃蒋孜怡.lrc", lrc: "lyrics/Someday.lrc", category: "tue" },
+    { title: "風鈴", artist: "蔣孜怡", src: "https://cdn-assets.bestelysia.com/火曜日/蔣孜怡-風鈴(FallingU中文版).mp3", cover: "assets/Elysia11.jpg", lrc: "lyrics/风铃蒋孜怡.lrc", category: "tue" },
     { title: "星晴", artist: "周杰倫", src: "https://cdn-assets.bestelysia.com/火曜日/周杰伦 - 星晴 + 回到过去 + 最后的战役 + 爱我别走 (Live).mp3", cover: "assets/xingqing.webp", lrc: "lyrics/星晴回到过去最后的战役爱我别走.lrc", category: "tue" },
     { title: "暗号", artist: "周杰倫", src: "https://cdn-assets.bestelysia.com/火曜日/周杰伦 - 暗号.flac", cover: "assets/anhao.webp", lrc: "lyrics/暗号周杰伦.lrc", category: "tue" },
     { title: "无限速", artist: "本兮 & 阿悄", src: "https://cdn-assets.bestelysia.com/火曜日/本兮&阿悄 - 无限速.flac", cover: "assets/wuxiansu.webp", lrc: "lyrics/无限速本兮阿悄.lrc", category: "tue" },

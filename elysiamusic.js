@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Version (Cleaned: No Progress Bar) */
+/* elysiamusic.js - Ultimate Version (Fixed: Instant Lyrics Sync) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -374,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  function updateTitleOrLyric() {
+  /* --- 🎵 核心逻辑：更新标题/歌词 (已修复：即时同步) --- */
+  function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
       let textToShow = "";
@@ -389,35 +390,45 @@ document.addEventListener("DOMContentLoaded", () => {
           textToShow = song.title; 
           titleEl.classList.remove("lyric-mode");
       } else {
+          // 歌词模式
           if (currentLyricIndex === -1 || currentLyricIndex >= currentLyrics.length) {
-              if(currentLyrics.length > 0 && audio.currentTime < currentLyrics[0].time) {
-                   textToShow = song.title; 
-                   titleEl.classList.remove("lyric-mode");
-              } else {
-                   textToShow = song.title;
-                   titleEl.classList.remove("lyric-mode");
-              }
+              textToShow = song.title;
+              titleEl.classList.remove("lyric-mode");
           } else {
               textToShow = currentLyrics[currentLyricIndex].text;
+              if (!textToShow.trim()) textToShow = song.title; 
               titleEl.classList.add("lyric-mode");
           }
       }
 
-      titleEl.innerHTML = `<span class="scroll-inner">${textToShow}</span>`;
+      // 优化：如果文字没变且不是强制更新，则不操作 DOM
+      const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
+      if (!forceUpdate && currentHTML === textToShow) {
+          return; 
+      }
+
+      // 重置 DOM 以强制动画从头开始
+      // style="transform:translateX(0)" 确保文字立即归位到最左侧（开头）
+      titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
+      
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
       if (textWidth > containerWidth) {
-          const duration = (textWidth / 50) + 1.5; 
+          // 动态计算滚动时间：基础 2秒 + 每多 40px 增加 1秒
+          const overflow = textWidth - containerWidth;
+          const duration = 2.5 + (overflow / 40); 
+          
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
-          innerSpan.classList.remove('scrolling');
+          
+          // 强制重绘 (Reflow) - 这是重启 CSS 动画的关键
           void innerSpan.offsetWidth; 
+          
           innerSpan.classList.add('scrolling');
           titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
-          innerSpan.style.transform = 'translateX(0)';
           titleEl.style.textAlign = 'left'; 
       }
   }
@@ -438,7 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCover(song);
 
     isLyricsLoading = true;
-    updateTitleOrLyric(); 
+    updateTitleOrLyric(true); // 切歌时强制更新
 
     fetchLyrics(song);
 
@@ -476,10 +487,9 @@ document.addEventListener("DOMContentLoaded", () => {
       playPauseBtn.classList.add("playing"); 
       player.classList.add("playing");
       
-      // 触发封面旋转动画（如果有设置CSS）
       if(currentCoverEl) currentCoverEl.classList.add("playing");
       
-      updateTitleOrLyric(); 
+      updateTitleOrLyric(true); 
 
     } else {
       audio.pause();
@@ -487,10 +497,9 @@ document.addEventListener("DOMContentLoaded", () => {
       playPauseBtn.classList.remove("playing");
       player.classList.remove("playing");
       
-      // 停止封面旋转
       if(currentCoverEl) currentCoverEl.classList.remove("playing");
       
-      updateTitleOrLyric(); 
+      updateTitleOrLyric(true); 
     }
   }
 
@@ -785,26 +794,28 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener('play', () => { 
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; 
       updatePositionState(); 
-      updateTitleOrLyric(); 
+      updateTitleOrLyric(true); 
   });
   
   audio.addEventListener('pause', () => { 
     if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
     updatePositionState();
     savePlaybackState();
-    updateTitleOrLyric(); 
+    updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 --- */
+  /* --- 🔥 timeupdate 监听器 (优化版) --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // 更新歌词
+    // --- 歌词逻辑 (核心修复) ---
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
+        
+        // 查找当前句
         for (let i = 0; i < currentLyrics.length; i++) {
             if (currentTime >= currentLyrics[i].time) {
                 activeIndex = i;
@@ -812,11 +823,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 break; 
             }
         }
+
+        // 只有当行数改变时，才触发 DOM 更新 (防止闪烁)
+        // 且调用 updateTitleOrLyric(true) 强制重置滚动位置
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
-            updateTitleOrLyric();
+            updateTitleOrLyric(true);
         }
     }
+    // -------------------------
 
     // 检测单曲循环播放计数
     if (playMode === 1 && audio.duration > 0) {

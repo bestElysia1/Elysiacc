@@ -1,480 +1,323 @@
-/* elysiastyle.css - Core Layout & Visual (v4.27 Dark Mode Integrated) */
-
-:root {
-  --accent-start: #9a6ef0;
-  --accent-end: #7b3fe4;
-  --link: #8f66f0;
-  --bg: #ffffff;
-  --maxw: 980px;
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft Yahei", Arial, sans-serif;
-  color: #333;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  /* 增加背景色过渡，切换模式时更丝滑 */
-  transition: background 0.5s ease, color 0.5s ease;
-}
-
-body {
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft Yahei', sans-serif;
-  letter-spacing: 0.3px;
-  line-height: 1.85;
-}
-
-.container {
-  max-width: var(--maxw);
-  margin: 28px auto;
-  padding: 0 48px;
-}
-
-.banner {
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 18px;
-}
-
-.banner img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.title h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  transition: filter 0.3s ease;
-}
-
-.subtitle {
-  color: #888;
-  margin-top: 6px;
-  font-size: 0.92rem;
-  transition: color 0.3s ease;
-}
-
-.music {
-  margin-left: auto;
-}
-
-iframe {
-  border-radius: 6px;
-  border: 0;
-}
+/* elysiamusic.css - V3: Fixed Glass UI & Fullscreen Logic */
 
 /* =========================================
-   🌌 Elysia — 液态紫粉玻璃倒计时
+   1. 基础容器
    ========================================= */
-.countdown {
-  position: relative;
-  margin: 22px 0;
-  padding: 20px 28px;
-  border-radius: 18px;
-  overflow: hidden;
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 18px rgba(160,120,255,0.3);
-  animation: countdownFloat 8s ease-in-out infinite;
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-  z-index: 1; 
-  transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
-}
-
-.countdown::before {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  background:
-    radial-gradient(45% 45% at 15% 25%, rgba(156,107,255,0.38), transparent 30%),
-    radial-gradient(40% 40% at 70% 60%, rgba(200,150,255,0.28), transparent 25%),
-    radial-gradient(35% 35% at 40% 80%, rgba(130,200,255,0.22), transparent 20%);
-  filter: blur(40px);
-  animation: blobMove 14s ease-in-out infinite;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: -1; 
-}
-
-.countdown div {
-  color: rgba(240,230,255,0.9);
-  font-size: 0.96rem;
-  margin-bottom: 8px;
-  text-shadow: none;
-  transition: color 0.3s ease;
-}
-
-.countdown .nums {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  color: #7a66c7;
-  text-shadow: none;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-@keyframes countdownFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-@keyframes blobMove {
-  0% { transform: translate(0,0) scale(1); }
-  25% { transform: translate(6%, -4%) scale(1.05); }
-  50% { transform: translate(-5%, 5%) scale(1.02); }
-  75% { transform: translate(3%, -3%) scale(1.07); }
-  100% { transform: translate(0,0) scale(1); }
-}
-
-/* =========================================
-   ✨ 滚动交互淡入淡出 (Scroll Reveal)
-   ========================================= */
-
-/* 1. 初始状态 */
-section, 
-.container ul li {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: opacity, transform;
-}
-
-/* 2. 可见状态 */
-section.visible,
-.container ul li.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ========================================= */
-
-h2 {
-  font-size: 1.02rem;
-  margin: 8px 0 14px 0;
-  padding-left: 10px;
-  border-left: 4px solid rgba(123,63,228,0.12);
-  color: var(--accent-end);
-  background: linear-gradient(90deg, rgba(154,110,240,0.03), rgba(123,63,228,0.01));
-  padding: 8px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #b388ff, #9c6bff, #b388ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  transition: all 0.6s ease;
-}
-
-h2:hover {
-  animation: gradientFlow 3s linear infinite;
-}
-
-p, ul, li {
-  color: #7a66c7 !important;
-  line-height: 1.8;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  transition: color 0.3s ease;
-}
-
-a {
-  color: var(--link);
-  text-decoration: none;
-  transition: all 0.4s ease;
-}
-a:hover { text-decoration: underline; }
-
-main.container p:hover,
-main.container li:hover {
-  color: #9a6ef0 !important;
-  transition: all 0.3s ease;
-  transform: translateX(4px); 
-}
-
-/* 修复 hover 冲突 */
-main.container ul li.visible:hover {
-  transform: translateX(4px); 
-}
-
-pre {
-  background: #faf6ff;
-  border: 1px solid rgba(123,63,228,0.06);
-  padding: 10px;
-  border-radius: 8px;
-  overflow: auto;
-  color: #5b4aa1;
-  transition: background 0.5s ease, color 0.3s ease;
-}
-
-footer {
-  margin: 36px 0 0 0;
-  padding-top: 12px;
-  color: #999;
-  font-size: 0.85rem;
-  text-align: center;
-  border-top: 1px solid rgba(156,107,255,0.2);
-  background: linear-gradient(90deg, rgba(179,136,255,0.05), rgba(156,107,255,0.05));
-  box-shadow: 0 -4px 12px rgba(156,107,255,0.05);
-  transition: all 0.4s ease;
-}
-
-footer:hover {
-  text-shadow: 0 0 6px rgba(156,107,255,0.6);
-  color: #bca9ff;
-}
-
-.leftnav {
+.elysia-player {
   position: fixed;
-  left: 12px;
-  top: 120px;
-  width: 160px;
-}
-.leftnav ul { list-style: none; padding: 0; margin: 0; }
-.leftnav li { margin: 8px 0; color: var(--link); font-size: 0.9rem; }
-
-@media (max-width: 900px) {
-  .container { padding: 0 18px; }
-  .leftnav { display: none; }
-  header { flex-direction: column; align-items: flex-start; }
-  .music { margin-left: 0; margin-top: 8px; }
-}
-
-@keyframes glowPulse {
-  0%, 100% { color: #9a6ef0; text-shadow: 0 0 4px rgba(156,107,255,0.4); }
-  50% { color: #ffffff; text-shadow: 0 0 10px rgba(156,107,255,0.9); }
-}
-
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-/* Banner 3D */
-.banner-3d {
-  position: relative;
-  width: 100%;
-  max-width: 980px;
-  margin: 0 auto 28px auto;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  
+  /* 还原原本的尺寸感 */
+  width: calc(100% - 36px);
+  max-width: 600px; 
+  height: 56px; /* 高度还原，比V2稍微矮一点，更精致 */
+  
   perspective: 1000px;
-  border-radius: 16px;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  box-shadow: 0 8px 28px rgba(120, 80, 255, 0.25);
-  animation: bannerFloaty 8s ease-in-out infinite;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  
+  /* 恢复原本的悬浮动画 */
+  animation: elysiaFloat 6s ease-in-out infinite;
+  transition: transform 0.4s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.3s;
 }
 
-.banner-3d .banner-layer {
-  transition: transform 0.25s ease-out;
-  transform-origin: center;
+/* 隐藏时的位置 */
+.elysia-player.ui-hidden {
+  transform: translate(-50%, 120%);
 }
 
-.banner-3d img {
-  width: 100%;
-  display: block;
-  border-radius: 16px;
-  /* ✨ 增加滤镜过渡，防止黑夜模式切换时闪烁 */
-  transition: filter 0.5s ease;
+@keyframes elysiaFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
 }
 
-.banner-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* =========================================
+   2. 还原：透亮玻璃风格 (Original Glass Style)
+   ========================================= */
+.player-glass-card {
+  position: relative;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25), transparent 70%);
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  opacity: 0.5;
-  transition: background-position 0.2s ease-out, mix-blend-mode 0.5s ease, opacity 0.5s ease;
-}
-
-@keyframes bannerFloaty {
-  0%, 100% { transform: translateY(0); filter: brightness(1); }
-  50% { transform: translateY(-6px); filter: brightness(1.05); }
-}
-
-.elysia-video-wrapper {
-  position: relative;
-  margin: 40px auto;
-  width: 100%;
-  max-width: 800px;
-  aspect-ratio: 16 / 9;
-  border-radius: 18px;
+  border-radius: 18px; /* 还原原本的圆角大小，不是完全胶囊 */
   overflow: hidden;
-  background: #000;
-  box-shadow: 0 0 30px rgba(150,120,255,0.15);
-  transition: box-shadow 0.5s ease;
+
+  /* 🔥 核心修复：还原原本的渐变透亮色 + 边框 + 阴影 */
+  background: linear-gradient(120deg, 
+      rgba(255,255,255,0.08) 0%,   
+      rgba(255,255,255,0.08) 35%,  
+      rgba(255,255,255,0.35) 50%,  
+      rgba(255,255,255,0.08) 65%,  
+      rgba(255,255,255,0.08) 100%
+  );
+  background-size: 250% 250%;   
+  animation: shimmerBg 10s ease infinite; /* 可选：背景微光流动 */
+
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.25), 
+              inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-.elysia-video-wrapper video {
+.player-face {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 12px; 
+  gap: 12px;
+}
+
+/* --- 左侧：缩略图 (完美嵌入框内) --- */
+.mini-cover-wrapper {
+  width: 40px; 
+  height: 40px;
+  border-radius: 8px; /* 方形圆角，符合原本风格 */
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.mini-cover-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 18px;
-  background: #000;
-  /* ✨ 增加 opacity 和 filter 过渡 */
-  transition: opacity 0.8s ease-in-out, filter 0.5s ease;
 }
-#videoA { opacity: 1; z-index: 2; }
-#videoB { opacity: 0; z-index: 1; }
-
-#starfield {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -2;
-  background: transparent;
-  pointer-events: none;
+.mini-cover-wrapper:active {
+  transform: scale(0.95);
+  opacity: 0.8;
 }
 
-/* 第一段特定渐变 (保留) */
-main.container > section:nth-of-type(1) p {
-  background: linear-gradient(90deg, #0E52D4 0%, #A639D7 100%);
-  width: fit-content;
-  width: -moz-fit-content; 
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-  font-weight: normal;
-  text-decoration: none;
-  margin-bottom: 12px;
-  transition: filter 0.3s ease;
-}
-main.container > section:nth-of-type(1) p strong {
-  background: none; 
-  -webkit-text-fill-color: transparent; 
-  font-weight: 700;
-}
-main.container > section:nth-of-type(1) p:hover {
-  filter: brightness(1.2);
-  cursor: default;
+/* --- 中间：歌曲信息 --- */
+.mini-info {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* iOS 适配 */
-@media screen and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-  .container p, .container h2, .container .subtitle, .container .countdown div {
-    word-break: break-word !important;
-    overflow-wrap: anywhere !important;
-    hyphens: auto !important;
-    text-align: justify !important;
-    line-height: 1.85 !important;
-  }
-  .container ul li { padding-left: 0.3em; text-indent: -0.3em; }
-  .container ul li::marker { unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
-  .container p:not(:empty) { text-indent: 0; }
+#songTitle {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* 加回文字阴影，更清晰 */
+  cursor: pointer;
+  mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+}
+
+.scroll-inner { display: inline-block; padding-right: 20px; }
+.scroll-inner.scrolling { animation: scrollText var(--scroll-duration, 8s) linear infinite; }
+@keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+/* --- 右侧：按钮组 (只保留播放和下一首) --- */
+.elysia-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.elysia-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15); /* 微透亮按钮底色 */
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.elysia-controls button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+.elysia-controls button:active {
+  transform: scale(0.95);
+}
+.elysia-controls button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* 🔥 强制隐藏列表按钮 (符合你的要求) */
+#playlistTitleBtn {
+  display: none !important;
+}
+
+/* --- 底部进度条 --- */
+.elysia-progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+.elysia-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b48eff, #ff9eb5); /* 保持原本的粉紫渐变 */
+  box-shadow: 0 0 10px rgba(180, 142, 255, 0.5);
 }
 
 /* =========================================
-   🌙 Dark Mode Support (iOS & System Default)
-   包含：配色反转、文字提亮、媒体压暗
+   3. 全屏播放器 (修复卡顿问题)
    ========================================= */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* 核心变量重定义 */
-    --bg: #0d0b14; 
-    --accent-start: #b388ff;
-    --accent-end: #9a6ef0;
-    --link: #bca9ff;
-  }
-
-  /* 全局基础 */
-  html, body {
-    background: var(--bg);
-    color: #e0e0e0;
-  }
-
-  /* 倒计时组件 (Glassmorphism) */
-  .countdown {
-    background: linear-gradient(145deg, rgba(30, 25, 40, 0.6), rgba(20, 15, 30, 0.4));
-    border: 1px solid rgba(156, 107, 255, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 25px rgba(0,0,0,0.6);
-  }
-  .countdown div {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .countdown .nums {
-    color: #d1c4e9;
-    text-shadow: 0 0 12px rgba(156, 107, 255, 0.5);
-  }
-
-  /* 文字与标题 */
-  .title h1 {
-    filter: brightness(1.1);
-  }
-  .subtitle {
-    color: #888899;
-  }
-  h2 {
-    background: linear-gradient(90deg, rgba(154,110,240,0.15), transparent);
-    color: #d1c4e9; 
-    -webkit-text-fill-color: #d1c4e9;
-  }
-  p, ul, li {
-    color: #cec2e6 !important; 
-  }
-
-  /* 特殊渐变文字提亮 */
-  main.container > section:nth-of-type(1) p {
-    filter: brightness(1.3) saturate(1.2);
-  }
-
-  /* 代码块 */
-  pre {
-    background: #15121e;
-    border: 1px solid rgba(123,63,228,0.15);
-    color: #e2d9f3;
-  }
-
-  /* Footer */
-  footer {
-    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02));
-    border-top: 1px solid rgba(255,255,255,0.05);
-    color: #666;
-  }
-
-  /* Banner 3D 光效修正 */
-  .banner-glow {
-    mix-blend-mode: screen; 
-    opacity: 0.2;
-  }
+.fullscreen-player {
+  /* 🔥 关键：因为移出了 elysia-player 容器，
+     position: fixed 现在的参考系是整个屏幕窗口，
+     所以它不会再被卡在小框框里了。
+  */
+  position: fixed;
+  inset: 0; 
+  z-index: 10000;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   
-  /* 链接 Hover */
-  a:hover {
-    color: #fff;
-    text-shadow: 0 0 8px rgba(188, 169, 255, 0.6);
-  }
-
-  /* ✨ 媒体元素压暗 (防刺眼) */
-  .banner-3d img,
-  .elysia-video-wrapper video {
-    filter: brightness(0.85) contrast(1.1) saturate(1.05);
-  }
-
-  /* 视频容器阴影调整 */
-  .elysia-video-wrapper {
-     box-shadow: 0 0 40px rgba(90, 60, 180, 0.25);
-  }
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  
+  transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
 }
+
+.fullscreen-player.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 背景模糊 */
+.fs-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.5);
+  transform: scale(1.1);
+  z-index: -1;
+  transition: background-image 0.5s ease;
+}
+/* 遮罩，让字更清楚 */
+.fullscreen-player::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 顶部下拉条 */
+.fs-drag-indicator {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin-top: 15px;
+}
+
+/* 头部 (关闭按钮) */
+.fs-header {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: flex-end; /* 按钮在右边 */
+  align-items: center;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+.fs-close-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.fs-close-btn:active { background: rgba(255,255,255,0.3); }
+
+/* 全屏内容区 */
+.fs-content {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 32px 60px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  box-sizing: border-box;
+}
+
+/* 大封面 */
+.fs-cover-container {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transform: scale(0.9);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fullscreen-player.active .fs-cover-container {
+  transform: scale(1);
+}
+.fs-cover { width: 100%; height: 100%; object-fit: cover; }
+
+/* 字体样式 */
+.fs-info { text-align: left; margin-bottom: 30px; }
+.fs-title { color: #fff; font-size: 1.6rem; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+.fs-artist { color: rgba(255,255,255,0.6); font-size: 1.1rem; }
+
+/* 全屏进度条 */
+.fs-progress-wrap { width: 100%; margin-bottom: 40px; position: relative; padding: 10px 0; cursor: pointer; }
+.fs-progress-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative; }
+.fs-progress-bar-fill { width: 0%; height: 100%; background: #fff; border-radius: 2px; position: relative; }
+.fs-progress-dot {
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%) scale(0);
+  width: 14px; height: 14px; background: #fff; border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5); transition: transform 0.2s;
+}
+.fs-progress-wrap:active .fs-progress-dot, .fs-progress-bar-bg:hover .fs-progress-dot { transform: translateY(-50%) scale(1); }
+.fs-time { position: absolute; top: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-family: monospace; }
+.fs-time.current { left: 0; }
+.fs-time.total { right: 0; }
+
+/* 全屏控制按钮 */
+.fs-controls { display: flex; justify-content: space-between; align-items: center; }
+.fs-btn { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.85; }
+.fs-btn:active { transform: scale(0.9); }
+.fs-btn svg { width: 30px; height: 30px; fill: currentColor; }
+.fs-btn.play-lg {
+  width: 76px; height: 76px; border-radius: 50%; background: #fff; color: #000;
+  box-shadow: 0 8px 20px rgba(255,255,255,0.3); opacity: 1;
+}
+.fs-btn.play-lg svg { fill: #000; width: 32px; height: 32px; margin-left: 4px; }
+.fs-btn.play-lg.playing svg { margin-left: 0; }
+.fs-btn.heart.liked { color: #ff6b81; opacity: 1; }

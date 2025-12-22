@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Version (Fixed: Instant Lyrics Sync) */
+/* elysiamusic.js - Final Version (No Progress Bar + No-Loop Lyrics) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
   
-  // 🔥 新增：封面元素获取
+  // 🔥 封面元素获取
   const currentCoverEl = document.getElementById("currentCover");
   const backCoverEl = document.getElementById("backCover");
 
@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (coverUrl) {
               currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
           } else {
-              currentCoverEl.style.backgroundImage = ''; // 会显示 CSS 中的默认 ♪
+              currentCoverEl.style.backgroundImage = ''; // CSS 会显示 ♪
           }
       }
       
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (!song.lrc) {
           isLyricsLoading = false;
-          updateTitleOrLyric();
+          updateTitleOrLyric(true);
           return;
       }
 
@@ -347,12 +347,12 @@ document.addEventListener("DOMContentLoaded", () => {
           currentLyrics = parseLRC(cachedLrc);
           if (currentLyrics.length > 0) hasLyrics = true;
           isLyricsLoading = false; 
-          updateTitleOrLyric();
+          updateTitleOrLyric(true);
           return;
       }
 
       isLyricsLoading = true;
-      updateTitleOrLyric(); 
+      updateTitleOrLyric(true); 
 
       try {
           const response = await fetch(song.lrc);
@@ -370,11 +370,11 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn(`[Elysia] 歌词加载失败: ${song.title}`, e);
       } finally {
           isLyricsLoading = false;
-          updateTitleOrLyric(); 
+          updateTitleOrLyric(true); 
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (已修复：即时同步) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 (修正版：不回滚) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -401,33 +401,37 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       }
 
-      // 优化：如果文字没变且不是强制更新，则不操作 DOM
+      // 如果不是强制更新且文字没变，直接返回
       const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
       if (!forceUpdate && currentHTML === textToShow) {
           return; 
       }
 
-      // 重置 DOM 以强制动画从头开始
-      // style="transform:translateX(0)" 确保文字立即归位到最左侧（开头）
+      // 强制重置位置，确保动画从头开始
+      // transform:translateX(0) 是为了防止上一句的偏移量残留在新句子上
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
+      // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          // 动态计算滚动时间：基础 2秒 + 每多 40px 增加 1秒
+          // 动态计算时间：基础3秒 + 每多40px加1秒 (稍微调慢一点，配合 forward 效果更好)
           const overflow = textWidth - containerWidth;
-          const duration = 2.5 + (overflow / 40); 
+          const duration = 3 + (overflow / 40); 
           
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           
-          // 强制重绘 (Reflow) - 这是重启 CSS 动画的关键
+          // 🔥 关键：强制重绘 (Reflow)
+          // 确保动画被重置，能从头播放
           void innerSpan.offsetWidth; 
           
+          // CSS类名负责触发 animation: scrollText ... 1 forwards;
           innerSpan.classList.add('scrolling');
           titleEl.style.textAlign = 'left'; 
       } else {
+          // 短歌词不滚动
           innerSpan.classList.remove('scrolling');
           titleEl.style.textAlign = 'left'; 
       }
@@ -445,11 +449,10 @@ document.addEventListener("DOMContentLoaded", () => {
     hasLyrics = false;
     currentLyricIndex = -1;
     
-    // 更新封面
     updateCover(song);
 
     isLyricsLoading = true;
-    updateTitleOrLyric(true); // 切歌时强制更新
+    updateTitleOrLyric(true); // 切歌强制刷新
 
     fetchLyrics(song);
 
@@ -489,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if(currentCoverEl) currentCoverEl.classList.add("playing");
       
-      updateTitleOrLyric(true); 
+      updateTitleOrLyric(true); // 暂停/播放切换样式
 
     } else {
       audio.pause();
@@ -804,18 +807,17 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 (优化版) --- */
+  /* --- 🔥 timeupdate 监听器 --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // --- 歌词逻辑 (核心修复) ---
+    // 歌词逻辑
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
         
-        // 查找当前句
         for (let i = 0; i < currentLyrics.length; i++) {
             if (currentTime >= currentLyrics[i].time) {
                 activeIndex = i;
@@ -824,16 +826,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // 只有当行数改变时，才触发 DOM 更新 (防止闪烁)
-        // 且调用 updateTitleOrLyric(true) 强制重置滚动位置
+        // 仅当歌词改变时触发 DOM 更新
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
-            updateTitleOrLyric(true);
+            updateTitleOrLyric(true); // 强制刷新以触发动画重置
         }
     }
-    // -------------------------
 
-    // 检测单曲循环播放计数
+    // 单曲循环计数
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
@@ -848,7 +848,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastTimeForLoop = audio.currentTime; 
     
-    // 保存进度
+    // 进度保存
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();

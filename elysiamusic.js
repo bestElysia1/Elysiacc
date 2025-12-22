@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Bug-Free Version */
+/* elysiamusic.js - Final Fixed Version (v5.02) */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -24,7 +24,7 @@ const auth = getAuth(app);
 const db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
 const provider = new GoogleAuthProvider();
 
-// Cloudflare logic
+// Cloudflare
 window.isCaptchaVerified = false;
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentIndex = 0;
   let playMode = 0; 
   let shuffleQueue = [];
+  let errorCount = 0; // 防止连续切歌死循环
 
   const audio = new Audio();
   audio.crossOrigin = "anonymous"; audio.preload = "auto"; audio.playsInline = true;
@@ -108,6 +109,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initUI();
 
+  // 🔥 修复：音频错误自动跳过
+  audio.addEventListener('error', (e) => {
+      console.warn("Audio Error:", e);
+      if (errorCount < 3) { // 最多连续跳过3次，防止死循环
+          errorCount++;
+          setTimeout(() => playNext(true), 1000);
+      } else {
+          updateTitleOrLyric("无法播放: 资源失效");
+          updatePlayState(false);
+          errorCount = 0;
+      }
+  });
+
   // === Player Logic ===
   async function loadSong(index, autoPlay = false) {
     if (!currentList.length) return;
@@ -118,14 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const song = currentList[currentIndex];
     const coverUrl = song.cover || 'assets/cover_placeholder.jpg';
     
-    // Update UI
+    // UI
     miniCoverImg.src = coverUrl;
     fsCoverImg.src = coverUrl;
     fsPlayer.style.setProperty('--bg-img', `url(${coverUrl})`);
     fsTitle.innerText = song.title;
     fsArtist.innerText = song.artist || "Unknown";
     
-    // Reset Views
+    // Reset
     fsViewLyrics.classList.remove('active');
     fsViewCover.classList.remove('hidden');
     lyricsBox.innerHTML = '<p class="placeholder" style="margin-top:50%">Loading...</p>';
@@ -138,8 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.loop = (playMode === 1);
     
     if (autoPlay) {
-      try { await audio.play(); updatePlayState(true); } 
-      catch(e) { updatePlayState(false); }
+      try { 
+          await audio.play(); 
+          updatePlayState(true); 
+          errorCount = 0; // 播放成功重置错误计数
+      } catch(e) { updatePlayState(false); }
     } else { updatePlayState(false); }
     
     updateHeartStatus();
@@ -226,23 +243,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // 🔥 修复：底部播放器歌词滚动
   function updateTitleOrLyric(textOverride = null) {
     let text = textOverride || currentList[currentIndex].title;
+    
+    // 如果正在播放且有歌词，优先显示歌词
     if (!audio.paused && hasLyrics && currentLyricIndex >= 0 && currentLyrics[currentLyricIndex]) {
       text = currentLyrics[currentLyricIndex].text;
     }
+    
     titleEl.innerHTML = `<span class="scroll-inner">${text}</span>`;
     const inner = titleEl.querySelector('.scroll-inner');
+    
+    // 强制重绘以确保 scrollWidth 计算正确
+    void inner.offsetWidth; 
+    
     if(inner.scrollWidth > titleEl.clientWidth) {
-      inner.style.setProperty('--scroll-duration', (inner.scrollWidth/40+2)+'s');
+      // 动态设置滚动时长
+      const duration = (inner.scrollWidth / 40) + 2;
+      inner.style.setProperty('--scroll-duration', `${duration}s`);
       inner.classList.add('scrolling');
-    } else inner.classList.remove('scrolling');
+    } else {
+      inner.classList.remove('scrolling');
+    }
   }
 
   // === Gestures & Events ===
   let startY=0, currentY=0, isDragging=false;
   fsPlayer.addEventListener('touchstart', (e) => {
-    // 歌词页正在滚动时，不触发下拉关闭
     if (fsViewLyrics.classList.contains('active') && lyricsBox.scrollTop > 5) return;
     startY = e.touches[0].clientY; isDragging = true; fsPlayer.classList.add('dragging');
   }, {passive:true});
@@ -282,14 +310,13 @@ document.addEventListener("DOMContentLoaded", () => {
   fsNextBtn.addEventListener("click", () => playNext(true));
   fsPrevBtn.addEventListener("click", playPrev);
   
-  // List Button
   fsListBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     if (playlistMenuEl.classList.contains("show")) hideMenu(playlistMenuEl);
     else {
         playlistMenuEl.classList.remove("hide");
         playlistMenuEl.classList.add("show");
-        playlistMenuEl.style.zIndex = "10002"; // Ensure above fullscr
+        playlistMenuEl.style.zIndex = "10002"; 
     }
   });
 
@@ -425,11 +452,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if(emailIn) emailIn.addEventListener("input", window.checkLoginButtonState);
 
   // Init
-  if (currentList.length > 0) {
+  if(currentList.length > 0) {
       renderPlaylistMenu(); 
       renderSongListDOM();
       loadSong(0, false);
-  } else {
-      console.log("No songs to load");
   }
 });

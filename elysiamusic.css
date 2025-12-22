@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + Instant Sync) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + No Rollback) */
 
 /* =========================================
    1. 基础容器
@@ -11,7 +11,7 @@
   z-index: 9999;
   width: calc(100% - 36px);  /* 模拟手机端 */
   max-width: 800px;          /* 模拟电脑端 */
-  height: 58px;              /* 🔥 修正：高度增加至 58px 以完美容纳 44px 封面 */
+  height: 58px;              /* 高度适配封面+内边距 */
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;
@@ -84,7 +84,6 @@
   background-position: 100% 100%;
 }
 
-
 /* --- 正面 (Front) --- */
 .face-front {
   transform: rotateX(0deg);
@@ -141,10 +140,11 @@
 }
 
 .album-cover.playing {
-  /* 如果需要封面旋转动画，可在此开启 */
+  /* 如果想要旋转，解开下面这行 */
   /* animation: spinCover 10s linear infinite; */
 }
 
+/* 无图片时的默认音符 */
 .album-cover:empty::before {
   content: "♪";
   position: absolute;
@@ -262,7 +262,7 @@
   text-shadow: none;
 }
 
-/* --- 🔥 优化的歌词滚动动画 --- */
+/* --- 🔥 优化的歌词滚动动画 (已配置：不回滚) --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
@@ -274,14 +274,16 @@
 }
 
 .scroll-inner.scrolling {
-  /* 时间由 JS 动态计算 */
-  animation: scrollText var(--scroll-duration, 8s) linear infinite;
+  /* 1: 只播放一次 
+     forwards: 播放完停在最后，不回跳 
+  */
+  animation: scrollText var(--scroll-duration, 8s) linear 1 forwards;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  20% { transform: translateX(0); } /* 🔥 开头停顿 20% 时间，让人看清 */
-  100% { transform: translateX(calc(-100% + 200px)); } 
+  25% { transform: translateX(0); } /* 开头停顿久一点，让人看清前几个字 */
+  100% { transform: translateX(calc(-100% + 200px)); } /* 滚到末尾 */
 }
 
 #songTitle.lyric-mode {

@@ -1,20 +1,34 @@
-/* elysiamusic.js - Final Version (v5.04)
-   Features:
-   - Horizontal Swipe (Cover <-> Lyrics)
-   - Vertical Swipe (Close Player)
-   - Auto-skip on Error
-   - Optimized Scrolling
-*/
+/* elysiamusic.js - Ultimate Version (Expanded Format & Logic Fixed) */
 
+/* =========================================================
+   🔥 PART 1: Firebase 初始化 & 配置
+   ========================================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-  getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile,
-  setPersistence, browserLocalPersistence   
+  getAuth, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  setPersistence,           
+  browserLocalPersistence   
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// 🔥 引入新的 Firestore 初始化模块，修复过时警告
 import { 
-  initializeFirestore, doc, setDoc, updateDoc, arrayUnion, arrayRemove, 
-  onSnapshot, increment, persistentLocalCache, persistentMultipleTabManager
+  initializeFirestore, 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove, 
+  onSnapshot, 
+  increment,
+  persistentLocalCache,
+  persistentMultipleTabManager
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -28,539 +42,1063 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+
+// 🔥🔥🔥 修复部分：使用新版 API 初始化 Firestore 并开启离线持久化 🔥🔥🔥
+// 这消除了 "enableIndexedDbPersistence will be deprecated" 的警告
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+});
+console.log("[Firebase] Firestore 离线持久化已启用 (新版 API)");
+
 const provider = new GoogleAuthProvider();
 
-// Cloudflare
+
+/* =========================================================
+   🔥 PART 1.5: Cloudflare 全局逻辑 (已修复按钮判定)
+   ========================================================= */
+// 使用 window 全局变量，防止模块作用域导致的状态不同步
 window.isCaptchaVerified = false;
+
+// 🔥 核心修复：更严谨的按钮状态检查逻辑
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
-  if (!btn) return;
-  const emailVal = document.getElementById("email-input")?.value.trim();
-  const passVal = document.getElementById("pass-input")?.value.trim();
-  const isValid = emailVal?.length > 0 && passVal?.length >= 6 && window.isCaptchaVerified;
-  btn.disabled = !isValid;
-  btn.style.opacity = isValid ? "1" : "0.6";
-  btn.style.cursor = isValid ? "pointer" : "not-allowed";
-};
-window.onTurnstileSuccess = function() { window.isCaptchaVerified = true; window.checkLoginButtonState(); };
+  const emailInput = document.getElementById("email-input");
+  const passInput = document.getElementById("pass-input");
+  const errorMsg = document.getElementById("auth-error-msg");
 
-document.addEventListener("DOMContentLoaded", () => {
-  const allSongsLibrary = window.allSongsLibrary || [];
+  if (!btn || !emailInput || !passInput) return;
+
+  const emailVal = emailInput.value.trim();
+  const passVal = passInput.value.trim();
   
-  // State
+  // 判定条件：邮箱不为空 && 密码大于等于6位 && 验证码通过
+  const isValid = emailVal.length > 0 && passVal.length >= 6 && window.isCaptchaVerified;
+
+  if (isValid) {
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.style.filter = "none";
+    btn.style.background = "linear-gradient(135deg, #9c6bff, #7b3fe4)";
+    // 如果之前有提示“请输入邮箱”，可以清除
+    if (errorMsg && errorMsg.innerText === "请输入邮箱和密码") {
+        errorMsg.innerText = "";
+    }
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+    btn.style.cursor = "not-allowed";
+    btn.style.background = ""; // 恢复 CSS 默认的禁用样式
+  }
+};
+
+// Turnstile 回调：成功
+window.onTurnstileSuccess = function(token) {
+  console.log("[Turnstile] 验证成功");
+  window.isCaptchaVerified = true;
+  const err = document.getElementById("auth-error-msg");
+  if (err) err.innerText = "";
+  window.checkLoginButtonState();
+};
+
+// Turnstile 回调：过期/失败
+window.onTurnstileExpired = function() {
+  console.log("[Turnstile] 验证过期");
+  window.isCaptchaVerified = false;
+  window.checkLoginButtonState();
+};
+
+
+/* =========================================================
+   🔥 PART 2: 播放器核心逻辑 & DOM交互
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  
+  const allSongsLibrary = window.allSongsLibrary || [];
+
+  if (!window.allSongsLibrary) {
+      console.error("严重错误：未找到歌单数据！请检查 song.js 是否在 elysiamusic.js 之前加载。");
+  }
+
   let userFavorites = [];
   let userPlayHistory = {}; 
   let currentUser = null;
   let lastSaveTime = 0; 
-  let currentLyrics = [], hasLyrics = false, currentLyricIndex = -1;
-  let currentPlaylistKey = 'piano';
-  let currentList = allSongsLibrary.filter(s => s.category === 'piano');
-  let currentIndex = 0;
-  let playMode = 0; 
-  let shuffleQueue = [];
-  let errorCount = 0;
+  let initialRestoreDone = false; 
 
-  const audio = new Audio();
-  audio.crossOrigin = "anonymous"; audio.preload = "auto"; audio.playsInline = true;
+  /* --- 🎵 歌词相关变量 --- */
+  let currentLyrics = [];     
+  let hasLyrics = false;      
+  let isLyricsLoading = false; 
+  let currentLyricIndex = -1; 
+  let lastCountTime = 0;
 
-  // UI Refs
-  const player = document.getElementById("elysiaPlayer");
-  const fsPlayer = document.getElementById("fullscreenPlayer");
-  const playPauseBtn = document.getElementById("playPauseBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const titleEl = document.getElementById("songTitle");
-  const miniCoverBtn = document.getElementById("miniCoverBtn");
-  const miniCoverImg = document.getElementById("miniCoverImg");
-  const progressBar = document.getElementById("progressBar");
-
-  const fsCloseBtn = document.getElementById("fsCloseBtn");
-  const fsCoverImg = document.getElementById("fsCoverImg");
-  const fsTitle = document.getElementById("fsTitle");
-  const fsArtist = document.getElementById("fsArtist");
-  const fsPlayBtn = document.getElementById("fsPlayPauseBtn");
-  const fsPrevBtn = document.getElementById("fsPrevBtn");
-  const fsNextBtn = document.getElementById("fsNextBtn");
-  const fsListBtn = document.getElementById("fsListBtn");
-  const fsHeartBtn = document.getElementById("fsHeartBtn");
-  const fsModeBtn = document.getElementById("fsModeBtn");
-  
-  const fsContent = document.getElementById("fsContent"); // Gesture Area
-  const fsViewCover = document.getElementById("fsViewCover");
-  const fsViewLyrics = document.getElementById("fsViewLyrics");
-  const fsCoverWrapper = document.getElementById("fsCoverWrapper");
-  const lyricsBox = document.getElementById("lyricsBox");
-  
-  const fsProgressWrap = document.getElementById("fsProgressWrap");
-  const fsProgressBarFill = document.getElementById("fsProgressBarFill");
-  const fsTimeCurrent = document.getElementById("fsTimeCurrent");
-  const fsTimeTotal = document.getElementById("fsTimeTotal");
-
-  const songListEl = document.getElementById("playlist");
-  const playlistMenuEl = document.getElementById("playlistMenu");
-
+  /* ... SVG ICONS ... */
   const ICONS = {
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
-    mode0: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
-    mode1: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
-    mode2: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
+    next: `<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>`,
+    loopList: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
+    loopOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
+    shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
+    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
   };
-  const modeIcons = [ICONS.mode0, ICONS.mode1, ICONS.mode2];
+
+  /* 2. 歌单配置与状态管理 */
   let playlistsConfig = [
-    { key: "All songs", name: "所有歌曲", filter: (s) => s.category !== 'piano' },
-    { key: "history_rank", name: "我的听歌排行", filter: (s) => (userPlayHistory[s.title] || 0) > 0 },
-    { key: "piano", name: " ピアノ音楽", filter: (s) => s.category === 'piano' }
+    { 
+        key: "All songs", 
+        name: "所有歌曲", 
+        filter: (s) => s.category !== 'piano' 
+    },
+    { 
+        key: "history_rank", 
+        name: "我的听歌排行", 
+        filter: (s) => (userPlayHistory[s.title] || 0) > 0 
+    },
+    { 
+        key: "piano", 
+        name: " ピアノ音楽", 
+        filter: (s) => s.category === 'piano' 
+    },
+    { 
+        key: "mon", 
+        name: "月曜日", 
+        filter: (s) => s.category === 'mon' 
+    },
+    { 
+        key: "tue", 
+        name: "火曜日", 
+        filter: (s) => s.category === 'tue' 
+    },
+    { 
+        key: "wed", 
+        name: "水曜日", 
+        filter: (s) => s.category === 'wed' 
+    },
+    { 
+        key: "thu", 
+        name: "木曜日", 
+        filter: (s) => s.category === 'thu' 
+    },
+    { 
+        key: "fri", 
+        name: "金曜日", 
+        filter: (s) => s.category === 'fri' 
+    },
+    { 
+        key: "sat", 
+        name: "土曜日", 
+        filter: (s) => s.category === 'sat' 
+    },
+    { 
+        key: "sun", 
+        name: "日曜日", 
+        filter: (s) => s.category === 'sun' 
+    },
+    { 
+        key: "unknown", 
+        name: "前方的区域后面再来探索吧～", 
+        filter: (s) => s.category === 'unknown' 
+    },
   ];
 
-  function initUI() {
-    playPauseBtn.innerHTML = ICONS.play; fsPlayBtn.innerHTML = ICONS.play; fsModeBtn.innerHTML = modeIcons[0];
+  function updatePlaylistConfig() {
+    const favIndex = playlistsConfig.findIndex(p => p.key === "my_favorites");
+    const myFavPlaylist = {
+        key: "my_favorites",
+        name: "私の好きな音乐",
+        filter: (s) => userFavorites.includes(s.title) 
+    };
+
+    if (currentUser && userFavorites.length > 0) {
+        if (favIndex === -1) {
+            playlistsConfig.splice(1, 0, myFavPlaylist);
+        } else {
+             playlistsConfig[favIndex] = myFavPlaylist;
+        }
+    } else {
+        if (favIndex !== -1) {
+            playlistsConfig.splice(favIndex, 1);
+            if (currentPlaylistKey === 'my_favorites') {
+                changePlaylist('All songs');
+            }
+        }
+    }
+    renderPlaylistMenu();
   }
-  initUI();
 
-  // Auto skip on error
-  audio.addEventListener('error', (e) => {
-      console.warn("Audio Error:", e);
-      if (errorCount < 3) { errorCount++; setTimeout(() => playNext(true), 1000); }
-      else { updateTitleOrLyric("无法播放"); updatePlayState(false); errorCount = 0; }
-  });
+  // 🔥 核心逻辑：原子级增加计数 (支持离线增量合并)
+  async function recordPlayHistory(songTitle) {
+    if (!currentUser) return; 
 
-  // =========================================================
-  // 🔥 Core Player Functions
-  // =========================================================
+    // 1. 立即更新本地 UI (Firestore 会处理离线时的本地视图，但手动更新更灵敏)
+    const currentCount = userPlayHistory[songTitle] || 0;
+    userPlayHistory[songTitle] = currentCount + 1;
+    
+    console.log(`播放计数增加: ${songTitle} -> ${userPlayHistory[songTitle]}`); 
 
-  async function loadSong(index, autoPlay = false) {
-    if (!currentList.length) return;
+    if (currentPlaylistKey === 'history_rank') {
+        renderSongListDOM(); 
+    }
+
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+        // 🔥 使用 increment(1) 而不是覆盖 userPlayHistory
+        // 这样离线播放的次数会在联网时“累加”到云端现有数值上
+        await setDoc(userDocRef, {
+            playHistory: {
+                [songTitle]: increment(1)
+            } 
+        }, { merge: true });
+    } catch (e) {
+        console.error("更新播放次数失败", e);
+    }
+  }
+
+  async function savePlaybackState() {
+    if (!currentUser || !currentList[currentIndex]) return;
+
+    const songTitle = currentList[currentIndex].title;
+    const currentTime = audio.currentTime;
+
+    const userDocRef = doc(db, "users", currentUser.uid);
+    try {
+      await setDoc(userDocRef, { 
+        lastPlayed: {
+          title: songTitle,
+          time: currentTime,
+          playlist: currentPlaylistKey 
+        }
+      }, { merge: true }); 
+    } catch (e) {
+      console.error("保存进度失败", e);
+    }
+  }
+
+  let currentPlaylistKey = 'piano';
+  let currentList = allSongsLibrary.filter(s => s.category === 'piano'); 
+  let currentIndex = 0;
+  let shuffleQueue = []; 
+
+  function getShuffledIndices(length) {
+    let arr = Array.from({length}, (_, i) => i);
+    for (let i = length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  
+  let playMode = 0; 
+  const playModes = [
+    { icon: ICONS.loopList, name: "列表循环" },
+    { icon: ICONS.loopOne, name: "单曲循环" },
+    { icon: ICONS.shuffle, name: "随机播放" }
+  ];
+
+  /* =========================================================
+     3. DOM 元素初始化 & 播放控制
+     ========================================================= */
+  const audio = new Audio();
+  // 🔥 关键：强制开启 CORS 请求模式，确保缓存入库
+  audio.crossOrigin = "anonymous"; 
+  audio.preload = "auto";
+  audio.playsInline = true; 
+
+  
+  const player = document.getElementById("elysiaPlayer");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const titleEl = document.getElementById("songTitle");
+  const songListEl = document.getElementById("playlist"); 
+  const playlistMenuEl = document.getElementById("playlistMenu");
+  const modeBtn = document.getElementById("modeBtn");
+  const heartBtn = document.getElementById("heartBtn");
+  const playlistTitleBtn = document.getElementById("playlistTitleBtn");
+  const progressContainer = document.getElementById("progressContainer");
+  const progressBar = document.getElementById("progressBar");
+
+  if (!player || !playPauseBtn) return;
+
+  function initIcons() {
+    playPauseBtn.innerHTML = ICONS.play;
+    nextBtn.innerHTML = ICONS.next;
+    modeBtn.innerHTML = playModes[0].icon;
+    heartBtn.innerHTML = ICONS.heart; 
+  }
+  initIcons();
+
+  function updateHeartStatus() {
+      if (!currentList || !currentList[currentIndex]) return;
+      const currentTitle = currentList[currentIndex].title;
+      if (userFavorites.includes(currentTitle)) {
+          heartBtn.classList.add("liked");
+      } else {
+          heartBtn.classList.remove("liked");
+      }
+  }
+
+  /* --- 🎵 歌词解析函数 --- */
+  function parseLRC(lrcText) {
+      if(!lrcText) return [];
+      const lines = lrcText.split('\n');
+      const regex = /^\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
+      const result = [];
+      
+      lines.forEach(line => {
+          const match = line.match(regex);
+          if (match) {
+              const min = parseInt(match[1]);
+              const sec = parseInt(match[2]);
+              const ms = parseInt(match[3].padEnd(3, '0').substring(0, 3));
+              const time = min * 60 + sec + ms / 1000;
+              const text = match[4].trim();
+              if (text) {
+                  result.push({ time, text });
+              }
+          }
+      });
+      return result;
+  }
+
+  /* --- 🎵 歌词加载函数 --- */
+  async function fetchLyrics(song) {
+      currentLyrics = [];
+      hasLyrics = false;
+      currentLyricIndex = -1;
+      
+      if (!song.lrc) {
+          isLyricsLoading = false;
+          updateTitleOrLyric();
+          return;
+      }
+
+      const localCacheKey = "lyric_" + song.title; 
+      const cachedLrc = localStorage.getItem(localCacheKey);
+
+      if (cachedLrc) {
+          console.log(`[Elysia] 命中本地歌词缓存: ${song.title}`);
+          currentLyrics = parseLRC(cachedLrc);
+          if (currentLyrics.length > 0) hasLyrics = true;
+          isLyricsLoading = false; 
+          updateTitleOrLyric();
+          return;
+      }
+
+      isLyricsLoading = true;
+      updateTitleOrLyric(); 
+
+      try {
+          const response = await fetch(song.lrc);
+          if (response.ok) {
+              const lrcText = await response.text();
+              try {
+                  localStorage.setItem(localCacheKey, lrcText);
+              } catch (storageErr) {
+                  console.warn("歌词缓存失败(可能是空间已满):", storageErr);
+              }
+              currentLyrics = parseLRC(lrcText);
+              if (currentLyrics.length > 0) hasLyrics = true;
+          }
+      } catch (e) {
+          console.warn(`[Elysia] 歌词加载失败: ${song.title}`, e);
+      } finally {
+          isLyricsLoading = false;
+          updateTitleOrLyric(); 
+      }
+  }
+
+  /* --- 🎵 核心逻辑：更新标题/歌词 + 滚动计算 --- */
+  function updateTitleOrLyric() {
+      if (!currentList || !currentList[currentIndex]) return;
+      const song = currentList[currentIndex];
+      let textToShow = "";
+      
+      if (audio.paused) {
+          textToShow = song.title;
+          titleEl.classList.remove("lyric-mode");
+      } else if (isLyricsLoading) {
+          textToShow = "歌词加载中...";
+          titleEl.classList.add("lyric-mode");
+      } else if (!hasLyrics) {
+          textToShow = song.title; 
+          titleEl.classList.remove("lyric-mode");
+      } else {
+          if (currentLyricIndex === -1 || currentLyricIndex >= currentLyrics.length) {
+              if(currentLyrics.length > 0 && audio.currentTime < currentLyrics[0].time) {
+                   textToShow = song.title; 
+                   titleEl.classList.remove("lyric-mode");
+              } else {
+                   textToShow = song.title;
+                   titleEl.classList.remove("lyric-mode");
+              }
+          } else {
+              textToShow = currentLyrics[currentLyricIndex].text;
+              titleEl.classList.add("lyric-mode");
+          }
+      }
+
+      titleEl.innerHTML = `<span class="scroll-inner">${textToShow}</span>`;
+      const innerSpan = titleEl.querySelector('.scroll-inner');
+      const containerWidth = titleEl.clientWidth;
+      const textWidth = innerSpan.scrollWidth;
+
+      if (textWidth > containerWidth) {
+          const duration = (textWidth / 50) + 1.5; 
+          innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
+          innerSpan.classList.remove('scrolling');
+          void innerSpan.offsetWidth; 
+          innerSpan.classList.add('scrolling');
+          titleEl.style.textAlign = 'left'; 
+      } else {
+          innerSpan.classList.remove('scrolling');
+          innerSpan.style.transform = 'translateX(0)';
+          titleEl.style.textAlign = 'left'; 
+      }
+  }
+
+  function loadSong(index, isRestore = false, startTime = 0) {
+    if (!currentList || currentList.length === 0) return;
     if (index < 0) index = currentList.length - 1;
     if (index >= currentList.length) index = 0;
     
     currentIndex = index;
     const song = currentList[currentIndex];
-    const coverUrl = song.cover || 'assets/cover_placeholder.jpg';
     
-    // UI Update
-    miniCoverImg.src = coverUrl;
-    fsCoverImg.src = coverUrl;
-    fsPlayer.style.setProperty('--bg-img', `url(${coverUrl})`);
-    fsTitle.innerText = song.title;
-    fsArtist.innerText = song.artist || "Unknown";
+    currentLyrics = [];
+    hasLyrics = false;
+    currentLyricIndex = -1;
     
-    // Reset View to Cover (Optional: remove this if you want to stay on lyrics page)
-    switchToCover(); 
-    lyricsBox.innerHTML = '<p class="placeholder" style="margin-top:50%">Loading...</p>';
-    
-    currentLyrics = []; hasLyrics = false; currentLyricIndex = -1;
-    updateTitleOrLyric(song.title);
+    isLyricsLoading = true;
+    updateTitleOrLyric(); 
+
     fetchLyrics(song);
 
-    audio.src = song.src;
-    audio.loop = (playMode === 1);
-    
-    if (autoPlay) {
-      try { await audio.play(); updatePlayState(true); errorCount=0; } catch(e) { updatePlayState(false); }
-    } else updatePlayState(false);
-    
-    updateHeartStatus();
-    updateMediaSession(song);
-    recordPlayHistory(song.title);
-  }
+    if (startTime > 0) {
+        audio.currentTime = startTime; 
+        const seekFn = () => {
+            if(Math.abs(audio.currentTime - startTime) > 1) {
+                audio.currentTime = startTime;
+            }
+        };
+        audio.addEventListener('canplay', seekFn, { once: true });
+    }
 
-  function updatePlayState(isPlaying) {
-    const icon = isPlaying ? ICONS.pause : ICONS.play;
-    playPauseBtn.innerHTML = icon; fsPlayBtn.innerHTML = icon;
-    if(isPlaying) { fsPlayBtn.classList.add("playing"); player.classList.add("playing"); }
-    else { fsPlayBtn.classList.remove("playing"); player.classList.remove("playing"); }
+    audio.src = song.src;
+
+    if (playMode === 1) {
+        audio.loop = true;
+    } else {
+        audio.loop = false;
+    }
+    
+    renderSongListDOM(); 
+    updateMediaSession(song);
+    updateHeartStatus();
+
+    if (!isRestore) {
+        savePlaybackState();
+    }
   }
 
   function togglePlay() {
-    if (audio.paused) { audio.play().catch(e=>{}); updatePlayState(true); }
-    else { audio.pause(); updatePlayState(false); }
+    if (audio.paused) {
+      audio.play().catch(e => console.log("Waiting for interaction"));
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing"); 
+      player.classList.add("playing");
+      updateTitleOrLyric(); 
+
+    } else {
+      audio.pause();
+      playPauseBtn.innerHTML = ICONS.play;
+      playPauseBtn.classList.remove("playing");
+      player.classList.remove("playing");
+      updateTitleOrLyric(); 
+    }
   }
 
-  function playNext(userTriggered = true) {
-    if (playMode === 1 && !userTriggered) return;
-    let nextIdx = (currentIndex + 1) % currentList.length;
-    if (playMode === 2) nextIdx = Math.floor(Math.random() * currentList.length);
-    loadSong(nextIdx, true);
+  function playNext(isAuto = false) {
+    let nextIndex;
+    
+    if (playMode === 1 && isAuto) { 
+      if (audio.paused) audio.play(); 
+      return; 
+    } 
+
+    if (playMode === 2) { 
+      if (shuffleQueue.length === 0) {
+        shuffleQueue = getShuffledIndices(currentList.length);
+        if (currentList.length > 1 && shuffleQueue[0] === currentIndex) {
+             shuffleQueue.push(shuffleQueue.shift());
+        }
+      }
+      nextIndex = shuffleQueue.shift();
+    } else { 
+      nextIndex = (currentIndex + 1) % currentList.length;
+    }
+    loadSong(nextIndex);
+    audio.play().catch(e => console.warn("Auto-play blocked:", e)); 
+    playPauseBtn.innerHTML = ICONS.pause;
+    playPauseBtn.classList.add("playing");
+    player.classList.add("playing");
   }
 
-  function playPrev() {
-    let prev = currentIndex - 1;
-    if (prev < 0) prev = currentList.length - 1;
-    loadSong(prev, true);
+  function toggleMenu(el) {
+    if (el.classList.contains("show")) {
+      hideMenu(el);
+    } else {
+      el.classList.remove("hide");
+      el.classList.add("show");
+    }
+  }
+  function hideMenu(el) {
+    if (el && el.classList.contains("show")) {
+        el.classList.remove("show");
+        el.classList.add("hide");
+    }
   }
 
-  // =========================================================
-  // 🔥 Lyrics
-  // =========================================================
-  async function fetchLyrics(song) {
-    if(!song.lrc) { renderLyrics([]); return; }
-    try {
-      const res = await fetch(song.lrc);
-      if(res.ok) {
-        const text = await res.text();
-        parseLRC(text);
-        hasLyrics = true;
-        renderLyrics(currentLyrics);
-      } else renderLyrics([]);
-    } catch(e) { renderLyrics([]); }
+  function renderSongListDOM() {
+    if (!songListEl) return;
+    songListEl.innerHTML = currentList.map((s, i) => {
+      const count = userPlayHistory[s.title] || 0;
+      let countHtml = '';
+      if (currentPlaylistKey === 'history_rank') {
+        countHtml = `<span class="play-count-tag">${count} 次</span>`;
+      }
+      return `
+      <div class="playlist-item ${i === currentIndex ? 'active' : ''}" data-index="${i}">
+        <span class="song-name">${s.title}</span>
+        ${countHtml}
+      </div>
+    `}).join("");
   }
 
-  function parseLRC(text) {
-    const lines = text.split('\n');
-    const regex = /^\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
-    lines.forEach(line => {
-      const match = line.match(regex);
-      if(match) {
-        const time = parseInt(match[1])*60 + parseInt(match[2]) + parseInt(match[3].substring(0,3).padEnd(3,'0'))/1000;
-        const txt = match[4].trim();
-        if(txt) currentLyrics.push({time, text: txt});
+  titleEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (player.classList.contains("flipped")) return; 
+    hideMenu(playlistMenuEl); 
+    toggleMenu(songListEl);
+  });
+
+  songListEl.addEventListener("click", e => {
+    const item = e.target.closest(".playlist-item");
+    if (item) {
+      loadSong(parseInt(item.dataset.index));
+      audio.play().catch(e => console.log("Play failed:", e));
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing");
+    }
+  });
+
+  function renderPlaylistMenu() {
+    if (!playlistMenuEl) return;
+    playlistMenuEl.innerHTML = playlistsConfig.map(cfg => `
+      <div class="playlist-item ${cfg.key === currentPlaylistKey ? 'active' : ''}" data-key="${cfg.key}">
+        ${cfg.name}
+      </div>
+    `).join("");
+  }
+
+  playlistTitleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideMenu(songListEl); 
+    toggleMenu(playlistMenuEl);
+  });
+
+  if (playlistMenuEl) {
+    playlistMenuEl.addEventListener('click', (e) => {
+      const item = e.target.closest(".playlist-item");
+      if (item) {
+        const key = item.dataset.key;
+        if (key !== currentPlaylistKey) changePlaylist(key);
+        hideMenu(playlistMenuEl);
       }
     });
   }
 
-  function renderLyrics(lyrics) {
-    lyricsBox.innerHTML = "";
-    if (!lyrics || lyrics.length === 0) {
-      lyricsBox.innerHTML = '<p class="placeholder" style="margin-top:50%">纯音乐 / 暂无歌词</p>';
+  function changePlaylist(key) {
+    const config = playlistsConfig.find(c => c.key === key);
+    if (!config) return;
+    currentPlaylistKey = key;
+    playlistTitleBtn.textContent = config.name; 
+    
+    currentList = allSongsLibrary.filter(config.filter);
+
+    if (key === 'history_rank') {
+        currentList.sort((a, b) => {
+            const countA = userPlayHistory[a.title] || 0;
+            const countB = userPlayHistory[b.title] || 0;
+            return countB - countA;
+        });
+    }
+
+    shuffleQueue = [];
+    currentIndex = 0;
+    
+    if (currentList.length > 0) {
+        loadSong(0);
+        audio.play().catch(e => console.warn("Autoplay blocked:", e));
+        playPauseBtn.innerHTML = ICONS.pause;
+        playPauseBtn.classList.add("playing");
+        player.classList.add("playing");
+    } else {
+        titleEl.textContent = "暂无数据";
+        songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
+    }
+
+    renderPlaylistMenu();
+    renderSongListDOM();
+  }
+  renderPlaylistMenu();
+
+  modeBtn.addEventListener('click', async (e) => {
+    e.stopPropagation(); 
+    playMode = (playMode + 1) % 3;
+    modeBtn.innerHTML = playModes[playMode].icon;
+
+    if (playMode === 1) {
+        audio.loop = true;
+    } else {
+        audio.loop = false;
+    }
+
+    if (currentUser) {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        try {
+            await setDoc(userDocRef, { playMode: playMode }, { merge: true });
+        } catch (err) {
+            console.error("保存播放模式失败", err);
+        }
+    }
+  });
+
+  heartBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (!currentUser) {
+      alert("请先登录才能收藏歌曲哦~");
+      const modal = document.getElementById("login-modal-overlay");
+      if(modal) modal.classList.add("active");
       return;
     }
-    const fragment = document.createDocumentFragment();
-    lyrics.forEach((line, index) => {
-      const p = document.createElement("p");
-      p.innerText = line.text;
-      p.addEventListener("click", () => { audio.currentTime = line.time; updateLyricsHighLight(index); });
-      fragment.appendChild(p);
-    });
-    lyricsBox.appendChild(fragment);
-  }
-
-  function updateLyricsHighLight(index) {
-    const allPs = lyricsBox.querySelectorAll('p');
-    const activeP = lyricsBox.querySelector('.active');
-    if (activeP) activeP.classList.remove('active');
-    if (index >= 0 && index < allPs.length) {
-      const target = allPs[index];
-      target.classList.add('active');
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  }
-
-  function updateTitleOrLyric(textOverride = null) {
-    let text = textOverride || currentList[currentIndex].title;
-    if (!audio.paused && hasLyrics && currentLyricIndex >= 0 && currentLyrics[currentLyricIndex]) {
-      text = currentLyrics[currentLyricIndex].text;
-    }
-    titleEl.innerHTML = `<span class="scroll-inner">${text}</span>`;
-    const inner = titleEl.querySelector('.scroll-inner');
-    void inner.offsetWidth; 
-    if(inner.scrollWidth > titleEl.clientWidth) {
-      inner.style.setProperty('--scroll-duration', (inner.scrollWidth/40+2)+'s');
-      inner.classList.add('scrolling');
-    } else inner.classList.remove('scrolling');
-  }
-
-  // =========================================================
-  // 🔥 Interactions & Gestures (Advanced)
-  // =========================================================
-  
-  // 1. View Switching Logic
-  function switchToLyrics() {
-      fsViewCover.classList.add('hidden');
-      fsViewLyrics.classList.add('active');
-      if(currentLyricIndex !== -1) updateLyricsHighLight(currentLyricIndex);
-  }
-
-  function switchToCover() {
-      fsViewLyrics.classList.remove('active');
-      fsViewCover.classList.remove('hidden');
-  }
-
-  // 2. Click Events
-  fsCoverWrapper.addEventListener('click', (e) => { e.stopPropagation(); switchToLyrics(); });
-  lyricsBox.addEventListener('click', (e) => { if(e.target === lyricsBox) switchToCover(); });
-
-  // 3. Gesture Logic (Swipe Down & Horizontal Swipe)
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isVerticalDrag = false;
-  let isHorizontalSwipe = false;
-
-  // Listen on fsContent to capture all fullscreen touches
-  fsContent.addEventListener('touchstart', (e) => {
-    // If lyrics are active, allow scrolling lyrics, only capture edge cases
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    isVerticalDrag = false;
-    isHorizontalSwipe = false;
+    const currentSong = currentList[currentIndex];
+    const songTitle = currentSong.title;
+    const userDocRef = doc(db, "users", currentUser.uid);
+    const isLiked = userFavorites.includes(songTitle);
     
-    // Only allow drag-down if at top of lyrics or if on cover
-    const isAtTop = lyricsBox.scrollTop <= 0;
-    const isCoverView = !fsViewLyrics.classList.contains('active');
-    
-    if (isCoverView || isAtTop) {
-        fsPlayer.classList.add('dragging'); // Ready to drag
-    }
-  }, {passive: true});
+    if (isLiked) heartBtn.classList.remove("liked");
+    else heartBtn.classList.add("liked");
 
-  fsContent.addEventListener('touchmove', (e) => {
-    const currentX = e.touches[0].clientX;
-    const currentY = e.touches[0].clientY;
-    const diffX = currentX - touchStartX;
-    const diffY = currentY - touchStartY;
-
-    // Determine direction on first significant move
-    if (!isVerticalDrag && !isHorizontalSwipe) {
-        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
-            // Vertical movement detected
-            if (diffY > 0) isVerticalDrag = true; // Downward
-        } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 5) {
-            // Horizontal movement detected
-            isHorizontalSwipe = true;
-        }
+    try {
+        if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
+        else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
+    } catch (err) {
+        console.error("操作失败", err);
+        updateHeartStatus(); 
+        alert("网络开小差了，同步失败");
     }
-
-    // Handle Vertical Drag (Close Player)
-    if (isVerticalDrag) {
-        // Prevent default only if we are dragging the player whole
-        if (e.cancelable) e.preventDefault(); 
-        fsPlayer.style.transform = `translateY(${diffY}px)`;
-        fsPlayer.style.opacity = `${1 - (diffY / window.innerHeight)}`;
-    }
-    
-    // Handle Horizontal Swipe (Change View) - Optional visual feedback could go here
-  }, {passive: false});
-
-  fsContent.addEventListener('touchend', (e) => {
-    fsPlayer.classList.remove('dragging');
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffX = touchEndX - touchStartX;
-    const diffY = touchEndY - touchStartY;
-
-    // 1. Close Player Logic
-    if (isVerticalDrag) {
-        if (diffY > 150) {
-            closeFullscreen();
-        } else {
-            // Reset
-            fsPlayer.style.transform = '';
-            fsPlayer.style.opacity = '';
-        }
-    }
-    // 2. Switch View Logic (Horizontal Swipe)
-    else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-        // Swipe Left (Go to Lyrics)
-        if (diffX < 0 && !fsViewLyrics.classList.contains('active')) {
-            switchToLyrics();
-        }
-        // Swipe Right (Go to Cover)
-        else if (diffX > 0 && fsViewLyrics.classList.contains('active')) {
-            switchToCover();
-        }
-    }
-    
-    isVerticalDrag = false;
-    isHorizontalSwipe = false;
   });
 
-  // Open/Close
-  function openFullscreen() { 
-      fsPlayer.classList.add("active"); 
-      player.classList.add("ui-hidden"); 
-      hideMenu(songListEl); hideMenu(playlistMenuEl); 
-  }
-  function closeFullscreen() { 
-      fsPlayer.classList.remove("active"); 
-      player.classList.remove("ui-hidden"); 
-      fsPlayer.style.transform = ''; 
-      fsPlayer.style.opacity = ''; 
-  }
+  document.addEventListener("click", e => {
+    const inPlayer = player.contains(e.target);
+    const inSongList = songListEl && songListEl.contains(e.target);
+    const inPlayListMenu = playlistMenuEl && playlistMenuEl.contains(e.target);
+    if (!inPlayer && !inSongList && !inPlayListMenu) {
+      hideMenu(songListEl);
+      hideMenu(playlistMenuEl);
+    }
+  });
 
-  miniCoverBtn.addEventListener("click", (e) => { e.stopPropagation(); openFullscreen(); });
-  fsCloseBtn.addEventListener("click", closeFullscreen);
+  let isDrag = false;
+  let pressTimer;
+  const startPress = (e) => {
+    if (e.target.closest('button') || e.target.closest('.elysia-progress-container')) return; 
+    isDrag = false;
+    pressTimer = setTimeout(() => {
+      if (!isDrag) {
+        player.classList.toggle("flipped");
+        hideMenu(songListEl);
+        hideMenu(playlistMenuEl);
+      }
+    }, 300);
+  };
+  const cancelPress = () => clearTimeout(pressTimer);
+  const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
+  player.addEventListener('mousedown', startPress);
+  player.addEventListener('touchstart', startPress, { passive: true });
+  player.addEventListener('mouseup', cancelPress);
+  player.addEventListener('mouseleave', cancelPress);
+  player.addEventListener('touchend', cancelPress);
+  player.addEventListener('mousemove', onMove);
+  player.addEventListener('touchmove', onMove, { passive: true });
 
-  // --- Controls ---
+  let inactivityTimer;
+  function hidePlayerUI() {
+    player.style.opacity = '0';
+    player.style.transform = 'translate(-50%, 40px)'; 
+    player.style.pointerEvents = 'none'; 
+    hideMenu(songListEl);
+    hideMenu(playlistMenuEl);
+  }
+  function showPlayerUI() {
+    player.style.opacity = '1';
+    player.style.transform = 'translate(-50%, 0)'; 
+    player.style.pointerEvents = 'auto'; 
+    resetTimer();
+  }
+  function resetTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(hidePlayerUI, 1800000); 
+  }
+  ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayerUI));
+
   playPauseBtn.addEventListener("click", togglePlay);
-  fsPlayBtn.addEventListener("click", togglePlay);
-  nextBtn.addEventListener("click", () => playNext(true));
-  fsNextBtn.addEventListener("click", () => playNext(true));
-  fsPrevBtn.addEventListener("click", playPrev);
+  nextBtn.addEventListener("click", () => playNext(false));
   
-  fsListBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (playlistMenuEl.classList.contains("show")) hideMenu(playlistMenuEl);
-    else {
-        playlistMenuEl.classList.remove("hide");
-        playlistMenuEl.classList.add("show");
-        playlistMenuEl.style.zIndex = "10002"; 
+  audio.addEventListener("ended", () => {
+    if (playMode !== 1) { 
+        if (currentList && currentList[currentIndex]) {
+            recordPlayHistory(currentList[currentIndex].title);
+        }
+        playNext(true);
     }
   });
 
-  // Time Update
-  audio.addEventListener('timeupdate', () => {
-    if(!audio.duration) return;
-    const pct = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = pct + "%";
-    fsProgressBarFill.style.width = pct + "%";
-    
-    const fmt = t => `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
-    fsTimeCurrent.innerText = fmt(audio.currentTime);
-    fsTimeTotal.innerText = fmt(audio.duration);
-
-    if(hasLyrics) {
-      let idx = -1;
-      for(let i=0; i<currentLyrics.length; i++) {
-        if(audio.currentTime >= currentLyrics[i].time) idx = i; else break;
-      }
-      if(idx!==-1 && idx!==currentLyricIndex) {
-        currentLyricIndex = idx;
-        updateTitleOrLyric();
-        if(fsViewLyrics.classList.contains('active')) updateLyricsHighLight(idx);
-      }
-    }
-    
-    if(Date.now() - lastSaveTime > 15000 && currentUser) { savePlaybackState(); lastSaveTime = Date.now(); }
-  });
-  
-  fsProgressWrap.addEventListener("click", (e) => {
-    const rect = fsProgressWrap.getBoundingClientRect();
-    if(audio.duration) audio.currentTime = ((e.clientX - rect.left)/rect.width) * audio.duration;
-  });
-  audio.addEventListener("ended", () => playNext(false));
-
-  fsModeBtn.addEventListener("click", () => {
-    playMode = (playMode + 1) % 3;
-    fsModeBtn.innerHTML = modeIcons[playMode];
-    audio.loop = (playMode === 1);
-  });
-
-  fsHeartBtn.addEventListener("click", async () => {
-    if(!currentUser) return alert("请先登录");
-    const title = currentList[currentIndex].title;
-    const ref = doc(db, "users", currentUser.uid);
-    if(userFavorites.includes(title)) {
-      await updateDoc(ref, { favorites: arrayRemove(title) });
-      userFavorites = userFavorites.filter(t => t!==title);
-      fsHeartBtn.classList.remove("liked");
-    } else {
-      await updateDoc(ref, { favorites: arrayUnion(title) });
-      userFavorites.push(title);
-      fsHeartBtn.classList.add("liked");
-    }
-  });
-  function updateHeartStatus() {
-    const title = currentList[currentIndex]?.title;
-    if(userFavorites.includes(title)) fsHeartBtn.classList.add("liked"); else fsHeartBtn.classList.remove("liked");
-  }
-
-  // Playlist
-  function hideMenu(el) { if(el.classList.contains("show")) { el.classList.remove("show"); el.classList.add("hide"); } }
-  function toggleMenu(el) { if(el.classList.contains("show")) hideMenu(el); else { el.classList.remove("hide"); el.classList.add("show"); } }
-  
-  titleEl.addEventListener("click", (e) => { e.stopPropagation(); hideMenu(playlistMenuEl); toggleMenu(songListEl); });
-  songListEl.addEventListener("click", (e) => {
-      const item = e.target.closest(".playlist-item");
-      if(item) loadSong(parseInt(item.dataset.index), true);
-  });
-  if (playlistMenuEl) {
-      playlistMenuEl.addEventListener('click', (e) => {
-          const item = e.target.closest(".playlist-item");
-          if (item) changePlaylist(item.dataset.key);
+  function updatePositionState() {
+    if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime
       });
-  }
-  function changePlaylist(key) {
-      const config = playlistsConfig.find(c => c.key === key);
-      if(!config) return;
-      currentPlaylistKey = key; hideMenu(songListEl); hideMenu(playlistMenuEl);
-      currentList = allSongsLibrary.filter(config.filter);
-      if(key === 'history_rank') currentList.sort((a,b)=>(userPlayHistory[b.title]||0)-(userPlayHistory[a.title]||0));
-      currentIndex = 0;
-      if(currentList.length>0) loadSong(0, true);
-      renderSongListDOM();
-  }
-  function renderSongListDOM() {
-      songListEl.innerHTML = currentList.map((s, i) => `<div class="playlist-item ${i===currentIndex?'active':''}" data-index="${i}"><span class="song-name">${s.title}</span></div>`).join("");
-  }
-  function renderPlaylistMenu() {
-      playlistMenuEl.innerHTML = playlistsConfig.map(cfg => `<div class="playlist-item ${cfg.key===currentPlaylistKey?'active':''}" data-key="${cfg.key}">${cfg.name}</div>`).join("");
-  }
-
-  // Helpers
-  async function recordPlayHistory(title) {
-    if(currentUser) await setDoc(doc(db,"users",currentUser.uid), { playHistory:{[title]:increment(1)} }, {merge:true});
-  }
-  async function savePlaybackState() {
-     if(!currentUser) return;
-     try { await setDoc(doc(db, "users", currentUser.uid), { lastPlayed: { title: currentList[currentIndex].title, time: audio.currentTime, playlist: currentPlaylistKey } }, { merge: true }); } catch(e) {}
+    }
   }
   function updateMediaSession(song) {
-    if('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({ title: song.title, artist: song.artist, artwork: [{ src: song.cover || 'assets/cover_placeholder.jpg', sizes: '512x512', type: 'image/jpeg' }]});
-      navigator.mediaSession.setActionHandler('play', togglePlay); navigator.mediaSession.setActionHandler('pause', togglePlay);
-      navigator.mediaSession.setActionHandler('nexttrack', () => playNext(true)); navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artist || "Elysia Player", 
+        album: playlistTitleBtn ? playlistTitleBtn.textContent : "Music",
+        artwork: [{ src: song.cover || 'assets/banner1.jpg', sizes: "512x512", type: "image/jpeg" }]
+      });
+      navigator.mediaSession.setActionHandler('play', togglePlay);
+      navigator.mediaSession.setActionHandler('pause', togglePlay);
+      navigator.mediaSession.setActionHandler('nexttrack', () => playNext(false));
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        let prevIndex = currentIndex - 1;
+        if (prevIndex < 0) prevIndex = currentList.length - 1;
+        loadSong(prevIndex);
+        audio.play();
+        playPauseBtn.innerHTML = ICONS.pause;
+        playPauseBtn.classList.add("playing");
+      });
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.fastSeek && 'fastSeek' in audio) audio.fastSeek(details.seekTime);
+        else audio.currentTime = details.seekTime;
+        updatePositionState();
+      });
     }
   }
-
-  // Auth
-  const navAuthBtn = document.getElementById("nav-auth-btn");
-  if(navAuthBtn) navAuthBtn.addEventListener("click", (e) => { e.preventDefault(); document.getElementById("login-modal-overlay").classList.add("active"); });
-  document.getElementById("close-modal-btn")?.addEventListener("click", () => document.getElementById("login-modal-overlay").classList.remove("active"));
+  audio.addEventListener('loadedmetadata', updatePositionState);
   
-  const emailSubmitBtn = document.getElementById("email-submit-btn");
-  if(emailSubmitBtn) {
-      emailSubmitBtn.addEventListener("click", async () => {
-          if(emailSubmitBtn.disabled) return;
-          const email = document.getElementById("email-input").value;
-          const pass = document.getElementById("pass-input").value;
-          try {
-              await setPersistence(auth, browserLocalPersistence);
-              await createUserWithEmailAndPassword(auth, email, pass);
-              await updateProfile(auth.currentUser, { displayName: email.split("@")[0], photoURL: "assets/bannernetwork.png" });
-              document.getElementById("login-modal-overlay").classList.remove("active");
-          } catch(e) {
-              if(e.code === 'auth/email-already-in-use') {
-                  try { await signInWithEmailAndPassword(auth, email, pass); document.getElementById("login-modal-overlay").classList.remove("active"); } 
-                  catch(e2) { document.getElementById("auth-error-msg").innerText = "Login Failed"; }
-              } else document.getElementById("auth-error-msg").innerText = e.message;
+  audio.addEventListener('play', () => { 
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; 
+      updatePositionState(); 
+      updateTitleOrLyric(); 
+  });
+  
+  audio.addEventListener('pause', () => { 
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
+    updatePositionState();
+    savePlaybackState();
+    updateTitleOrLyric(); 
+  });
+
+  /* --- 🔥 timeupdate 监听器 (整合计数逻辑) --- */
+  let lastTimeForLoop = 0; 
+
+  audio.addEventListener('timeupdate', () => { 
+    if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
+    
+    // 1. 更新进度条 UI
+    if (progressBar && audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${percent}%`;
+    }
+
+    // 2. 更新歌词
+    if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
+        const currentTime = audio.currentTime;
+        let activeIndex = -1;
+        for (let i = 0; i < currentLyrics.length; i++) {
+            if (currentTime >= currentLyrics[i].time) {
+                activeIndex = i;
+            } else {
+                break; 
+            }
+        }
+        if (activeIndex !== currentLyricIndex) {
+            currentLyricIndex = activeIndex;
+            updateTitleOrLyric();
+        }
+    }
+
+    // 3. 🔥 检测单曲循环播放计数 (带原子累加防抖)
+    if (playMode === 1 && audio.duration > 0) {
+        if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
+             const now = Date.now();
+             if (now - lastCountTime > 2000) {
+                 console.log("检测到单曲循环：播放次数 +1");
+                 if (currentList && currentList[currentIndex]) {
+                     recordPlayHistory(currentList[currentIndex].title);
+                 }
+                 lastCountTime = now;
+             }
+        }
+    }
+    lastTimeForLoop = audio.currentTime; 
+    
+    // 4. 保存进度
+    const now = Date.now();
+    if (now - lastSaveTime > 10000 && !audio.paused) { 
+        savePlaybackState();
+        lastSaveTime = now;
+    }
+  });
+
+  if (progressContainer) {
+      progressContainer.addEventListener('click', (e) => {
+          const width = progressContainer.clientWidth;
+          const clickX = e.offsetX;
+          const duration = audio.duration;
+          
+          if (duration > 0 && Number.isFinite(duration)) {
+              audio.currentTime = (clickX / width) * duration;
+              updatePositionState(); 
           }
       });
   }
-  document.getElementById("google-login-btn")?.addEventListener("click", async () => { try { await signInWithPopup(auth, provider); document.getElementById("login-modal-overlay").classList.remove("active"); } catch(e){} });
-  document.getElementById("logout-confirm-btn")?.addEventListener("click", () => signOut(auth).then(() => document.getElementById("login-modal-overlay").classList.remove("active")));
 
-  onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    if(user) {
-      const name = user.displayName || user.email.split("@")[0];
-      document.getElementById("nav-auth-text").innerText = name;
-      document.getElementById("login-actions").style.display = "none";
-      document.getElementById("user-info-panel").style.display = "block";
-      document.getElementById("modal-user-name").innerText = name;
-      document.getElementById("modal-user-avatar").src = user.photoURL || "assets/bannernetwork.png";
-      onSnapshot(doc(db, "users", user.uid), (snap) => {
-        if(snap.exists()) {
-          const d = snap.data();
-          userFavorites = d.favorites || []; userPlayHistory = d.playHistory || {};
-        }
-        updateHeartStatus();
-      });
-    } else {
-      document.getElementById("nav-auth-text").innerText = "登录 / 同步";
-      document.getElementById("login-actions").style.display = "block";
-      document.getElementById("user-info-panel").style.display = "none";
-      userFavorites = []; updateHeartStatus();
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === 'hidden') {
+        savePlaybackState();
     }
-    renderPlaylistMenu();
   });
 
-  const emailIn = document.getElementById("email-input");
-  if(emailIn) emailIn.addEventListener("input", window.checkLoginButtonState);
+  resetTimer();
+  
+  if(allSongsLibrary.length > 0) loadSong(0);
 
-  // Init
-  if(currentList.length > 0) {
-      renderPlaylistMenu(); 
-      renderSongListDOM();
-      loadSong(0, false);
+  /* =========================================================
+     🔥 PART 3: 登录 & UI 交互 (已强化按钮状态检查)
+     ========================================================= */
+  const navAuthBtn = document.getElementById("nav-auth-btn");
+  const navAuthText = document.getElementById("nav-auth-text");
+  const navAuthIconSlot = document.getElementById("auth-icon-slot");
+  
+  const modalOverlay = document.getElementById("login-modal-overlay");
+  const closeModalBtn = document.getElementById("close-modal-btn");
+  const googleLoginBtn = document.getElementById("google-login-btn");
+  const logoutConfirmBtn = document.getElementById("logout-confirm-btn");
+  const loginActionsDiv = document.getElementById("login-actions");
+  const userInfoPanel = document.getElementById("user-info-panel");
+  const emailInput = document.getElementById("email-input");
+  const passInput = document.getElementById("pass-input");
+  const emailSubmitBtn = document.getElementById("email-submit-btn");
+  const errorMsg = document.getElementById("auth-error-msg");
+
+  // 初始检查
+  if(window.checkLoginButtonState) window.checkLoginButtonState();
+
+  // 🔥 增加更多事件监听，确保响应及时
+  if (emailInput && passInput) {
+      ['input', 'change', 'keyup', 'paste'].forEach(evt => {
+          emailInput.addEventListener(evt, window.checkLoginButtonState);
+          passInput.addEventListener(evt, window.checkLoginButtonState);
+      });
   }
+
+  if (navAuthBtn) {
+    navAuthBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (modalOverlay) modalOverlay.classList.add("active");
+      const dropdown = document.getElementById("dropdown");
+      if (dropdown && dropdown.classList.contains("show")) dropdown.classList.remove("show");
+      
+      // 打开模态框时，重置 Turnstile 和状态
+      if (window.turnstile) {
+        try { window.turnstile.reset(); } 
+        catch(e) { /* Fallback */ }
+      }
+      window.isCaptchaVerified = false; // 重置全局状态
+      if(window.checkLoginButtonState) window.checkLoginButtonState();
+    });
+  }
+
+  const closeModal = () => modalOverlay?.classList.remove("active");
+  if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  }
+
+  if (emailSubmitBtn) {
+    emailSubmitBtn.addEventListener("click", async () => {
+      if(emailSubmitBtn.disabled || !window.isCaptchaVerified) return;
+
+      const email = emailInput.value;
+      const pass = passInput.value;
+      
+      if (!email || !pass) { errorMsg.innerText = "请输入邮箱和密码"; return; }
+      if (pass.length < 6) { errorMsg.innerText = "密码至少需要6位"; return; }
+      errorMsg.innerText = "处理中...";
+      
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const defaultName = email.split("@")[0];
+        await updateProfile(userCredential.user, {
+          displayName: defaultName,
+          photoURL: "assets/bannernetwork.png" 
+        });
+        closeModal(); 
+      } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+          try {
+            await setPersistence(auth, browserLocalPersistence);
+            await signInWithEmailAndPassword(auth, email, pass);
+            closeModal();
+            errorMsg.innerText = "";
+          } catch (loginError) {
+             errorMsg.innerText = "密码错误或登录失败";
+          }
+        } else {
+          errorMsg.innerText = "错误: " + error.message;
+        }
+      }
+    });
+  }
+
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener("click", async () => {
+      try {
+          await setPersistence(auth, browserLocalPersistence);
+          await signInWithPopup(auth, provider);
+          closeModal();
+      } catch(e) {
+          console.error(e);
+      }
+    });
+  }
+
+  if (logoutConfirmBtn) {
+    logoutConfirmBtn.addEventListener("click", () => {
+      signOut(auth).then(() => closeModal());
+    });
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user; 
+    if (user) {
+      const displayName = user.displayName || user.email.split("@")[0]; 
+      const photoURL = user.photoURL || "assets/bannernetwork.png";  
+
+      if (navAuthText) navAuthText.innerText = displayName;
+      if (navAuthIconSlot) navAuthIconSlot.innerHTML = `<img src="${photoURL}" alt="user">`;
+      if (loginActionsDiv) loginActionsDiv.style.display = "none";
+      if (userInfoPanel) userInfoPanel.style.display = "block";
+      
+      const modalUserName = document.getElementById("modal-user-name");
+      const modalUserAvatar = document.getElementById("modal-user-avatar");
+      if (modalUserName) modalUserName.innerText = displayName;
+      if (modalUserAvatar) modalUserAvatar.src = photoURL;
+
+      const userDocRef = doc(db, "users", user.uid);
+      
+      onSnapshot(userDocRef, (docSnap) => {
+         if (docSnap.exists()) {
+             const data = docSnap.data();
+             userFavorites = data.favorites || [];
+             userPlayHistory = data.playHistory || {}; 
+             
+             if (data.playMode !== undefined) {
+                 playMode = data.playMode; 
+                 modeBtn.innerHTML = playModes[playMode].icon; 
+                 
+                 if (playMode === 1) {
+                     audio.loop = true;
+                 } else {
+                     audio.loop = false;
+                 }
+             }
+             
+             if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
+                 let lastTitle = "";
+                 let lastTime = 0;
+                 let lastPlaylist = "All songs";
+
+                 if (typeof data.lastPlayed === 'object') {
+                     lastTitle = data.lastPlayed.title;
+                     lastTime = data.lastPlayed.time || 0;
+                     lastPlaylist = data.lastPlayed.playlist || "All songs"; 
+                 } else {
+                     lastTitle = data.lastPlayed;
+                 }
+
+                 const savedPlaylistConfig = playlistsConfig.find(c => c.key === lastPlaylist);
+                 const targetConfig = savedPlaylistConfig || playlistsConfig.find(c => c.key === 'All songs') || playlistsConfig[0];
+
+                 if (targetConfig) {
+                     currentPlaylistKey = targetConfig.key;
+                     currentList = allSongsLibrary.filter(targetConfig.filter);
+                     
+                     if (currentPlaylistKey === 'history_rank') {
+                        currentList.sort((a, b) => {
+                            const countA = userPlayHistory[a.title] || 0;
+                            const countB = userPlayHistory[b.title] || 0;
+                            return countB - countA;
+                        });
+                     }
+
+                     if (playlistTitleBtn) playlistTitleBtn.textContent = targetConfig.name;
+                     const targetIndex = currentList.findIndex(s => s.title === lastTitle);
+                     
+                     if (targetIndex !== -1) {
+                         loadSong(targetIndex, true, lastTime);
+                         renderPlaylistMenu();
+                         initialRestoreDone = true;
+                     }
+                 }
+             }
+
+         } else {
+             setDoc(userDocRef, { favorites: [], playHistory: {} }, { merge: true });
+             userFavorites = [];
+             userPlayHistory = {};
+         }
+         updatePlaylistConfig();
+         updateHeartStatus();
+         if (currentPlaylistKey === 'history_rank') {
+            renderSongListDOM();
+         }
+      });
+    } else {
+      if (navAuthText) navAuthText.innerText = "登录 / 同步";
+      if (navAuthIconSlot) navAuthIconSlot.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
+      if (loginActionsDiv) loginActionsDiv.style.display = "block";
+      if (userInfoPanel) userInfoPanel.style.display = "none";
+      userFavorites = [];
+      userPlayHistory = {};
+      initialRestoreDone = false;
+      updatePlaylistConfig();
+      updateHeartStatus();
+    }
+  });
+
 });

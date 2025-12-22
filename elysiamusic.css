@@ -1,4 +1,4 @@
-/* elysiamusic.css - Ultimate Version (Left Cover + Split Layout + Scrolling Fix) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Version: Fixed Mask & Scrolling Lyrics) */
 
 /* =========================================
    1. 基础容器
@@ -42,19 +42,15 @@
 }
 
 /* =========================================
-   3. 前后两面 (Face Layout - 核心布局修改)
+   3. 前后两面 (Face Layout)
    ========================================= */
 .player-face {
   position: absolute;
   inset: 0;
-  
-  /* 🔥 [NEW] 核心布局：两端对齐 */
   display: flex;
   align-items: center;
-  justify-content: space-between; 
-  
-  padding: 8px 14px; /* 调整内边距适应两端 */
-  gap: 10px;
+  gap: 14px;
+  padding: 8px 20px;
   
   border-radius: 16px;
 
@@ -86,15 +82,18 @@
   background-position: 100% 100%;
 }
 
+
 /* --- 正面 (Front) --- */
 .face-front {
   transform: rotateX(0deg);
+  justify-content: flex-start; 
   pointer-events: auto;
 }
 
 /* --- 背面 (Back) --- */
 .face-back {
   transform: rotateX(180deg);
+  justify-content: flex-start; 
   pointer-events: auto;
 }
 
@@ -120,113 +119,13 @@
 }
 
 /* =========================================
-   4. [NEW] 左侧信息区 (封面 + 歌名)
-   ========================================= */
-.track-info-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;       /* 封面和文字的间距 */
-  flex: 1;         /* 占据左侧所有剩余空间 */
-  min-width: 0;    /* 🔥 [CRITICAL] 允许 flex 子项收缩，防止长歌名撑开容器 */
-  margin-right: 8px; /* 和右侧按钮保持距离 */
-  height: 100%;
-}
-
-/* 歌曲封面样式 */
-.song-cover {
-  width: 36px;       
-  height: 36px;
-  border-radius: 6px; 
-  object-fit: cover;
-  flex-shrink: 0;     
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
-  border: 1px solid rgba(255,255,255,0.15);
-  transition: transform 0.3s ease;
-}
-
-.song-cover:hover {
-  transform: scale(1.05);
-}
-
-/* =========================================
-   5. [UPDATE] 歌名与滚动文字
-   ========================================= */
-#songTitle,
-#playlistTitleBtn,
-.back-face-label {
-  color: #cdbaff; 
-  font-weight: 600; 
-  
-  /* 🔥 Flex 自适应修改 */
-  width: auto;      
-  flex: 1;
-  min-width: 0;     /* 配合上面的 container，确保溢出检测生效 */
-  
-  height: 24px; 
-  font-size: 0.95rem;
-  line-height: 24px;
-  text-align: center; 
-  
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; /* 没滚动时显示省略号 */
-  position: relative;
-  
-  cursor: pointer;
-  transition: color 0.3s ease;
-  
-  /* 遮罩：只在最右侧渐变消失，防止文字突兀切断 */
-  mask-image: linear-gradient(90deg, #000 0%, #000 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 85%, transparent 100%);
-}
-
-/* 背面特有的提示文字样式 */
-.back-face-label {
-  font-size: 0.85rem;
-  opacity: 0.8;
-  letter-spacing: 1px;
-  pointer-events: none; /* 纯展示 */
-}
-
-#playlistTitleBtn:hover, #songTitle:hover {
-  color: #cdbaff;
-  text-shadow: none;
-}
-
-/* 内部滚动容器 */
-.scroll-inner {
-  display: inline-block;
-  padding-left: 0;
-  will-change: transform; 
-}
-
-/* 激活滚动 */
-.scroll-inner.scrolling {
-  animation: scrollText var(--scroll-duration, 8s) linear infinite;
-}
-
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 开头稍作停留 */
-  100% { transform: translateX(calc(-100% + 150px)); } /* 稍微多滚一点确保看完 */
-}
-
-/* 歌词模式下的微调 */
-#songTitle.lyric-mode {
-  font-size: 0.95rem;            
-  color: #cdbaff;
-  white-space: nowrap; 
-}
-
-/* =========================================
-   6. [UPDATE] 控件按钮组 (右侧对齐)
+   4. 控件按钮 (Apple Music Style)
    ========================================= */
 .elysia-controls { 
   display: flex; 
-  gap: 8px;        /* 按钮间距 */
-  flex-shrink: 0;  /* 防止按钮被挤压 */
+  gap: 12px; 
+  flex-shrink: 0; 
   align-items: center;
-  justify-content: flex-end;
 }
 
 .elysia-controls button,
@@ -287,8 +186,68 @@
   100% { transform: scale(1.05); }
 }
 
+/* --- 统一标题与歌词样式 (滚动版 + 修复遮罩) --- */
+#songTitle,
+#playlistTitleBtn {
+  color: #cdbaff; 
+  font-weight: 600; 
+  width: 200px; 
+  height: 24px; /* 固定高度，防止抖动 */
+  font-size: 0.95rem;
+  line-height: 24px;
+  text-align: left; 
+  
+  /* 强制不换行，以便 JS 计算滚动 */
+  white-space: nowrap; 
+  overflow: hidden; 
+  position: relative;
+  
+  cursor: pointer;
+  transition: color 0.3s ease;
+  
+  /* 🔥 修复：遮罩改为只在最右侧 10% 处渐变消失，左侧完全不遮挡 */
+  /* 这样单行短歌词就不会被切掉了 */
+  mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
+}
+
+#playlistTitleBtn:hover, #songTitle:hover {
+  color: #cdbaff;
+  text-shadow: none;
+}
+
+/* 内部文本容器 (JS会把文字包在这个span里用于滚动) */
+.scroll-inner {
+  display: inline-block;
+  padding-left: 0;
+  will-change: transform; 
+}
+
+/* 只有当添加了 .scrolling 类时才激活动画 */
+.scroll-inner.scrolling {
+  /* 匀速单向滚动，无限循环 (配合 JS 的单向逻辑) */
+  animation: scrollText var(--scroll-duration, 8s) linear infinite;
+}
+
+/* 滚动动画关键帧 - 单向滚动 */
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(0); } /* 开头停顿一会让人看清 */
+  100% { transform: translateX(calc(-100% + 200px)); } /* 滚到末尾 */
+}
+
+/* 歌词模式下的微调 */
+#songTitle.lyric-mode {
+  /* 保持和歌名一样的大小和颜色 */
+  font-size: 0.95rem;            
+  color: #cdbaff;
+  /* 确保不换行，为了滚动 */
+  white-space: nowrap; 
+}
+
+
 /* =========================================
-   7. 播放列表 & 歌单菜单
+   5. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -382,7 +341,7 @@
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   8. 动画
+   6. 动画
    ========================================= */
 .elysia-playlist.show {
   opacity: 1; 
@@ -418,7 +377,7 @@
 }
 
 /* =========================================
-   9. 进度条
+   7. 进度条
    ========================================= */
 .elysia-progress-container {
   position: absolute;
@@ -469,7 +428,7 @@
 }
 
 /* =========================================
-   10. 滚动条美化
+   8. 滚动条美化
    ========================================= */
 .elysia-playlist::-webkit-scrollbar {
   width: 4px;

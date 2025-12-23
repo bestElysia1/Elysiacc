@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (Event Sync + Auto Color) */
+/* elysiamusic.js - Ultimate Final Version (Gesture Control + Auto Color + Sync) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -17,7 +17,6 @@ import {
   browserLocalPersistence   
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 引入 Firestore 初始化模块
 import { 
   initializeFirestore, 
   doc, 
@@ -43,7 +42,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 初始化 Firestore 并开启离线持久化
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager()
@@ -184,7 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentUser) return; 
     const currentCount = userPlayHistory[songTitle] || 0;
     userPlayHistory[songTitle] = currentCount + 1;
-    console.log(`播放计数增加: ${songTitle} -> ${userPlayHistory[songTitle]}`); 
 
     if (currentPlaylistKey === 'history_rank') {
         renderSongListDOM(); 
@@ -258,8 +255,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const modeBtn = document.getElementById("modeBtn");
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
+  const progressContainer = document.getElementById("progressContainer");
+  const progressBar = document.getElementById("progressBar");
   
-  // 🔥 封面元素获取
   const currentCoverEl = document.getElementById("currentCover");
   const backCoverEl = document.getElementById("backCover");
 
@@ -284,46 +282,36 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* --- 🌈 异步取色与光效逻辑 --- */
-  
-  // 1. 获取图片主色调 (使用 Canvas)
   function getAverageRGB(imgUrl) {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = "Anonymous"; // 必须设置，否则 Canvas 会因为跨域污染报错
+      img.crossOrigin = "Anonymous"; 
       img.src = imgUrl;
 
       img.onload = () => {
         try {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          // 缩小尺寸以加快处理速度 (1x1 即可取平均色)
           canvas.width = 1;
           canvas.height = 1;
           ctx.drawImage(img, 0, 0, 1, 1);
-          
           const imgData = ctx.getImageData(0, 0, 1, 1).data;
-          // 返回格式: "255, 100, 50"
           resolve(`${imgData[0]}, ${imgData[1]}, ${imgData[2]}`);
         } catch (e) {
           reject(e);
         }
       };
-
       img.onerror = (err) => reject(err);
     });
   }
 
-  // 2. 应用或重置主题色
   function applyThemeColor(song) {
     if (!song.cover) {
       resetThemeColor();
       return;
     }
-
-    // 异步执行，不等待，不阻塞
     getAverageRGB(song.cover)
       .then((rgbStr) => {
-        // 设置 CSS 变量 (Player 的自定义属性)
         if (player) {
           player.style.setProperty('--theme-rgb', rgbStr);
           player.classList.add('has-custom-theme');
@@ -335,43 +323,25 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // 3. 重置回默认紫色
   function resetThemeColor() {
     if (player) {
-      // 移除自定义样式，CSS 会 fallback 到默认变量
       player.classList.remove('has-custom-theme');
       player.style.removeProperty('--theme-rgb');
     }
   }
 
-
-  /* --- 🎵 封面更新逻辑 --- */
+  /* --- 🎵 封面 & 歌词加载 --- */
   function updateCover(song) {
       const coverUrl = song.cover || ''; 
-      
-      // 更新正面封面
       if (currentCoverEl) {
-          if (coverUrl) {
-              currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          } else {
-              currentCoverEl.style.backgroundImage = ''; // CSS 会显示 ♪
-          }
+          currentCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
       }
-      
-      // 更新背面封面
       if (backCoverEl) {
-          if (coverUrl) {
-              backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          } else {
-              backCoverEl.style.backgroundImage = '';
-          }
+          backCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
       }
-
-      // 🔥 触发异步取色逻辑 (不影响播放流程)
       applyThemeColor(song);
   }
 
-  /* --- 🎵 歌词解析函数 --- */
   function parseLRC(lrcText) {
       if(!lrcText) return [];
       const lines = lrcText.split('\n');
@@ -423,23 +393,18 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch(song.lrc);
           if (response.ok) {
               const lrcText = await response.text();
-              try {
-                  localStorage.setItem(localCacheKey, lrcText);
-              } catch (storageErr) {
-                  console.warn("歌词缓存失败(可能是空间已满):", storageErr);
-              }
+              try { localStorage.setItem(localCacheKey, lrcText); } catch(e){}
               currentLyrics = parseLRC(lrcText);
               if (currentLyrics.length > 0) hasLyrics = true;
           }
       } catch (e) {
-          console.warn(`[Elysia] 歌词加载失败: ${song.title}`, e);
+          console.warn(`[Elysia] 歌词加载失败`, e);
       } finally {
           isLyricsLoading = false;
           updateTitleOrLyric(true); 
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -455,7 +420,6 @@ document.addEventListener("DOMContentLoaded", () => {
           textToShow = song.title; 
           titleEl.classList.remove("lyric-mode");
       } else {
-          // 歌词模式
           if (currentLyricIndex === -1 || currentLyricIndex >= currentLyrics.length) {
               textToShow = song.title;
               titleEl.classList.remove("lyric-mode");
@@ -467,34 +431,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
-      if (!forceUpdate && currentHTML === textToShow) {
-          return; 
-      }
+      if (!forceUpdate && currentHTML === textToShow) return; 
 
-      // 重置 DOM 以强制动画从头开始
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
-      
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
-      // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
           const duration = (textWidth / 50) + 1.5; 
-          
-          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
-          // 容器宽 - 文字宽 - 20px余量 = 负数
           const offset = containerWidth - textWidth - 20;
-
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
-          
-          // 3. 强制重绘 (Reflow)
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
-          
           titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
@@ -515,14 +466,10 @@ document.addEventListener("DOMContentLoaded", () => {
     hasLyrics = false;
     currentLyricIndex = -1;
     
-    // 🔥 先重置颜色，避免上一首的颜色闪烁
     resetThemeColor();
-    
-    updateCover(song); // updateCover 内部会触发异步取色
-
+    updateCover(song);
     isLyricsLoading = true;
-    updateTitleOrLyric(true); // 切歌强制刷新
-
+    updateTitleOrLyric(true); 
     fetchLyrics(song);
 
     if (startTime > 0) {
@@ -536,20 +483,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     audio.src = song.src;
-
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
+    audio.loop = (playMode === 1);
     
     renderSongListDOM(); 
     updateMediaSession(song);
     updateHeartStatus();
 
-    if (!isRestore) {
-        savePlaybackState();
-    }
+    if (!isRestore) savePlaybackState();
   }
 
   function togglePlay() {
@@ -562,12 +502,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playNext(isAuto = false) {
     let nextIndex;
-    
     if (playMode === 1 && isAuto) { 
       if (audio.paused) audio.play(); 
       return; 
     } 
-
     if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
@@ -583,29 +521,22 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.play().catch(e => console.warn("Auto-play blocked:", e)); 
   }
 
-  function toggleMenu(el) {
-    if (el.classList.contains("show")) {
-      hideMenu(el);
-    } else {
-      el.classList.remove("hide");
-      el.classList.add("show");
-    }
-  }
   function hideMenu(el) {
     if (el && el.classList.contains("show")) {
         el.classList.remove("show");
         el.classList.add("hide");
     }
   }
+  function toggleMenu(el) {
+     if(el.classList.contains("show")) hideMenu(el);
+     else { el.classList.remove("hide"); el.classList.add("show"); }
+  }
 
   function renderSongListDOM() {
     if (!songListEl) return;
     songListEl.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
-      let countHtml = '';
-      if (currentPlaylistKey === 'history_rank') {
-        countHtml = `<span class="play-count-tag">${count} 次</span>`;
-      }
+      let countHtml = (currentPlaylistKey === 'history_rank') ? `<span class="play-count-tag">${count} 次</span>` : '';
       return `
       <div class="playlist-item ${i === currentIndex ? 'active' : ''}" data-index="${i}">
         <span class="song-name">${s.title}</span>
@@ -613,13 +544,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `}).join("");
   }
-
-  titleEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (player.classList.contains("flipped")) return; 
-    hideMenu(playlistMenuEl); 
-    toggleMenu(songListEl);
-  });
 
   songListEl.addEventListener("click", e => {
     const item = e.target.closest(".playlist-item");
@@ -681,7 +605,6 @@ document.addEventListener("DOMContentLoaded", () => {
         titleEl.textContent = "暂无数据";
         songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
     }
-
     renderPlaylistMenu();
     renderSongListDOM();
   }
@@ -691,20 +614,12 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
     modeBtn.innerHTML = playModes[playMode].icon;
-
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
+    audio.loop = (playMode === 1);
 
     if (currentUser) {
-        const userDocRef = doc(db, "users", currentUser.uid);
         try {
-            await setDoc(userDocRef, { playMode: playMode }, { merge: true });
-        } catch (err) {
-            console.error("保存播放模式失败", err);
-        }
+            await setDoc(doc(db, "users", currentUser.uid), { playMode: playMode }, { merge: true });
+        } catch (err) { console.error("保存播放模式失败", err); }
     }
   });
 
@@ -733,59 +648,6 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("网络开小差了，同步失败");
     }
   });
-
-  document.addEventListener("click", e => {
-    const inPlayer = player.contains(e.target);
-    const inSongList = songListEl && songListEl.contains(e.target);
-    const inPlayListMenu = playlistMenuEl && playlistMenuEl.contains(e.target);
-    if (!inPlayer && !inSongList && !inPlayListMenu) {
-      hideMenu(songListEl);
-      hideMenu(playlistMenuEl);
-    }
-  });
-
-  let isDrag = false;
-  let pressTimer;
-  const startPress = (e) => {
-    if (e.target.closest('button')) return; 
-    isDrag = false;
-    pressTimer = setTimeout(() => {
-      if (!isDrag) {
-        player.classList.toggle("flipped");
-        hideMenu(songListEl);
-        hideMenu(playlistMenuEl);
-      }
-    }, 300);
-  };
-  const cancelPress = () => clearTimeout(pressTimer);
-  const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
-  player.addEventListener('mousedown', startPress);
-  player.addEventListener('touchstart', startPress, { passive: true });
-  player.addEventListener('mouseup', cancelPress);
-  player.addEventListener('mouseleave', cancelPress);
-  player.addEventListener('touchend', cancelPress);
-  player.addEventListener('mousemove', onMove);
-  player.addEventListener('touchmove', onMove, { passive: true });
-
-  let inactivityTimer;
-  function hidePlayerUI() {
-    player.style.opacity = '0';
-    player.style.transform = 'translate(-50%, 40px)'; 
-    player.style.pointerEvents = 'none'; 
-    hideMenu(songListEl);
-    hideMenu(playlistMenuEl);
-  }
-  function showPlayerUI() {
-    player.style.opacity = '1';
-    player.style.transform = 'translate(-50%, 0)'; 
-    player.style.pointerEvents = 'auto'; 
-    resetTimer();
-  }
-  function resetTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(hidePlayerUI, 1800000); 
-  }
-  ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayerUI));
 
   playPauseBtn.addEventListener("click", togglePlay);
   nextBtn.addEventListener("click", () => playNext(false));
@@ -832,76 +694,54 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
-  audio.addEventListener('loadedmetadata', updatePositionState);
-  
-  // 🔥🔥🔥 核心修改：将 UI 状态更新移动到 Audio 事件监听器中
-  // 这样无论通过点击按钮、键盘媒体键还是系统菜单控制，UI 都能完美同步
   
   audio.addEventListener('play', () => { 
-      // 1. 同步按钮图标
       playPauseBtn.innerHTML = ICONS.pause;
       playPauseBtn.classList.add("playing"); 
-      
-      // 2. 启动呼吸灯和光效
       player.classList.add("playing");
       if(currentCoverEl) currentCoverEl.classList.add("playing");
-
-      // 3. 更新媒体中心状态
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; 
-      
       updatePositionState(); 
       updateTitleOrLyric(true); 
   });
   
   audio.addEventListener('pause', () => { 
-      // 1. 同步按钮图标
       playPauseBtn.innerHTML = ICONS.play;
       playPauseBtn.classList.remove("playing");
-
-      // 2. 停止呼吸灯
       player.classList.remove("playing");
       if(currentCoverEl) currentCoverEl.classList.remove("playing");
-
-      // 3. 更新媒体中心状态
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
-      
       updatePositionState();
       savePlaybackState();
       updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 --- */
   let lastTimeForLoop = 0; 
-
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // --- 歌词逻辑 (核心修复) ---
+    if (progressBar && audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${percent}%`;
+    }
+
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
-        
         for (let i = 0; i < currentLyrics.length; i++) {
-            if (currentTime >= currentLyrics[i].time) {
-                activeIndex = i;
-            } else {
-                break; 
-            }
+            if (currentTime >= currentLyrics[i].time) activeIndex = i;
+            else break; 
         }
-
-        // 仅当歌词改变时触发 DOM 更新 (防抖 + 重置动画)
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
-            updateTitleOrLyric(true); 
+            updateTitleOrLyric();
         }
     }
 
-    // 单曲循环计数
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
              if (now - lastCountTime > 2000) {
-                 console.log("检测到单曲循环：播放次数 +1");
                  if (currentList && currentList[currentIndex]) {
                      recordPlayHistory(currentList[currentIndex].title);
                  }
@@ -911,7 +751,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastTimeForLoop = audio.currentTime; 
     
-    // 进度保存
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();
@@ -919,15 +758,122 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'hidden') {
-        savePlaybackState();
+  if (progressContainer) {
+      progressContainer.addEventListener('click', (e) => {
+          const width = progressContainer.clientWidth;
+          const clickX = e.offsetX;
+          const duration = audio.duration;
+          if (duration > 0 && Number.isFinite(duration)) {
+              audio.currentTime = (clickX / width) * duration;
+              updatePositionState(); 
+          }
+      });
+  }
+
+  /* =========================================================
+     🔥 修复版：交互核心 (单击列表 / 长按翻转 / 忽略按钮)
+     ========================================================= */
+  function isInteractiveElement(target) {
+    return target.closest('button') || 
+           target.closest('.elysia-progress-container') ||
+           target.closest('.playlist-item'); 
+  }
+
+  let pressTimer = null;
+  let isLongPressTriggered = false;
+  let startX = 0;
+  let startY = 0;
+  
+  const handleStart = (e) => {
+    if (isInteractiveElement(e.target)) return;
+    isLongPressTriggered = false;
+    
+    if (e.type === 'touchstart') {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    } else {
+        startX = e.clientX;
+        startY = e.clientY;
+    }
+
+    pressTimer = setTimeout(() => {
+        isLongPressTriggered = true;
+        if (navigator.vibrate) navigator.vibrate(50);
+        player.classList.toggle("flipped");
+        hideMenu(songListEl);
+        hideMenu(playlistMenuEl);
+    }, 300);
+  };
+
+  const handleMove = (e) => {
+    if (!pressTimer) return;
+    let currentX, currentY;
+    if (e.type === 'touchmove') {
+        currentX = e.touches[0].clientX;
+        currentY = e.touches[0].clientY;
+    } else {
+        currentX = e.clientX;
+        currentY = e.clientY;
+    }
+
+    if (Math.abs(currentX - startX) > 10 || Math.abs(currentY - startY) > 10) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        isLongPressTriggered = true; 
+    }
+  };
+
+  const handleEnd = (e) => {
+    if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+    }
+  };
+
+  const handleClick = (e) => {
+    if (isInteractiveElement(e.target)) return;
+    
+    if (isLongPressTriggered) {
+        isLongPressTriggered = false; 
+        return;
+    }
+    if (player.classList.contains("flipped")) return;
+
+    hideMenu(playlistMenuEl); 
+    
+    if (songListEl.classList.contains("show")) {
+        hideMenu(songListEl);
+    } else {
+        songListEl.classList.remove("hide");
+        songListEl.classList.add("show");
+    }
+  };
+
+  player.addEventListener('mousedown', handleStart);
+  player.addEventListener('touchstart', handleStart, { passive: true });
+  
+  player.addEventListener('mousemove', handleMove);
+  player.addEventListener('touchmove', handleMove, { passive: true });
+  
+  player.addEventListener('mouseup', handleEnd);
+  player.addEventListener('touchend', handleEnd);
+  player.addEventListener('mouseleave', handleEnd);
+
+  player.addEventListener('click', handleClick);
+
+  document.addEventListener("click", e => {
+    const inPlayer = player.contains(e.target);
+    const inSongList = songListEl && songListEl.contains(e.target);
+    const inPlayListMenu = playlistMenuEl && playlistMenuEl.contains(e.target);
+    if (!inPlayer && !inSongList && !inPlayListMenu) {
+      hideMenu(songListEl);
+      hideMenu(playlistMenuEl);
     }
   });
 
-  resetTimer();
-  
-  if(allSongsLibrary.length > 0) loadSong(0);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === 'hidden') savePlaybackState();
+  });
 
   /* =========================================================
      🔥 PART 3: 登录 & UI 交互

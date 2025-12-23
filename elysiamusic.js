@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (User Logic + Auto Color Extraction + Event Sync) */
+/* elysiamusic.js - Ultimate Final Version (Event Sync + Auto Color) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置

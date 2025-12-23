@@ -1,8 +1,7 @@
-/* elysiamusic.js - Ultimate Final Version (Commented & Fixed) */
+/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
 
 /* =========================================================
-   🔥 PART 1: Firebase 初始化 & 身份验证配置
-   此部分负责连接 Firebase 后端，处理登录、注册、数据库同步
+   🔥 PART 1: Firebase 初始化 & 配置
    ========================================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -18,7 +17,7 @@ import {
   browserLocalPersistence   
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 引入 Firestore 数据库模块
+// 引入 Firestore 初始化模块
 import { 
   initializeFirestore, 
   doc, 
@@ -32,7 +31,6 @@ import {
   persistentMultipleTabManager
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase 项目配置
 const firebaseConfig = {
   apiKey: "AIzaSyDeda0UP6TzdfraFcqMwIkE_iNwJ2xbeKs",
   authDomain: "elysiamusic-dddcf.firebaseapp.com",
@@ -45,24 +43,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 初始化数据库（开启离线缓存功能）
+// 初始化 Firestore 并开启离线持久化
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager()
   })
 });
-console.log("[Firebase] Firestore 离线持久化已启用");
+console.log("[Firebase] Firestore 离线持久化已启用 (新版 API)");
 
 const provider = new GoogleAuthProvider();
 
 
 /* =========================================================
-   🔥 PART 1.5: Cloudflare 验证 & 登录框逻辑
-   此部分处理 Turnstile 验证码和登录按钮的状态检查
+   🔥 PART 1.5: Cloudflare 全局逻辑
    ========================================================= */
 window.isCaptchaVerified = false;
 
-// 检查邮箱/密码是否合法，控制登录按钮是否可点
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
   const emailInput = document.getElementById("email-input");
@@ -74,7 +70,6 @@ window.checkLoginButtonState = function() {
   const emailVal = emailInput.value.trim();
   const passVal = passInput.value.trim();
   
-  // 规则：有邮箱 + 密码>6位 + 验证码通过
   const isValid = emailVal.length > 0 && passVal.length >= 6 && window.isCaptchaVerified;
 
   if (isValid) {
@@ -94,7 +89,6 @@ window.checkLoginButtonState = function() {
   }
 };
 
-// 验证码成功回调
 window.onTurnstileSuccess = function(token) {
   console.log("[Turnstile] 验证成功");
   window.isCaptchaVerified = true;
@@ -103,7 +97,6 @@ window.onTurnstileSuccess = function(token) {
   window.checkLoginButtonState();
 };
 
-// 验证码过期回调
 window.onTurnstileExpired = function() {
   console.log("[Turnstile] 验证过期");
   window.isCaptchaVerified = false;
@@ -112,32 +105,30 @@ window.onTurnstileExpired = function() {
 
 
 /* =========================================================
-   🔥 PART 2: 播放器核心变量 & 数据准备
-   这里定义了全局变量、图标、歌词解析逻辑
+   🔥 PART 2: 播放器核心逻辑 & DOM交互
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   
-  // 检查歌单数据是否加载
   const allSongsLibrary = window.allSongsLibrary || [];
+
   if (!window.allSongsLibrary) {
       console.error("严重错误：未找到歌单数据！请检查 song.js 是否在 elysiamusic.js 之前加载。");
   }
 
-  // 用户状态变量
-  let userFavorites = [];     // 收藏列表
-  let userPlayHistory = {};   // 播放计数
-  let currentUser = null;     // 当前登录用户
-  let lastSaveTime = 0;       // 上次保存进度的时间
-  let initialRestoreDone = false; // 是否已恢复上次播放进度
+  let userFavorites = [];
+  let userPlayHistory = {}; 
+  let currentUser = null;
+  let lastSaveTime = 0; 
+  let initialRestoreDone = false; 
 
-  // 歌词状态变量
+  /* --- 🎵 歌词相关变量 --- */
   let currentLyrics = [];     
   let hasLyrics = false;      
   let isLyricsLoading = false; 
   let currentLyricIndex = -1; 
   let lastCountTime = 0;
 
-  // SVG 图标定义
+  /* ... SVG ICONS ... */
   const ICONS = {
     play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
     pause: `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
@@ -148,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
   };
 
-  /* --- 歌单分类配置 --- */
+  /* 2. 歌单配置与状态管理 */
   let playlistsConfig = [
     { key: "All songs", name: "所有歌曲", filter: (s) => s.category !== 'piano' },
     { key: "history_rank", name: "我的听歌排行", filter: (s) => (userPlayHistory[s.title] || 0) > 0 },
@@ -163,7 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "unknown", name: "前方的区域后面再来探索吧～", filter: (s) => s.category === 'unknown' },
   ];
 
-  // 动态更新“我的收藏”歌单
   function updatePlaylistConfig() {
     const favIndex = playlistsConfig.findIndex(p => p.key === "my_favorites");
     const myFavPlaylist = {
@@ -182,35 +172,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (favIndex !== -1) {
             playlistsConfig.splice(favIndex, 1);
             if (currentPlaylistKey === 'my_favorites') {
-                changePlaylist('All songs'); // 如果当前在收藏夹但没收藏了，切回首页
+                changePlaylist('All songs');
             }
         }
     }
     renderPlaylistMenu();
   }
 
-  // 播放历史记录功能
+  // 记录播放历史
   async function recordPlayHistory(songTitle) {
     if (!currentUser) return; 
     const currentCount = userPlayHistory[songTitle] || 0;
     userPlayHistory[songTitle] = currentCount + 1;
-    
-    // 实时更新排行UI
+    console.log(`播放计数增加: ${songTitle} -> ${userPlayHistory[songTitle]}`); 
+
     if (currentPlaylistKey === 'history_rank') {
         renderSongListDOM(); 
     }
-    // 上传到数据库
+
     const userDocRef = doc(db, "users", currentUser.uid);
     try {
         await setDoc(userDocRef, {
-            playHistory: { [songTitle]: increment(1) } 
+            playHistory: {
+                [songTitle]: increment(1)
+            } 
         }, { merge: true });
     } catch (e) {
         console.error("更新播放次数失败", e);
     }
   }
 
-  // 保存播放进度 (Title, Time, Playlist)
   async function savePlaybackState() {
     if (!currentUser || !currentList[currentIndex]) return;
     const songTitle = currentList[currentIndex].title;
@@ -224,16 +215,16 @@ document.addEventListener("DOMContentLoaded", () => {
           playlist: currentPlaylistKey 
         }
       }, { merge: true }); 
-    } catch (e) { console.error("保存进度失败", e); }
+    } catch (e) {
+      console.error("保存进度失败", e);
+    }
   }
 
-  // 当前播放列表状态
   let currentPlaylistKey = 'piano';
   let currentList = allSongsLibrary.filter(s => s.category === 'piano'); 
   let currentIndex = 0;
-  let shuffleQueue = []; // 随机播放队列
+  let shuffleQueue = []; 
 
-  // 生成随机数组
   function getShuffledIndices(length) {
     let arr = Array.from({length}, (_, i) => i);
     for (let i = length - 1; i > 0; i--) {
@@ -243,16 +234,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return arr;
   }
   
-  let playMode = 0; // 0:列表循环, 1:单曲循环, 2:随机
+  let playMode = 0; 
   const playModes = [
     { icon: ICONS.loopList, name: "列表循环" },
     { icon: ICONS.loopOne, name: "单曲循环" },
     { icon: ICONS.shuffle, name: "随机播放" }
   ];
 
-
   /* =========================================================
-     🔥 PART 3: DOM 元素获取 & 基础 Audio 初始化
+     3. DOM 元素初始化 & 播放控制
      ========================================================= */
   const audio = new Audio();
   audio.crossOrigin = "anonymous"; 
@@ -269,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
   
+  // 🔥 封面元素获取
   const currentCoverEl = document.getElementById("currentCover");
   const backCoverEl = document.getElementById("backCover");
 
@@ -282,7 +273,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initIcons();
 
-  // 更新心形图标状态
   function updateHeartStatus() {
       if (!currentList || !currentList[currentIndex]) return;
       const currentTitle = currentList[currentIndex].title;
@@ -293,18 +283,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  // 更新封面图 (异步 CSS)
+  /* --- 🎵 封面更新逻辑 --- */
   function updateCover(song) {
       const coverUrl = song.cover || ''; 
+      
+      // 更新正面封面
       if (currentCoverEl) {
-          currentCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
+          if (coverUrl) {
+              currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          } else {
+              currentCoverEl.style.backgroundImage = ''; // CSS 会显示 ♪
+          }
       }
+      
+      // 更新背面封面
       if (backCoverEl) {
-          backCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
+          if (coverUrl) {
+              backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          } else {
+              backCoverEl.style.backgroundImage = '';
+          }
       }
   }
 
-  /* --- 歌词解析逻辑 --- */
+  /* --- 🎵 歌词解析函数 --- */
   function parseLRC(lrcText) {
       if(!lrcText) return [];
       const lines = lrcText.split('\n');
@@ -326,7 +328,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return result;
   }
 
-  // 获取歌词 (Fetch Async)
   async function fetchLyrics(song) {
       currentLyrics = [];
       hasLyrics = false;
@@ -338,11 +339,11 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
-      // 1. 查缓存
       const localCacheKey = "lyric_" + song.title; 
       const cachedLrc = localStorage.getItem(localCacheKey);
+
       if (cachedLrc) {
-          console.log(`[Elysia] 命中歌词缓存: ${song.title}`);
+          console.log(`[Elysia] 命中本地歌词缓存: ${song.title}`);
           currentLyrics = parseLRC(cachedLrc);
           if (currentLyrics.length > 0) hasLyrics = true;
           isLyricsLoading = false; 
@@ -350,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
-      // 2. 没缓存，去网络请求
       isLyricsLoading = true;
       updateTitleOrLyric(true); 
 
@@ -358,7 +358,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch(song.lrc);
           if (response.ok) {
               const lrcText = await response.text();
-              try { localStorage.setItem(localCacheKey, lrcText); } catch (e) {}
+              try {
+                  localStorage.setItem(localCacheKey, lrcText);
+              } catch (storageErr) {
+                  console.warn("歌词缓存失败(可能是空间已满):", storageErr);
+              }
               currentLyrics = parseLRC(lrcText);
               if (currentLyrics.length > 0) hasLyrics = true;
           }
@@ -370,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  // 更新标题栏文字 (歌词或歌名)
+  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -398,37 +402,42 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
-      if (!forceUpdate && currentHTML === textToShow) return;
+      if (!forceUpdate && currentHTML === textToShow) {
+          return; 
+      }
 
-      // 滚动动画逻辑
+      // 重置 DOM 以强制动画从头开始
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
+      
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
+      // 只有溢出时才滚动
       if (textWidth > containerWidth) {
+          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
           const duration = (textWidth / 50) + 1.5; 
+          
+          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
+          // 容器宽 - 文字宽 - 20px余量 = 负数
           const offset = containerWidth - textWidth - 20;
 
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
+          // 3. 强制重绘 (Reflow)
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
+          
           titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
+          innerSpan.style.transform = 'translateX(0)';
           titleEl.style.textAlign = 'left'; 
       }
   }
 
-
-  /* =========================================================
-     🔥 PART 4: 播放控制 (Load, Play, Next, Playlist)
-     ========================================================= */
-  
-  // 核心：加载歌曲
   function loadSong(index, isRestore = false, startTime = 0) {
     if (!currentList || currentList.length === 0) return;
     if (index < 0) index = currentList.length - 1;
@@ -442,27 +451,37 @@ document.addEventListener("DOMContentLoaded", () => {
     currentLyricIndex = -1;
     
     updateCover(song);
+
     isLyricsLoading = true;
-    updateTitleOrLyric(true); 
+    updateTitleOrLyric(true); // 切歌强制刷新
+
     fetchLyrics(song);
 
-    // 恢复播放进度
     if (startTime > 0) {
         audio.currentTime = startTime; 
         const seekFn = () => {
-            if(Math.abs(audio.currentTime - startTime) > 1) audio.currentTime = startTime;
+            if(Math.abs(audio.currentTime - startTime) > 1) {
+                audio.currentTime = startTime;
+            }
         };
         audio.addEventListener('canplay', seekFn, { once: true });
     }
 
     audio.src = song.src;
-    audio.loop = (playMode === 1);
+
+    if (playMode === 1) {
+        audio.loop = true;
+    } else {
+        audio.loop = false;
+    }
     
     renderSongListDOM(); 
     updateMediaSession(song);
     updateHeartStatus();
 
-    if (!isRestore) savePlaybackState();
+    if (!isRestore) {
+        savePlaybackState();
+    }
   }
 
   function togglePlay() {
@@ -471,24 +490,31 @@ document.addEventListener("DOMContentLoaded", () => {
       playPauseBtn.innerHTML = ICONS.pause;
       playPauseBtn.classList.add("playing"); 
       player.classList.add("playing");
+      
       if(currentCoverEl) currentCoverEl.classList.add("playing");
+      
       updateTitleOrLyric(true); 
+
     } else {
       audio.pause();
       playPauseBtn.innerHTML = ICONS.play;
       playPauseBtn.classList.remove("playing");
       player.classList.remove("playing");
+      
       if(currentCoverEl) currentCoverEl.classList.remove("playing");
+      
       updateTitleOrLyric(true); 
     }
   }
 
   function playNext(isAuto = false) {
+    let nextIndex;
+    
     if (playMode === 1 && isAuto) { 
       if (audio.paused) audio.play(); 
       return; 
     } 
-    let nextIndex;
+
     if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
@@ -509,25 +535,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleMenu(el) {
-    if (el.classList.contains("show")) hideMenu(el);
-    else {
+    if (el.classList.contains("show")) {
+      hideMenu(el);
+    } else {
       el.classList.remove("hide");
       el.classList.add("show");
     }
   }
-  // 强力关闭菜单函数
   function hideMenu(el) {
-    if (!el) return;
-    el.classList.remove("show");
-    el.classList.add("hide");
+    if (el && el.classList.contains("show")) {
+        el.classList.remove("show");
+        el.classList.add("hide");
+    }
   }
 
-  // 渲染歌曲列表 HTML
   function renderSongListDOM() {
     if (!songListEl) return;
     songListEl.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
-      let countHtml = (currentPlaylistKey === 'history_rank') ? `<span class="play-count-tag">${count} 次</span>` : '';
+      let countHtml = '';
+      if (currentPlaylistKey === 'history_rank') {
+        countHtml = `<span class="play-count-tag">${count} 次</span>`;
+      }
       return `
       <div class="playlist-item ${i === currentIndex ? 'active' : ''}" data-index="${i}">
         <span class="song-name">${s.title}</span>
@@ -536,73 +565,13 @@ document.addEventListener("DOMContentLoaded", () => {
     `}).join("");
   }
 
-  // 渲染歌单菜单 HTML
-  function renderPlaylistMenu() {
-    if (!playlistMenuEl) return;
-    playlistMenuEl.innerHTML = playlistsConfig.map(cfg => `
-      <div class="playlist-item ${cfg.key === currentPlaylistKey ? 'active' : ''}" data-key="${cfg.key}">
-        ${cfg.name}
-      </div>
-    `).join("");
-  }
-
-  // 切换歌单逻辑
-  function changePlaylist(key) {
-    const config = playlistsConfig.find(c => c.key === key);
-    if (!config) return;
-    currentPlaylistKey = key;
-    playlistTitleBtn.textContent = config.name; 
-    
-    currentList = allSongsLibrary.filter(config.filter);
-
-    if (key === 'history_rank') {
-        currentList.sort((a, b) => {
-            return (userPlayHistory[b.title] || 0) - (userPlayHistory[a.title] || 0);
-        });
-    }
-
-    shuffleQueue = [];
-    currentIndex = 0;
-    
-    if (currentList.length > 0) {
-        loadSong(0);
-        audio.play().catch(e => {});
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        player.classList.add("playing");
-        if(currentCoverEl) currentCoverEl.classList.add("playing");
-    } else {
-        titleEl.textContent = "暂无数据";
-        songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
-    }
-    renderPlaylistMenu();
-    renderSongListDOM();
-  }
-  renderPlaylistMenu();
-
-  /* =========================================================
-     🔥 PART 5: 交互逻辑 (长按翻转修复版)
-     包含：点击事件、长按翻转、冷却锁 (0.2s)
-     ========================================================= */
-
-  // 全局锁：控制是否允许点击（默认允许）
-  let isClickAllowed = true; 
-  let isDrag = false;
-  let pressTimer;
-
-  /* 1. 标题点击事件 (打开歌曲列表) */
   titleEl.addEventListener("click", (e) => {
     e.stopPropagation();
-    
-    // 冷却期检查：如果刚翻转过，或者在背面，禁止打开
-    if (!isClickAllowed) return;
     if (player.classList.contains("flipped")) return; 
-    
     hideMenu(playlistMenuEl); 
     toggleMenu(songListEl);
   });
 
-  /* 2. 歌曲列表项点击 */
   songListEl.addEventListener("click", e => {
     const item = e.target.closest(".playlist-item");
     if (item) {
@@ -614,17 +583,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* 3. 歌单标题按钮点击 (打开歌单菜单) */
+  function renderPlaylistMenu() {
+    if (!playlistMenuEl) return;
+    playlistMenuEl.innerHTML = playlistsConfig.map(cfg => `
+      <div class="playlist-item ${cfg.key === currentPlaylistKey ? 'active' : ''}" data-key="${cfg.key}">
+        ${cfg.name}
+      </div>
+    `).join("");
+  }
+
   playlistTitleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!isClickAllowed) return;
-    if (player.classList.contains("flipped")) return;
-    
     hideMenu(songListEl); 
     toggleMenu(playlistMenuEl);
   });
 
-  /* 4. 歌单菜单项点击 */
   if (playlistMenuEl) {
     playlistMenuEl.addEventListener('click', (e) => {
       const item = e.target.closest(".playlist-item");
@@ -636,20 +609,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* 5. 模式切换按钮 */
+  function changePlaylist(key) {
+    const config = playlistsConfig.find(c => c.key === key);
+    if (!config) return;
+    currentPlaylistKey = key;
+    playlistTitleBtn.textContent = config.name; 
+    
+    currentList = allSongsLibrary.filter(config.filter);
+
+    if (key === 'history_rank') {
+        currentList.sort((a, b) => {
+            const countA = userPlayHistory[a.title] || 0;
+            const countB = userPlayHistory[b.title] || 0;
+            return countB - countA;
+        });
+    }
+
+    shuffleQueue = [];
+    currentIndex = 0;
+    
+    if (currentList.length > 0) {
+        loadSong(0);
+        audio.play().catch(e => console.warn("Autoplay blocked:", e));
+        playPauseBtn.innerHTML = ICONS.pause;
+        playPauseBtn.classList.add("playing");
+        player.classList.add("playing");
+        if(currentCoverEl) currentCoverEl.classList.add("playing");
+    } else {
+        titleEl.textContent = "暂无数据";
+        songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
+    }
+
+    renderPlaylistMenu();
+    renderSongListDOM();
+  }
+  renderPlaylistMenu();
+
   modeBtn.addEventListener('click', async (e) => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
     modeBtn.innerHTML = playModes[playMode].icon;
-    audio.loop = (playMode === 1);
+
+    if (playMode === 1) {
+        audio.loop = true;
+    } else {
+        audio.loop = false;
+    }
 
     if (currentUser) {
         const userDocRef = doc(db, "users", currentUser.uid);
-        try { await setDoc(userDocRef, { playMode: playMode }, { merge: true }); } catch (err) {}
+        try {
+            await setDoc(userDocRef, { playMode: playMode }, { merge: true });
+        } catch (err) {
+            console.error("保存播放模式失败", err);
+        }
     }
   });
 
-  /* 6. 收藏按钮 */
   heartBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
     if (!currentUser) {
@@ -670,12 +686,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
         else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
     } catch (err) {
+        console.error("操作失败", err);
         updateHeartStatus(); 
-        alert("同步失败，请检查网络");
+        alert("网络开小差了，同步失败");
     }
   });
 
-  /* 7. 点击空白处关闭菜单 */
   document.addEventListener("click", e => {
     const inPlayer = player.contains(e.target);
     const inSongList = songListEl && songListEl.contains(e.target);
@@ -686,33 +702,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* --- 🔥 核心：长按翻转逻辑 (带 0.2s 缓冲) --- */
+  let isDrag = false;
+  let pressTimer;
   const startPress = (e) => {
-    // 忽略按钮点击
     if (e.target.closest('button')) return; 
-    
     isDrag = false;
     pressTimer = setTimeout(() => {
       if (!isDrag) {
-        // A. 执行翻转
         player.classList.toggle("flipped");
-        
-        // B. 强制关闭所有菜单
         hideMenu(songListEl);
         hideMenu(playlistMenuEl);
-
-        // C. 上锁：0.2秒内禁止所有点击
-        isClickAllowed = false;
-        setTimeout(() => {
-          isClickAllowed = true;
-        }, 200); 
       }
-    }, 300); // 长按时间阈值
+    }, 300);
   };
-
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
-  
   player.addEventListener('mousedown', startPress);
   player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
@@ -721,10 +725,6 @@ document.addEventListener("DOMContentLoaded", () => {
   player.addEventListener('mousemove', onMove);
   player.addEventListener('touchmove', onMove, { passive: true });
 
-
-  /* =========================================================
-     🔥 PART 6: 自动隐藏 UI & Audio 高级事件
-     ========================================================= */
   let inactivityTimer;
   function hidePlayerUI() {
     player.style.opacity = '0';
@@ -741,7 +741,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function resetTimer() {
     clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(hidePlayerUI, 1800000); // 30分钟无操作隐藏
+    inactivityTimer = setTimeout(hidePlayerUI, 1800000); 
   }
   ['scroll','mousemove','mousedown','touchstart','keydown'].forEach(evt => window.addEventListener(evt, showPlayerUI));
 
@@ -750,12 +750,13 @@ document.addEventListener("DOMContentLoaded", () => {
   
   audio.addEventListener("ended", () => {
     if (playMode !== 1) { 
-        if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
+        if (currentList && currentList[currentIndex]) {
+            recordPlayHistory(currentList[currentIndex].title);
+        }
         playNext(true);
     }
   });
 
-  // MediaSession API 支持 (锁屏控制)
   function updatePositionState() {
     if ('setPositionState' in navigator.mediaSession && !isNaN(audio.duration)) {
       navigator.mediaSession.setPositionState({
@@ -807,39 +808,48 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(true); 
   });
 
-  /* timeupdate: 处理进度、歌词滚动、单曲循环计数 */
+  /* --- 🔥 timeupdate 监听器 (无进度条版) --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // 歌词滚动
+    // --- 歌词逻辑 (核心修复) ---
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
+        
         for (let i = 0; i < currentLyrics.length; i++) {
-            if (currentTime >= currentLyrics[i].time) activeIndex = i;
-            else break; 
+            if (currentTime >= currentLyrics[i].time) {
+                activeIndex = i;
+            } else {
+                break; 
+            }
         }
+
+        // 仅当歌词改变时触发 DOM 更新 (防抖 + 重置动画)
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
             updateTitleOrLyric(true); 
         }
     }
 
-    // 单曲循环计数检测
+    // 单曲循环计数
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
              if (now - lastCountTime > 2000) {
-                 if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
+                 console.log("检测到单曲循环：播放次数 +1");
+                 if (currentList && currentList[currentIndex]) {
+                     recordPlayHistory(currentList[currentIndex].title);
+                 }
                  lastCountTime = now;
              }
         }
     }
     lastTimeForLoop = audio.currentTime; 
     
-    // 定时保存进度
+    // 进度保存
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();
@@ -848,15 +858,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'hidden') savePlaybackState();
+    if (document.visibilityState === 'hidden') {
+        savePlaybackState();
+    }
   });
 
   resetTimer();
+  
   if(allSongsLibrary.length > 0) loadSong(0);
 
   /* =========================================================
-     🔥 PART 7: 用户登录 UI 交互逻辑
-     处理模态框、登录、登出、用户信息同步
+     🔥 PART 3: 登录 & UI 交互
      ========================================================= */
   const navAuthBtn = document.getElementById("nav-auth-btn");
   const navAuthText = document.getElementById("nav-auth-text");
@@ -882,7 +894,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // 打开登录框
   if (navAuthBtn) {
     navAuthBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -891,14 +902,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (dropdown && dropdown.classList.contains("show")) dropdown.classList.remove("show");
       
       if (window.turnstile) {
-        try { window.turnstile.reset(); } catch(e) {}
+        try { window.turnstile.reset(); } 
+        catch(e) { /* Fallback */ }
       }
       window.isCaptchaVerified = false; 
       if(window.checkLoginButtonState) window.checkLoginButtonState();
     });
   }
 
-  // 关闭登录框
   const closeModal = () => modalOverlay?.classList.remove("active");
   if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
   if (modalOverlay) {
@@ -907,7 +918,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 邮箱登录/注册
   if (emailSubmitBtn) {
     emailSubmitBtn.addEventListener("click", async () => {
       if(emailSubmitBtn.disabled || !window.isCaptchaVerified) return;
@@ -921,7 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       try {
         await setPersistence(auth, browserLocalPersistence);
-        // 尝试注册
+        
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const defaultName = email.split("@")[0];
         await updateProfile(userCredential.user, {
@@ -930,7 +940,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         closeModal(); 
       } catch (error) {
-        // 如果邮箱已存在，则尝试登录
         if (error.code === 'auth/email-already-in-use') {
           try {
             await setPersistence(auth, browserLocalPersistence);
@@ -947,29 +956,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Google 登录
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener("click", async () => {
       try {
           await setPersistence(auth, browserLocalPersistence);
           await signInWithPopup(auth, provider);
           closeModal();
-      } catch(e) { console.error(e); }
+      } catch(e) {
+          console.error(e);
+      }
     });
   }
 
-  // 登出
   if (logoutConfirmBtn) {
     logoutConfirmBtn.addEventListener("click", () => {
       signOut(auth).then(() => closeModal());
     });
   }
 
-  // 监听用户登录状态变化
   onAuthStateChanged(auth, (user) => {
     currentUser = user; 
     if (user) {
-      // 登录后逻辑
       const displayName = user.displayName || user.email.split("@")[0]; 
       const photoURL = user.photoURL || "assets/bannernetwork.png";  
 
@@ -983,7 +990,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (modalUserName) modalUserName.innerText = displayName;
       if (modalUserAvatar) modalUserAvatar.src = photoURL;
 
-      // 从数据库同步数据
       const userDocRef = doc(db, "users", user.uid);
       
       onSnapshot(userDocRef, (docSnap) => {
@@ -995,10 +1001,14 @@ document.addEventListener("DOMContentLoaded", () => {
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
                  modeBtn.innerHTML = playModes[playMode].icon; 
-                 audio.loop = (playMode === 1);
+                 
+                 if (playMode === 1) {
+                     audio.loop = true;
+                 } else {
+                     audio.loop = false;
+                 }
              }
              
-             // 恢复上次播放状态
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
                  let lastTitle = "";
                  let lastTime = 0;
@@ -1008,7 +1018,9 @@ document.addEventListener("DOMContentLoaded", () => {
                      lastTitle = data.lastPlayed.title;
                      lastTime = data.lastPlayed.time || 0;
                      lastPlaylist = data.lastPlayed.playlist || "All songs"; 
-                 } else { lastTitle = data.lastPlayed; }
+                 } else {
+                     lastTitle = data.lastPlayed;
+                 }
 
                  const savedPlaylistConfig = playlistsConfig.find(c => c.key === lastPlaylist);
                  const targetConfig = savedPlaylistConfig || playlistsConfig.find(c => c.key === 'All songs') || playlistsConfig[0];
@@ -1016,8 +1028,13 @@ document.addEventListener("DOMContentLoaded", () => {
                  if (targetConfig) {
                      currentPlaylistKey = targetConfig.key;
                      currentList = allSongsLibrary.filter(targetConfig.filter);
+                     
                      if (currentPlaylistKey === 'history_rank') {
-                        currentList.sort((a, b) => (userPlayHistory[b.title] || 0) - (userPlayHistory[a.title] || 0));
+                        currentList.sort((a, b) => {
+                            const countA = userPlayHistory[a.title] || 0;
+                            const countB = userPlayHistory[b.title] || 0;
+                            return countB - countA;
+                        });
                      }
 
                      if (playlistTitleBtn) playlistTitleBtn.textContent = targetConfig.name;
@@ -1032,17 +1049,17 @@ document.addEventListener("DOMContentLoaded", () => {
              }
 
          } else {
-             // 新用户初始化数据
              setDoc(userDocRef, { favorites: [], playHistory: {} }, { merge: true });
              userFavorites = [];
              userPlayHistory = {};
          }
          updatePlaylistConfig();
          updateHeartStatus();
-         if (currentPlaylistKey === 'history_rank') renderSongListDOM();
+         if (currentPlaylistKey === 'history_rank') {
+            renderSongListDOM();
+         }
       });
     } else {
-      // 未登录逻辑
       if (navAuthText) navAuthText.innerText = "登录 / 同步";
       if (navAuthIconSlot) navAuthIconSlot.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
       if (loginActionsDiv) loginActionsDiv.style.display = "block";

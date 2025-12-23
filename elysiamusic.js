@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final (Full Features: Color Extract + Lyrics Fix) */
+/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -283,57 +283,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎨 颜色提取辅助函数 --- */
-  function getAverageColor(src) {
-      return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.src = src;
-          
-          img.onload = () => {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              canvas.width = 1; 
-              canvas.height = 1;
-              ctx.drawImage(img, 0, 0, 1, 1);
-              const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-              resolve(`${r}, ${g}, ${b}`);
-          };
-
-          img.onerror = () => {
-              resolve("150, 110, 240"); // 默认紫色
-          };
-      });
-  }
-
-  /* --- 🎵 封面更新逻辑 (已升级：取色 + 呼吸) --- */
-  async function updateCover(song) {
+  /* --- 🎵 封面更新逻辑 --- */
+  function updateCover(song) {
       const coverUrl = song.cover || ''; 
       
-      // 1. 设置背景图
+      // 更新正面封面
       if (currentCoverEl) {
-          currentCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
-      }
-      if (backCoverEl) {
-          backCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
-      }
-
-      // 2. 提取颜色并应用到呼吸灯变量
-      let dominantColor = "150, 110, 240"; 
-      
-      if (coverUrl) {
-          try {
-              dominantColor = await getAverageColor(coverUrl);
-          } catch (e) {
-              console.warn("取色失败", e);
+          if (coverUrl) {
+              currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          } else {
+              currentCoverEl.style.backgroundImage = ''; // CSS 会显示 ♪
           }
       }
-
-      // 3. 将 RGB 值设置给 CSS 变量
-      const faces = document.querySelectorAll('.player-face');
-      faces.forEach(face => {
-          face.style.setProperty('--dominant-rgb', dominantColor);
-      });
+      
+      // 更新背面封面
+      if (backCoverEl) {
+          if (coverUrl) {
+              backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          } else {
+              backCoverEl.style.backgroundImage = '';
+          }
+      }
   }
 
   /* --- 🎵 歌词解析函数 --- */
@@ -404,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 降速 + 阻尼适配 + 不回滚) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -445,19 +415,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          const overflow = textWidth - containerWidth;
-          
-          // 方向：向左 (负数)
-          const offset = containerWidth - textWidth - 10;
-          
-          // 🔥 速度调整：
-          // (textWidth / 50) + 1.5 --> 您的指定逻辑
+          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
           const duration = (textWidth / 50) + 1.5; 
           
+          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
+          // 容器宽 - 文字宽 - 20px余量 = 负数
+          const offset = containerWidth - textWidth - 20;
+
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
-          // 强制重绘 (Reflow)
+          // 3. 强制重绘 (Reflow)
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
@@ -482,7 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
     hasLyrics = false;
     currentLyricIndex = -1;
     
-    // 🔥 调用带取色的封面更新
     updateCover(song);
 
     isLyricsLoading = true;

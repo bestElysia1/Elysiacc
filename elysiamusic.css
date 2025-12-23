@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + No Rollback) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Optimized Layout) */
 
 /* =========================================
    1. 基础容器
@@ -11,7 +11,7 @@
   z-index: 9999;
   width: calc(100% - 36px);  /* 模拟手机端 */
   max-width: 800px;          /* 模拟电脑端 */
-  height: 54px;              /* 高度适配封面+内边距 */
+  height: 54px;              /* 高度固定 */
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;
@@ -43,16 +43,18 @@
 }
 
 /* =========================================
-   3. 前后两面 (Face Layout)
+   3. 前后两面 (核心布局修改)
    ========================================= */
 .player-face {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 布局：左-中-右 */
-  gap: 12px;
-  padding: 6px 16px;
+  justify-content: space-between;
+  
+  /* --- 修改点：间距优化 --- */
+  gap: 8px;           /* 减小元素间距，腾出空间给歌词 */
+  padding: 5px;       /* 修改点：上下左右统一为5px (54px高度-44px封面=10px，上下各5px，故左侧也设为5px) */
   
   border-radius: 16px;
 
@@ -65,7 +67,6 @@
   );
   background-size: 250% 250%;   
   background-position: 0% 0%;   
-  
   transition: background-position 0.6s ease; 
 
   border: 1px solid rgba(255,255,255,0.15);
@@ -84,22 +85,13 @@
   background-position: 100% 100%;
 }
 
-/* --- 正面 (Front) --- */
-.face-front {
-  transform: rotateX(0deg);
-  pointer-events: auto;
-}
-
-/* --- 背面 (Back) --- */
-.face-back {
-  transform: rotateX(180deg);
-  pointer-events: auto;
-}
+.face-front { transform: rotateX(0deg); pointer-events: auto; }
+.face-back { transform: rotateX(180deg); pointer-events: auto; }
 
 .elysia-player.flipped .face-front { pointer-events: none !important; }
 .elysia-player.flipped .face-back { pointer-events: auto !important; }
 
-/* 内部流动的液态光斑 */
+/* 液态光斑背景 */
 .player-glass-card::before {
   content: "";
   position: absolute;
@@ -118,7 +110,7 @@
 }
 
 /* =========================================
-   新增：歌曲封面缩略图样式 (左侧)
+   封面缩略图 (左侧)
    ========================================= */
 .album-cover {
   width: 44px;  
@@ -135,16 +127,8 @@
   overflow: hidden;
 }
 
-.album-cover:active {
-  transform: scale(0.9);
-}
+.album-cover:active { transform: scale(0.9); }
 
-.album-cover.playing {
-  /* 如果想要旋转，解开下面这行 */
-  /* animation: spinCover 10s linear infinite; */
-}
-
-/* 无图片时的默认音符 */
 .album-cover:empty::before {
   content: "♪";
   position: absolute;
@@ -156,17 +140,12 @@
   font-size: 20px;
 }
 
-@keyframes spinCover {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* =========================================
    4. 控件按钮 (靠右)
    ========================================= */
 .elysia-controls { 
   display: flex; 
-  gap: 10px; 
+  gap: 8px; /* 稍微缩小按钮间距以节省空间 */
   flex-shrink: 0; 
   align-items: center;
   justify-content: flex-end; 
@@ -177,16 +156,13 @@
   width: 36px; 
   height: 36px; 
   border-radius: 50%;
-  
   background: rgba(255, 255, 255, 0.1); 
   border: none; 
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
-  
   color: #cdbaff; 
   cursor: pointer; 
   transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
   backdrop-filter: blur(8px);
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,9 +179,7 @@
   transition: transform 0.2s;
 }
 
-#playPauseBtn:not(.playing) svg {
-  margin-left: 2px;
-}
+#playPauseBtn:not(.playing) svg { margin-left: 2px; }
 
 .elysia-controls button:hover,
 .control-btn:hover { 
@@ -230,15 +204,19 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题与歌词样式 (中间自适应) --- */
+/* =========================================
+   标题与歌词样式 (中间自适应区域优化)
+   ========================================= */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
   font-weight: 600; 
   
-  flex: 1; 
+  flex: 1;      /* 自动占据剩余空间 */
   min-width: 0; 
-  margin: 0 12px; 
+  
+  /* --- 修改点：移除左右 margin，利用 gap 布局最大化宽度 --- */
+  margin: 0;    
   
   height: 24px; 
   font-size: 0.95rem;
@@ -252,7 +230,6 @@
   cursor: pointer;
   transition: color 0.3s ease;
   
-  /* 渐变遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -262,31 +239,23 @@
   text-shadow: none;
 }
 
-/* --- 🔥 修复版：歌词滚动动画 (阻尼感 + 降速) --- */
+/* 歌词滚动动画 */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
   will-change: transform; 
   white-space: nowrap;
-  
-  /* 默认位置：强制靠左 */
   transform: translateX(0); 
 }
 
 .scroll-inner.scrolling {
-  /* 1. var(--scroll-duration): JS 计算的时间
-     2. cubic-bezier(0.25, 0.1, 0.25, 1): 关键修改！
-        不再是 linear (匀速)。这个曲线会让文字启动后平滑移动，
-        但在最后 20% 的距离时会明显减速（阻尼感），轻轻停在末尾。
-     3. 1 forwards: 只滚一次，不回弹
-  */
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 开头停顿 */
-  100% { transform: translateX(var(--scroll-offset)); } /* 滚到 JS 计算的负数值 */
+  15% { transform: translateX(0); } 
+  100% { transform: translateX(var(--scroll-offset)); }
 }
 
 #songTitle.lyric-mode {
@@ -295,10 +264,8 @@
   white-space: nowrap; 
 }
 
-
-
 /* =========================================
-   5. 播放列表 & 歌单菜单
+   5. 播放列表
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -427,20 +394,8 @@
   50% { transform: translateX(-50%) translateY(-6px); }
 }
 
-/* =========================================
-   7. 滚动条美化
-   ========================================= */
-.elysia-playlist::-webkit-scrollbar {
-  width: 4px;
-}
-.elysia-playlist::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-}
-.elysia-playlist::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
-  border-radius: 4px;
-}
-.elysia-playlist::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.4);
-}
+/* 滚动条 */
+.elysia-playlist::-webkit-scrollbar { width: 4px; }
+.elysia-playlist::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+.elysia-playlist::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }

@@ -284,8 +284,10 @@
   white-space: nowrap; 
 }
 
+/* ...保留之前的 .elysia-player 等代码... */
+
 /* =========================================
-   7. 播放列表 & 歌单菜单 (恢复旧版淡紫色外观)
+   7. 播放列表 & 歌单菜单 (修复：颜色与播放器完全统一)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -298,15 +300,16 @@
   padding: 10px 14px;
   border-radius: 16px;
   
-  /* 🔥 恢复旧版淡紫色背景 */
-  background: rgba(255,240,255,0.25);
-  border: 1px solid rgba(255,210,255,0.35);
+  /* 🔥 核心修复：背景色使用 var(--theme-rgb) */
+  /* 使用较高的不透明度 (0.65) 确保文字清晰，同时保留色彩倾向 */
+  background: rgba(var(--theme-rgb), 0.65);
   
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* 边框和阴影也使用主题色 */
+  border: 1px solid rgba(var(--theme-rgb), 0.3);
+  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
   
-  /* 🔥 恢复旧版阴影 */
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   
   overflow-y: auto;
   overflow-x: hidden;
@@ -337,8 +340,8 @@
   gap: 10px; 
   padding: 6px 10px;
   
-  /* 🔥 恢复旧版淡紫色文字 */
-  color: #cdbaff; 
+  /* 文字颜色：稍微带一点白色，保证在深色背景下的可读性 */
+  color: rgba(255, 255, 255, 0.9); 
   
   font-size: 0.9rem;
   border-radius: 8px;
@@ -362,36 +365,31 @@
   flex-shrink: 0;         
   font-size: 0.9em;       
   font-family: monospace, sans-serif; 
-  
-  /* 🔥 恢复旧版淡紫色 */
-  color: #cdbaff;       
+  color: rgba(255, 255, 255, 0.6);         
   transition: color 0.2s; 
 }
 
 .playlist-item:hover {
-  background: rgba(160, 120, 255, 0.15);
-  color: #ffffff;
-}
-.playlist-item:hover .play-count-tag,
-.playlist-item.active .play-count-tag {
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 
 .playlist-item.active {
-  /* 选中状态稍微保留一点主题色的意思，但样式接近旧版 */
-  background: rgba(160, 120, 255, 0.25);
+  /* 选中项：加深背景色 */
+  background: rgba(0, 0, 0, 0.2); 
   color: #fff;
-  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  font-weight: 600;
   animation: softPulse 3s ease-in-out infinite;
 }
 
-/* 列表背后的光晕 */
+/* 列表背后的光晕也跟随主题色 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
   inset: 0; 
   border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  background: radial-gradient(circle at 50% 30%, rgba(var(--theme-rgb),0.5), rgba(var(--theme-rgb),0.2) 45%, transparent 65%);
   opacity: 0; 
   transform: scale(0.8); 
   pointer-events: none; 
@@ -401,6 +399,12 @@
 
 .elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* 滚动条颜色适配 */
+.elysia-playlist::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 
 /* =========================================
    8. 动画关键帧

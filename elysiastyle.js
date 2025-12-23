@@ -167,71 +167,99 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ======================================
-  // 5. 🔋 智能节能模式 (Elysia Energy Saver)
-  // 当页面不可见（锁屏/切后台）时，暂停视觉视频，防止发烫
+  // 5. 🔋 智能节能模式 PRO (iOS 18 PWA 强力版)
   // ======================================
-  document.addEventListener("visibilitychange", () => {
-    // 获取页面上所有的背景装饰视频 (包含主页和彩蛋页的可能ID)
-    const visualElements = [
-      document.getElementById('sakura-video'), // 樱花特效
-      document.getElementById('videoA'),       // 轮播视频A
-      document.getElementById('videoB')        // 轮播视频B
-    ];
+  const visualElements = [
+    document.getElementById('sakura-video'),
+    document.getElementById('videoA'),
+    document.getElementById('videoB')
+  ];
 
-    if (document.hidden) {
-      // 🌙 用户锁屏 或 切换到其他APP -> 暂停所有装饰视频
-      // 这样 GPU 就会停止渲染樱花和混合模式，极大降低发热
-      visualElements.forEach(v => {
-        if (v && !v.paused) {
+  // 核心暂停逻辑
+  function suspendVisuals() {
+    console.log('[Elysia] ❄️ 进入后台/锁屏，执行强力节能...');
+    visualElements.forEach(v => {
+      if (v) {
+        // 1. 记录播放状态
+        if (!v.paused) {
+          v.dataset.wasPlaying = "true";
           v.pause();
-          v.dataset.wasPlaying = "true"; // 标记它刚才在播放，一会儿回来要接着放
         }
-      });
-      console.log('[Elysia] 进入后台/锁屏，已暂停视觉特效以省电 🔋');
-    } else {
-      // ☀️ 用户回到网页 -> 恢复播放
-      visualElements.forEach(v => {
-        if (v && v.dataset.wasPlaying === "true") {
-          v.play().catch(err => console.log("恢复播放被阻拦:", err));
-          v.dataset.wasPlaying = "false"; // 重置标记
-        }
-      });
-      
-      // 强制检查：确保樱花视频恢复（因为它最重要且没有复杂的切换逻辑）
-      const sakura = document.getElementById('sakura-video');
-      if (sakura && sakura.paused) {
-         sakura.play().catch(()=>{});
+        // 2. [关键] 强制隐藏 DOM，通知 iOS 释放 GPU 纹理
+        v.style.display = 'none';
       }
-      
-      console.log('[Elysia] 回到前台，视觉特效已恢复 ✨');
+    });
+  }
+
+  // 核心恢复逻辑
+  function resumeVisuals() {
+    console.log('[Elysia] 🔥 回到前台，恢复视觉特效...');
+    visualElements.forEach(v => {
+      if (v) {
+        // 1. 恢复显示
+        v.style.display = 'block'; 
+        
+        // 2. 恢复播放
+        if (v.dataset.wasPlaying === "true") {
+          setTimeout(() => {
+             v.play().catch(err => console.log("恢复播放被阻拦:", err));
+          }, 50);
+          v.dataset.wasPlaying = "false";
+        }
+      }
+    });
+
+    // 🌸 强制兜底检查：樱花必须动起来
+    const sakura = document.getElementById('sakura-video');
+    if (sakura) {
+        sakura.style.display = 'block'; 
+        if(sakura.paused) sakura.play().catch(()=>{});
+    }
+  }
+
+  // 事件 A: 标准可见性变化
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      suspendVisuals();
+    } else {
+      resumeVisuals();
     }
   });
 
-});
+  // 事件 B: iOS 特有的页面挂起
+  window.addEventListener("pagehide", () => {
+    suspendVisuals();
+  });
 
-/* ====================================
-   📜 滚动交互检测 (Scroll Observer)
-   当内容进入屏幕时，让它淡入显示
-   ==================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  // 创建一个观察器
+  // 事件 C: 窗口失焦 (PWA)
+  window.addEventListener("blur", () => {
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+       suspendVisuals();
+    }
+  });
+  
+  // 事件 D: 窗口获焦
+  window.addEventListener("focus", () => {
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+       if (!document.hidden) resumeVisuals();
+    }
+  });
+
+  // ====================================
+  // 6. 📜 滚动交互检测 (Scroll Observer)
+  // ====================================
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      // 如果元素进入了视口 (isIntersecting 为 true)
       if (entry.isIntersecting) {
-        // 添加 visible 类，触发 CSS 里的上浮淡入效果
         entry.target.classList.add('visible');
-      } else {
-        // 【可选】如果你希望往回滚的时候元素再次消失，去掉下面这行的注释 //
-        // entry.target.classList.remove('visible'); 
       }
     });
   }, {
-    threshold: 0.1 // 只要元素的 10% 进入屏幕就开始动画
+    threshold: 0.1 
   });
 
-  // 告诉观察器要盯着哪些元素：所有的 section 和 li
   document.querySelectorAll('section, .container ul li').forEach((el) => {
     observer.observe(el);
   });
-});
+
+}); // 🔥 这里是你原本缺失的闭合标签！

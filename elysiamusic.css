@@ -251,7 +251,7 @@
   min-width: 0; 
   
   /* 保留 Margin 确保翻转逻辑/点击区域正常 */
-  margin: 0 12px; 
+  margin: 0 8px 0 14px;
   
   height: 24px; 
   font-size: 0.95rem;

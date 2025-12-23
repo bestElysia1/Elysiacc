@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (User Logic + Auto Color Extraction) */
+/* elysiamusic.js - Ultimate Final Version (User Logic + Auto Color Extraction + Event Sync) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -555,23 +555,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function togglePlay() {
     if (audio.paused) {
       audio.play().catch(e => console.log("Waiting for interaction"));
-      playPauseBtn.innerHTML = ICONS.pause;
-      playPauseBtn.classList.add("playing"); 
-      player.classList.add("playing");
-      
-      if(currentCoverEl) currentCoverEl.classList.add("playing");
-      
-      updateTitleOrLyric(true); 
-
     } else {
       audio.pause();
-      playPauseBtn.innerHTML = ICONS.play;
-      playPauseBtn.classList.remove("playing");
-      player.classList.remove("playing");
-      
-      if(currentCoverEl) currentCoverEl.classList.remove("playing");
-      
-      updateTitleOrLyric(true); 
     }
   }
 
@@ -596,10 +581,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadSong(nextIndex);
     audio.play().catch(e => console.warn("Auto-play blocked:", e)); 
-    playPauseBtn.innerHTML = ICONS.pause;
-    playPauseBtn.classList.add("playing");
-    player.classList.add("playing");
-    if(currentCoverEl) currentCoverEl.classList.add("playing");
   }
 
   function toggleMenu(el) {
@@ -645,9 +626,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (item) {
       loadSong(parseInt(item.dataset.index));
       audio.play().catch(e => console.log("Play failed:", e));
-      playPauseBtn.innerHTML = ICONS.pause;
-      playPauseBtn.classList.add("playing");
-      if(currentCoverEl) currentCoverEl.classList.add("playing");
     }
   });
 
@@ -699,10 +677,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentList.length > 0) {
         loadSong(0);
         audio.play().catch(e => console.warn("Autoplay blocked:", e));
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        player.classList.add("playing");
-        if(currentCoverEl) currentCoverEl.classList.add("playing");
     } else {
         titleEl.textContent = "暂无数据";
         songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
@@ -850,9 +824,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (prevIndex < 0) prevIndex = currentList.length - 1;
         loadSong(prevIndex);
         audio.play();
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        if(currentCoverEl) currentCoverEl.classList.add("playing");
       });
       navigator.mediaSession.setActionHandler('seekto', (details) => {
         if (details.fastSeek && 'fastSeek' in audio) audio.fastSeek(details.seekTime);
@@ -863,20 +834,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   audio.addEventListener('loadedmetadata', updatePositionState);
   
+  // 🔥🔥🔥 核心修改：将 UI 状态更新移动到 Audio 事件监听器中
+  // 这样无论通过点击按钮、键盘媒体键还是系统菜单控制，UI 都能完美同步
+  
   audio.addEventListener('play', () => { 
+      // 1. 同步按钮图标
+      playPauseBtn.innerHTML = ICONS.pause;
+      playPauseBtn.classList.add("playing"); 
+      
+      // 2. 启动呼吸灯和光效
+      player.classList.add("playing");
+      if(currentCoverEl) currentCoverEl.classList.add("playing");
+
+      // 3. 更新媒体中心状态
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"; 
+      
       updatePositionState(); 
       updateTitleOrLyric(true); 
   });
   
   audio.addEventListener('pause', () => { 
-    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
-    updatePositionState();
-    savePlaybackState();
-    updateTitleOrLyric(true); 
+      // 1. 同步按钮图标
+      playPauseBtn.innerHTML = ICONS.play;
+      playPauseBtn.classList.remove("playing");
+
+      // 2. 停止呼吸灯
+      player.classList.remove("playing");
+      if(currentCoverEl) currentCoverEl.classList.remove("playing");
+
+      // 3. 更新媒体中心状态
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; 
+      
+      updatePositionState();
+      savePlaybackState();
+      updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 (无进度条版) --- */
+  /* --- 🔥 timeupdate 监听器 --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 

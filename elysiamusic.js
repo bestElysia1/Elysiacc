@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
+/* elysiamusic.js - Ultimate Final Version (User Logic + Auto Color Extraction) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -283,6 +283,68 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
+  /* --- 🌈 异步取色与光效逻辑 --- */
+  
+  // 1. 获取图片主色调 (使用 Canvas)
+  function getAverageRGB(imgUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous"; // 必须设置，否则 Canvas 会因为跨域污染报错
+      img.src = imgUrl;
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          // 缩小尺寸以加快处理速度 (1x1 即可取平均色)
+          canvas.width = 1;
+          canvas.height = 1;
+          ctx.drawImage(img, 0, 0, 1, 1);
+          
+          const imgData = ctx.getImageData(0, 0, 1, 1).data;
+          // 返回格式: "255, 100, 50"
+          resolve(`${imgData[0]}, ${imgData[1]}, ${imgData[2]}`);
+        } catch (e) {
+          reject(e);
+        }
+      };
+
+      img.onerror = (err) => reject(err);
+    });
+  }
+
+  // 2. 应用或重置主题色
+  function applyThemeColor(song) {
+    if (!song.cover) {
+      resetThemeColor();
+      return;
+    }
+
+    // 异步执行，不等待，不阻塞
+    getAverageRGB(song.cover)
+      .then((rgbStr) => {
+        // 设置 CSS 变量 (Player 的自定义属性)
+        if (player) {
+          player.style.setProperty('--theme-rgb', rgbStr);
+          player.classList.add('has-custom-theme');
+        }
+      })
+      .catch((err) => {
+        console.warn("[Elysia Color] 取色失败，使用默认颜色", err);
+        resetThemeColor();
+      });
+  }
+
+  // 3. 重置回默认紫色
+  function resetThemeColor() {
+    if (player) {
+      // 移除自定义样式，CSS 会 fallback 到默认变量
+      player.classList.remove('has-custom-theme');
+      player.style.removeProperty('--theme-rgb');
+    }
+  }
+
+
   /* --- 🎵 封面更新逻辑 --- */
   function updateCover(song) {
       const coverUrl = song.cover || ''; 
@@ -304,6 +366,9 @@ document.addEventListener("DOMContentLoaded", () => {
               backCoverEl.style.backgroundImage = '';
           }
       }
+
+      // 🔥 触发异步取色逻辑 (不影响播放流程)
+      applyThemeColor(song);
   }
 
   /* --- 🎵 歌词解析函数 --- */
@@ -450,7 +515,10 @@ document.addEventListener("DOMContentLoaded", () => {
     hasLyrics = false;
     currentLyricIndex = -1;
     
-    updateCover(song);
+    // 🔥 先重置颜色，避免上一首的颜色闪烁
+    resetThemeColor();
+    
+    updateCover(song); // updateCover 内部会触发异步取色
 
     isLyricsLoading = true;
     updateTitleOrLyric(true); // 切歌强制刷新

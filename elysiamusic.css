@@ -1,34 +1,27 @@
-/* elysiamusic.css - Ultimate Final (Pale Purple Skin + Fixed Logic) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + No Rollback) */
 
 /* =========================================
-   1. 基础容器 (Variables & Layout)
+   1. 基础容器
    ========================================= */
 .elysia-player {
-  /* 定义默认主题色 (用于背景光效) */
-  --theme-rgb: 156, 107, 255; 
-  
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  width: calc(100% - 36px);  
-  max-width: 800px;          
-  height: 54px;              
+  width: calc(100% - 36px);  /* 模拟手机端 */
+  max-width: 800px;          /* 模拟电脑端 */
+  height: 54px;              /* 高度适配封面+内边距 */
   perspective: 1000px;
   background: transparent;
-  
   animation: elysiaFloat 6s ease-in-out infinite;
-  
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  
-  transition: --theme-rgb 1s ease; 
 }
 
 /* =========================================
-   2. 3D 骨架 & 呼吸光效
+   2. 3D 骨架
    ========================================= */
 .player-glass-card {
   position: relative;
@@ -41,36 +34,12 @@
 .elysia-player.flipped .player-glass-card {
   transform: rotateX(180deg);
 }
+
 .elysia-player:active .player-glass-card {
   transform: scale(0.98);
 }
-
-/* 🔥 背景光效层 (保持浓郁光效，不影响文字颜色) */
-.player-glass-card::before {
-  content: "";
-  position: absolute;
-  inset: -30%; 
-  
-  background:
-    radial-gradient(40% 40% at 10% 30%, rgba(var(--theme-rgb), 0.6), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(var(--theme-rgb), 0.5), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(var(--theme-rgb), 0.4), transparent 22%);
-  
-  filter: blur(36px);
-  opacity: 0.7; 
-  animation: moveBlobs 14s ease-in-out infinite;
-  
-  pointer-events: none;
-  mix-blend-mode: normal; 
-  transform: translateZ(-10px); 
-  z-index: -1; 
-  
-  transition: opacity 0.8s ease, background 0.8s ease;
-}
-
-.elysia-player.playing .player-glass-card::before {
-  opacity: 1; 
-  animation: moveBlobs 14s ease-in-out infinite, breathingGlow 4s ease-in-out infinite;
+.elysia-player.flipped:active .player-glass-card {
+  transform: rotateX(180deg) scale(0.98);
 }
 
 /* =========================================
@@ -81,41 +50,75 @@
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between; /* 布局：左-中-右 */
+  gap: 12px;
+  padding: 6px 16px;
   
-  /* 布局保持修复后的完美对齐 */
-  padding: 5px 12px 5px 5px;
-  gap: 8px;
   border-radius: 16px;
 
-  /* 背景：保持动态取色，但为了配合淡紫色文字，稍微调淡一点点 */
   background: linear-gradient(120deg, 
-      rgba(var(--theme-rgb), 0.25) 0%,   
-      rgba(var(--theme-rgb), 0.55) 50%,  
-      rgba(var(--theme-rgb), 0.25) 100%
+      rgba(255,255,255,0.08) 0%,   
+      rgba(255,255,255,0.08) 35%,  
+      rgba(255,255,255,0.35) 50%,  
+      rgba(255,255,255,0.08) 65%,  
+      rgba(255,255,255,0.08) 100%
   );
-  background-size: 200% 200%;   
-  transition: background 0.6s ease; 
+  background-size: 250% 250%;   
+  background-position: 0% 0%;   
+  
+  transition: background-position 0.6s ease; 
 
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
+  
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
 
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   z-index: 1; 
 }
 
-.elysia-player.flipped .player-face { background-position: 100% 100%; }
-.face-front { transform: rotateX(0deg); pointer-events: auto; }
-.face-back { transform: rotateX(180deg); pointer-events: auto; }
+.elysia-player.flipped .player-face {
+  background-position: 100% 100%;
+}
+
+/* --- 正面 (Front) --- */
+.face-front {
+  transform: rotateX(0deg);
+  pointer-events: auto;
+}
+
+/* --- 背面 (Back) --- */
+.face-back {
+  transform: rotateX(180deg);
+  pointer-events: auto;
+}
+
 .elysia-player.flipped .face-front { pointer-events: none !important; }
 .elysia-player.flipped .face-back { pointer-events: auto !important; }
 
+/* 内部流动的液态光斑 */
+.player-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
+  filter: blur(36px);
+  opacity: 0.9;
+  animation: moveBlobs 14s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translateZ(-10px); 
+  z-index: -1; 
+}
+
 /* =========================================
-   4. 歌曲封面
+   新增：歌曲封面缩略图样式 (左侧)
    ========================================= */
 .album-cover {
   width: 44px;  
@@ -127,16 +130,21 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   flex-shrink: 0; 
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   overflow: hidden;
-  z-index: 5; 
 }
 
 .album-cover:active {
   transform: scale(0.9);
 }
 
+.album-cover.playing {
+  /* 如果想要旋转，解开下面这行 */
+  /* animation: spinCover 10s linear infinite; */
+}
+
+/* 无图片时的默认音符 */
 .album-cover:empty::before {
   content: "♪";
   position: absolute;
@@ -148,8 +156,13 @@
   font-size: 20px;
 }
 
+@keyframes spinCover {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* =========================================
-   5. 控件按钮 (淡紫色 + 无缩放修复)
+   4. 控件按钮 (靠右)
    ========================================= */
 .elysia-controls { 
   display: flex; 
@@ -157,7 +170,6 @@
   flex-shrink: 0; 
   align-items: center;
   justify-content: flex-end; 
-  z-index: 20;
 }
 
 .elysia-controls button,
@@ -166,15 +178,13 @@
   height: 36px; 
   border-radius: 50%;
   
-  background: rgba(255, 255, 255, 0.15); 
+  background: rgba(255, 255, 255, 0.1); 
   border: none; 
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
   
-  /* 🔥 恢复淡紫色 */
   color: #cdbaff; 
-  
   cursor: pointer; 
-  transition: background 0.2s, box-shadow 0.2s; /* 移除 transform */
+  transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
   backdrop-filter: blur(8px);
   
   display: flex;
@@ -190,46 +200,46 @@
   height: 18px;
   pointer-events: none;
   fill: currentColor; 
+  transition: transform 0.2s;
 }
 
-#playPauseBtn:not(.playing) svg { margin-left: 2px; }
+#playPauseBtn:not(.playing) svg {
+  margin-left: 2px;
+}
 
-/* 悬停状态 */
 .elysia-controls button:hover,
 .control-btn:hover { 
-  background: rgba(255, 255, 255, 0.3);
-  transform: none; /* 🚫 禁止缩放 */
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05); 
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
 }
 
-/* 点击状态 */
 .elysia-controls button:active {
-  transform: none; /* 🚫 禁止缩放 */
-  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 #heartBtn.liked {
   color: #ff6b81; 
   animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 @keyframes heartPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }
   100% { transform: scale(1.05); }
 }
 
-/* =========================================
-   6. 标题与歌词 (淡紫色 + 点击修复)
-   ========================================= */
+/* --- 统一标题与歌词样式 (中间自适应) --- */
 #songTitle,
 #playlistTitleBtn {
-  /* 🔥 恢复淡紫色 */
   color: #cdbaff; 
-  
   font-weight: 600; 
+  
   flex: 1; 
   min-width: 0; 
-  margin: 0 6px; 
+  margin: 0 12px; 
+  
   height: 24px; 
   font-size: 0.95rem;
   line-height: 24px;
@@ -237,57 +247,58 @@
   
   white-space: nowrap; 
   overflow: hidden; 
-  
-  /* 🔥 修复列表无法点击的核心逻辑 */
   position: relative;
-  z-index: 50; 
-  pointer-events: auto !important;
-  cursor: pointer;
   
+  cursor: pointer;
   transition: color 0.3s ease;
   
+  /* 渐变遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
 
 #playlistTitleBtn:hover, #songTitle:hover {
+  color: #cdbaff;
   text-shadow: none;
-  color: #fff; /* 悬停时稍微变亮，增加交互感 */
 }
 
-/* --- 歌词滚动动画 --- */
+/* --- 🔥 修复版：歌词滚动动画 (阻尼感 + 降速) --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
   will-change: transform; 
   white-space: nowrap;
-  transform: translateX(0); 
   
-  /* 🔥 修复：文字不阻挡点击 */
-  pointer-events: none; 
+  /* 默认位置：强制靠左 */
+  transform: translateX(0); 
 }
 
 .scroll-inner.scrolling {
+  /* 1. var(--scroll-duration): JS 计算的时间
+     2. cubic-bezier(0.25, 0.1, 0.25, 1): 关键修改！
+        不再是 linear (匀速)。这个曲线会让文字启动后平滑移动，
+        但在最后 20% 的距离时会明显减速（阻尼感），轻轻停在末尾。
+     3. 1 forwards: 只滚一次，不回弹
+  */
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  15% { transform: translateX(0); } 
-  100% { transform: translateX(var(--scroll-offset)); } 
+  15% { transform: translateX(0); } /* 开头停顿 */
+  100% { transform: translateX(var(--scroll-offset)); } /* 滚到 JS 计算的负数值 */
 }
 
 #songTitle.lyric-mode {
   font-size: 0.95rem;            
-  /* 🔥 恢复淡紫色 */
-  color: #cdbaff; 
+  color: #cdbaff;
   white-space: nowrap; 
 }
 
-/* ...保留之前的 .elysia-player 等代码... */
+
 
 /* =========================================
-   7. 播放列表 & 歌单菜单 (修复：颜色与播放器完全统一)
+   5. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -299,38 +310,20 @@
   max-height: 260px;
   padding: 10px 14px;
   border-radius: 16px;
-  
-  /* 🔥 核心修复：背景色使用 var(--theme-rgb) */
-  /* 使用较高的不透明度 (0.65) 确保文字清晰，同时保留色彩倾向 */
-  background: rgba(var(--theme-rgb), 0.65);
-  
-  /* 边框和阴影也使用主题色 */
-  border: 1px solid rgba(var(--theme-rgb), 0.3);
-  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
-  
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: none;
-  
   opacity: 0; 
   pointer-events: none;
-  
   z-index: 9998;
   scrollbar-width: thin;
   will-change: transform, opacity;
-}
-
-.elysia-playlist.show {
-  opacity: 1; 
-  pointer-events: auto;
-  animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-.elysia-playlist.hide {
-  animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
 }
 
 .playlist-item {
@@ -339,10 +332,7 @@
   align-items: center;
   gap: 10px; 
   padding: 6px 10px;
-  
-  /* 文字颜色：稍微带一点白色，保证在深色背景下的可读性 */
-  color: rgba(255, 255, 255, 0.9); 
-  
+  color: #cdbaff; 
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
@@ -365,31 +355,32 @@
   flex-shrink: 0;         
   font-size: 0.9em;       
   font-family: monospace, sans-serif; 
-  color: rgba(255, 255, 255, 0.6);         
+  color: #cdbaff;         
   transition: color 0.2s; 
 }
 
 .playlist-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff;
+}
+.playlist-item:hover .play-count-tag,
+.playlist-item.active .play-count-tag {
+  color: #ffffff;
 }
 
 .playlist-item.active {
-  /* 选中项：加深背景色 */
-  background: rgba(0, 0, 0, 0.2); 
+  background: rgba(160, 120, 255, 0.25);
   color: #fff;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
-  font-weight: 600;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
 
-/* 列表背后的光晕也跟随主题色 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
   inset: 0; 
   border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(var(--theme-rgb),0.5), rgba(var(--theme-rgb),0.2) 45%, transparent 65%);
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
   opacity: 0; 
   transform: scale(0.8); 
   pointer-events: none; 
@@ -400,18 +391,18 @@
 .elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
-/* 滚动条颜色适配 */
-.elysia-playlist::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-
 /* =========================================
-   8. 动画关键帧
+   6. 动画
    ========================================= */
-@keyframes breathingGlow {
-  0%, 100% { opacity: 0.8; transform: translateZ(-10px) scale(1); }
-  50% { opacity: 1; transform: translateZ(-10px) scale(1.05); }
+.elysia-playlist.show {
+  opacity: 1; 
+  pointer-events: auto;
+  animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: 50% 100%;
+}
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
 }
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
@@ -437,9 +428,19 @@
 }
 
 /* =========================================
-   9. 滚动条 (恢复紫色系)
+   7. 滚动条美化
    ========================================= */
-.elysia-playlist::-webkit-scrollbar { width: 4px; }
-.elysia-playlist::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
-.elysia-playlist::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+.elysia-playlist::-webkit-scrollbar {
+  width: 4px;
+}
+.elysia-playlist::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.elysia-playlist::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+.elysia-playlist::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.4);
+}

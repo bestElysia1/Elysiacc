@@ -1,11 +1,11 @@
-/* elysiamusic.css - Ultimate Final Version (Dynamic Color & Breathing) */
+/* elysiamusic.css - Ultimate Final Version (Perfect Layout + Dynamic Color) */
 
 /* =========================================
    1. 基础容器 (Variables & Layout)
    ========================================= */
 .elysia-player {
   /* 🔥 定义默认主题色 (Elysia Purple) */
-  /* JS 会通过 setProperty修改这个变量 */
+  /* JS 会通过 setProperty 修改这个变量 */
   --theme-rgb: 156, 107, 255; 
   
   position: fixed;
@@ -15,7 +15,7 @@
   z-index: 9999;
   width: calc(100% - 36px);  /* 模拟手机端 */
   max-width: 800px;          /* 模拟电脑端 */
-  height: 54px;              /* 高度适配封面+内边距 */
+  height: 54px;              /* 高度固定 */
   perspective: 1000px;
   background: transparent;
   
@@ -87,7 +87,7 @@
 }
 
 /* =========================================
-   3. 前后两面 (Face Layout)
+   3. 前后两面 (Face Layout) - 核心布局调整
    ========================================= */
 .player-face {
   position: absolute;
@@ -95,8 +95,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between; /* 布局：左-中-右 */
-  gap: 12px;
-  padding: 6px 16px;
+  
+  /* 🔥 布局优化：
+     上=5px, 右=12px, 下=5px, 左=5px
+     (54px高度 - 44px封面) / 2 = 5px。
+     这样左侧封面就是完美的 5px 等距包围。
+  */
+  padding: 5px 12px 5px 5px;
+  
+  /* 🔥 减小元素间距，把空间留给歌词 */
+  gap: 8px;
   
   border-radius: 16px;
 
@@ -165,11 +173,6 @@
   transform: scale(0.9);
 }
 
-.album-cover.playing {
-  /* 如果想要旋转，解开下面这行 */
-  /* animation: spinCover 10s linear infinite; */
-}
-
 /* 无图片时的默认音符 */
 .album-cover:empty::before {
   content: "♪";
@@ -180,11 +183,6 @@
   justify-content: center;
   color: rgba(255,255,255,0.4);
   font-size: 20px;
-}
-
-@keyframes spinCover {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 /* =========================================
@@ -266,7 +264,10 @@
   
   flex: 1; 
   min-width: 0; 
-  margin: 0 12px; 
+  
+  /* 🔥 减小左右外边距 (从 12px 减到 6px) */
+  /* 配合减小的父容器 padding，极大增加了歌词宽度 */
+  margin: 0 6px; 
   
   height: 24px; 
   font-size: 0.95rem;

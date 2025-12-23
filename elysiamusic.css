@@ -1,4 +1,4 @@
-/* elysiamusic.css - Ultimate Final Version (Perfect Layout + Dynamic Color) */
+/* elysiamusic.css - Ultimate Final (Full Color + Perfect Layout + Interactive Fix) */
 
 /* =========================================
    1. 基础容器 (Variables & Layout)
@@ -31,7 +31,7 @@
 }
 
 /* =========================================
-   2. 3D 骨架 & 呼吸光效
+   2. 3D 骨架 & 呼吸光效 (加强版)
    ========================================= */
 .player-glass-card {
   position: relative;
@@ -52,26 +52,26 @@
   transform: rotateX(180deg) scale(0.98);
 }
 
-/* 🔥 内部流动的液态光斑 (核心光效层) */
+/* 🔥 内部流动的液态光斑 (背景光效层) */
 .player-glass-card::before {
   content: "";
   position: absolute;
   inset: -30%; /* 光晕扩散范围 */
   
-  /* 使用变量替换固定颜色 */
+  /* 🔥 核心修改：大幅提高透明度 (0.4 - 0.6)，让光效显色更浓郁 */
   background:
-    radial-gradient(40% 40% at 10% 30%, rgba(var(--theme-rgb), 0.35), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(var(--theme-rgb), 0.25), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(var(--theme-rgb), 0.18), transparent 22%);
+    radial-gradient(40% 40% at 10% 30%, rgba(var(--theme-rgb), 0.6), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(var(--theme-rgb), 0.5), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(var(--theme-rgb), 0.4), transparent 22%);
   
   filter: blur(36px);
   
-  /* 默认状态 (暂停/未播放)：较暗，不呼吸，仅流动 */
-  opacity: 0.6; 
+  /* 默认状态 */
+  opacity: 0.7; 
   animation: moveBlobs 14s ease-in-out infinite;
   
   pointer-events: none;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal; /* 改为 normal 以保证颜色准确覆盖 */
   transform: translateZ(-10px); 
   z-index: -1; 
   
@@ -82,50 +82,48 @@
 /* 🔥 播放状态：光效增强 + 叠加呼吸动画 */
 .elysia-player.playing .player-glass-card::before {
   opacity: 1; /* 变亮 */
-  /* 同时保留流动动画(moveBlobs) 和 新增呼吸动画(breathingGlow) */
   animation: moveBlobs 14s ease-in-out infinite, breathingGlow 4s ease-in-out infinite;
 }
 
 /* =========================================
-   3. 前后两面 (Face Layout) - 核心布局调整
+   3. 前后两面 (Face Layout) - 布局与颜色核心
    ========================================= */
 .player-face {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 布局：左-中-右 */
+  justify-content: space-between; 
   
-  /* 🔥 布局优化：
-     上=5px, 右=12px, 下=5px, 左=5px
-     (54px高度 - 44px封面) / 2 = 5px。
-     这样左侧封面就是完美的 5px 等距包围。
-  */
+  /* 🔥 布局优化：左/上/下均为 5px，右侧保留 12px */
+  /* (54 - 44) / 2 = 5px，实现完美对齐 */
   padding: 5px 12px 5px 5px;
   
-  /* 🔥 减小元素间距，把空间留给歌词 */
+  /* 🔥 极窄间距，把空间留给歌词 */
   gap: 8px;
   
   border-radius: 16px;
 
-  /* 背景微调：中间的高光部分混入主题色 */
+  /* 🔥 核心修改：背景使用高浓度主题色渐变 */
   background: linear-gradient(120deg, 
-      rgba(255,255,255,0.08) 0%,   
-      rgba(var(--theme-rgb), 0.12) 50%,  
-      rgba(255,255,255,0.08) 100%
+      rgba(var(--theme-rgb), 0.3) 0%,   
+      rgba(var(--theme-rgb), 0.65) 50%,  
+      rgba(var(--theme-rgb), 0.3) 100%
   );
   background-size: 200% 200%;   
   
   transition: background 0.6s ease; 
 
-  border: 1px solid rgba(255,255,255,0.15);
+  /* 边框增加一点亮度 */
+  border: 1px solid rgba(255,255,255,0.25);
+  
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
   
   overflow: hidden;
   
-  /* 阴影也跟随主题色，产生辉光感 */
-  box-shadow: 0 8px 24px rgba(var(--theme-rgb), 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  /* 阴影使用纯主题色，增强辉光 */
+  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
 
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -202,11 +200,11 @@
   height: 36px; 
   border-radius: 50%;
   
-  background: rgba(255, 255, 255, 0.1); 
+  background: rgba(255, 255, 255, 0.15); /* 稍微调高透明度以适应深色背景 */
   border: none; 
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
   
-  color: #cdbaff; 
+  color: #fff; /* 按钮颜色改为白色以提高对比度 */
   cursor: pointer; 
   transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
   backdrop-filter: blur(8px);
@@ -233,14 +231,14 @@
 
 .elysia-controls button:hover,
 .control-btn:hover { 
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05); 
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
 }
 
 .elysia-controls button:active {
   transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 #heartBtn.liked {
@@ -255,18 +253,18 @@
 }
 
 /* =========================================
-   /* =========================================
-   6. 标题与歌词 (修复点击失效问题)
+   6. 标题与歌词 (点击修复版)
    ========================================= */
 #songTitle,
 #playlistTitleBtn {
-  color: #cdbaff; 
+  color: #fff; /* 文字改为纯白，适应深色背景 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   font-weight: 600; 
   
   flex: 1; 
   min-width: 0; 
   
-  /* 保持刚才的窄边距 */
+  /* 🔥 极窄外边距，最大化歌词显示宽度 */
   margin: 0 6px; 
   
   height: 24px; 
@@ -277,9 +275,9 @@
   white-space: nowrap; 
   overflow: hidden; 
   
-  /* 🔥 关键修复：确保标题层级高于背景和遮罩，且允许点击 */
+  /* 🔥 关键修复：允许点击，提高层级 */
   position: relative;
-  z-index: 10; 
+  z-index: 10;
   pointer-events: auto;
   cursor: pointer;
   
@@ -291,7 +289,7 @@
 }
 
 #playlistTitleBtn:hover, #songTitle:hover {
-  color: #cdbaff;
+  opacity: 0.8;
   text-shadow: none;
 }
 
@@ -302,21 +300,31 @@
   will-change: transform; 
   white-space: nowrap;
   
-  /* 默认位置 */
   transform: translateX(0); 
   
-  /* 🔥 关键修复：内部span不阻挡点击，让点击事件穿透给父元素(#songTitle) */
-  pointer-events: none; 
+  /* 🔥 关键修复：防止 span 阻挡点击 */
+  pointer-events: none;
 }
 
 .scroll-inner.scrolling {
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(0); } 
+  100% { transform: translateX(var(--scroll-offset)); } 
+}
+
+#songTitle.lyric-mode {
+  font-size: 0.95rem;            
+  color: #fff;
+  white-space: nowrap; 
+}
 
 
 /* =========================================
-   7. 播放列表 & 歌单菜单
+   7. 播放列表 & 歌单菜单 (主题色适配)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -328,11 +336,15 @@
   max-height: 260px;
   padding: 10px 14px;
   border-radius: 16px;
-  background: rgba(255,240,255,0.25);
-  border: 1px solid rgba(255,210,255,0.35);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  
+  /* 🔥 修改背景为主题色，保持一致性 */
+  background: rgba(var(--theme-rgb), 0.4);
+  border: 1px solid rgba(var(--theme-rgb), 0.3);
+  
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
@@ -350,7 +362,7 @@
   align-items: center;
   gap: 10px; 
   padding: 6px 10px;
-  color: #cdbaff; 
+  color: rgba(255,255,255,0.85); /* 默认字体颜色改亮 */
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
@@ -373,12 +385,12 @@
   flex-shrink: 0;         
   font-size: 0.9em;       
   font-family: monospace, sans-serif; 
-  color: #cdbaff;         
+  color: rgba(255,255,255,0.7);         
   transition: color 0.2s; 
 }
 
 .playlist-item:hover {
-  background: rgba(160, 120, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
 }
 .playlist-item:hover .play-count-tag,
@@ -387,9 +399,10 @@
 }
 
 .playlist-item.active {
-  background: rgba(160, 120, 255, 0.25);
+  /* 高亮背景也使用主题色混合 */
+  background: rgba(var(--theme-rgb), 0.6);
   color: #fff;
-  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  box-shadow: 0 0 12px rgba(var(--theme-rgb), 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
 
@@ -398,7 +411,8 @@
   position: absolute; 
   inset: 0; 
   border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  /* 列表弹窗背后的光晕也跟随主题色 */
+  background: radial-gradient(circle at 50% 30%, rgba(var(--theme-rgb),0.45), rgba(var(--theme-rgb),0.18) 45%, transparent 65%);
   opacity: 0; 
   transform: scale(0.8); 
   pointer-events: none; 
@@ -413,7 +427,7 @@
    8. 动画关键帧
    ========================================= */
 
-/* 🔥 新增：呼吸光效动画 */
+/* 🔥 呼吸光效动画 */
 @keyframes breathingGlow {
   0%, 100% { 
     opacity: 0.8; 
@@ -440,8 +454,8 @@
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
 @keyframes softPulse { 
-  0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
-  50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
+  0%,100%{box-shadow:0 0 10px rgba(var(--theme-rgb),0.4);} 
+  50%{box-shadow:0 0 18px rgba(var(--theme-rgb),0.8);} 
 }
 @keyframes elysiaFloat {
   0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -459,9 +473,9 @@
   border-radius: 4px;
 }
 .elysia-playlist::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.3);
   border-radius: 4px;
 }
 .elysia-playlist::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.5);
 }

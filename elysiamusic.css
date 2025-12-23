@@ -1,9 +1,13 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + No Rollback) */
+/* elysiamusic.css - Ultimate Final Version (Dynamic Color & Breathing) */
 
 /* =========================================
-   1. 基础容器
+   1. 基础容器 (Variables & Layout)
    ========================================= */
 .elysia-player {
+  /* 🔥 定义默认主题色 (Elysia Purple) */
+  /* JS 会通过 setProperty修改这个变量 */
+  --theme-rgb: 156, 107, 255; 
+  
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -14,14 +18,20 @@
   height: 54px;              /* 高度适配封面+内边距 */
   perspective: 1000px;
   background: transparent;
+  
+  /* 整体悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
+  
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  
+  /* 颜色变化的过渡效果 */
+  transition: --theme-rgb 1s ease; 
 }
 
 /* =========================================
-   2. 3D 骨架
+   2. 3D 骨架 & 呼吸光效
    ========================================= */
 .player-glass-card {
   position: relative;
@@ -42,6 +52,40 @@
   transform: rotateX(180deg) scale(0.98);
 }
 
+/* 🔥 内部流动的液态光斑 (核心光效层) */
+.player-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: -30%; /* 光晕扩散范围 */
+  
+  /* 使用变量替换固定颜色 */
+  background:
+    radial-gradient(40% 40% at 10% 30%, rgba(var(--theme-rgb), 0.35), transparent 20%),
+    radial-gradient(30% 30% at 70% 20%, rgba(var(--theme-rgb), 0.25), transparent 18%),
+    radial-gradient(35% 35% at 40% 70%, rgba(var(--theme-rgb), 0.18), transparent 22%);
+  
+  filter: blur(36px);
+  
+  /* 默认状态 (暂停/未播放)：较暗，不呼吸，仅流动 */
+  opacity: 0.6; 
+  animation: moveBlobs 14s ease-in-out infinite;
+  
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translateZ(-10px); 
+  z-index: -1; 
+  
+  /* 颜色和透明度变化的过渡 */
+  transition: opacity 0.8s ease, background 0.8s ease;
+}
+
+/* 🔥 播放状态：光效增强 + 叠加呼吸动画 */
+.elysia-player.playing .player-glass-card::before {
+  opacity: 1; /* 变亮 */
+  /* 同时保留流动动画(moveBlobs) 和 新增呼吸动画(breathingGlow) */
+  animation: moveBlobs 14s ease-in-out infinite, breathingGlow 4s ease-in-out infinite;
+}
+
 /* =========================================
    3. 前后两面 (Face Layout)
    ========================================= */
@@ -56,24 +100,24 @@
   
   border-radius: 16px;
 
+  /* 背景微调：中间的高光部分混入主题色 */
   background: linear-gradient(120deg, 
       rgba(255,255,255,0.08) 0%,   
-      rgba(255,255,255,0.08) 35%,  
-      rgba(255,255,255,0.35) 50%,  
-      rgba(255,255,255,0.08) 65%,  
+      rgba(var(--theme-rgb), 0.12) 50%,  
       rgba(255,255,255,0.08) 100%
   );
-  background-size: 250% 250%;   
-  background-position: 0% 0%;   
+  background-size: 200% 200%;   
   
-  transition: background-position 0.6s ease; 
+  transition: background 0.6s ease; 
 
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
   
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(150,110,240,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  
+  /* 阴影也跟随主题色，产生辉光感 */
+  box-shadow: 0 8px 24px rgba(var(--theme-rgb), 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
 
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -99,26 +143,8 @@
 .elysia-player.flipped .face-front { pointer-events: none !important; }
 .elysia-player.flipped .face-back { pointer-events: auto !important; }
 
-/* 内部流动的液态光斑 */
-.player-glass-card::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(40% 40% at 10% 30%, rgba(156,107,255,0.35), transparent 20%),
-    radial-gradient(30% 30% at 70% 20%, rgba(180,120,255,0.25), transparent 18%),
-    radial-gradient(35% 35% at 40% 70%, rgba(140,200,255,0.18), transparent 22%);
-  filter: blur(36px);
-  opacity: 0.9;
-  animation: moveBlobs 14s ease-in-out infinite;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  transform: translateZ(-10px); 
-  z-index: -1; 
-}
-
 /* =========================================
-   新增：歌曲封面缩略图样式 (左侧)
+   4. 歌曲封面缩略图样式 (左侧)
    ========================================= */
 .album-cover {
   width: 44px;  
@@ -162,7 +188,7 @@
 }
 
 /* =========================================
-   4. 控件按钮 (靠右)
+   5. 控件按钮 (靠右)
    ========================================= */
 .elysia-controls { 
   display: flex; 
@@ -230,7 +256,9 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题与歌词样式 (中间自适应) --- */
+/* =========================================
+   6. 标题与歌词 (中间自适应)
+   ========================================= */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
@@ -252,7 +280,7 @@
   cursor: pointer;
   transition: color 0.3s ease;
   
-  /* 渐变遮罩 */
+  /* 渐变遮罩，防止文字突然截断 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -262,7 +290,7 @@
   text-shadow: none;
 }
 
-/* --- 🔥 修复版：歌词滚动动画 (阻尼感 + 降速) --- */
+/* --- 歌词滚动动画 (阻尼感) --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
@@ -274,19 +302,15 @@
 }
 
 .scroll-inner.scrolling {
-  /* 1. var(--scroll-duration): JS 计算的时间
-     2. cubic-bezier(0.25, 0.1, 0.25, 1): 关键修改！
-        不再是 linear (匀速)。这个曲线会让文字启动后平滑移动，
-        但在最后 20% 的距离时会明显减速（阻尼感），轻轻停在末尾。
-     3. 1 forwards: 只滚一次，不回弹
-  */
+  /* JS 计算 duration 和 offset */
+  /* 曲线：前半段平滑，后半段减速刹车 */
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 开头停顿 */
-  100% { transform: translateX(var(--scroll-offset)); } /* 滚到 JS 计算的负数值 */
+  15% { transform: translateX(0); } /* 稍微停顿一下再开始滚 */
+  100% { transform: translateX(var(--scroll-offset)); } 
 }
 
 #songTitle.lyric-mode {
@@ -296,9 +320,8 @@
 }
 
 
-
 /* =========================================
-   5. 播放列表 & 歌单菜单
+   7. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -392,18 +415,21 @@
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   6. 动画
+   8. 动画关键帧
    ========================================= */
-.elysia-playlist.show {
-  opacity: 1; 
-  pointer-events: auto;
-  animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transform-origin: 50% 100%;
+
+/* 🔥 新增：呼吸光效动画 */
+@keyframes breathingGlow {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: translateZ(-10px) scale(1); 
+  }
+  50% { 
+    opacity: 1; /* 最亮 */
+    transform: translateZ(-10px) scale(1.05); /* 微微膨胀 */
+  }
 }
-.elysia-playlist.hide {
-  animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 50% 100%;
-}
+
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
@@ -428,7 +454,7 @@
 }
 
 /* =========================================
-   7. 滚动条美化
+   9. 滚动条美化
    ========================================= */
 .elysia-playlist::-webkit-scrollbar {
   width: 4px;

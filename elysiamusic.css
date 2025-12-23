@@ -11,7 +11,7 @@
   z-index: 9999;
   width: calc(100% - 36px);  /* 模拟手机端 */
   max-width: 800px;          /* 模拟电脑端 */
-  height: 58px;              /* 高度适配封面+内边距 */
+  height: 54px;              /* 高度适配封面+内边距 */
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;

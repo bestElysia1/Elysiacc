@@ -255,7 +255,8 @@
 }
 
 /* =========================================
-   6. 标题与歌词 (中间自适应)
+   /* =========================================
+   6. 标题与歌词 (修复点击失效问题)
    ========================================= */
 #songTitle,
 #playlistTitleBtn {
@@ -265,8 +266,7 @@
   flex: 1; 
   min-width: 0; 
   
-  /* 🔥 减小左右外边距 (从 12px 减到 6px) */
-  /* 配合减小的父容器 padding，极大增加了歌词宽度 */
+  /* 保持刚才的窄边距 */
   margin: 0 6px; 
   
   height: 24px; 
@@ -276,12 +276,16 @@
   
   white-space: nowrap; 
   overflow: hidden; 
-  position: relative;
   
+  /* 🔥 关键修复：确保标题层级高于背景和遮罩，且允许点击 */
+  position: relative;
+  z-index: 10; 
+  pointer-events: auto;
   cursor: pointer;
+  
   transition: color 0.3s ease;
   
-  /* 渐变遮罩，防止文字突然截断 */
+  /* 渐变遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -291,34 +295,24 @@
   text-shadow: none;
 }
 
-/* --- 歌词滚动动画 (阻尼感) --- */
+/* --- 歌词滚动动画 --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
   will-change: transform; 
   white-space: nowrap;
   
-  /* 默认位置：强制靠左 */
+  /* 默认位置 */
   transform: translateX(0); 
+  
+  /* 🔥 关键修复：内部span不阻挡点击，让点击事件穿透给父元素(#songTitle) */
+  pointer-events: none; 
 }
 
 .scroll-inner.scrolling {
-  /* JS 计算 duration 和 offset */
-  /* 曲线：前半段平滑，后半段减速刹车 */
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 稍微停顿一下再开始滚 */
-  100% { transform: translateX(var(--scroll-offset)); } 
-}
-
-#songTitle.lyric-mode {
-  font-size: 0.95rem;            
-  color: #cdbaff;
-  white-space: nowrap; 
-}
 
 
 /* =========================================

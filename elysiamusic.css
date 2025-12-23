@@ -1,10 +1,10 @@
-/* elysiamusic.css - Ultimate Final (Fixed Click & No Scale) */
+/* elysiamusic.css - Ultimate Final (Pale Purple Skin + Fixed Logic) */
 
 /* =========================================
    1. 基础容器 (Variables & Layout)
    ========================================= */
 .elysia-player {
-  /* 🔥 定义默认主题色 */
+  /* 定义默认主题色 (用于背景光效) */
   --theme-rgb: 156, 107, 255; 
   
   position: fixed;
@@ -18,7 +18,6 @@
   perspective: 1000px;
   background: transparent;
   
-  /* 整体悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
   
   user-select: none;
@@ -46,13 +45,12 @@
   transform: scale(0.98);
 }
 
-/* 🔥 背景光效层 */
+/* 🔥 背景光效层 (保持浓郁光效，不影响文字颜色) */
 .player-glass-card::before {
   content: "";
   position: absolute;
   inset: -30%; 
   
-  /* 浓郁的主题色光斑 */
   background:
     radial-gradient(40% 40% at 10% 30%, rgba(var(--theme-rgb), 0.6), transparent 20%),
     radial-gradient(30% 30% at 70% 20%, rgba(var(--theme-rgb), 0.5), transparent 18%),
@@ -85,16 +83,16 @@
   align-items: center;
   justify-content: space-between; 
   
-  /* 布局优化 */
+  /* 布局保持修复后的完美对齐 */
   padding: 5px 12px 5px 5px;
   gap: 8px;
   border-radius: 16px;
 
-  /* 背景颜色 */
+  /* 背景：保持动态取色，但为了配合淡紫色文字，稍微调淡一点点 */
   background: linear-gradient(120deg, 
-      rgba(var(--theme-rgb), 0.3) 0%,   
-      rgba(var(--theme-rgb), 0.65) 50%,  
-      rgba(var(--theme-rgb), 0.3) 100%
+      rgba(var(--theme-rgb), 0.25) 0%,   
+      rgba(var(--theme-rgb), 0.55) 50%,  
+      rgba(var(--theme-rgb), 0.25) 100%
   );
   background-size: 200% 200%;   
   transition: background 0.6s ease; 
@@ -132,7 +130,7 @@
   transition: transform 0.3s;
   position: relative;
   overflow: hidden;
-  z-index: 5; /* 确保封面可点 */
+  z-index: 5; 
 }
 
 .album-cover:active {
@@ -151,7 +149,7 @@
 }
 
 /* =========================================
-   5. 控件按钮 (修复：移除变大效果)
+   5. 控件按钮 (淡紫色 + 无缩放修复)
    ========================================= */
 .elysia-controls { 
   display: flex; 
@@ -159,7 +157,7 @@
   flex-shrink: 0; 
   align-items: center;
   justify-content: flex-end; 
-  z-index: 20; /* 确保按钮在最上层 */
+  z-index: 20;
 }
 
 .elysia-controls button,
@@ -172,9 +170,11 @@
   border: none; 
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
   
-  color: #fff; 
+  /* 🔥 恢复淡紫色 */
+  color: #cdbaff; 
+  
   cursor: pointer; 
-  transition: background 0.2s, box-shadow 0.2s; /* 🔥 移除 transform 动画 */
+  transition: background 0.2s, box-shadow 0.2s; /* 移除 transform */
   backdrop-filter: blur(8px);
   
   display: flex;
@@ -194,7 +194,7 @@
 
 #playPauseBtn:not(.playing) svg { margin-left: 2px; }
 
-/* 🔥 修复：悬停只变亮，不变大 */
+/* 悬停状态 */
 .elysia-controls button:hover,
 .control-btn:hover { 
   background: rgba(255, 255, 255, 0.3);
@@ -202,7 +202,7 @@
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
 }
 
-/* 🔥 修复：点击只变暗，不变小 */
+/* 点击状态 */
 .elysia-controls button:active {
   transform: none; /* 🚫 禁止缩放 */
   background: rgba(255, 255, 255, 0.1);
@@ -219,14 +219,14 @@
 }
 
 /* =========================================
-   6. 标题与歌词 (修复：列表点击失效)
+   6. 标题与歌词 (淡紫色 + 点击修复)
    ========================================= */
 #songTitle,
 #playlistTitleBtn {
-  color: #fff; 
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  font-weight: 600; 
+  /* 🔥 恢复淡紫色 */
+  color: #cdbaff; 
   
+  font-weight: 600; 
   flex: 1; 
   min-width: 0; 
   margin: 0 6px; 
@@ -238,7 +238,7 @@
   white-space: nowrap; 
   overflow: hidden; 
   
-  /* 🔥 终极修复：强制层级最高，确保绝对可点击 */
+  /* 🔥 修复列表无法点击的核心逻辑 */
   position: relative;
   z-index: 50; 
   pointer-events: auto !important;
@@ -251,8 +251,8 @@
 }
 
 #playlistTitleBtn:hover, #songTitle:hover {
-  opacity: 0.8;
   text-shadow: none;
+  color: #fff; /* 悬停时稍微变亮，增加交互感 */
 }
 
 /* --- 歌词滚动动画 --- */
@@ -263,7 +263,7 @@
   white-space: nowrap;
   transform: translateX(0); 
   
-  /* 🔥 修复：内部文字不阻挡点击，让点击穿透到 songTitle */
+  /* 🔥 修复：文字不阻挡点击 */
   pointer-events: none; 
 }
 
@@ -279,12 +279,13 @@
 
 #songTitle.lyric-mode {
   font-size: 0.95rem;            
-  color: #fff;
+  /* 🔥 恢复淡紫色 */
+  color: #cdbaff; 
   white-space: nowrap; 
 }
 
 /* =========================================
-   7. 播放列表 & 歌单菜单
+   7. 播放列表 & 歌单菜单 (恢复旧版淡紫色外观)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -297,19 +298,21 @@
   padding: 10px 14px;
   border-radius: 16px;
   
-  background: rgba(var(--theme-rgb), 0.4);
-  border: 1px solid rgba(var(--theme-rgb), 0.3);
+  /* 🔥 恢复旧版淡紫色背景 */
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
   
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  box-shadow: 0 8px 32px rgba(var(--theme-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  
+  /* 🔥 恢复旧版阴影 */
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: none;
   
-  /* 默认隐藏状态 */
   opacity: 0; 
   pointer-events: none;
   
@@ -318,7 +321,6 @@
   will-change: transform, opacity;
 }
 
-/* 🔥 修复：显示时恢复点击事件 */
 .elysia-playlist.show {
   opacity: 1; 
   pointer-events: auto;
@@ -334,7 +336,10 @@
   align-items: center;
   gap: 10px; 
   padding: 6px 10px;
-  color: rgba(255,255,255,0.85); 
+  
+  /* 🔥 恢复旧版淡紫色文字 */
+  color: #cdbaff; 
+  
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
@@ -357,12 +362,14 @@
   flex-shrink: 0;         
   font-size: 0.9em;       
   font-family: monospace, sans-serif; 
-  color: rgba(255,255,255,0.7);         
+  
+  /* 🔥 恢复旧版淡紫色 */
+  color: #cdbaff;       
   transition: color 0.2s; 
 }
 
 .playlist-item:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(160, 120, 255, 0.15);
   color: #ffffff;
 }
 .playlist-item:hover .play-count-tag,
@@ -371,18 +378,20 @@
 }
 
 .playlist-item.active {
-  background: rgba(var(--theme-rgb), 0.6);
+  /* 选中状态稍微保留一点主题色的意思，但样式接近旧版 */
+  background: rgba(160, 120, 255, 0.25);
   color: #fff;
-  box-shadow: 0 0 12px rgba(var(--theme-rgb), 0.6);
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
   animation: softPulse 3s ease-in-out infinite;
 }
 
+/* 列表背后的光晕 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
   inset: 0; 
   border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(var(--theme-rgb),0.45), rgba(var(--theme-rgb),0.18) 45%, transparent 65%);
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
   opacity: 0; 
   transform: scale(0.8); 
   pointer-events: none; 
@@ -415,8 +424,8 @@
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
 @keyframes softPulse { 
-  0%,100%{box-shadow:0 0 10px rgba(var(--theme-rgb),0.4);} 
-  50%{box-shadow:0 0 18px rgba(var(--theme-rgb),0.8);} 
+  0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
+  50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
 @keyframes elysiaFloat {
   0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -424,9 +433,9 @@
 }
 
 /* =========================================
-   9. 滚动条
+   9. 滚动条 (恢复紫色系)
    ========================================= */
 .elysia-playlist::-webkit-scrollbar { width: 4px; }
 .elysia-playlist::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
-.elysia-playlist::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+.elysia-playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+.elysia-playlist::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }

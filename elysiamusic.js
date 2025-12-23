@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
+/* elysiamusic.js - Ultimate Fixed Version (Flip Bug Solved) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
+  /* --- 🎵 核心逻辑：更新标题/歌词 --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -406,26 +406,19 @@ document.addEventListener("DOMContentLoaded", () => {
           return; 
       }
 
-      // 重置 DOM 以强制动画从头开始
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
-      // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
           const duration = (textWidth / 50) + 1.5; 
-          
-          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
-          // 容器宽 - 文字宽 - 20px余量 = 负数
           const offset = containerWidth - textWidth - 20;
 
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
-          // 3. 强制重绘 (Reflow)
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
@@ -453,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCover(song);
 
     isLyricsLoading = true;
-    updateTitleOrLyric(true); // 切歌强制刷新
+    updateTitleOrLyric(true); 
 
     fetchLyrics(song);
 
@@ -542,11 +535,12 @@ document.addEventListener("DOMContentLoaded", () => {
       el.classList.add("show");
     }
   }
+
+  // 🛠️ FIX: 更强硬的关闭函数
   function hideMenu(el) {
-    if (el && el.classList.contains("show")) {
-        el.classList.remove("show");
-        el.classList.add("hide");
-    }
+    if (!el) return;
+    el.classList.remove("show");
+    el.classList.add("hide");
   }
 
   function renderSongListDOM() {
@@ -565,9 +559,16 @@ document.addEventListener("DOMContentLoaded", () => {
     `}).join("");
   }
 
+  // 🔥 🛠️ FIX START: 修复长按翻转重叠 Bug
+  let isFlipping = false; // 全局锁
+  let isDrag = false;
+  let pressTimer;
+
   titleEl.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (player.classList.contains("flipped")) return; 
+    // 🛠️ 拦截逻辑：如果刚翻转过，或者处于背面，不打开菜单
+    if (isFlipping || player.classList.contains("flipped")) return; 
+    
     hideMenu(playlistMenuEl); 
     toggleMenu(songListEl);
   });
@@ -594,6 +595,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playlistTitleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    // 🛠️ 拦截逻辑：防止翻转时误触
+    if (isFlipping || player.classList.contains("flipped")) return;
+    
     hideMenu(songListEl); 
     toggleMenu(playlistMenuEl);
   });
@@ -702,21 +706,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  let isDrag = false;
-  let pressTimer;
+  // 🛠️ FIX START: 彻底重写的长按逻辑
   const startPress = (e) => {
     if (e.target.closest('button')) return; 
     isDrag = false;
+    
     pressTimer = setTimeout(() => {
       if (!isDrag) {
+        // 1. 设置锁，防止 click 事件触发
+        isFlipping = true;
+        
+        // 2. 翻转界面
         player.classList.toggle("flipped");
+        
+        // 3. 强制关闭所有菜单 (防止重叠的核心)
         hideMenu(songListEl);
         hideMenu(playlistMenuEl);
+
+        // 4. 500ms 后释放锁 (给予手指抬起的时间)
+        setTimeout(() => {
+          isFlipping = false;
+        }, 500);
       }
     }, 300);
   };
+  // 🔥 FIX END
+
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
+  
   player.addEventListener('mousedown', startPress);
   player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
@@ -808,13 +826,13 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 (无进度条版) --- */
+  /* --- 🔥 timeupdate 监听器 --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // --- 歌词逻辑 (核心修复) ---
+    // --- 歌词逻辑 ---
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
@@ -827,7 +845,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // 仅当歌词改变时触发 DOM 更新 (防抖 + 重置动画)
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
             updateTitleOrLyric(true); 

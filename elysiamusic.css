@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final: No Progress + No Rollback) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Custom Size: 332x50) */
 
 /* =========================================
    1. 基础容器
@@ -9,9 +9,12 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  width: calc(100% - 36px);  /* 模拟手机端 */
-  max-width: 800px;          /* 模拟电脑端 */
-  height: 54px;              /* 高度适配封面+内边距 */
+  
+  /* --- 修改点：自定义尺寸 --- */
+  width: 332px;      /* 固定宽度 */
+  height: 50px;      /* 固定高度 */
+  /* 移除之前的 max-width，强制使用指定宽度 */
+  
   perspective: 1000px;
   background: transparent;
   animation: elysiaFloat 6s ease-in-out infinite;
@@ -50,17 +53,15 @@
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 布局：左-中-右 */
+  justify-content: space-between; 
   
-  /* --- 修改开始 --- */
-  /* 1. 将 padding 统一为 5px */
-  /* 计算：高度 54px - 封面 44px = 10px，上下各 5px。为了左侧对齐，左侧也设为 5px */
+  /* --- 关键布局调整 --- */
+  /* padding 5px：保证上下各5px (50px高度 - 40px内容 = 10px剩余) */
+  /* 左侧也就自动是 5px，达成“左边距=上下边距” */
   padding: 5px; 
   
-  /* 2. 将 gap 设为 0 */
-  /* 因为标题保留了 margin: 0 12px，这里设为 0 可以避免双重间距，最大化歌词显示宽度 */
+  /* gap 设为 0，因为标题自带 margin，最大化中间歌词区域 */
   gap: 0px;
-  /* --- 修改结束 --- */
   
   border-radius: 16px;
 
@@ -126,11 +127,14 @@
 }
 
 /* =========================================
-   新增：歌曲封面缩略图样式 (左侧)
+   歌曲封面缩略图样式 (左侧)
    ========================================= */
 .album-cover {
-  width: 44px;  
-  height: 44px;
+  /* --- 修改点：适配 50px 高度 --- */
+  /* 50px(总高) - 5px(上) - 5px(下) = 40px */
+  width: 40px;  
+  height: 40px;
+  
   border-radius: 8px; 
   background-color: rgba(255,255,255,0.1);
   background-size: cover;
@@ -148,7 +152,6 @@
 }
 
 .album-cover.playing {
-  /* 如果想要旋转，解开下面这行 */
   /* animation: spinCover 10s linear infinite; */
 }
 
@@ -247,7 +250,7 @@
   flex: 1; 
   min-width: 0; 
   
-  /* --- 关键修复：保留这个 margin --- */
+  /* 保留 Margin 确保翻转逻辑/点击区域正常 */
   margin: 0 12px; 
   
   height: 24px; 
@@ -272,7 +275,7 @@
   text-shadow: none;
 }
 
-/* --- 🔥 修复版：歌词滚动动画 (阻尼感 + 降速) --- */
+/* --- 歌词滚动动画 --- */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
@@ -284,12 +287,6 @@
 }
 
 .scroll-inner.scrolling {
-  /* 1. var(--scroll-duration): JS 计算的时间
-     2. cubic-bezier(0.25, 0.1, 0.25, 1): 关键修改！
-        不再是 linear (匀速)。这个曲线会让文字启动后平滑移动，
-        但在最后 20% 的距离时会明显减速（阻尼感），轻轻停在末尾。
-     3. 1 forwards: 只滚一次，不回弹
-  */
   animation: scrollText var(--scroll-duration, 5s) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards;
 }
 
@@ -305,14 +302,12 @@
   white-space: nowrap; 
 }
 
-
-
 /* =========================================
    5. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;
-  bottom: 84px; 
+  bottom: 80px; /* 适配新的高度 50px + bottom 20px + gap 10px */
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;

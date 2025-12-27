@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final Custom Size: 332x50) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Fixed Version) */
 
 /* =========================================
    1. 基础容器
@@ -11,7 +11,6 @@
   bottom: calc(20px + env(safe-area-inset-bottom)); 
   
   left: 50%;
-  
   z-index: 9999;
   
   /* 自定义尺寸 */
@@ -28,10 +27,7 @@
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  /* ================================================= */
   /* --- 核心防掉帧/防乱动代码 --- */
-  /* ================================================= */
-  
   will-change: transform;
   transform: translateX(-50%) translateZ(0); 
 }
@@ -139,7 +135,6 @@
 .album-cover {
   width: 40px;  
   height: 40px;
-  
   border-radius: 8px; 
   background-color: rgba(255,255,255,0.1);
   background-size: cover;
@@ -167,11 +162,6 @@
   font-size: 20px;
 }
 
-@keyframes spinCover {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* =========================================
    4. 控件按钮 (靠右)
    ========================================= */
@@ -188,16 +178,13 @@
   width: 36px; 
   height: 36px; 
   border-radius: 50%;
-  
   background: rgba(255, 255, 255, 0.1); 
   border: none; 
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
-  
   color: #cdbaff; 
   cursor: pointer; 
   transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
   backdrop-filter: blur(8px);
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,7 +228,7 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题与歌词样式 (中间自适应) --- */
+/* --- 标题与歌词 (中间自适应) --- */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
@@ -298,7 +285,7 @@
 }
 
 /* =========================================
-   5. 播放列表容器 (固定高度版)
+   5. 播放列表容器 (单框布局)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -308,11 +295,10 @@
   transform-origin: 50% 100%;
   width: 260px;
   
-  /* --- [关键] 固定高度，防止内容少时抖动 --- */
-  height: 260px;
-  /* max-height: 260px; (已废弃) */
+  /* 固定高度防止抖动 */
+  height: 280px;
   
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: 16px;
   background: rgba(255,240,255,0.25);
   border: 1px solid rgba(255,210,255,0.35);
@@ -320,10 +306,9 @@
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   
-  /* --- 布局改为 Flex 垂直排列 --- */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 内部滚动，外层隐藏 */
+  overflow: hidden;
   
   touch-action: pan-y;
   overscroll-behavior-x: none;
@@ -333,6 +318,23 @@
   will-change: transform, opacity;
 }
 
+.elysia-playlist::after {
+  content: ""; 
+  position: absolute; 
+  inset: 0; 
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; 
+  transform: scale(0.8); 
+  pointer-events: none; 
+  transition: opacity .6s ease, transform .6s ease;
+  z-index: -1;
+}
+
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+
+/* --- 列表项样式 --- */
 .playlist-item {
   display: flex;
   justify-content: space-between; 
@@ -348,7 +350,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0; /* 防止被压缩 */
+  flex-shrink: 0;
 }
 
 .playlist-item .song-name {
@@ -383,24 +385,88 @@
   animation: softPulse 3s ease-in-out infinite;
 }
 
-.elysia-playlist::after {
-  content: ""; 
-  position: absolute; 
-  inset: 0; 
-  border-radius: 16px;
-  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
-  opacity: 0; 
-  transform: scale(0.8); 
-  pointer-events: none; 
-  transition: opacity .6s ease, transform .6s ease;
-  z-index: -1;
+/* =========================================
+   6. [UI重构] 极简单框搜索栏
+   ========================================= */
+.search-container {
+  position: relative; 
+  z-index: 20; 
+  width: 100%;
+  flex-shrink: 0; 
+  margin-bottom: 10px;
 }
 
-.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
-.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
+.search-icon-pos {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none; 
+  color: #cdbaff;
+  opacity: 0.8;
+  z-index: 22;
+}
+
+.search-icon-pos svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.search-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 36px; 
+  border-radius: 19px; 
+  
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15); 
+  color: #fff;
+  
+  font-size: 16px; /* 核心：防止 iOS 放大 */
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  backdrop-filter: blur(8px);
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: #cdbaff;
+  box-shadow: 0 0 15px rgba(205, 186, 255, 0.3);
+}
+
+.search-input::placeholder {
+  color: rgba(205, 186, 255, 0.6); 
+}
+
+/* 实际列表容器 (让它占满剩余空间并可滚动) */
+#realSongListContainer {
+  flex: 1; 
+  width: 100%;
+  overflow-y: auto; 
+  overflow-x: hidden;
+  padding-bottom: 5px;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  
+  /* 优化滚动体验 */
+  -webkit-overflow-scrolling: touch;
+}
+
+.search-empty-tip {
+    padding: 30px 10px;
+    text-align: center;
+    color: #cdbaff;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
 
 /* =========================================
-   6. 动画
+   7. 动画与交互类
    ========================================= */
 .elysia-playlist.show {
   opacity: 1; 
@@ -412,6 +478,7 @@
   animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
   transform-origin: 50% 100%;
 }
+
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
@@ -430,111 +497,13 @@
   0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
   50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
-
 @keyframes elysiaFloat {
-  0%, 100% { 
-    transform: translateX(-50%) translateY(0) translateZ(0); 
-  }
-  50% { 
-    transform: translateX(-50%) translateY(-6px) translateZ(0); 
-  }
+  0%, 100% { transform: translateX(-50%) translateY(0) translateZ(0); }
+  50% { transform: translateX(-50%) translateY(-6px) translateZ(0); }
 }
 
-/* =========================================
-   7. 滚动条美化
-   ========================================= */
-/* 注意：滚动条现在应用在内部容器 #realSongListContainer 上 */
-#realSongListContainer::-webkit-scrollbar {
-  width: 4px;
-}
-#realSongListContainer::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-}
-#realSongListContainer::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
-  border-radius: 4px;
-}
-#realSongListContainer::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.4);
-}
-
-/* =========================================
-   8. [UI重构] 极简单框搜索栏
-   ========================================= */
-.search-container {
-  position: relative; /* 相对定位，为了放绝对定位的图标 */
-  z-index: 10;
-  width: 100%;
-  flex-shrink: 0; /* 防止被压缩 */
-  margin-bottom: 8px;
-}
-
-/* 绝对定位的图标 (放在框内) */
-.search-icon-pos {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  pointer-events: none; /* 让点击穿透到 input */
-  color: #cdbaff;
-  opacity: 0.8;
-  z-index: 12;
-}
-.search-icon-pos svg {
-  width: 100%;
-  height: 100%;
-  fill: currentColor;
-}
-
-/* 输入框样式 (亮色风格，单框) */
-.search-input {
-  width: 100%;
-  height: 36px;
-  
-  /* 左侧内边距避让图标 */
-  padding: 0 12px 0 34px; 
-  
-  border-radius: 18px; 
-  
-  /* 亮色半透明背景，与播放器控件一致 */
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.15); 
-  color: #fff;
-  
-  font-size: 16px; /* 核心：防止 iOS 放大 */
-  outline: none;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-  -webkit-appearance: none;
-  box-sizing: border-box;
-}
-
-.search-input:focus {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-}
-
-.search-input::placeholder {
-  color: rgba(205, 186, 255, 0.5); 
-}
-
-/* 实际列表容器 (让它占满剩余空间并可滚动) */
-#realSongListContainer {
-  flex: 1; /* 占满剩余高度 */
-  overflow-y: auto; /* 滚动条加在这里 */
-  padding-bottom: 5px;
-  
-  scrollbar-width: thin;
-}
-
-.search-empty-tip {
-    padding: 20px;
-    text-align: center;
-    color: #cdbaff;
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
+/* 滚动条美化 */
+#realSongListContainer::-webkit-scrollbar { width: 4px; }
+#realSongListContainer::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+#realSongListContainer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+#realSongListContainer::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }

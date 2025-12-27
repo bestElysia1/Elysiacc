@@ -1,19 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>订阅使用指南 ver.5.01</title>
   
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/ico1.jpg" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
+
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0d0b14" media="(prefers-color-scheme: dark)">
 
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/bannernetwork.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/ico1.jpg" />
+
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="deeptools.js"></script>
 
   <link rel="stylesheet" href="elysiastyle.css">
   <link rel="stylesheet" href="hamburger.css">
@@ -31,7 +36,6 @@
   <li><a href="index.html">Home</a></li>
   <li><a href="elysia-3d.html">Elysia</a></li>
   <li><a href="speedtest.html">IP Test</a></li>
-  <li><a href="http://star.bestelysia.com/">Star</a></li>
   
   <li class="menu-divider"></li>
 
@@ -313,8 +317,8 @@ domain:chatgpt.com</pre>
 
     <div id="login-actions">
       <div class="email-auth-container">
-        <input type="email" id="email-input" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username" />
-        <input type="password" id="pass-input" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password" />
+        <input type="email" id="email-input" name="email" class="glass-input" placeholder="邮箱 (Email)" autocomplete="username" />
+        <input type="password" id="pass-input" name="password" class="glass-input" placeholder="密码 (Password)" autocomplete="current-password" />
         
         <div class="turnstile-wrapper">
             <div class="cf-turnstile" 
@@ -353,6 +357,32 @@ domain:chatgpt.com</pre>
   </div>
 </div>
 
+<script>
+  window.isCaptchaVerified = false;
+
+  function onTurnstileSuccess(token) {
+    console.log("🔥 [HTML] Cloudflare 验证成功! Token:", token);
+    window.isCaptchaVerified = true;
+    
+    if (typeof window.checkLoginButtonState === 'function') {
+      window.checkLoginButtonState();
+    } else {
+      console.log("⚠️ 主逻辑尚未加载，但在加载完成后会自动检测状态");
+    }
+  }
+
+  function onTurnstileExpired() {
+    console.log("⚠️ [HTML] Cloudflare 验证过期");
+    window.isCaptchaVerified = false;
+    if (typeof window.checkLoginButtonState === 'function') {
+      window.checkLoginButtonState();
+    }
+  }
+
+  window.onTurnstileSuccess = onTurnstileSuccess;
+  window.onTurnstileExpired = onTurnstileExpired;
+</script>
+
 <script src="elysiastyle.js"></script>
 <script src="hamburger.js" defer></script>
 <script src="songs.js" defer></script>
@@ -361,7 +391,6 @@ domain:chatgpt.com</pre>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // 显式指定 scope 为 './'，确保它能控制根目录下的所有文件
       navigator.serviceWorker.register('./sw.js', { scope: './' })
         .then(registration => {
           console.log('[Elysia] Service Worker 注册成功:', registration.scope);

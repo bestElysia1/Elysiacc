@@ -5,22 +5,35 @@
    ========================================= */
 .elysia-player {
   position: fixed;
-  bottom: 20px;
+  
+  /* --- 适配 iOS 底部安全区 --- */
+  bottom: 20px; 
+  bottom: calc(20px + env(safe-area-inset-bottom)); 
+  
   left: 50%;
-  transform: translateX(-50%);
+  
   z-index: 9999;
   
-  /* --- 修改点：自定义尺寸 --- */
-  width: 332px;      /* 固定宽度 */
-  height: 50px;      /* 固定高度 */
-  /* 移除之前的 max-width，强制使用指定宽度 */
+  /* 自定义尺寸 */
+  width: 332px;      
+  height: 50px;      
   
   perspective: 1000px;
   background: transparent;
+  
+  /* 动画引用 */
   animation: elysiaFloat 6s ease-in-out infinite;
+  
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  /* ================================================= */
+  /* --- 核心防掉帧/防乱动代码 --- */
+  /* ================================================= */
+  
+  will-change: transform;
+  transform: translateX(-50%) translateZ(0); 
 }
 
 /* =========================================
@@ -55,14 +68,8 @@
   align-items: center;
   justify-content: space-between; 
   
-  /* --- 关键布局调整 --- */
-  /* padding 5px：保证上下各5px (50px高度 - 40px内容 = 10px剩余) */
-  /* 左侧也就自动是 5px，达成“左边距=上下边距” */
   padding: 5px; 
-  
-  /* gap 设为 0，因为标题自带 margin，最大化中间歌词区域 */
   gap: 0px;
-  
   border-radius: 16px;
 
   background: linear-gradient(120deg, 
@@ -130,8 +137,6 @@
    歌曲封面缩略图样式 (左侧)
    ========================================= */
 .album-cover {
-  /* --- 修改点：适配 50px 高度 --- */
-  /* 50px(总高) - 5px(上) - 5px(下) = 40px */
   width: 40px;  
   height: 40px;
   
@@ -151,11 +156,6 @@
   transform: scale(0.9);
 }
 
-.album-cover.playing {
-  /* animation: spinCover 10s linear infinite; */
-}
-
-/* 无图片时的默认音符 */
 .album-cover:empty::before {
   content: "♪";
   position: absolute;
@@ -249,8 +249,6 @@
   
   flex: 1; 
   min-width: 0; 
-  
-  /* 保留 Margin 确保翻转逻辑/点击区域正常 */
   margin: 0 8px 0 14px;
   
   height: 24px; 
@@ -265,7 +263,6 @@
   cursor: pointer;
   transition: color 0.3s ease;
   
-  /* 渐变遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -281,8 +278,6 @@
   padding-left: 0;
   will-change: transform; 
   white-space: nowrap;
-  
-  /* 默认位置：强制靠左 */
   transform: translateX(0); 
 }
 
@@ -292,8 +287,8 @@
 
 @keyframes scrollText {
   0% { transform: translateX(0); }
-  15% { transform: translateX(0); } /* 开头停顿 */
-  100% { transform: translateX(var(--scroll-offset)); } /* 滚到 JS 计算的负数值 */
+  15% { transform: translateX(0); } 
+  100% { transform: translateX(var(--scroll-offset)); } 
 }
 
 #songTitle.lyric-mode {
@@ -307,7 +302,7 @@
    ========================================= */
 .elysia-playlist {
   position: fixed;
-  bottom: 80px; /* 适配新的高度 50px + bottom 20px + gap 10px */
+  bottom: 80px; 
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
@@ -427,9 +422,14 @@
   0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
   50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
+
 @keyframes elysiaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0) translateZ(0); 
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-6px) translateZ(0); 
+  }
 }
 
 /* =========================================
@@ -448,4 +448,45 @@
 }
 .elysia-playlist::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.4);
+}
+
+/* =========================================
+   8. [新增] 顶部模糊搜索框样式
+   ========================================= */
+.search-container {
+  position: sticky;
+  top: 0;
+  z-index: 10; 
+  padding: 0 0 10px 0; /* 调整内边距 */
+  background: transparent; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 5px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.15); 
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.search-input::placeholder {
+  color: rgba(205, 186, 255, 0.5); 
+}
+
+.search-input:focus {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(205, 186, 255, 0.5);
+  box-shadow: 0 0 8px rgba(160, 120, 255, 0.2);
+}
+
+/* 实际列表容器 */
+#realSongListContainer {
+  padding-bottom: 10px;
 }

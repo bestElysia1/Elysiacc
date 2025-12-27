@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version with Smart Search & Auto-Switch */
+/* elysiamusic.js - Final Version (Single Box UI & Smart Jump) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -242,7 +242,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // 原始歌单容器
   const songListEl = document.getElementById("playlist"); 
-  // [变量] 真正的歌单列表容器
+  
+  // [变量] 真正的歌单列表容器 (滚动区域)
   let realSongListEl = null; 
   let searchInputEl = null;
 
@@ -265,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initIcons();
 
   /* =========================================================
-     🔥 [优化] 初始化歌单结构 (搜索框 + 列表)
+     🔥 [UI重构] 初始化歌单结构 (单框设计)
      ========================================================= */
   function initPlaylistStructure() {
     if (!songListEl) return;
@@ -279,20 +280,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     songListEl.innerHTML = '';
 
-    // 1. 创建搜索框容器 (Flex布局 + 搜索图标)
+    // 1. 创建搜索框容器
     const searchBox = document.createElement("div");
     searchBox.className = "search-container";
     
-    // SVG 图标与播放器风格统一
+    // HTML 结构：图标绝对定位 + 输入框 (无 placeholder)
     searchBox.innerHTML = `
-      <div class="search-icon-wrapper">
+      <div class="search-icon-pos">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </div>
-      <input type="text" class="search-input" placeholder="搜索所有歌曲..." autocomplete="off">
+      <input type="text" class="search-input" placeholder="" autocomplete="off">
     `;
     songListEl.appendChild(searchBox);
 
-    // 2. 创建真正的歌曲列表区域
+    // 2. 创建真正的歌曲列表区域 (可滚动)
     realSongListEl = document.createElement("div");
     realSongListEl.id = "realSongListContainer";
     songListEl.appendChild(realSongListEl);
@@ -308,25 +309,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // B. 全局搜索 (从 allSongsLibrary 中搜)
+        // B. 全局搜索
         const results = (window.allSongsLibrary || []).filter(s => 
             s.title.toLowerCase().includes(keyword) || 
             (s.artist && s.artist.toLowerCase().includes(keyword))
         );
 
-        // C. 渲染搜索结果 (临时覆盖列表)
+        // C. 渲染搜索结果
         if (results.length === 0) {
             realSongListEl.innerHTML = `<div class="search-empty-tip">未找到相关歌曲</div>`;
         } else {
             realSongListEl.innerHTML = results.map(s => {
                 // 找到这首歌在全局库里的原始索引
                 const globalIndex = window.allSongsLibrary.findIndex(item => item.title === s.title);
-                // 显示所属歌单提示（可选）
-                let categoryName = playlistsConfig.find(c => c.key === s.category)?.name || "未知列表";
-
+                let categoryName = playlistsConfig.find(c => c.key === s.category)?.name || "";
+                
                 return `
                 <div class="playlist-item search-result-item" data-global-index="${globalIndex}">
-                    <span class="song-name">${s.title} <span style="font-size:0.8em;opacity:0.6;margin-left:5px">(${categoryName})</span></span>
+                    <span class="song-name">${s.title} <span style="font-size:0.8em;opacity:0.6;margin-left:5px">${categoryName}</span></span>
                 </div>
                 `;
             }).join("");
@@ -582,7 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     [修正版] 渲染列表逻辑 (只更新列表体，保留搜索框)
+     [修正] 渲染列表 (针对新容器 #realSongListContainer)
      ========================================================= */
   function renderSongListDOM() {
     if (!realSongListEl) initPlaylistStructure();
@@ -667,8 +667,6 @@ document.addEventListener("DOMContentLoaded", () => {
                      }
                  }, 150);
             }
-        } else {
-            console.error("在目标歌单中未找到该歌曲，逻辑异常");
         }
 
     } else {
@@ -734,10 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = 0;
     
     if (currentList.length > 0) {
-        // 注意：这里不再自动播放(loadSong)，只是切换列表视图
-        // 除非需要在切换时重置播放器状态，通常我们只重置索引
-        // 为了体验，切换歌单默认选中第一首但不一定播放，或者保持原样
-        // 你的原逻辑是切换歌单就自动播放第一首：
+        // 注意：切换歌单默认选中第一首
         loadSong(0);
         audio.play().catch(e => console.warn("Autoplay blocked:", e));
         playPauseBtn.innerHTML = ICONS.pause;

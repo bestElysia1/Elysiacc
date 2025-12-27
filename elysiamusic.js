@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version (Single Box UI & Smart Jump Fix) */
+/* elysiamusic.js - Final Version with Search & Jump Function */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -47,13 +47,13 @@ const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager()
   })
 });
-console.log("[Firebase] Firestore 离线持久化已启用");
+console.log("[Firebase] Firestore 离线持久化已启用 (新版 API)");
 
 const provider = new GoogleAuthProvider();
 
 
 /* =========================================================
-   🔥 PART 1.5: 登录状态检查逻辑
+   🔥 PART 1.5: 登录状态检查逻辑 (JS 部分)
    ========================================================= */
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
@@ -66,6 +66,7 @@ window.checkLoginButtonState = function() {
   const emailVal = emailInput.value.trim();
   const passVal = passInput.value.trim();
   
+  // 核心校验：邮箱非空 && 密码>=6位 && HTML中记录的验证码状态为true
   const isValid = emailVal.length > 0 && passVal.length >= 6 && window.isCaptchaVerified;
 
   if (isValid) {
@@ -96,6 +97,7 @@ window.checkLoginButtonState = function() {
 document.addEventListener("DOMContentLoaded", () => {
   
   const allSongsLibrary = window.allSongsLibrary || [];
+
   if (!window.allSongsLibrary) {
       console.error("严重错误：未找到歌单数据！请检查 song.js 是否在 elysiamusic.js 之前加载。");
   }
@@ -121,7 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loopList: `<svg viewBox="0 0 24 24"><path d="M17 17H7v-3l-4 4 4 4v-3h12v-6h-2v4zm2-2v-4h-2v3H5v-6h2v4h12z"/></svg>`,
     loopOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`,
     shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
-    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
+    heart: `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    search: `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`
   };
 
   /* 2. 歌单配置与状态管理 */
@@ -170,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentUser) return; 
     const currentCount = userPlayHistory[songTitle] || 0;
     userPlayHistory[songTitle] = currentCount + 1;
-    
+
     if (currentPlaylistKey === 'history_rank') {
         renderSongListDOM(); 
     }
@@ -239,12 +242,52 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const titleEl = document.getElementById("songTitle");
   
-  // 原始歌单容器
-  const songListEl = document.getElementById("playlist"); 
-  
-  // [变量] 真正的歌单列表容器 (滚动区域)
-  let realSongListEl = null; 
-  let searchInputEl = null;
+  // 🔥 歌单容器 & 动态结构调整
+  const originalPlaylistEl = document.getElementById("playlist"); 
+  let playlistScrollArea = null;
+  let searchInput = null;
+
+  /* --- 动态重构播放列表结构以支持置顶搜索栏 --- */
+  if (originalPlaylistEl && !originalPlaylistEl.querySelector('.playlist-scroll-area')) {
+      // 1. 清空原内容（通常是空的，或者是预渲染的）
+      originalPlaylistEl.innerHTML = '';
+      
+      // 2. 创建搜索栏
+      const searchContainer = document.createElement('div');
+      searchContainer.className = 'playlist-search-bar';
+      searchContainer.innerHTML = `
+          ${ICONS.search}
+          <input type="text" placeholder="搜索歌曲..." spellcheck="false">
+      `;
+      searchInput = searchContainer.querySelector('input');
+      
+      // 3. 创建滚动区域
+      playlistScrollArea = document.createElement('div');
+      playlistScrollArea.className = 'playlist-scroll-area';
+      
+      // 4. 组装
+      originalPlaylistEl.appendChild(searchContainer);
+      originalPlaylistEl.appendChild(playlistScrollArea);
+      
+      // 5. 绑定搜索事件
+      searchInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim().toLowerCase();
+          if (val) {
+             const results = allSongsLibrary.filter(s => 
+                s.title.toLowerCase().includes(val) || 
+                (s.artist && s.artist.toLowerCase().includes(val))
+             );
+             renderSearchResults(results);
+          } else {
+             renderSongListDOM(); // 恢复当前歌单显示
+          }
+      });
+      // 阻止搜索框点击冒泡，防止触发歌单关闭
+      searchInput.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  // 使用新的滚动区域作为列表渲染目标，如果不存在则回退到原元素
+  const songListTarget = playlistScrollArea || originalPlaylistEl;
 
   const playlistMenuEl = document.getElementById("playlistMenu");
   const modeBtn = document.getElementById("modeBtn");
@@ -264,79 +307,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initIcons();
 
-  /* =========================================================
-     🔥 [UI重构] 初始化歌单结构 (单框设计)
-     ========================================================= */
-  function initPlaylistStructure() {
-    if (!songListEl) return;
-    
-    // 如果已经初始化过，更新引用即可
-    if (document.getElementById("realSongListContainer")) {
-        realSongListEl = document.getElementById("realSongListContainer");
-        searchInputEl = songListEl.querySelector(".search-input");
-        return;
-    }
-
-    songListEl.innerHTML = '';
-
-    // 1. 创建搜索框容器
-    const searchBox = document.createElement("div");
-    searchBox.className = "search-container";
-    
-    searchBox.innerHTML = `
-      <div class="search-icon-pos">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      </div>
-      <input type="text" class="search-input" placeholder="Search..." autocomplete="off">
-    `;
-    songListEl.appendChild(searchBox);
-
-    // 2. 创建真正的歌曲列表区域
-    realSongListEl = document.createElement("div");
-    realSongListEl.id = "realSongListContainer";
-    songListEl.appendChild(realSongListEl);
-
-    // 3. 绑定全局搜索逻辑
-    searchInputEl = searchBox.querySelector("input");
-    searchInputEl.addEventListener("input", (e) => {
-        const keyword = e.target.value.toLowerCase().trim();
-        
-        if (!keyword) {
-            renderSongListDOM();
-            return;
-        }
-
-        const results = (window.allSongsLibrary || []).filter(s => 
-            s.title.toLowerCase().includes(keyword) || 
-            (s.artist && s.artist.toLowerCase().includes(keyword))
-        );
-
-        if (results.length === 0) {
-            realSongListEl.innerHTML = `<div class="search-empty-tip">未找到 "${keyword}" 相关歌曲</div>`;
-        } else {
-            realSongListEl.innerHTML = results.map(s => {
-                const globalIndex = window.allSongsLibrary.findIndex(item => item.title === s.title);
-                let categoryName = playlistsConfig.find(c => c.key === s.category)?.name || "单曲";
-                
-                return `
-                <div class="playlist-item search-result-item" data-global-index="${globalIndex}">
-                     <div style="overflow:hidden; flex:1;">
-                        <div class="song-name">${s.title}</div>
-                        <div style="font-size:0.75em; opacity:0.6; margin-top:2px;">${categoryName} - ${s.artist || 'Unknown'}</div>
-                    </div>
-                </div>
-                `;
-            }).join("");
-        }
-    });
-    
-    // 防止点击输入框关闭菜单
-    searchInputEl.addEventListener("click", (e) => e.stopPropagation());
-  }
-
-  // 立即初始化结构
-  initPlaylistStructure();
-
   function updateHeartStatus() {
       if (!currentList || !currentList[currentIndex]) return;
       const currentTitle = currentList[currentIndex].title;
@@ -349,14 +319,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateCover(song) {
       const coverUrl = song.cover || ''; 
-      if (currentCoverEl) {
-          if (coverUrl) currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          else currentCoverEl.style.backgroundImage = ''; 
-      }
-      if (backCoverEl) {
-          if (coverUrl) backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          else backCoverEl.style.backgroundImage = '';
-      }
+      if (currentCoverEl) currentCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
+      if (backCoverEl) backCoverEl.style.backgroundImage = coverUrl ? `url('${coverUrl}')` : '';
   }
 
   function parseLRC(lrcText) {
@@ -409,11 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch(song.lrc);
           if (response.ok) {
               const lrcText = await response.text();
-              try {
-                  localStorage.setItem(localCacheKey, lrcText);
-              } catch (storageErr) {
-                  console.warn("歌词缓存失败(空间已满):", storageErr);
-              }
+              try { localStorage.setItem(localCacheKey, lrcText); } catch(e){}
               currentLyrics = parseLRC(lrcText);
               if (currentLyrics.length > 0) hasLyrics = true;
           }
@@ -454,7 +414,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!forceUpdate && currentHTML === textToShow) return; 
 
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
-      
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
@@ -462,14 +421,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (textWidth > containerWidth) {
           const duration = (textWidth / 50) + 1.5; 
           const offset = containerWidth - textWidth - 20;
-
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
-          
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
-          
           titleEl.style.textAlign = 'left'; 
       } else {
           innerSpan.classList.remove('scrolling');
@@ -512,7 +468,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (playMode === 1) audio.loop = true;
     else audio.loop = false;
     
-    renderSongListDOM(); 
+    // 如果是搜索状态下切歌，需要刷新列表以高亮当前歌曲（如果还在搜索结果中）
+    if (!searchInput || !searchInput.value) {
+        renderSongListDOM(); 
+    } else {
+        // 如果正在搜索，可能需要重绘搜索结果来高亮，或者不做操作
+        // 这里选择不做操作，保持搜索结果显示
+    }
+    
     updateMediaSession(song);
     updateHeartStatus();
 
@@ -539,10 +502,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playNext(isAuto = false) {
     let nextIndex;
+    
     if (playMode === 1 && isAuto) { 
       if (audio.paused) audio.play(); 
       return; 
     } 
+
     if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
@@ -563,34 +528,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleMenu(el) {
-    if (el.classList.contains("show")) hideMenu(el);
-    else {
+    if (el.classList.contains("show")) {
+      hideMenu(el);
+    } else {
       el.classList.remove("hide");
       el.classList.add("show");
+      
+      // 当打开列表时，如果是歌单列表，滚动到当前播放歌曲位置
+      if (el === originalPlaylistEl) {
+           setTimeout(() => {
+               const activeItem = songListTarget.querySelector('.playlist-item.active');
+               if (activeItem) {
+                   activeItem.scrollIntoView({ block: "center", behavior: "smooth" });
+               }
+           }, 300);
+      }
     }
   }
   function hideMenu(el) {
     if (el && el.classList.contains("show")) {
         el.classList.remove("show");
         el.classList.add("hide");
+        // 关闭时清空搜索
+        if (el === originalPlaylistEl && searchInput) {
+            searchInput.value = '';
+            renderSongListDOM();
+        }
     }
   }
 
-  /* =========================================================
-     [修复] 渲染列表 (针对新容器 #realSongListContainer)
-     ========================================================= */
+  // 🔥 正常列表渲染
   function renderSongListDOM() {
-    if (!realSongListEl) initPlaylistStructure();
-    if (!realSongListEl) return;
-
-    // 如果搜索框里有内容，触发搜索逻辑而不是渲染普通列表
-    const isSearching = searchInputEl && searchInputEl.value.trim() !== "";
-    if (isSearching) {
-        searchInputEl.dispatchEvent(new Event('input'));
-        return;
-    }
-
-    realSongListEl.innerHTML = currentList.map((s, i) => {
+    if (!songListTarget) return;
+    songListTarget.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
       let countHtml = '';
       if (currentPlaylistKey === 'history_rank') {
@@ -604,74 +574,89 @@ document.addEventListener("DOMContentLoaded", () => {
     `}).join("");
   }
 
+  // 🔥 搜索结果渲染
+  function renderSearchResults(results) {
+      if (!songListTarget) return;
+      if (results.length === 0) {
+          songListTarget.innerHTML = `<div style="padding:15px;text-align:center;color:#cdbaff;opacity:0.6;font-size:0.9rem">未找到相关歌曲</div>`;
+          return;
+      }
+      
+      songListTarget.innerHTML = results.map((s) => `
+        <div class="playlist-item search-result-item" data-title="${s.title}">
+          <span class="song-name">${s.title}</span>
+          <span style="font-size:0.8rem;opacity:0.6">${s.artist || ''}</span>
+        </div>
+      `).join("");
+  }
+
   titleEl.addEventListener("click", (e) => {
     e.stopPropagation();
     if (player.classList.contains("flipped")) return; 
     hideMenu(playlistMenuEl); 
-    toggleMenu(songListEl);
+    toggleMenu(originalPlaylistEl);
   });
 
-  /* =========================================================
-     🔥 [核心修复] 列表点击与智能跳转
-     ========================================================= */
-  songListEl.addEventListener("click", e => {
+  // 🔥 列表点击代理 (处理普通列表点击 和 搜索结果点击)
+  songListTarget.addEventListener("click", e => {
     const item = e.target.closest(".playlist-item");
     if (!item) return;
 
-    // --- 搜索结果点击 ---
-    if (item.classList.contains("search-result-item")) {
-        const globalIndex = parseInt(item.dataset.globalIndex);
-        const targetSong = window.allSongsLibrary[globalIndex];
-
-        // 1. 判断所属歌单
-        let targetPlaylistKey = 'All songs';
-        if (targetSong.category) {
-            const hasCategoryConfig = playlistsConfig.some(c => c.key === targetSong.category);
-            if (hasCategoryConfig) targetPlaylistKey = targetSong.category;
-        }
-
-        // 2. 切换歌单 (参数true = 不要重置播放)
-        changePlaylist(targetPlaylistKey, true); 
+    // A. 如果是搜索结果
+    if (item.classList.contains('search-result-item')) {
+        const title = item.dataset.title;
+        const songObj = allSongsLibrary.find(s => s.title === title);
         
-        // 3. 在新歌单里找这首歌
-        let newIndex = currentList.findIndex(s => s.title === targetSong.title);
-        
-        // 兜底：如果目标分类里找不到，切回 All songs
-        if (newIndex === -1 && targetPlaylistKey !== 'All songs') {
-             changePlaylist('All songs', true);
-             newIndex = currentList.findIndex(s => s.title === targetSong.title);
-        }
-
-        if (newIndex !== -1) {
-            loadSong(newIndex); 
-            audio.play().catch(e => console.log("Play failed:", e));
-            playPauseBtn.innerHTML = ICONS.pause;
-            playPauseBtn.classList.add("playing");
-            player.classList.add("playing");
-            if(currentCoverEl) currentCoverEl.classList.add("playing");
+        if (songObj) {
+            // 1. 获取歌曲的分类
+            const targetCategory = songObj.category;
+            // 2. 尝试找到对应的歌单 key
+            let targetPlaylistKey = 'All songs'; // 默认回退
             
-            // 4. 清空搜索并滚动
-            if(searchInputEl) {
-                 searchInputEl.value = "";
-                 renderSongListDOM(); // 强制重绘回正常列表
-                 
-                 setTimeout(() => {
-                     const activeItem = realSongListEl.querySelector(`.playlist-item[data-index="${newIndex}"]`);
-                     if(activeItem) {
-                         activeItem.scrollIntoView({block: "center", behavior: "smooth"});
-                     }
-                 }, 150);
+            // 查找是否有匹配该 category 的歌单配置
+            const configMatch = playlistsConfig.find(p => p.filter(songObj) && p.key !== 'All songs' && p.key !== 'history_rank');
+            
+            if (configMatch) {
+                targetPlaylistKey = configMatch.key;
+            } else if (songObj.category === 'piano') {
+                targetPlaylistKey = 'piano';
+            }
+
+            // 3. 切换歌单
+            changePlaylist(targetPlaylistKey);
+
+            // 4. 在新歌单中找到该歌曲的索引
+            const newIndex = currentList.findIndex(s => s.title === songObj.title);
+            
+            if (newIndex !== -1) {
+                loadSong(newIndex);
+                audio.play().catch(e => console.log("Play failed:", e));
+                playPauseBtn.innerHTML = ICONS.pause;
+                playPauseBtn.classList.add("playing");
+                if(currentCoverEl) currentCoverEl.classList.add("playing");
+                
+                // 清空搜索并关闭列表 (可选，如果你想保留列表打开则注释掉 hideMenu)
+                if (searchInput) searchInput.value = '';
+                // hideMenu(originalPlaylistEl); 
+                // 或者重新渲染列表以显示高亮
+                renderSongListDOM();
+                setTimeout(() => {
+                    const activeItem = songListTarget.querySelector('.playlist-item.active');
+                    if (activeItem) activeItem.scrollIntoView({ block: "center" });
+                }, 100);
             }
         }
-
-    } else {
-        // --- 普通点击 ---
-        loadSong(parseInt(item.dataset.index));
-        audio.play().catch(e => console.log("Play failed:", e));
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        player.classList.add("playing");
-        if(currentCoverEl) currentCoverEl.classList.add("playing");
+    } 
+    // B. 如果是普通播放列表项
+    else {
+        const indexStr = item.dataset.index;
+        if (indexStr !== undefined) {
+          loadSong(parseInt(indexStr));
+          audio.play().catch(e => console.log("Play failed:", e));
+          playPauseBtn.innerHTML = ICONS.pause;
+          playPauseBtn.classList.add("playing");
+          if(currentCoverEl) currentCoverEl.classList.add("playing");
+        }
     }
   });
 
@@ -686,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playlistTitleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    hideMenu(songListEl); 
+    hideMenu(originalPlaylistEl); 
     toggleMenu(playlistMenuEl);
   });
 
@@ -701,18 +686,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* =========================================================
-     [修改] 切换歌单逻辑 (支持搜索跳转不打断)
-     ========================================================= */
-  function changePlaylist(key, isJumpFromSearch = false) {
+  function changePlaylist(key) {
     const config = playlistsConfig.find(c => c.key === key);
     if (!config) return;
-    
-    // 如果不是跳转模式，切换歌单时才清空搜索框
-    if (!isJumpFromSearch && searchInputEl) {
-        searchInputEl.value = "";
-    }
-
     currentPlaylistKey = key;
     playlistTitleBtn.textContent = config.name; 
     
@@ -727,39 +703,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     shuffleQueue = [];
+    currentIndex = 0;
     
-    // 正常切换逻辑：切到新歌单选中第0首
-    if (!isJumpFromSearch) {
-        currentIndex = 0;
-        if (currentList.length > 0) {
-            loadSong(0);
-            audio.play().catch(e => {});
-            playPauseBtn.innerHTML = ICONS.pause;
-            playPauseBtn.classList.add("playing");
-            player.classList.add("playing");
-            if(currentCoverEl) currentCoverEl.classList.add("playing");
+    if (currentList.length > 0) {
+        // 如果是自动跳转触发的，不需要立即 loadSong(0) 重置，由调用方处理 loadSong
+        // 但这里是通用切换函数，通常会重置到第一首。
+        // 为了配合搜索跳转，我们在搜索逻辑里手动 loadSong，这里仅更新列表数据
+        // 因此：如果是用户点击菜单切换 -> 需要 loadSong(0)
+        // 如果是代码调用 -> 我们通过标志位或检查 play 状态来决定？
+        // 简化逻辑：这里总是 loadSong(0)，搜索逻辑会在调用 changePlaylist 后立即覆盖 loadSong(targetIndex)
+        loadSong(0);
+        
+        // 注意：搜索跳转时会连续触发两次 loadSong，第二次会覆盖第一次，这是可接受的
+        
+        // audio.play()... 只有在用户显式点击菜单时才自动播放在这里可能不合适
+        // 保持原逻辑：
+        if (playPauseBtn.classList.contains("playing")) { 
+             audio.play().catch(e => console.warn("Autoplay blocked:", e));
         } else {
-            titleEl.textContent = "暂无数据";
-            if (realSongListEl) realSongListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>空空如也</div>";
+             // 如果原本是暂停的，切换歌单后是否自动播放？通常 UI 上是期望播放第一首的
+             // 这里为了搜索体验顺滑，暂时保持状态，搜索点击会强制 play
         }
-        renderSongListDOM();
+    } else {
+        titleEl.textContent = "暂无数据";
+        songListTarget.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
     }
-    
+
     renderPlaylistMenu();
+    renderSongListDOM();
   }
   renderPlaylistMenu();
 
+  /* ... 后续事件监听保持不变 ... */
   modeBtn.addEventListener('click', async (e) => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
     modeBtn.innerHTML = playModes[playMode].icon;
-    audio.loop = (playMode === 1);
+
+    if (playMode === 1) audio.loop = true;
+    else audio.loop = false;
 
     if (currentUser) {
         const userDocRef = doc(db, "users", currentUser.uid);
-        try {
-            await setDoc(userDocRef, { playMode: playMode }, { merge: true });
-        } catch (err) {}
+        try { await setDoc(userDocRef, { playMode: playMode }, { merge: true }); } catch (err) {}
     }
   });
 
@@ -786,6 +772,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
         else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
     } catch (err) {
+        console.error("操作失败", err);
         updateHeartStatus(); 
         alert("网络开小差了，同步失败");
     }
@@ -793,10 +780,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("click", e => {
     const inPlayer = player.contains(e.target);
-    const inSongList = songListEl && songListEl.contains(e.target);
+    const inSongList = originalPlaylistEl && originalPlaylistEl.contains(e.target);
     const inPlayListMenu = playlistMenuEl && playlistMenuEl.contains(e.target);
     if (!inPlayer && !inSongList && !inPlayListMenu) {
-      hideMenu(songListEl);
+      hideMenu(originalPlaylistEl);
       hideMenu(playlistMenuEl);
     }
   });
@@ -804,19 +791,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let isDrag = false;
   let pressTimer;
   const startPress = (e) => {
-    if (e.target.closest('button')) return; 
+    if (e.target.closest('button') || e.target.closest('input')) return; // 防止点输入框翻转
     isDrag = false;
     pressTimer = setTimeout(() => {
       if (!isDrag) {
         player.classList.toggle("flipped");
-        hideMenu(songListEl);
+        hideMenu(originalPlaylistEl);
         hideMenu(playlistMenuEl);
       }
     }, 300);
   };
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
-  
   player.addEventListener('mousedown', startPress);
   player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
@@ -830,7 +816,7 @@ document.addEventListener("DOMContentLoaded", () => {
     player.style.opacity = '0';
     player.style.transform = 'translate(-50%, 40px)'; 
     player.style.pointerEvents = 'none'; 
-    hideMenu(songListEl);
+    hideMenu(originalPlaylistEl);
     hideMenu(playlistMenuEl);
   }
   function showPlayerUI() {
@@ -908,6 +894,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(true); 
   });
 
+  /* --- timeupdate --- */
   let lastTimeForLoop = 0; 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
@@ -924,20 +911,16 @@ document.addEventListener("DOMContentLoaded", () => {
             updateTitleOrLyric(true); 
         }
     }
-
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
              if (now - lastCountTime > 2000) {
-                 if (currentList && currentList[currentIndex]) {
-                     recordPlayHistory(currentList[currentIndex].title);
-                 }
+                 if (currentList && currentList[currentIndex]) recordPlayHistory(currentList[currentIndex].title);
                  lastCountTime = now;
              }
         }
     }
     lastTimeForLoop = audio.currentTime; 
-    
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();
@@ -950,6 +933,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   resetTimer();
+  
   if(allSongsLibrary.length > 0) loadSong(0);
 
   /* =========================================================
@@ -1006,10 +990,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (emailSubmitBtn) {
     emailSubmitBtn.addEventListener("click", async () => {
       if(emailSubmitBtn.disabled || !window.isCaptchaVerified) return;
-
       const email = emailInput.value;
       const pass = passInput.value;
-      
       if (!email || !pass) { errorMsg.innerText = "请输入邮箱和密码"; return; }
       if (pass.length < 6) { errorMsg.innerText = "密码至少需要6位"; return; }
       errorMsg.innerText = "处理中...";
@@ -1085,7 +1067,8 @@ document.addEventListener("DOMContentLoaded", () => {
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
                  modeBtn.innerHTML = playModes[playMode].icon; 
-                 audio.loop = (playMode === 1);
+                 if (playMode === 1) audio.loop = true;
+                 else audio.loop = false;
              }
              
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
@@ -1157,6 +1140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof window.checkLoginButtonState === 'function') {
       window.checkLoginButtonState();
     }
-  }, 500);
+  }, 500); 
 
 });

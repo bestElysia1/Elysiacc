@@ -304,8 +304,8 @@
   transform-origin: 50% 100%;
   width: 260px;
   
-  /* --- 修复点 3：固定高度，防止搜索时框体抖动 --- */
-  height: 260px; /* 原为 max-height */
+  /* --- 修复点 3：固定高度，防止抖动 --- */
+  height: 260px; 
   
   padding: 10px 14px;
   border-radius: 16px;
@@ -315,7 +315,6 @@
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   
-  /* 改动：移除主容器的滚动，交给内部区域，以便 sticky 生效 */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -328,18 +327,17 @@
   will-change: transform, opacity;
 }
 
-/* --- 新增：内部滚动区域 --- */
+/* --- 内部滚动区域 --- */
 .playlist-scroll-area {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    /* 给滚动区域一点内边距，防止内容贴边 */
     margin: 0 -4px;
     padding: 0 4px;
     scrollbar-width: thin;
 }
 
-/* --- 新增：搜索栏样式 --- */
+/* --- 修复点 1：搜索栏样式 (去除边框，融合背景) --- */
 .playlist-search-bar {
   /* 核心：固定在顶部 */
   position: sticky;
@@ -351,16 +349,15 @@
   align-items: center;
   gap: 10px;
   
-  /* 保持与 playlist-item 一致的尺寸与外观 */
   padding: 6px 10px;
-  margin-bottom: 8px; /* 与下方列表的间距 */
+  margin-bottom: 8px; 
   border-radius: 8px;
   
-  /* --- 修复点 1：颜色改为白色磨砂，去除紫色，去除阴影 --- */
+  /* 融合背景，彻底移除边框 */
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: none;
   box-shadow: none;
 }
 
@@ -377,7 +374,7 @@
     background: transparent;
     outline: none;
     
-    /* --- 修复点 2：字体设为 16px，防止 iOS 自动放大页面 --- */
+    /* 修复点 2：16px 字体防止 iOS 放大 */
     font-size: 16px;
     
     color: #fff;
@@ -387,8 +384,9 @@
     min-width: 0;
 }
 
+/* --- 修复点：强制隐藏 Placeholder 提示文字 --- */
 .playlist-search-bar input::placeholder {
-    color: rgba(255, 255, 255, 0.5); /* 提示文字颜色淡化 */
+    color: transparent; 
 }
 
 /* 列表项通用样式 */
@@ -407,7 +405,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0; /* 防止被压缩 */
+  flex-shrink: 0; 
 }
 
 .playlist-item .song-name {

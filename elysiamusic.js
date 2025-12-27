@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version (Single Box UI & Smart Jump) */
+/* elysiamusic.js - Final Version (Single Box UI & Smart Jump Fix) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -47,13 +47,13 @@ const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager()
   })
 });
-console.log("[Firebase] Firestore 离线持久化已启用 (新版 API)");
+console.log("[Firebase] Firestore 离线持久化已启用");
 
 const provider = new GoogleAuthProvider();
 
 
 /* =========================================================
-   🔥 PART 1.5: 登录状态检查逻辑 (JS 部分)
+   🔥 PART 1.5: 登录状态检查逻辑
    ========================================================= */
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
@@ -96,7 +96,6 @@ window.checkLoginButtonState = function() {
 document.addEventListener("DOMContentLoaded", () => {
   
   const allSongsLibrary = window.allSongsLibrary || [];
-
   if (!window.allSongsLibrary) {
       console.error("严重错误：未找到歌单数据！请检查 song.js 是否在 elysiamusic.js 之前加载。");
   }
@@ -271,10 +270,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function initPlaylistStructure() {
     if (!songListEl) return;
     
-    // 如果已经初始化过，不再重复创建
+    // 如果已经初始化过，更新引用即可
     if (document.getElementById("realSongListContainer")) {
         realSongListEl = document.getElementById("realSongListContainer");
-        searchInputEl = document.querySelector(".search-input");
+        searchInputEl = songListEl.querySelector(".search-input");
         return;
     }
 
@@ -284,16 +283,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchBox = document.createElement("div");
     searchBox.className = "search-container";
     
-    // HTML 结构：图标绝对定位 + 输入框 (无 placeholder)
     searchBox.innerHTML = `
       <div class="search-icon-pos">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </div>
-      <input type="text" class="search-input" placeholder="" autocomplete="off">
+      <input type="text" class="search-input" placeholder="Search..." autocomplete="off">
     `;
     songListEl.appendChild(searchBox);
 
-    // 2. 创建真正的歌曲列表区域 (可滚动)
+    // 2. 创建真正的歌曲列表区域
     realSongListEl = document.createElement("div");
     realSongListEl.id = "realSongListContainer";
     songListEl.appendChild(realSongListEl);
@@ -303,30 +301,29 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInputEl.addEventListener("input", (e) => {
         const keyword = e.target.value.toLowerCase().trim();
         
-        // A. 如果清空了，恢复显示当前歌单
         if (!keyword) {
             renderSongListDOM();
             return;
         }
 
-        // B. 全局搜索
         const results = (window.allSongsLibrary || []).filter(s => 
             s.title.toLowerCase().includes(keyword) || 
             (s.artist && s.artist.toLowerCase().includes(keyword))
         );
 
-        // C. 渲染搜索结果
         if (results.length === 0) {
-            realSongListEl.innerHTML = `<div class="search-empty-tip">未找到相关歌曲</div>`;
+            realSongListEl.innerHTML = `<div class="search-empty-tip">未找到 "${keyword}" 相关歌曲</div>`;
         } else {
             realSongListEl.innerHTML = results.map(s => {
-                // 找到这首歌在全局库里的原始索引
                 const globalIndex = window.allSongsLibrary.findIndex(item => item.title === s.title);
-                let categoryName = playlistsConfig.find(c => c.key === s.category)?.name || "";
+                let categoryName = playlistsConfig.find(c => c.key === s.category)?.name || "单曲";
                 
                 return `
                 <div class="playlist-item search-result-item" data-global-index="${globalIndex}">
-                    <span class="song-name">${s.title} <span style="font-size:0.8em;opacity:0.6;margin-left:5px">${categoryName}</span></span>
+                     <div style="overflow:hidden; flex:1;">
+                        <div class="song-name">${s.title}</div>
+                        <div style="font-size:0.75em; opacity:0.6; margin-top:2px;">${categoryName} - ${s.artist || 'Unknown'}</div>
+                    </div>
                 </div>
                 `;
             }).join("");
@@ -339,7 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 立即初始化结构
   initPlaylistStructure();
-
 
   function updateHeartStatus() {
       if (!currentList || !currentList[currentIndex]) return;
@@ -399,7 +395,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const cachedLrc = localStorage.getItem(localCacheKey);
 
       if (cachedLrc) {
-          console.log(`[Elysia] 命中本地歌词缓存: ${song.title}`);
           currentLyrics = parseLRC(cachedLrc);
           if (currentLyrics.length > 0) hasLyrics = true;
           isLyricsLoading = false; 
@@ -417,7 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
               try {
                   localStorage.setItem(localCacheKey, lrcText);
               } catch (storageErr) {
-                  console.warn("歌词缓存失败(可能是空间已满):", storageErr);
+                  console.warn("歌词缓存失败(空间已满):", storageErr);
               }
               currentLyrics = parseLRC(lrcText);
               if (currentLyrics.length > 0) hasLyrics = true;
@@ -582,11 +577,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     [修正] 渲染列表 (针对新容器 #realSongListContainer)
+     [修复] 渲染列表 (针对新容器 #realSongListContainer)
      ========================================================= */
   function renderSongListDOM() {
     if (!realSongListEl) initPlaylistStructure();
     if (!realSongListEl) return;
+
+    // 如果搜索框里有内容，触发搜索逻辑而不是渲染普通列表
+    const isSearching = searchInputEl && searchInputEl.value.trim() !== "";
+    if (isSearching) {
+        searchInputEl.dispatchEvent(new Event('input'));
+        return;
+    }
 
     realSongListEl.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
@@ -600,11 +602,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ${countHtml}
       </div>
     `}).join("");
-
-    // 重新应用过滤（如果搜索框里有字）
-    if (searchInputEl && searchInputEl.value.trim() !== "") {
-        searchInputEl.dispatchEvent(new Event('input'));
-    }
   }
 
   titleEl.addEventListener("click", (e) => {
@@ -615,51 +612,49 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =========================================================
-     🔥 [优化] 列表点击事件 (支持智能跳转)
+     🔥 [核心修复] 列表点击与智能跳转
      ========================================================= */
   songListEl.addEventListener("click", e => {
-    // 1. 尝试获取点击项
     const item = e.target.closest(".playlist-item");
     if (!item) return;
 
-    // 2. 判断是否是“搜索结果”
+    // --- 搜索结果点击 ---
     if (item.classList.contains("search-result-item")) {
-        // --- 搜索模式下的点击 ---
         const globalIndex = parseInt(item.dataset.globalIndex);
         const targetSong = window.allSongsLibrary[globalIndex];
 
-        // A. 智能判断所属歌单
-        // 如果这首歌有 category，且我们在配置里能找到对应的 key，就切过去
-        // 否则切到 'All songs'
+        // 1. 判断所属歌单
         let targetPlaylistKey = 'All songs';
         if (targetSong.category) {
             const hasCategoryConfig = playlistsConfig.some(c => c.key === targetSong.category);
-            if (hasCategoryConfig) {
-                targetPlaylistKey = targetSong.category;
-            }
+            if (hasCategoryConfig) targetPlaylistKey = targetSong.category;
         }
 
-        // B. 切换歌单
-        changePlaylist(targetPlaylistKey); 
+        // 2. 切换歌单 (参数true = 不要重置播放)
+        changePlaylist(targetPlaylistKey, true); 
         
-        // C. 在新歌单里找到这首歌的索引
-        // changePlaylist 会更新 currentList，现在在 currentList 里找 title 匹配的
-        const newIndex = currentList.findIndex(s => s.title === targetSong.title);
+        // 3. 在新歌单里找这首歌
+        let newIndex = currentList.findIndex(s => s.title === targetSong.title);
         
+        // 兜底：如果目标分类里找不到，切回 All songs
+        if (newIndex === -1 && targetPlaylistKey !== 'All songs') {
+             changePlaylist('All songs', true);
+             newIndex = currentList.findIndex(s => s.title === targetSong.title);
+        }
+
         if (newIndex !== -1) {
             loadSong(newIndex); 
             audio.play().catch(e => console.log("Play failed:", e));
             playPauseBtn.innerHTML = ICONS.pause;
             playPauseBtn.classList.add("playing");
+            player.classList.add("playing");
             if(currentCoverEl) currentCoverEl.classList.add("playing");
             
-            // D. 清空搜索框并滚动到对应位置
+            // 4. 清空搜索并滚动
             if(searchInputEl) {
                  searchInputEl.value = "";
-                 // 强制重绘回正常列表
-                 renderSongListDOM();
+                 renderSongListDOM(); // 强制重绘回正常列表
                  
-                 // 滚动定位
                  setTimeout(() => {
                      const activeItem = realSongListEl.querySelector(`.playlist-item[data-index="${newIndex}"]`);
                      if(activeItem) {
@@ -670,11 +665,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
     } else {
-        // --- 普通列表模式下的点击 ---
+        // --- 普通点击 ---
         loadSong(parseInt(item.dataset.index));
         audio.play().catch(e => console.log("Play failed:", e));
         playPauseBtn.innerHTML = ICONS.pause;
         playPauseBtn.classList.add("playing");
+        player.classList.add("playing");
         if(currentCoverEl) currentCoverEl.classList.add("playing");
     }
   });
@@ -706,14 +702,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     [修改] 切换歌单逻辑 (清空搜索框)
+     [修改] 切换歌单逻辑 (支持搜索跳转不打断)
      ========================================================= */
-  function changePlaylist(key) {
+  function changePlaylist(key, isJumpFromSearch = false) {
     const config = playlistsConfig.find(c => c.key === key);
     if (!config) return;
     
-    // 切换时清空搜索
-    if (searchInputEl) searchInputEl.value = "";
+    // 如果不是跳转模式，切换歌单时才清空搜索框
+    if (!isJumpFromSearch && searchInputEl) {
+        searchInputEl.value = "";
+    }
 
     currentPlaylistKey = key;
     playlistTitleBtn.textContent = config.name; 
@@ -729,25 +727,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     shuffleQueue = [];
-    currentIndex = 0;
     
-    if (currentList.length > 0) {
-        // 注意：切换歌单默认选中第一首
-        loadSong(0);
-        audio.play().catch(e => console.warn("Autoplay blocked:", e));
-        playPauseBtn.innerHTML = ICONS.pause;
-        playPauseBtn.classList.add("playing");
-        player.classList.add("playing");
-        if(currentCoverEl) currentCoverEl.classList.add("playing");
-    } else {
-        titleEl.textContent = "暂无数据";
-        if (realSongListEl) {
-             realSongListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
+    // 正常切换逻辑：切到新歌单选中第0首
+    if (!isJumpFromSearch) {
+        currentIndex = 0;
+        if (currentList.length > 0) {
+            loadSong(0);
+            audio.play().catch(e => {});
+            playPauseBtn.innerHTML = ICONS.pause;
+            playPauseBtn.classList.add("playing");
+            player.classList.add("playing");
+            if(currentCoverEl) currentCoverEl.classList.add("playing");
+        } else {
+            titleEl.textContent = "暂无数据";
+            if (realSongListEl) realSongListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>空空如也</div>";
         }
+        renderSongListDOM();
     }
-
+    
     renderPlaylistMenu();
-    renderSongListDOM();
   }
   renderPlaylistMenu();
 
@@ -755,17 +753,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
     modeBtn.innerHTML = playModes[playMode].icon;
-
-    if (playMode === 1) audio.loop = true;
-    else audio.loop = false;
+    audio.loop = (playMode === 1);
 
     if (currentUser) {
         const userDocRef = doc(db, "users", currentUser.uid);
         try {
             await setDoc(userDocRef, { playMode: playMode }, { merge: true });
-        } catch (err) {
-            console.error("保存播放模式失败", err);
-        }
+        } catch (err) {}
     }
   });
 
@@ -792,7 +786,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isLiked) await updateDoc(userDocRef, { favorites: arrayRemove(songTitle) });
         else await updateDoc(userDocRef, { favorites: arrayUnion(songTitle) });
     } catch (err) {
-        console.error("操作失败", err);
         updateHeartStatus(); 
         alert("网络开小差了，同步失败");
     }
@@ -823,6 +816,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const cancelPress = () => clearTimeout(pressTimer);
   const onMove = () => { isDrag = true; clearTimeout(pressTimer); };
+  
   player.addEventListener('mousedown', startPress);
   player.addEventListener('touchstart', startPress, { passive: true });
   player.addEventListener('mouseup', cancelPress);
@@ -915,22 +909,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let lastTimeForLoop = 0; 
-
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
-        
         for (let i = 0; i < currentLyrics.length; i++) {
-            if (currentTime >= currentLyrics[i].time) {
-                activeIndex = i;
-            } else {
-                break; 
-            }
+            if (currentTime >= currentLyrics[i].time) activeIndex = i;
+            else break; 
         }
-
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
             updateTitleOrLyric(true); 
@@ -941,7 +929,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
              if (now - lastCountTime > 2000) {
-                 console.log("检测到单曲循环：播放次数 +1");
                  if (currentList && currentList[currentIndex]) {
                      recordPlayHistory(currentList[currentIndex].title);
                  }
@@ -959,9 +946,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'hidden') {
-        savePlaybackState();
-    }
+    if (document.visibilityState === 'hidden') savePlaybackState();
   });
 
   resetTimer();
@@ -1003,7 +988,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (window.turnstile) {
         try { window.turnstile.reset(); } 
-        catch(e) { /* Fallback */ }
+        catch(e) {}
       }
       window.isCaptchaVerified = false; 
       if(window.checkLoginButtonState) window.checkLoginButtonState();
@@ -1031,7 +1016,6 @@ document.addEventListener("DOMContentLoaded", () => {
       
       try {
         await setPersistence(auth, browserLocalPersistence);
-        
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const defaultName = email.split("@")[0];
         await updateProfile(userCredential.user, {
@@ -1101,9 +1085,7 @@ document.addEventListener("DOMContentLoaded", () => {
              if (data.playMode !== undefined) {
                  playMode = data.playMode; 
                  modeBtn.innerHTML = playModes[playMode].icon; 
-                 
-                 if (playMode === 1) audio.loop = true;
-                 else audio.loop = false;
+                 audio.loop = (playMode === 1);
              }
              
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
@@ -1152,9 +1134,7 @@ document.addEventListener("DOMContentLoaded", () => {
          }
          updatePlaylistConfig();
          updateHeartStatus();
-         if (currentPlaylistKey === 'history_rank') {
-            renderSongListDOM();
-         }
+         if (currentPlaylistKey === 'history_rank') renderSongListDOM();
       });
     } else {
       if (navAuthText) navAuthText.innerText = "登录 / 同步";

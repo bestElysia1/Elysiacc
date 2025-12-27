@@ -1,4 +1,4 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final Fixed Version) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Custom Size: 332x50) */
 
 /* =========================================
    1. 基础容器
@@ -27,7 +27,7 @@
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  /* --- 核心防掉帧/防乱动代码 --- */
+  /* 核心防掉帧/防乱动代码 */
   will-change: transform;
   transform: translateX(-50%) translateZ(0); 
 }
@@ -135,6 +135,7 @@
 .album-cover {
   width: 40px;  
   height: 40px;
+  
   border-radius: 8px; 
   background-color: rgba(255,255,255,0.1);
   background-size: cover;
@@ -162,6 +163,11 @@
   font-size: 20px;
 }
 
+@keyframes spinCover {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* =========================================
    4. 控件按钮 (靠右)
    ========================================= */
@@ -178,13 +184,16 @@
   width: 36px; 
   height: 36px; 
   border-radius: 50%;
+  
   background: rgba(255, 255, 255, 0.1); 
   border: none; 
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+  
   color: #cdbaff; 
   cursor: pointer; 
   transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1); 
   backdrop-filter: blur(8px);
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,7 +237,7 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 标题与歌词 (中间自适应) --- */
+/* --- 统一标题与歌词样式 (中间自适应) --- */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
@@ -285,7 +294,7 @@
 }
 
 /* =========================================
-   5. 播放列表容器 (修复滚动 & 还原通透UI)
+   5. 播放列表 & 歌单菜单
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -294,130 +303,105 @@
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   width: 260px;
+  max-height: 260px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,240,255,0.25);
+  border: 1px solid rgba(255,210,255,0.35);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   
-  /* --- [关键] 必须有固定高度 --- */
-  height: 300px; 
-  
-  padding: 15px; /* 增加内边距 */
-  border-radius: 20px;
-  
-  /* --- [UI修复] 降低背景浓度，减弱边框，还原通透感 --- */
-  background: rgba(230, 220, 255, 0.15); /* 更淡的背景 */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* 极细微的边框 */
-  
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15); /* 用阴影代替边框 */
-  
+  /* 改动：移除主容器的滚动，交给内部区域，以便 sticky 生效 */
   display: flex;
   flex-direction: column;
-  
+  overflow: hidden;
+
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
   opacity: 0; 
   pointer-events: none;
   z-index: 9998;
   will-change: transform, opacity;
 }
 
-/* 列表背景光效 */
-.elysia-playlist::after {
-  content: ""; 
-  position: absolute; 
-  inset: 0; 
-  border-radius: 20px;
-  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.2), transparent 50%);
-  opacity: 0; 
-  pointer-events: none; 
-  transition: opacity .6s ease;
-  z-index: -1;
-}
-.elysia-playlist.show::after { opacity: 1; }
-
-/* =========================================
-   6. [UI重构] 极简无边框搜索栏
-   ========================================= */
-.search-container {
-  position: relative; 
-  z-index: 20; 
-  width: 100%;
-  flex-shrink: 0; 
-  margin-bottom: 12px;
+/* --- 新增：内部滚动区域 --- */
+.playlist-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 给滚动区域一点内边距，防止内容贴边 */
+    margin: 0 -4px;
+    padding: 0 4px;
+    scrollbar-width: thin;
 }
 
-.search-icon-pos {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 15px;
-  height: 15px;
-  pointer-events: none; 
-  color: rgba(255,255,255,0.7);
-  z-index: 22;
-}
-.search-icon-pos svg {
-  width: 100%;
-  height: 100%;
-  fill: currentColor;
-}
+/* --- 新增：搜索栏样式 --- */
+.playlist-search-bar {
+  /* 核心：固定在顶部 */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
 
-/* --- [UI修复] 输入框去边框化，融入背景 --- */
-.search-input {
-  width: 100%;
-  height: 36px;
-  padding: 0 12px 0 34px; 
-  border-radius: 12px; 
+  display: flex;
+  align-items: center;
+  gap: 10px;
   
-  /* 几乎透明的背景和极淡的边框 */
-  background: rgba(0, 0, 0, 0.05); 
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  /* 保持与 playlist-item 一致的尺寸与外观 */
+  padding: 6px 10px;
+  margin-bottom: 8px; /* 与下方列表的间距 */
+  border-radius: 8px;
   
-  color: #fff;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  -webkit-appearance: none;
+  /* 更强的背景模糊，防止下方文字透出来太乱 */
+  background: rgba(160, 120, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.search-input:focus {
-  background: rgba(0, 0, 0, 0.15);
-  border-color: rgba(255, 255, 255, 0.15);
+.playlist-search-bar svg {
+    width: 18px;
+    height: 18px;
+    fill: #cdbaff;
+    flex-shrink: 0;
 }
 
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4); 
+.playlist-search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.9rem;
+    color: #fff;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
 }
 
-/* =========================================
-   [关键修复] 滚动列表容器
-   ========================================= */
-#realSongListContainer {
-  flex: 1; 
-  width: 100%;
-  
-  /* --- 🔥 核心修复：min-height: 0 解决 flex 子元素不滚动的问题 --- */
-  min-height: 0; 
-  
-  overflow-y: auto; 
-  overflow-x: hidden;
-  padding-right: 4px; /* 给滚动条留空隙 */
-  
-  /* iOS 惯性滚动 */
-  -webkit-overflow-scrolling: touch; 
+.playlist-search-bar input::placeholder {
+    color: rgba(205, 186, 255, 0.7);
 }
 
-/* 列表项样式优化 */
+/* 列表项通用样式 */
 .playlist-item {
   display: flex;
   justify-content: space-between; 
   align-items: center;
-  padding: 8px 10px;
-  margin-bottom: 2px;
-  color: rgba(255, 255, 255, 0.75); 
+  gap: 10px; 
+  padding: 6px 10px;
+  color: #cdbaff; 
   font-size: 0.9rem;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 .playlist-item .song-name {
@@ -425,40 +409,62 @@
   white-space: nowrap;    
   overflow: hidden;       
   text-overflow: ellipsis;
+  text-align: left;
 }
 
 .play-count-tag {
-  font-size: 0.8em;       
-  color: rgba(255, 255, 255, 0.5);         
+  flex-shrink: 0;         
+  font-size: 0.9em;       
+  font-family: monospace, sans-serif; 
+  color: #cdbaff;         
+  transition: color 0.2s; 
 }
 
 .playlist-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgba(160, 120, 255, 0.15);
+  color: #ffffff;
 }
-.playlist-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255,255,255,0.4);
+.playlist-item:hover .play-count-tag,
+.playlist-item.active .play-count-tag {
+  color: #ffffff;
 }
 
-/* --- 极简滚动条 --- */
-#realSongListContainer::-webkit-scrollbar { width: 3px; }
-#realSongListContainer::-webkit-scrollbar-track { background: transparent; }
-#realSongListContainer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+.playlist-item.active {
+  background: rgba(160, 120, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(160, 120, 255, 0.6);
+  animation: softPulse 3s ease-in-out infinite;
+}
+
+.elysia-playlist::after {
+  content: ""; 
+  position: absolute; 
+  inset: 0; 
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, rgba(220,190,255,0.45), rgba(200,160,255,0.18) 45%, transparent 65%);
+  opacity: 0; 
+  transform: scale(0.8); 
+  pointer-events: none; 
+  transition: opacity .6s ease, transform .6s ease;
+  z-index: -1;
+}
+
+.elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
+.elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
 /* =========================================
-   7. 动画与交互类
+   6. 动画
    ========================================= */
 .elysia-playlist.show {
   opacity: 1; 
   pointer-events: auto;
   animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: 50% 100%;
 }
 .elysia-playlist.hide {
   animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
 }
-
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
@@ -466,6 +472,45 @@
 }
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
-  100% { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
+  35%  { transform: translateX(-50%) scale(1.02); }
+  100% { transform: translateX(-50%) scale(0.8) translateY(10px); opacity: 0; }
+}
+@keyframes moveBlobs { 
+  0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
+  50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
+}
+@keyframes softPulse { 
+  0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
+  50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
 
+@keyframes elysiaFloat {
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0) translateZ(0); 
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-6px) translateZ(0); 
+  }
+}
+
+/* =========================================
+   7. 滚动条美化
+   ========================================= */
+.playlist-scroll-area::-webkit-scrollbar,
+.elysia-playlist::-webkit-scrollbar {
+  width: 4px;
+}
+.playlist-scroll-area::-webkit-scrollbar-track,
+.elysia-playlist::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.playlist-scroll-area::-webkit-scrollbar-thumb,
+.elysia-playlist::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+.playlist-scroll-area::-webkit-scrollbar-thumb:hover,
+.elysia-playlist::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.4);
+}

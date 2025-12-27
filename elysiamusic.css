@@ -1,12 +1,12 @@
-/* elysiamusic.css - Elysia Liquid Glass Player (Final Custom Size: 332x50) */
+/* elysiamusic.css - Elysia Liquid Glass Player (Final Complete Version) */
 
-/* =========================================
-   1. 基础容器
-   ========================================= */
+/* ==========================================================================
+   1. 基础容器 (Base Container)
+   ========================================================================== */
 .elysia-player {
   position: fixed;
   
-  /* --- 适配 iOS 底部安全区 --- */
+  /* --- 适配 iOS 底部安全区 (Safe Area) --- */
   bottom: 20px; 
   bottom: calc(20px + env(safe-area-inset-bottom)); 
   
@@ -20,21 +20,23 @@
   perspective: 1000px;
   background: transparent;
   
-  /* 动画引用 */
+  /* 悬浮动画 */
   animation: elysiaFloat 6s ease-in-out infinite;
   
+  /* 禁止选中文本 */
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  /* 核心防掉帧/防乱动代码 */
+  /* 核心性能优化：防掉帧/防抖动 */
   will-change: transform;
+  /* 强制开启 GPU 加速，并修正居中 */
   transform: translateX(-50%) translateZ(0); 
 }
 
-/* =========================================
-   2. 3D 骨架
-   ========================================= */
+/* ==========================================================================
+   2. 3D 骨架 (3D Card Structure)
+   ========================================================================== */
 .player-glass-card {
   position: relative;
   width: 100%;
@@ -43,10 +45,12 @@
   transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* 翻转状态 */
 .elysia-player.flipped .player-glass-card {
   transform: rotateX(180deg);
 }
 
+/* 按压微缩效果 */
 .elysia-player:active .player-glass-card {
   transform: scale(0.98);
 }
@@ -54,9 +58,9 @@
   transform: rotateX(180deg) scale(0.98);
 }
 
-/* =========================================
-   3. 前后两面 (Face Layout)
-   ========================================= */
+/* ==========================================================================
+   3. 前后两面布局 (Face Layout)
+   ========================================================================== */
 .player-face {
   position: absolute;
   inset: 0;
@@ -68,6 +72,7 @@
   gap: 0px;
   border-radius: 16px;
 
+  /* 动态全息流光背景 */
   background: linear-gradient(120deg, 
       rgba(255,255,255,0.08) 0%,   
       rgba(255,255,255,0.08) 35%,  
@@ -80,6 +85,7 @@
   
   transition: background-position 0.6s ease; 
 
+  /* 玻璃拟态核心 */
   border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
@@ -108,10 +114,11 @@
   pointer-events: auto;
 }
 
+/* 翻转时的交互屏蔽 */
 .elysia-player.flipped .face-front { pointer-events: none !important; }
 .elysia-player.flipped .face-back { pointer-events: auto !important; }
 
-/* 内部流动的液态光斑 */
+/* 内部流动的液态光斑 (Blobs) */
 .player-glass-card::before {
   content: "";
   position: absolute;
@@ -129,9 +136,9 @@
   z-index: -1; 
 }
 
-/* =========================================
-   歌曲封面缩略图样式 (左侧)
-   ========================================= */
+/* ==========================================================================
+   4. 歌曲封面缩略图 (Album Cover)
+   ========================================================================== */
 .album-cover {
   width: 40px;  
   height: 40px;
@@ -168,9 +175,9 @@
   to { transform: rotate(360deg); }
 }
 
-/* =========================================
-   4. 控件按钮 (靠右)
-   ========================================= */
+/* ==========================================================================
+   5. 控件按钮区域 (Controls)
+   ========================================================================== */
 .elysia-controls { 
   display: flex; 
   gap: 10px; 
@@ -210,10 +217,12 @@
   transition: transform 0.2s;
 }
 
+/* 播放按钮微调 */
 #playPauseBtn:not(.playing) svg {
   margin-left: 2px;
 }
 
+/* 按钮悬停态 */
 .elysia-controls button:hover,
 .control-btn:hover { 
   background: rgba(255, 255, 255, 0.2);
@@ -221,11 +230,13 @@
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
 }
 
+/* 按钮点击态 */
 .elysia-controls button:active {
   transform: scale(0.92);
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* 喜欢按钮动画 */
 #heartBtn.liked {
   color: #ff6b81; 
   animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -237,7 +248,9 @@
   100% { transform: scale(1.05); }
 }
 
-/* --- 统一标题与歌词样式 (中间自适应) --- */
+/* ==========================================================================
+   6. 标题与歌词 (Title & Lyrics)
+   ========================================================================== */
 #songTitle,
 #playlistTitleBtn {
   color: #cdbaff; 
@@ -259,6 +272,7 @@
   cursor: pointer;
   transition: color 0.3s ease;
   
+  /* 文本两端渐隐遮罩 */
   mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 90%, transparent 100%);
 }
@@ -268,7 +282,7 @@
   text-shadow: none;
 }
 
-/* --- 歌词滚动动画 --- */
+/* 歌词滚动容器 */
 .scroll-inner {
   display: inline-block;
   padding-left: 0;
@@ -293,22 +307,24 @@
   white-space: nowrap; 
 }
 
-/* =========================================
-   5. 播放列表 & 歌单菜单
-   ========================================= */
+/* ==========================================================================
+   7. 播放列表 & 歌单菜单容器 (Playlist & Menu)
+   ========================================================================== */
 .elysia-playlist {
   position: fixed;
   bottom: 80px; 
   left: 50%;
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
-  width: 260px;
   
-  /* --- 修复点 3：固定高度，防止抖动 --- */
-  height: 260px; 
+  width: 260px;
+  /* 修复：固定高度，防止搜索时高度塌陷 */
+  height: 260px;
   
   padding: 10px 14px;
   border-radius: 16px;
+  
+  /* 背景与边框 */
   background: rgba(255,240,255,0.25);
   border: 1px solid rgba(255,210,255,0.35);
   backdrop-filter: blur(12px) saturate(180%);
@@ -317,17 +333,39 @@
   
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+
+  /* 🔥 修复点 1：允许容器自身滚动 */
+  /* 这样 id="playlistMenu" 这种直接放子元素的列表就能上下滑动了 */
+  overflow-y: auto; 
+  overflow-x: hidden;
 
   touch-action: pan-y;
   overscroll-behavior-x: none;
+  
   opacity: 0; 
   pointer-events: none;
   z-index: 9998;
   will-change: transform, opacity;
+  
+  /* 定义滚动条 */
+  scrollbar-width: thin;
 }
 
-/* --- 内部滚动区域 --- */
+/* 展开与收起状态 */
+.elysia-playlist.show {
+  opacity: 1; 
+  pointer-events: auto;
+  animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: 50% 100%;
+}
+
+.elysia-playlist.hide {
+  animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
+  transform-origin: 50% 100%;
+}
+
+/* --- 内部滚动区域 (用于 id="playlist" 歌曲列表) --- */
+/* 当存在搜索栏时，歌曲在这个区域内滚动 */
 .playlist-scroll-area {
     flex: 1;
     overflow-y: auto;
@@ -337,9 +375,11 @@
     scrollbar-width: thin;
 }
 
-/* --- 修复点 1：搜索栏样式 (去除边框，融合背景) --- */
+/* ==========================================================================
+   8. 搜索栏 (Search Bar) - 🔥 核心 UI 修复区
+   ========================================================================== */
 .playlist-search-bar {
-  /* 核心：固定在顶部 */
+  /* 粘性定位：确保滚动时始终在顶部 */
   position: sticky;
   top: 0;
   z-index: 10;
@@ -353,14 +393,19 @@
   margin-bottom: 8px; 
   border-radius: 8px;
   
-  /* 融合背景，彻底移除边框 */
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* 🔥 修复点 2：背景改为透明，完全融合大背景 */
+  background: transparent; 
+  backdrop-filter: none; /* 不需要二次模糊 */
+  
+  /* 移除原本的边框，防止色差边框出现 */
   border: none;
   box-shadow: none;
+  
+  /* 可选：加一条极细的底线区分头部，不想要可删 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15); 
 }
 
+/* 搜索图标 */
 .playlist-search-bar svg {
     width: 18px;
     height: 18px;
@@ -368,28 +413,33 @@
     flex-shrink: 0;
 }
 
+/* 输入框本体 */
 .playlist-search-bar input {
     flex: 1;
     border: none;
     background: transparent;
     outline: none;
     
-    /* 修复点 2：16px 字体防止 iOS 放大 */
+    /* 强制 16px 防止 iOS 聚焦时页面放大 */
     font-size: 16px;
     
+    /* 输入文字颜色与歌曲名统一 */
     color: #cdbaff;
+    
     font-family: inherit;
     padding: 0;
     margin: 0;
     min-width: 0;
 }
 
-/* --- 修复点：强制隐藏 Placeholder 提示文字 --- */
+/* 彻底隐藏 Placeholder 提示字 */
 .playlist-search-bar input::placeholder {
     color: transparent; 
 }
 
-/* 列表项通用样式 */
+/* ==========================================================================
+   9. 列表单项 (Playlist Items)
+   ========================================================================== */
 .playlist-item {
   display: flex;
   justify-content: space-between; 
@@ -405,9 +455,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0; 
+  flex-shrink: 0; /* 防止挤压 */
 }
 
+/* 歌曲名 */
 .playlist-item .song-name {
   flex: 1;               
   white-space: nowrap;    
@@ -416,6 +467,7 @@
   text-align: left;
 }
 
+/* 播放次数标签 */
 .play-count-tag {
   flex-shrink: 0;         
   font-size: 0.9em;       
@@ -424,6 +476,7 @@
   transition: color 0.2s; 
 }
 
+/* 悬停效果 */
 .playlist-item:hover {
   background: rgba(160, 120, 255, 0.15);
   color: #ffffff;
@@ -433,6 +486,7 @@
   color: #ffffff;
 }
 
+/* 选中高亮效果 */
 .playlist-item.active {
   background: rgba(160, 120, 255, 0.25);
   color: #fff;
@@ -440,6 +494,7 @@
   animation: softPulse 3s ease-in-out infinite;
 }
 
+/* 列表背景装饰光晕 */
 .elysia-playlist::after {
   content: ""; 
   position: absolute; 
@@ -456,38 +511,36 @@
 .elysia-playlist.show::after { opacity: 1; transform: scale(1.35); }
 .elysia-playlist.hide::after { opacity: 0; transform: scale(0.6); }
 
-/* =========================================
-   6. 动画
-   ========================================= */
-.elysia-playlist.show {
-  opacity: 1; 
-  pointer-events: auto;
-  animation: dockBounceOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transform-origin: 50% 100%;
-}
-.elysia-playlist.hide {
-  animation: dockBounceClose 0.4s cubic-bezier(0.3, 0, 0.7, 0.3) both;
-  transform-origin: 50% 100%;
-}
+/* ==========================================================================
+   10. 动画关键帧 (Animations)
+   ========================================================================== */
+/* 列表打开动画 */
 @keyframes dockBounceOpen {
   0%   { transform: translateX(-50%) scale(0.9) translateY(10px); opacity: 0; }
   60%  { transform: translateX(-50%) scale(1.02) translateY(-2px); opacity: 1; }
   100% { transform: translateX(-50%) scale(1) translateY(0); }
 }
+
+/* 列表关闭动画 */
 @keyframes dockBounceClose {
   0%   { transform: translateX(-50%) scale(1); opacity: 1; }
   35%  { transform: translateX(-50%) scale(1.02); }
   100% { transform: translateX(-50%) scale(0.8) translateY(10px); opacity: 0; }
 }
+
+/* 光斑移动动画 */
 @keyframes moveBlobs { 
   0%,100%{transform:translate3d(0,0,0) scale(1.03);} 
   50%{transform:translate3d(4%,-3%,0) scale(1.05);} 
 }
+
+/* 高亮呼吸动画 */
 @keyframes softPulse { 
   0%,100%{box-shadow:0 0 10px rgba(160,120,255,0.4);} 
   50%{box-shadow:0 0 18px rgba(160,120,255,0.8);} 
 }
 
+/* 播放器悬浮动画 */
 @keyframes elysiaFloat {
   0%, 100% { 
     transform: translateX(-50%) translateY(0) translateZ(0); 
@@ -497,9 +550,9 @@
   }
 }
 
-/* =========================================
-   7. 滚动条美化
-   ========================================= */
+/* ==========================================================================
+   11. 滚动条美化 (Scrollbars)
+   ========================================================================== */
 .playlist-scroll-area::-webkit-scrollbar,
 .elysia-playlist::-webkit-scrollbar {
   width: 4px;

@@ -377,7 +377,7 @@
     /* 修复点 2：16px 字体防止 iOS 放大 */
     font-size: 16px;
     
-    color: #fff;
+    color: #cdbaff;
     font-family: inherit;
     padding: 0;
     margin: 0;

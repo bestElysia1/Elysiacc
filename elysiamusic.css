@@ -303,7 +303,10 @@
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   width: 260px;
-  max-height: 260px;
+  
+  /* --- 修复点 3：固定高度，防止搜索时框体抖动 --- */
+  height: 260px; /* 原为 max-height */
+  
   padding: 10px 14px;
   border-radius: 16px;
   background: rgba(255,240,255,0.25);
@@ -353,12 +356,12 @@
   margin-bottom: 8px; /* 与下方列表的间距 */
   border-radius: 8px;
   
-  /* 更强的背景模糊，防止下方文字透出来太乱 */
-  background: rgba(160, 120, 255, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  /* --- 修复点 1：颜色改为白色磨砂，去除紫色，去除阴影 --- */
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: none;
 }
 
 .playlist-search-bar svg {
@@ -373,7 +376,10 @@
     border: none;
     background: transparent;
     outline: none;
-    font-size: 0.9rem;
+    
+    /* --- 修复点 2：字体设为 16px，防止 iOS 自动放大页面 --- */
+    font-size: 16px;
+    
     color: #fff;
     font-family: inherit;
     padding: 0;
@@ -382,7 +388,7 @@
 }
 
 .playlist-search-bar input::placeholder {
-    color: rgba(205, 186, 255, 0.7);
+    color: rgba(255, 255, 255, 0.5); /* 提示文字颜色淡化 */
 }
 
 /* 列表项通用样式 */

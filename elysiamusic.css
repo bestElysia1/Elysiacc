@@ -298,7 +298,7 @@
 }
 
 /* =========================================
-   5. 播放列表 & 歌单菜单
+   5. 播放列表容器 (固定高度版)
    ========================================= */
 .elysia-playlist {
   position: fixed;
@@ -307,7 +307,11 @@
   transform: translateX(-50%) scale(0.98);
   transform-origin: 50% 100%;
   width: 260px;
-  max-height: 260px;
+  
+  /* --- [关键] 固定高度，防止内容少时抖动 --- */
+  height: 260px;
+  /* max-height: 260px; (已废弃) */
+  
   padding: 10px 14px;
   border-radius: 16px;
   background: rgba(255,240,255,0.25);
@@ -315,14 +319,17 @@
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   box-shadow: 0 8px 24px rgba(200,160,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  overflow-y: auto;
-  overflow-x: hidden;
+  
+  /* --- 布局改为 Flex 垂直排列 --- */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 内部滚动，外层隐藏 */
+  
   touch-action: pan-y;
   overscroll-behavior-x: none;
   opacity: 0; 
   pointer-events: none;
   z-index: 9998;
-  scrollbar-width: thin;
   will-change: transform, opacity;
 }
 
@@ -341,6 +348,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 .playlist-item .song-name {
@@ -435,98 +443,94 @@
 /* =========================================
    7. 滚动条美化
    ========================================= */
-.elysia-playlist::-webkit-scrollbar {
+/* 注意：滚动条现在应用在内部容器 #realSongListContainer 上 */
+#realSongListContainer::-webkit-scrollbar {
   width: 4px;
 }
-.elysia-playlist::-webkit-scrollbar-track {
+#realSongListContainer::-webkit-scrollbar-track {
   background: rgba(255,255,255,0.05);
   border-radius: 4px;
 }
-.elysia-playlist::-webkit-scrollbar-thumb {
+#realSongListContainer::-webkit-scrollbar-thumb {
   background: rgba(255,255,255,0.25);
   border-radius: 4px;
 }
-.elysia-playlist::-webkit-scrollbar-thumb:hover {
+#realSongListContainer::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.4);
 }
 
 /* =========================================
-   8. [修正版] 顶部全局搜索框样式
+   8. [UI重构] 极简单框搜索栏
    ========================================= */
 .search-container {
-  position: sticky;
-  top: 0;
+  position: relative; /* 相对定位，为了放绝对定位的图标 */
   z-index: 10;
-  /* 使用 Flex 布局排列图标和输入框 */
-  display: flex;
-  align-items: center;
-  gap: 8px; /* 图标和输入框的间距 */
-  
-  width: 100%; /* 限制宽度 */
-  box-sizing: border-box; /* 防止 padding 撑大导致溢出 */
-  padding: 0 4px 10px 4px; /* 稍微留点余地 */
-  
-  background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 5px;
+  width: 100%;
+  flex-shrink: 0; /* 防止被压缩 */
+  margin-bottom: 8px;
 }
 
-/* 搜索图标容器 (模仿播放器按钮风格) */
-.search-icon-wrapper {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0; /* 防止被挤压 */
-  backdrop-filter: blur(8px);
-  color: #cdbaff; /* 主题色 */
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
-}
-
-.search-icon-wrapper svg {
+/* 绝对定位的图标 (放在框内) */
+.search-icon-pos {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  fill: currentColor;
+  pointer-events: none; /* 让点击穿透到 input */
+  color: #cdbaff;
   opacity: 0.8;
+  z-index: 12;
+}
+.search-icon-pos svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
 }
 
-/* 输入框样式 */
+/* 输入框样式 (亮色风格，单框) */
 .search-input {
-  flex: 1; /* 占满剩余空间 */
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(0, 0, 0, 0.15);
+  width: 100%;
+  height: 36px;
+  
+  /* 左侧内边距避让图标 */
+  padding: 0 12px 0 34px; 
+  
+  border-radius: 18px; 
+  
+  /* 亮色半透明背景，与播放器控件一致 */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15); 
   color: #fff;
   
-  /* 核心：设置 16px 防止 iOS 自动放大 */
-  font-size: 16px; 
-  
+  font-size: 16px; /* 核心：防止 iOS 放大 */
   outline: none;
   transition: all 0.3s ease;
   backdrop-filter: blur(4px);
-  
-  /* 移除默认外观 */
   -webkit-appearance: none;
   box-sizing: border-box;
 }
 
-.search-input::placeholder {
-  color: rgba(205, 186, 255, 0.5);
-  font-size: 14px; /* placeholder字体可以小一点 */
-}
-
 .search-input:focus {
-  background: rgba(0, 0, 0, 0.25);
-  border-color: rgba(205, 186, 255, 0.5);
-  box-shadow: 0 0 8px rgba(160, 120, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
 }
 
-/* 搜索结果为空时的提示文字 */
+.search-input::placeholder {
+  color: rgba(205, 186, 255, 0.5); 
+}
+
+/* 实际列表容器 (让它占满剩余空间并可滚动) */
+#realSongListContainer {
+  flex: 1; /* 占满剩余高度 */
+  overflow-y: auto; /* 滚动条加在这里 */
+  padding-bottom: 5px;
+  
+  scrollbar-width: thin;
+}
+
 .search-empty-tip {
     padding: 20px;
     text-align: center;
@@ -534,4 +538,3 @@
     font-size: 0.9rem;
     opacity: 0.7;
 }
-

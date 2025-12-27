@@ -1,4 +1,4 @@
-/* elysiamusic.js - Ultimate Final Version (User Logic Integrated) */
+/* elysiamusic.js - Final Version with Fuzzy Search */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -17,7 +17,6 @@ import {
   browserLocalPersistence   
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 引入 Firestore 初始化模块
 import { 
   initializeFirestore, 
   doc, 
@@ -43,7 +42,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 初始化 Firestore 并开启离线持久化
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager()
@@ -55,10 +53,8 @@ const provider = new GoogleAuthProvider();
 
 
 /* =========================================================
-   🔥 PART 1.5: Cloudflare 全局逻辑
+   🔥 PART 1.5: 登录状态检查逻辑 (JS 部分)
    ========================================================= */
-window.isCaptchaVerified = false;
-
 window.checkLoginButtonState = function() {
   const btn = document.getElementById("email-submit-btn");
   const emailInput = document.getElementById("email-input");
@@ -73,34 +69,24 @@ window.checkLoginButtonState = function() {
   const isValid = emailVal.length > 0 && passVal.length >= 6 && window.isCaptchaVerified;
 
   if (isValid) {
-    btn.disabled = false;
-    btn.style.opacity = "1";
-    btn.style.cursor = "pointer";
-    btn.style.filter = "none";
-    btn.style.background = "linear-gradient(135deg, #9c6bff, #7b3fe4)";
-    if (errorMsg && errorMsg.innerText === "请输入邮箱和密码") {
-        errorMsg.innerText = "";
+    if (btn.disabled) {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        btn.style.filter = "none";
+        btn.style.background = "linear-gradient(135deg, #9c6bff, #7b3fe4)";
+        if (errorMsg && errorMsg.innerText === "请输入邮箱和密码") {
+            errorMsg.innerText = "";
+        }
     }
   } else {
-    btn.disabled = true;
-    btn.style.opacity = "0.6";
-    btn.style.cursor = "not-allowed";
-    btn.style.background = ""; 
+    if (!btn.disabled) {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.style.cursor = "not-allowed";
+        btn.style.background = ""; 
+    }
   }
-};
-
-window.onTurnstileSuccess = function(token) {
-  console.log("[Turnstile] 验证成功");
-  window.isCaptchaVerified = true;
-  const err = document.getElementById("auth-error-msg");
-  if (err) err.innerText = "";
-  window.checkLoginButtonState();
-};
-
-window.onTurnstileExpired = function() {
-  console.log("[Turnstile] 验证过期");
-  window.isCaptchaVerified = false;
-  window.checkLoginButtonState();
 };
 
 
@@ -148,10 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "tue", name: "火曜日", filter: (s) => s.category === 'tue' },
     { key: "wed", name: "水曜日", filter: (s) => s.category === 'wed' },
     { key: "thu", name: "木曜日", filter: (s) => s.category === 'thu' },
-    { key: "fri", name: "金曜日", filter: (s) => s.category === 'fri' },
+    { key: "best", name: "金曜日", filter: (s) => s.category === 'best' },
     { key: "sat", name: "土曜日", filter: (s) => s.category === 'sat' },
     { key: "sun", name: "日曜日", filter: (s) => s.category === 'sun' },
     { key: "unknown", name: "前方的区域后面再来探索吧～", filter: (s) => s.category === 'unknown' },
+    { key: "fri", name: "虽然但是年度抖音热歌～", filter: (s) => s.category === 'fri' },
   ];
 
   function updatePlaylistConfig() {
@@ -184,8 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentUser) return; 
     const currentCount = userPlayHistory[songTitle] || 0;
     userPlayHistory[songTitle] = currentCount + 1;
-    console.log(`播放计数增加: ${songTitle} -> ${userPlayHistory[songTitle]}`); 
-
+    
     if (currentPlaylistKey === 'history_rank') {
         renderSongListDOM(); 
     }
@@ -253,13 +239,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const playPauseBtn = document.getElementById("playPauseBtn");
   const nextBtn = document.getElementById("nextBtn");
   const titleEl = document.getElementById("songTitle");
+  
+  // 原始歌单容器
   const songListEl = document.getElementById("playlist"); 
+  // [新增] 真正的歌单列表容器变量
+  let realSongListEl = null; 
+  let searchInputEl = null;
+
   const playlistMenuEl = document.getElementById("playlistMenu");
   const modeBtn = document.getElementById("modeBtn");
   const heartBtn = document.getElementById("heartBtn");
   const playlistTitleBtn = document.getElementById("playlistTitleBtn");
   
-  // 🔥 封面元素获取
   const currentCoverEl = document.getElementById("currentCover");
   const backCoverEl = document.getElementById("backCover");
 
@@ -273,6 +264,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initIcons();
 
+  /* =========================================================
+     [新增] 初始化歌单结构 (搜索框 + 列表)
+     ========================================================= */
+  function initPlaylistStructure() {
+    if (!songListEl) return;
+    
+    // 如果已经初始化过，不再重复创建
+    if (document.getElementById("realSongListContainer")) {
+        realSongListEl = document.getElementById("realSongListContainer");
+        searchInputEl = document.querySelector(".search-input");
+        return;
+    }
+
+    songListEl.innerHTML = '';
+
+    // 创建搜索框
+    const searchBox = document.createElement("div");
+    searchBox.className = "search-container";
+    searchBox.innerHTML = `
+      <input type="text" class="search-input" placeholder="🔍 搜索歌名..." autocomplete="off">
+    `;
+    songListEl.appendChild(searchBox);
+
+    // 创建真正的歌曲列表区域
+    realSongListEl = document.createElement("div");
+    realSongListEl.id = "realSongListContainer";
+    songListEl.appendChild(realSongListEl);
+
+    // 绑定搜索事件
+    searchInputEl = searchBox.querySelector("input");
+    searchInputEl.addEventListener("input", (e) => {
+        const keyword = e.target.value.toLowerCase().trim();
+        const items = realSongListEl.querySelectorAll(".playlist-item");
+        
+        items.forEach(item => {
+            const text = item.querySelector(".song-name").innerText.toLowerCase();
+            if (text.includes(keyword)) {
+                item.style.display = "flex"; 
+            } else {
+                item.style.display = "none"; 
+            }
+        });
+    });
+    
+    // 防止点击搜索框时关闭菜单
+    searchInputEl.addEventListener("click", (e) => e.stopPropagation());
+  }
+
+  // 立即初始化结构
+  initPlaylistStructure();
+
+
   function updateHeartStatus() {
       if (!currentList || !currentList[currentIndex]) return;
       const currentTitle = currentList[currentIndex].title;
@@ -283,30 +326,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 封面更新逻辑 --- */
   function updateCover(song) {
       const coverUrl = song.cover || ''; 
-      
-      // 更新正面封面
       if (currentCoverEl) {
-          if (coverUrl) {
-              currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          } else {
-              currentCoverEl.style.backgroundImage = ''; // CSS 会显示 ♪
-          }
+          if (coverUrl) currentCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          else currentCoverEl.style.backgroundImage = ''; 
       }
-      
-      // 更新背面封面
       if (backCoverEl) {
-          if (coverUrl) {
-              backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
-          } else {
-              backCoverEl.style.backgroundImage = '';
-          }
+          if (coverUrl) backCoverEl.style.backgroundImage = `url('${coverUrl}')`;
+          else backCoverEl.style.backgroundImage = '';
       }
   }
 
-  /* --- 🎵 歌词解析函数 --- */
   function parseLRC(lrcText) {
       if(!lrcText) return [];
       const lines = lrcText.split('\n');
@@ -374,7 +405,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  /* --- 🎵 核心逻辑：更新标题/歌词 (🔥 按照您要求的逻辑整合) --- */
   function updateTitleOrLyric(forceUpdate = false) {
       if (!currentList || !currentList[currentIndex]) return;
       const song = currentList[currentIndex];
@@ -390,7 +420,6 @@ document.addEventListener("DOMContentLoaded", () => {
           textToShow = song.title; 
           titleEl.classList.remove("lyric-mode");
       } else {
-          // 歌词模式
           if (currentLyricIndex === -1 || currentLyricIndex >= currentLyrics.length) {
               textToShow = song.title;
               titleEl.classList.remove("lyric-mode");
@@ -402,30 +431,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const currentHTML = titleEl.querySelector('.scroll-inner')?.innerText;
-      if (!forceUpdate && currentHTML === textToShow) {
-          return; 
-      }
+      if (!forceUpdate && currentHTML === textToShow) return; 
 
-      // 重置 DOM 以强制动画从头开始
       titleEl.innerHTML = `<span class="scroll-inner" style="transform:translateX(0)">${textToShow}</span>`;
       
       const innerSpan = titleEl.querySelector('.scroll-inner');
       const containerWidth = titleEl.clientWidth;
       const textWidth = innerSpan.scrollWidth;
 
-      // 只有溢出时才滚动
       if (textWidth > containerWidth) {
-          // 1. 🔥 您要求的计算逻辑： (文字宽度 / 50) + 1.5
           const duration = (textWidth / 50) + 1.5; 
-          
-          // 2. 🔥 必须计算的偏移量 (保证向左滚动且不回滚)
-          // 容器宽 - 文字宽 - 20px余量 = 负数
           const offset = containerWidth - textWidth - 20;
 
           innerSpan.style.setProperty('--scroll-duration', `${duration}s`);
           innerSpan.style.setProperty('--scroll-offset', `${offset}px`);
           
-          // 3. 强制重绘 (Reflow)
           innerSpan.classList.remove('scrolling');
           void innerSpan.offsetWidth; 
           innerSpan.classList.add('scrolling');
@@ -453,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCover(song);
 
     isLyricsLoading = true;
-    updateTitleOrLyric(true); // 切歌强制刷新
+    updateTitleOrLyric(true); 
 
     fetchLyrics(song);
 
@@ -469,19 +489,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     audio.src = song.src;
 
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
+    if (playMode === 1) audio.loop = true;
+    else audio.loop = false;
     
     renderSongListDOM(); 
     updateMediaSession(song);
     updateHeartStatus();
 
-    if (!isRestore) {
-        savePlaybackState();
-    }
+    if (!isRestore) savePlaybackState();
   }
 
   function togglePlay() {
@@ -490,31 +505,24 @@ document.addEventListener("DOMContentLoaded", () => {
       playPauseBtn.innerHTML = ICONS.pause;
       playPauseBtn.classList.add("playing"); 
       player.classList.add("playing");
-      
       if(currentCoverEl) currentCoverEl.classList.add("playing");
-      
       updateTitleOrLyric(true); 
-
     } else {
       audio.pause();
       playPauseBtn.innerHTML = ICONS.play;
       playPauseBtn.classList.remove("playing");
       player.classList.remove("playing");
-      
       if(currentCoverEl) currentCoverEl.classList.remove("playing");
-      
       updateTitleOrLyric(true); 
     }
   }
 
   function playNext(isAuto = false) {
     let nextIndex;
-    
     if (playMode === 1 && isAuto) { 
       if (audio.paused) audio.play(); 
       return; 
     } 
-
     if (playMode === 2) { 
       if (shuffleQueue.length === 0) {
         shuffleQueue = getShuffledIndices(currentList.length);
@@ -535,9 +543,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleMenu(el) {
-    if (el.classList.contains("show")) {
-      hideMenu(el);
-    } else {
+    if (el.classList.contains("show")) hideMenu(el);
+    else {
       el.classList.remove("hide");
       el.classList.add("show");
     }
@@ -549,9 +556,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* =========================================================
+     [修改] 渲染列表逻辑 (只更新列表体，保留搜索框)
+     ========================================================= */
   function renderSongListDOM() {
-    if (!songListEl) return;
-    songListEl.innerHTML = currentList.map((s, i) => {
+    if (!realSongListEl) initPlaylistStructure();
+    if (!realSongListEl) return;
+
+    realSongListEl.innerHTML = currentList.map((s, i) => {
       const count = userPlayHistory[s.title] || 0;
       let countHtml = '';
       if (currentPlaylistKey === 'history_rank') {
@@ -563,6 +575,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ${countHtml}
       </div>
     `}).join("");
+
+    // 重新应用过滤（如果搜索框里有字）
+    if (searchInputEl && searchInputEl.value.trim() !== "") {
+        searchInputEl.dispatchEvent(new Event('input'));
+    }
   }
 
   titleEl.addEventListener("click", (e) => {
@@ -609,9 +626,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* =========================================================
+     [修改] 切换歌单逻辑 (清空搜索框)
+     ========================================================= */
   function changePlaylist(key) {
     const config = playlistsConfig.find(c => c.key === key);
     if (!config) return;
+    
+    // 切换时清空搜索
+    if (searchInputEl) searchInputEl.value = "";
+
     currentPlaylistKey = key;
     playlistTitleBtn.textContent = config.name; 
     
@@ -637,7 +661,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if(currentCoverEl) currentCoverEl.classList.add("playing");
     } else {
         titleEl.textContent = "暂无数据";
-        songListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
+        // 清空列表容器而不是整个 songListEl
+        if (realSongListEl) {
+             realSongListEl.innerHTML = "<div style='padding:15px;text-align:center;color:#999'>还没有播放记录哦</div>";
+        }
     }
 
     renderPlaylistMenu();
@@ -650,11 +677,8 @@ document.addEventListener("DOMContentLoaded", () => {
     playMode = (playMode + 1) % 3;
     modeBtn.innerHTML = playModes[playMode].icon;
 
-    if (playMode === 1) {
-        audio.loop = true;
-    } else {
-        audio.loop = false;
-    }
+    if (playMode === 1) audio.loop = true;
+    else audio.loop = false;
 
     if (currentUser) {
         const userDocRef = doc(db, "users", currentUser.uid);
@@ -671,7 +695,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentUser) {
       alert("请先登录才能收藏歌曲哦~");
       const modal = document.getElementById("login-modal-overlay");
-      if(modal) modal.classList.add("active");
+      if(modal) {
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false"); 
+      }
       return;
     }
     const currentSong = currentList[currentIndex];
@@ -808,13 +835,11 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTitleOrLyric(true); 
   });
 
-  /* --- 🔥 timeupdate 监听器 (无进度条版) --- */
   let lastTimeForLoop = 0; 
 
   audio.addEventListener('timeupdate', () => { 
     if (Math.floor(audio.currentTime) % 5 === 0) updatePositionState();
     
-    // --- 歌词逻辑 (核心修复) ---
     if (!audio.paused && hasLyrics && currentLyrics.length > 0 && !isLyricsLoading) {
         const currentTime = audio.currentTime;
         let activeIndex = -1;
@@ -827,14 +852,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // 仅当歌词改变时触发 DOM 更新 (防抖 + 重置动画)
         if (activeIndex !== currentLyricIndex) {
             currentLyricIndex = activeIndex;
             updateTitleOrLyric(true); 
         }
     }
 
-    // 单曲循环计数
     if (playMode === 1 && audio.duration > 0) {
         if (audio.currentTime < lastTimeForLoop && lastTimeForLoop > audio.duration - 1.5) {
              const now = Date.now();
@@ -849,7 +872,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastTimeForLoop = audio.currentTime; 
     
-    // 进度保存
     const now = Date.now();
     if (now - lastSaveTime > 10000 && !audio.paused) { 
         savePlaybackState();
@@ -864,7 +886,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   resetTimer();
-  
   if(allSongsLibrary.length > 0) loadSong(0);
 
   /* =========================================================
@@ -1002,11 +1023,8 @@ document.addEventListener("DOMContentLoaded", () => {
                  playMode = data.playMode; 
                  modeBtn.innerHTML = playModes[playMode].icon; 
                  
-                 if (playMode === 1) {
-                     audio.loop = true;
-                 } else {
-                     audio.loop = false;
-                 }
+                 if (playMode === 1) audio.loop = true;
+                 else audio.loop = false;
              }
              
              if (!initialRestoreDone && data.lastPlayed && audio.paused && audio.currentTime === 0) {
@@ -1071,5 +1089,15 @@ document.addEventListener("DOMContentLoaded", () => {
       updateHeartStatus();
     }
   });
+
+  const autofillInterval = setInterval(() => {
+    if (currentUser) {
+      clearInterval(autofillInterval);
+      return;
+    }
+    if (typeof window.checkLoginButtonState === 'function') {
+      window.checkLoginButtonState();
+    }
+  }, 500);
 
 });

@@ -1,4 +1,4 @@
-/* elysiamusic.js - Final Version with Search & Jump Function */
+/* elysiamusic.js - Final Version (Search, Jump, Sync, Firebase) */
 
 /* =========================================================
    🔥 PART 1: Firebase 初始化 & 配置
@@ -242,22 +242,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const titleEl = document.getElementById("songTitle");
   
-  // 🔥 歌单容器 & 动态结构调整
+  // 🔥 歌单容器 & 动态结构调整 (支持搜索)
   const originalPlaylistEl = document.getElementById("playlist"); 
   let playlistScrollArea = null;
   let searchInput = null;
 
-  /* --- 动态重构播放列表结构以支持置顶搜索栏 --- */
+  /* --- 动态重构播放列表结构 --- */
   if (originalPlaylistEl && !originalPlaylistEl.querySelector('.playlist-scroll-area')) {
-      // 1. 清空原内容（通常是空的，或者是预渲染的）
+      // 1. 清空原内容
       originalPlaylistEl.innerHTML = '';
       
       // 2. 创建搜索栏
       const searchContainer = document.createElement('div');
       searchContainer.className = 'playlist-search-bar';
+      // 修复：将 placeholder 设为空字符串，实现界面无提示字
       searchContainer.innerHTML = `
           ${ICONS.search}
-          <input type="text" placeholder="搜索歌曲..." spellcheck="false">
+          <input type="text" placeholder="" spellcheck="false">
       `;
       searchInput = searchContainer.querySelector('input');
       
@@ -286,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
       searchInput.addEventListener('click', (e) => e.stopPropagation());
   }
 
-  // 使用新的滚动区域作为列表渲染目标，如果不存在则回退到原元素
+  // 使用新的滚动区域作为列表渲染目标
   const songListTarget = playlistScrollArea || originalPlaylistEl;
 
   const playlistMenuEl = document.getElementById("playlistMenu");
@@ -471,9 +472,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 如果是搜索状态下切歌，需要刷新列表以高亮当前歌曲（如果还在搜索结果中）
     if (!searchInput || !searchInput.value) {
         renderSongListDOM(); 
-    } else {
-        // 如果正在搜索，可能需要重绘搜索结果来高亮，或者不做操作
-        // 这里选择不做操作，保持搜索结果显示
     }
     
     updateMediaSession(song);
@@ -635,10 +633,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 playPauseBtn.classList.add("playing");
                 if(currentCoverEl) currentCoverEl.classList.add("playing");
                 
-                // 清空搜索并关闭列表 (可选，如果你想保留列表打开则注释掉 hideMenu)
+                // 清空搜索
                 if (searchInput) searchInput.value = '';
-                // hideMenu(originalPlaylistEl); 
-                // 或者重新渲染列表以显示高亮
+                // 重新渲染列表以显示高亮
                 renderSongListDOM();
                 setTimeout(() => {
                     const activeItem = songListTarget.querySelector('.playlist-item.active');
@@ -706,23 +703,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = 0;
     
     if (currentList.length > 0) {
-        // 如果是自动跳转触发的，不需要立即 loadSong(0) 重置，由调用方处理 loadSong
-        // 但这里是通用切换函数，通常会重置到第一首。
-        // 为了配合搜索跳转，我们在搜索逻辑里手动 loadSong，这里仅更新列表数据
-        // 因此：如果是用户点击菜单切换 -> 需要 loadSong(0)
-        // 如果是代码调用 -> 我们通过标志位或检查 play 状态来决定？
-        // 简化逻辑：这里总是 loadSong(0)，搜索逻辑会在调用 changePlaylist 后立即覆盖 loadSong(targetIndex)
         loadSong(0);
-        
-        // 注意：搜索跳转时会连续触发两次 loadSong，第二次会覆盖第一次，这是可接受的
-        
-        // audio.play()... 只有在用户显式点击菜单时才自动播放在这里可能不合适
-        // 保持原逻辑：
         if (playPauseBtn.classList.contains("playing")) { 
              audio.play().catch(e => console.warn("Autoplay blocked:", e));
-        } else {
-             // 如果原本是暂停的，切换歌单后是否自动播放？通常 UI 上是期望播放第一首的
-             // 这里为了搜索体验顺滑，暂时保持状态，搜索点击会强制 play
         }
     } else {
         titleEl.textContent = "暂无数据";
@@ -734,7 +717,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   renderPlaylistMenu();
 
-  /* ... 后续事件监听保持不变 ... */
+  /* ... 后续事件监听 ... */
   modeBtn.addEventListener('click', async (e) => {
     e.stopPropagation(); 
     playMode = (playMode + 1) % 3;
@@ -1121,7 +1104,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     } else {
       if (navAuthText) navAuthText.innerText = "登录 / 同步";
-      if (navAuthIconSlot) navAuthIconSlot.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
+      if (navAuthIconSlot) navAuthIconSlot.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
       if (loginActionsDiv) loginActionsDiv.style.display = "block";
       if (userInfoPanel) userInfoPanel.style.display = "none";
       userFavorites = [];
